@@ -1,4 +1,4 @@
-import { HoudiniClient } from '$houdini';
+import { HoudiniClient } from 'houdini';
 
 export default new HoudiniClient({
 	url: 'http://localhost:8000/api/v1/graphql',

@@ -23,7 +23,6 @@ import type { ComponentSupportInterface } from "$rete/components/ComponentSuppor
 import type { BaseComponent } from "$rete/components/BaseComponent";
 import { PythonNodeComponent } from "$rete/components/Python_NC";
 import { R_SocketSelection_NC } from "$rete/components/R_SocketSelection_NC";
-import { GraphVersionStore } from "$houdini";
 import { get } from "svelte/store";
 import { _ } from "$lib/global";
 

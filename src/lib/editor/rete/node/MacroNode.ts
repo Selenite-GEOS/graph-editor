@@ -1,4 +1,4 @@
-import { GetGraphStore, GraphVersionStore } from "$houdini";
+// import { GetGraphStore, GraphVersionStore } from "$houdini";
 import {
   Input,
   Node,
@@ -427,15 +427,15 @@ export class MacroNode extends Node {
     return res;
   }
 
-  async isOutdated(): Promise<boolean> {
-    const version = (
-      await new GraphVersionStore().fetch({
-        variables: {
-          id: this.graphId,
-        },
-      })
-    ).data?.graph.graph.version;
-    if (version === undefined) throw new Error("Failed to fetch graph version");
-    return version !== this.params.graphVersion;
-  }
+  // async isOutdated(): Promise<boolean> {
+  //   const version = (
+  //     await new GraphVersionStore().fetch({
+  //       variables: {
+  //         id: this.graphId,
+  //       },
+  //     })
+  //   ).data?.graph.graph.version;
+  //   if (version === undefined) throw new Error("Failed to fetch graph version");
+  //   return version !== this.params.graphVersion;
+  // }
 }

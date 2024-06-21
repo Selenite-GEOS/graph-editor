@@ -11,7 +11,7 @@
 	import { XmlNode, type Node, type NodeEditorSaveData, Input } from '$rete';
 	import Fa from 'svelte-fa';
 	import { EditMacroNodeChannel } from '$lib/broadcast-channels';
-	import { GetGraphStore } from '$houdini';
+	// import { GetGraphStore } from '$houdini';
 	import { fade } from 'svelte/transition';
 	import { newLocalId } from '$lib/utils';
 	import { VariableNode } from '$rete/node/XML/VariableNode';
@@ -70,18 +70,18 @@
 
 	let outdated = false;
 
-	async function onDblClickNode() {
-		console.log('Double click on node');
-		if (macroNode === undefined) return;
-		console.log('Double click on macro node');
-		const graph = (await new GetGraphStore().fetch({ variables: { id: macroNode.graphId } })).data
-			?.graph.graph;
-		if (graph === undefined) throw new Error('Graph not found');
-		const saveData = graph.editorData as NodeEditorSaveData;
-		new EditMacroNodeChannel().postMessage({
-			graph: saveData
-		});
-	}
+	// async function onDblClickNode() {
+	// 	console.log('Double click on node');
+	// 	if (macroNode === undefined) return;
+	// 	console.log('Double click on macro node');
+	// 	const graph = (await new GetGraphStore().fetch({ variables: { id: macroNode.graphId } })).data
+	// 		?.graph.graph;
+	// 	if (graph === undefined) throw new Error('Graph not found');
+	// 	const saveData = graph.editorData as NodeEditorSaveData;
+	// 	new EditMacroNodeChannel().postMessage({
+	// 		graph: saveData
+	// 	});
+	// }
 	const isVariable = data instanceof VariableNode;
 	let highlight = false;
 	if (isVariable) {

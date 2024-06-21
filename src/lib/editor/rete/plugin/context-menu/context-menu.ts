@@ -12,7 +12,7 @@ import type { NodeFactory } from "../../node/NodeFactory";
 import {
   GeosXmlSchemaStore as GetXmlSchemaStore,
   PendingValue,
-} from "$houdini";
+} from "houdini";
 import { XmlNode } from "$rete/node/XML/XmlNode";
 import type { XmlAttributeDefinition } from "$rete/node/XML/types";
 import {
@@ -45,6 +45,7 @@ import { EditorType } from "$lib/editor";
 import { VariableNode } from "$rete/node/XML/VariableNode";
 import type { Variable } from "$lib/editor/overlay/variables-list";
 import { newUuid } from "$utils";
+import { stringify } from "uuid";
 
 type Entry = Map<string, Entry | (() => Node | Promise<Node>)>;
 function isClassConstructor(obj: unknown): boolean {
@@ -145,9 +146,14 @@ export class ContextMenuSetup extends Setup {
 
       // items.push([file, () => new node()]);
     }
-
-    const xmlSchema = (await new GetXmlSchemaStore().fetch()).data?.geos
-      .xmlSchema;
+    return;
+    // const xmlSchema = (await new GetXmlSchemaStore().fetch()).data?.geos
+    //   .xmlSchema;
+    const xmlSchema: {
+      complexTypes: ({ name: string, attributes: {name: string}[] } | typeof PendingValue)[];
+    } = {
+      complexTypes: []
+    }
 
     const newMoonItems: IBaseMenuItem[] = [];
 

@@ -26,7 +26,7 @@
   export {classes as class};
   import type { UUID } from "crypto";
   import type { Node } from "$rete";
-  import { GetGraphStore } from "$houdini";
+  // import { GetGraphStore } from "$houdini";
   import { translateNodeFromGlobal } from "$utils/html";
   import type { ConnectionDropEvent } from "$rete/setup/ConnectionSetup";
   import type { spawnMoonMenu as t_spawnMoonMenu } from "$lib/menu/context-menu/moonContextMenu";
@@ -201,56 +201,56 @@
     });
     return visibleNodes;
   }
-  async function onDrop(event: DragEvent) {
-    if (!factory) throw new Error("No factory");
-    if (!MacroNode) throw new Error("No MacroNode");
-    const type = event.dataTransfer?.types[0];
+  // async function onDrop(event: DragEvent) {
+  //   if (!factory) throw new Error("No factory");
+  //   if (!MacroNode) throw new Error("No MacroNode");
+  //   const type = event.dataTransfer?.types[0];
 
-    if (type === "rete/macronode") {
-      const graphId = event.dataTransfer?.getData("rete/macronode") as UUID;
-      if (!graphId) throw new Error("No graph id");
-      const graph = (
-        await new GetGraphStore().fetch({ variables: { id: graphId } })
-      ).data?.graph.graph;
-      if (!graph) throw new Error("Graph not found");
-      console.log("Dropped", graph.name);
-      const saveData = graph.editorData as NodeEditorSaveData;
-      const node = await factory.addNode(MacroNode, {
-        saveData: saveData,
-        graphId,
-        graphVersion: graph.version,
-      });
-      if (!node) throw new Error("Node not created");
-      // Move node to drop position
-      translateNodeFromGlobal({
-        center: false,
-        globalPos: { x: event.clientX, y: event.clientY },
-        node,
-        factory,
-      });
-    }
+  //   if (type === "rete/macronode") {
+  //     const graphId = event.dataTransfer?.getData("rete/macronode") as UUID;
+  //     if (!graphId) throw new Error("No graph id");
+  //     const graph = (
+  //       await new GetGraphStore().fetch({ variables: { id: graphId } })
+  //     ).data?.graph.graph;
+  //     if (!graph) throw new Error("Graph not found");
+  //     console.log("Dropped", graph.name);
+  //     const saveData = graph.editorData as NodeEditorSaveData;
+  //     const node = await factory.addNode(MacroNode, {
+  //       saveData: saveData,
+  //       graphId,
+  //       graphVersion: graph.version,
+  //     });
+  //     if (!node) throw new Error("Node not created");
+  //     // Move node to drop position
+  //     translateNodeFromGlobal({
+  //       center: false,
+  //       globalPos: { x: event.clientX, y: event.clientY },
+  //       node,
+  //       factory,
+  //     });
+  //   }
 
-    if (type === "application/graph-variable") {
-      console.log("ctrl", event.ctrlKey, "alt", event.altKey);
-      const variable = JSON.parse(
-        event.dataTransfer?.getData("application/graph-variable") ?? "{}"
-      ) as Variable;
-      console.log("Dropped variable", variable);
-      const node = await factory.addNode(VariableNode, {
-        variableId: variable.id,
-      });
-      if (!node) throw new Error("Node not created");
-      // Move node to drop position
-      translateNodeFromGlobal({
-        globalPos: { x: event.clientX, y: event.clientY },
-        center: true,
-        node,
-        factory,
-      });
-    }
+  //   if (type === "application/graph-variable") {
+  //     console.log("ctrl", event.ctrlKey, "alt", event.altKey);
+  //     const variable = JSON.parse(
+  //       event.dataTransfer?.getData("application/graph-variable") ?? "{}"
+  //     ) as Variable;
+  //     console.log("Dropped variable", variable);
+  //     const node = await factory.addNode(VariableNode, {
+  //       variableId: variable.id,
+  //     });
+  //     if (!node) throw new Error("Node not created");
+  //     // Move node to drop position
+  //     translateNodeFromGlobal({
+  //       globalPos: { x: event.clientX, y: event.clientY },
+  //       center: true,
+  //       node,
+  //       factory,
+  //     });
+  //   }
 
-    // nodeView.translate(event.clientX - surfacePos.x, event.clientY - surfacePos.y);
-  }
+  //   // nodeView.translate(event.clientX - surfacePos.x, event.clientY - surfacePos.y);
+  // }
 
   function onConnectionDrop(event: ConnectionDropEvent) {
     if (!spawnMoonMenu) throw new Error("No spawnMoonMenu");
