@@ -41,7 +41,6 @@
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-svelte": "^2.36.0",
-    "fast-xml-parser": "^4.4.0",
     "globals": "^15.0.0",
     "houdini": "^1.2.47",
     "houdini-svelte": "^1.2.47",
@@ -60,6 +59,7 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {
+    "fast-xml-parser": "^4.4.0",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "autoprefixer": "^10.4.19",
