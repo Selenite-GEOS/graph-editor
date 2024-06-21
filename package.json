@@ -21,8 +21,8 @@
     }
   },
   "files": [
-    "dist/**/*.js",
-    "dist/**/*.ts",
+    "dist",
+    "!dist/**/*.svelte",
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*"
   ],
