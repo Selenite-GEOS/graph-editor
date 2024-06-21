@@ -101,55 +101,55 @@ export async function setupEditor(params: {
       });
       nodeFactory.selectableNodes = selectableNodes;
     }
-
-    // Setup react renderer
-    const megaSetup = new MegaSetup({ render });
-    megaSetup.setup(editor, nodeFactoryParams.area, nodeFactory, geosContext, geosContextV2);
-
-
-
-    let nodesToFocus: Node[] = [];
-    let isExample = false;
-    if (loadExample && saveData === undefined) {
-      isExample = true;
-      nodesToFocus = await loadExample(nodeFactory);
-      await arrange.layout();
-    }
-
-    if (saveData) {
-      await nodeFactory.loadGraph(saveData);
-      nodesToFocus = editor.getNodes();
-    }
-
-
-    // await AreaExtensions.zoomAt(area, nodesToFocus);
-
-    console.log("Editor setup");
-
-    return {
-      destroy: () => area?.destroy(),
-      firstDisplay: async () => {
-        nodeFactory.dataflowEngine.reset();
-        nodeFactory.process();
-        editor.addPipe((context) => {
-          if (
-            context.type === "connectioncreated" ||
-            context.type === "connectionremoved"
-          ) {
-            const conn = context.data;
-            console.log("resetting node", conn.target);
-            nodeFactory.dataflowEngine.reset(conn.target);
-          }
-
-          return context;
-        });
-        // if (isExample)
-        // 	await arrange.layout();
-        if (nodeFactoryParams.area)
-          await AreaExtensions.zoomAt(nodeFactoryParams.area, nodesToFocus);
-      },
-      editor,
-      factory: nodeFactory,
-    };
   }
+
+  // Setup react renderer
+  const megaSetup = new MegaSetup({ render });
+  megaSetup.setup(editor, nodeFactoryParams.area, nodeFactory, geosContext, geosContextV2);
+
+
+
+  let nodesToFocus: Node[] = [];
+  let isExample = false;
+  if (loadExample && saveData === undefined) {
+    isExample = true;
+    nodesToFocus = await loadExample(nodeFactory);
+    await arrange.layout();
+  }
+
+  if (saveData) {
+    await nodeFactory.loadGraph(saveData);
+    nodesToFocus = editor.getNodes();
+  }
+
+
+  // await AreaExtensions.zoomAt(area, nodesToFocus);
+
+  console.log("Editor setup");
+
+  return {
+    destroy: () => nodeFactoryParams.area?.destroy(),
+    firstDisplay: async () => {
+      nodeFactory.dataflowEngine.reset();
+      nodeFactory.process();
+      editor.addPipe((context) => {
+        if (
+          context.type === "connectioncreated" ||
+          context.type === "connectionremoved"
+        ) {
+          const conn = context.data;
+          console.log("resetting node", conn.target);
+          nodeFactory.dataflowEngine.reset(conn.target);
+        }
+
+        return context;
+      });
+      // if (isExample)
+      // 	await arrange.layout();
+      if (nodeFactoryParams.area)
+        await AreaExtensions.zoomAt(nodeFactoryParams.area, nodesToFocus);
+    },
+    editor,
+    factory: nodeFactory,
+  };
 }
