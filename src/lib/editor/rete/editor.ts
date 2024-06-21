@@ -22,13 +22,13 @@ import { HistoryPlugin } from "$rete/plugin/history";
 import { CommentPlugin, CommentExtensions } from "$rete/plugin/CommentPlugin";
 import { getModalStore } from "$lib/global";
 export async function setupEditor(params: {
-  container: HTMLElement;
-  makutuClasses: MakutuClassRepository;
+  container?: HTMLElement;
+  makutuClasses?: MakutuClassRepository;
   loadExample?: EditorExample;
   saveData?: NodeEditorSaveData;
   geosContext: GeosDataContext;
   geosContextV2: NewGeosContext;
-  modalStore: ReturnType<typeof getModalStore>;
+  modalStore?: ReturnType<typeof getModalStore>;
   render?: boolean
 }) {
   const {
@@ -49,91 +49,107 @@ export async function setupEditor(params: {
   const arrange = new AutoArrangePlugin<Schemes>();
   arrange.addPreset(ArrangePresets.classic.setup());
 
-  const area = new AreaPlugin<Schemes, AreaExtra>(container);
-  editor.use(area);
+  const nodeFactoryParams: ConstructorParameters<typeof NodeFactory>[0] = {
+    editor,
+  }
+  if (container) {
+    const area = new AreaPlugin<Schemes, AreaExtra>(container);
+    editor.use(area);
 
-  const selector = AreaExtensions.selector();
-  const accumulating = AreaExtensions.accumulateOnCtrl();
+    const selector = AreaExtensions.selector();
+    const accumulating = AreaExtensions.accumulateOnCtrl();
 
-  const history = new HistoryPlugin<Schemes>();
-  history.addPreset(HistoryPresets.classic.setup());
-  area.use(history);
+    const history = new HistoryPlugin<Schemes>();
+    history.addPreset(HistoryPresets.classic.setup());
+    area.use(history);
+
+    nodeFactoryParams.area = area;
+    nodeFactoryParams.history = history;
+    nodeFactoryParams.selector = selector;
+    nodeFactoryParams.accumulating = accumulating;
+  }
+
+
 
   // Setup node factory
   const nodeFactory = new NodeFactory({
-    editor,
-    area,
+    ...nodeFactoryParams,
     makutuClasses,
-    selector,
     arrange,
-    history,
     modalStore,
-    accumulating,
   });
-
-  // Setup comments
-  const comment = new CommentPlugin<Schemes, AreaExtra>({
-    factory: nodeFactory,
-  });
-  CommentExtensions.selectable<Schemes, AreaExtra>(
-    comment,
-    selector,
-    accumulating,
-  );
-  area.use(comment);
-
-  nodeFactory.comment = comment;
-  // Setup react renderer
-  const megaSetup = new MegaSetup({render});
-  megaSetup.setup(editor, area, nodeFactory, geosContext, geosContextV2);
-
-  area.use(arrange);
-  AreaExtensions.showInputControl(area);
-  const selectableNodes = AreaExtensions.selectableNodes(area, selector, {
-    accumulating,
-  });
-  nodeFactory.selectableNodes = selectableNodes;
-
-  let nodesToFocus: Node[] = [];
-  let isExample = false;
-  if (loadExample && saveData === undefined) {
-    isExample = true;
-    nodesToFocus = await loadExample(nodeFactory);
-    await arrange.layout();
-  }
-
-  if (saveData) {
-    await nodeFactory.loadGraph(saveData);
-    nodesToFocus = editor.getNodes();
-  }
-
-  AreaExtensions.simpleNodesOrder(area);
-  // await AreaExtensions.zoomAt(area, nodesToFocus);
-
-  console.log("Editor setup");
-
-  return {
-    destroy: () => area.destroy(),
-    firstDisplay: async () => {
-      nodeFactory.dataflowEngine.reset();
-      nodeFactory.process();
-      editor.addPipe((context) => {
-        if (
-          context.type === "connectioncreated" ||
-          context.type === "connectionremoved"
-        ) {
-          const conn = context.data;
-          console.log("resetting node", conn.target);
-          nodeFactory.dataflowEngine.reset(conn.target);
-        }
-
-        return context;
+  if (container) {
+    const { area, selector, accumulating } = nodeFactoryParams;
+    if (area && selector && accumulating) {
+      // Setup comments
+      const comment = new CommentPlugin<Schemes, AreaExtra>({
+        factory: nodeFactory,
       });
-      // if (isExample)
-      // 	await arrange.layout();
-      await AreaExtensions.zoomAt(area, nodesToFocus);
-    },
-    editor,
-    factory: nodeFactory,
-  };
+      CommentExtensions.selectable<Schemes, AreaExtra>(
+        comment,
+        selector,
+        accumulating,
+      );
+      area.use(comment);
+
+      nodeFactory.comment = comment;
+      area.use(arrange);
+      AreaExtensions.showInputControl(area);
+      AreaExtensions.simpleNodesOrder(area);
+      const selectableNodes = AreaExtensions.selectableNodes(area, selector, {
+        accumulating,
+      });
+      nodeFactory.selectableNodes = selectableNodes;
+    }
+
+    // Setup react renderer
+    const megaSetup = new MegaSetup({ render });
+    megaSetup.setup(editor, nodeFactoryParams.area, nodeFactory, geosContext, geosContextV2);
+
+
+
+    let nodesToFocus: Node[] = [];
+    let isExample = false;
+    if (loadExample && saveData === undefined) {
+      isExample = true;
+      nodesToFocus = await loadExample(nodeFactory);
+      await arrange.layout();
+    }
+
+    if (saveData) {
+      await nodeFactory.loadGraph(saveData);
+      nodesToFocus = editor.getNodes();
+    }
+
+
+    // await AreaExtensions.zoomAt(area, nodesToFocus);
+
+    console.log("Editor setup");
+
+    return {
+      destroy: () => area?.destroy(),
+      firstDisplay: async () => {
+        nodeFactory.dataflowEngine.reset();
+        nodeFactory.process();
+        editor.addPipe((context) => {
+          if (
+            context.type === "connectioncreated" ||
+            context.type === "connectionremoved"
+          ) {
+            const conn = context.data;
+            console.log("resetting node", conn.target);
+            nodeFactory.dataflowEngine.reset(conn.target);
+          }
+
+          return context;
+        });
+        // if (isExample)
+        // 	await arrange.layout();
+        if (nodeFactoryParams.area)
+          await AreaExtensions.zoomAt(nodeFactoryParams.area, nodesToFocus);
+      },
+      editor,
+      factory: nodeFactory,
+    };
+  }
 }

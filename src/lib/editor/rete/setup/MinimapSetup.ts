@@ -10,9 +10,9 @@ export class MinimapSetup extends Setup {
   private minimap = new MinimapPlugin<Schemes>();
   setup(
     editor: NodeEditor,
-    area: AreaPlugin<Schemes, AreaExtra>,
+    area: AreaPlugin<Schemes, AreaExtra> | undefined,
     factory: NodeFactory,
   ): void {
-    area.use(this.minimap);
+    area?.use(this.minimap);
   }
 }

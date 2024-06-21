@@ -128,7 +128,7 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 export class ConnectionSetup extends Setup {
   setup(
     editor: NodeEditor,
-    area: AreaPlugin<Schemes, AreaExtra>,
+    area: AreaPlugin<Schemes, AreaExtra> | undefined,
     factory: NodeFactory,
   ): void {
     // let lastButtonClicked : number;
@@ -242,6 +242,6 @@ export class ConnectionSetup extends Setup {
       }
       return ctx;
     });
-    area.use(connection);
+    area?.use(connection);
   }
 }

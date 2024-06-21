@@ -9,7 +9,7 @@ import type { NewGeosContext } from "$lib/global";
 export abstract class Setup {
   abstract setup(
     editor: NodeEditor,
-    area: AreaPlugin<Schemes, AreaExtra>,
+    area: AreaPlugin<Schemes, AreaExtra> | undefined,
     factory: NodeFactory,
     geos: GeosDataContext,
     geosContextV2: NewGeosContext,

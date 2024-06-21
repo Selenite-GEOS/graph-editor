@@ -28,7 +28,7 @@ export class MegaSetup extends Setup {
 
   async setup(
     editor: NodeEditor,
-    area: AreaPlugin<Schemes, AreaExtra>,
+    area: AreaPlugin<Schemes, AreaExtra> | undefined,
     factory: NodeFactory,
     geos: GeosDataContext,
     geosContextV2: NewGeosContext,

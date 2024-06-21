@@ -10,10 +10,10 @@ export class AreaSetup extends Setup {
   private lastClicked: HTMLElement | null = null;
   setup(
     editor: NodeEditor,
-    area: AreaPlugin<Schemes, AreaExtra>,
+    area: AreaPlugin<Schemes, AreaExtra> | undefined,
     factory: NodeFactory,
   ): void {
-    area.addPipe((ctx) => {
+    area?.addPipe((ctx) => {
       const ignored: (AreaExtra | Area2D<Schemes> | Root<Schemes>)["type"][] = [
         "unmount",
         "pointermove",
