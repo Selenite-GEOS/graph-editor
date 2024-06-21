@@ -33,10 +33,10 @@ export class MegaSetup extends Setup {
     geos: GeosDataContext,
     geosContextV2: NewGeosContext,
   ) {
-    if (this.render) {
-      const { RenderSetup } = await import("../customization/render");
-      this.toSetup.push(new RenderSetup());
-    }
+    // if (this.render) {
+    //   const { RenderSetup } = await import("../customization/render");
+    //   this.toSetup.push(new RenderSetup());
+    // }
     for (const setup of this.toSetup) {
       setup.setup(editor, area, factory, geos, geosContextV2);
     }
