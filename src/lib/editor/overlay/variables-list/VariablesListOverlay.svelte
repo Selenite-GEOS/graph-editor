@@ -20,14 +20,14 @@
 
 	let variables: Writable<Record<string, Variable>> | undefined = undefined;
 	let setVarsUndefinedTimeout: NodeJS.Timeout | undefined;
-	$: {
-		if ($activeEditor?.variables) {
-			clearTimeout(setVarsUndefinedTimeout);
-			variables = $activeEditor.variables;
-		} else {
-			setVarsUndefinedTimeout = setTimeout(() => (variables = undefined), 100);
-		}
-	}
+	// $: {
+	// 	if ($activeEditor?.variables) {
+	// 		clearTimeout(setVarsUndefinedTimeout);
+	// 		variables = $activeEditor.variables;
+	// 	} else {
+	// 		setVarsUndefinedTimeout = setTimeout(() => (variables = undefined), 100);
+	// 	}
+	// }
 
 	// let localId = newLocalId('variable');
 	// variables[localId] = { name: 'variable1', value: 'value1', type: 'string', localId };
