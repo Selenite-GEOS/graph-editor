@@ -147,6 +147,9 @@ importers:
       publint:
         specifier: ^0.1.9
         version: 0.1.16
+      rete-svelte-plugin:
+        specifier: ^2.0.1
+        version: 2.0.1(rete-area-plugin@2.0.4(rete@2.0.3))(rete-render-utils@2.0.2(rete-area-plugin@2.0.4(rete@2.0.3))(rete@2.0.3))(rete@2.0.3)(sass@1.77.6)(svelte@4.2.18)
       svelte-check:
         specifier: ^3.6.0
         version: 3.8.1(postcss-load-config@4.0.2(postcss@8.4.38))(postcss@8.4.38)(sass@1.77.6)(svelte@4.2.18)
@@ -2273,6 +2276,15 @@ packages:
     resolution: {integrity: sha512-8S7zkoHLnDOz7T9L4qfwp6efdp790wk3sZBF2qsHLtHJIyAxC8lDNNngy7R2Eh762nadgfcn/ItHpLPmpXQGeQ==}
     peerDependencies:
       rete: ^2.0.1
+
+  rete-svelte-plugin@2.0.1:
+    resolution: {integrity: sha512-a92+/iL2hPh7yLkIquwx1kGk1PgUaJG5RNWWWMxMcQTP9G4cBfSUm2JB0K0SAl707ufLhGSeySE8uDuf11KVjA==}
+    peerDependencies:
+      rete: ^2.0.1
+      rete-area-plugin: ^2.0.0
+      rete-render-utils: ^2.0.0
+      sass: ^1.63.6
+      svelte: '>= 3.54.0 < 5'
 
   rete@2.0.3:
     resolution: {integrity: sha512-/xzcyEBhVXhMZVZHElnYaLKOmTEuwlnul9Wfjvxw5sdl/+6Nqn2nyqIaW4koefrFpIWZy9aitnjnP3zeCMVDuw==}
@@ -4864,6 +4876,15 @@ snapshots:
   rete-structures@2.0.1(rete@2.0.3):
     dependencies:
       rete: 2.0.3
+
+  rete-svelte-plugin@2.0.1(rete-area-plugin@2.0.4(rete@2.0.3))(rete-render-utils@2.0.2(rete-area-plugin@2.0.4(rete@2.0.3))(rete@2.0.3))(rete@2.0.3)(sass@1.77.6)(svelte@4.2.18):
+    dependencies:
+      '@babel/runtime': 7.24.7
+      rete: 2.0.3
+      rete-area-plugin: 2.0.4(rete@2.0.3)
+      rete-render-utils: 2.0.2(rete-area-plugin@2.0.4(rete@2.0.3))(rete@2.0.3)
+      sass: 1.77.6
+      svelte: 4.2.18
 
   rete@2.0.3:
     dependencies:
