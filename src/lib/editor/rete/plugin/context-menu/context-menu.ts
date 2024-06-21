@@ -10,7 +10,6 @@ import type { NodeEditor } from "../../NodeEditor";
 import type { NodeFactory } from "../../node/NodeFactory";
 
 import {
-  GeosXmlSchemaStore as GetXmlSchemaStore,
   PendingValue,
 } from "houdini";
 import { XmlNode } from "$rete/node/XML/XmlNode";

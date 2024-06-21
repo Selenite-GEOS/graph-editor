@@ -1,4 +1,5 @@
-import { Node, NodeFactory } from "$rete";
+import type{ NodeFactory } from "$rete";
+import { Node} from '../Node'
 import { InputControl } from "$rete/control/Control";
 
 export class StringNode extends Node {

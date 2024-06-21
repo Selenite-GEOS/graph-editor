@@ -1,8 +1,6 @@
-import { ClassicPreset, NodeEditor } from "rete";
-import type { AreaPlugin } from "rete-area-plugin";
+import { ClassicPreset } from "rete";
 import type { DataflowNode } from "rete-engine";
 import type { AreaExtra } from "./AreaExtra";
-import type { Schemes } from "./Schemes";
 import type { GetRenderTypes } from "rete-area-plugin/_types/types";
 import { Socket } from "../socket/Socket";
 import { ExecSocket } from "../socket/ExecSocket";
@@ -10,7 +8,7 @@ import { Output } from "../Output";
 import { Input } from "../Input";
 // import { format } from "svelte-i18n";
 import { Stack } from "$lib/types/Stack";
-import type { SocketType, TypedSocketsPlugin } from "../plugin/typed-sockets";
+import type { SocketType } from "../plugin/typed-sockets";
 import {
   Control,
   InputControl,
@@ -18,7 +16,7 @@ import {
   type InputControlTypes,
   type InputControlValueType,
 } from "../control/Control";
-import { NodeFactory } from "./NodeFactory";
+import type { NodeFactory } from "./NodeFactory";
 import type { ComponentSupportInterface } from "$rete/components/ComponentSupportInterface";
 import type { BaseComponent } from "$rete/components/BaseComponent";
 import { PythonNodeComponent } from "$rete/components/Python_NC";
