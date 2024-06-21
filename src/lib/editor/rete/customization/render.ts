@@ -14,7 +14,7 @@ import CustomConnection from "$custom-components/Connection.svelte";
 import CustomExecSocket from "$custom-components/ExecSocket.svelte";
 import CustomSocket from "$custom-components/Socket.svelte";
 import type { Setup } from "../setup/Setup";
-import { SveltePlugin, Presets } from "rete-svelte-plugin";
+
 import { InputControl } from "$rete/control/Control";
 import InputControlComponent from "$rete/customization/presets/classic/components/InputControl.svelte";
 import { Socket } from "$rete/socket/Socket";
@@ -34,16 +34,19 @@ import { get } from "svelte/store";
 import { ErrorWNotif } from "$lib/global";
 import type { Connection } from "$rete";
 import { assignConnectionPath } from "$lib/editor/connection-path";
+import type { SveltePlugin } from "rete-svelte-plugin";
 
 export class RenderSetup implements Setup {
-  private render = new SveltePlugin<Schemes, AreaExtra>();
+  private render: SveltePlugin<Schemes, AreaExtra> | undefined;
   // private render = new ReactPlugin<Schemes, AreaExtra>();
 
-  setup(
+  async setup(
     editor: NodeEditor<Schemes>,
     area: AreaPlugin<Schemes, AreaExtra>,
     factory: NodeFactory,
   ) {
+    const { SveltePlugin, Presets } = await import("rete-svelte-plugin");
+    this.render = new SveltePlugin<Schemes, AreaExtra>();
     const pathPlugin = new ConnectionPathPlugin<Schemes, Area2D<Schemes>>({
       curve: (conn: Connection) =>
         assignConnectionPath(get(factory.connectionPathType)),
