@@ -1,7 +1,6 @@
 import type { BaseSchemes } from "rete";
 
 import type { RenderPreset } from "../types";
-import Menu from "./components/Menu.svelte";
 import type { ContextMenuRender } from "./types";
 
 export function setup<
@@ -24,7 +23,7 @@ export function setup<
     render(context) {
       if (context.data.type === "contextmenu") {
         return {
-          component: Menu,
+          component: undefined,
           props: {
             items: context.data.items,
             delay,
