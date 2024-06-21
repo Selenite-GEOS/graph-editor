@@ -4,7 +4,7 @@ import { NodeFactory } from "../node/NodeFactory";
 export {};
 
 const areclassesSetup = false;
-async function setupClasses() {
+export async function setupClasses() {
   console.log("Setting up classes");
 
   const modules = import.meta.glob("../node/**/*.ts");
