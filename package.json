@@ -1,6 +1,6 @@
 {
   "name": "@selenite/graph-editor",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run package",
@@ -13,6 +13,7 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
+  "module": "./dist/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
