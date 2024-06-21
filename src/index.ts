@@ -1,1 +1,0 @@
-export {setupEditor} from '$rete/editor'

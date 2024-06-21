@@ -1,1 +1,1 @@
-// Reexport your entry components here
+export {setupEditor} from '$rete/editor'
