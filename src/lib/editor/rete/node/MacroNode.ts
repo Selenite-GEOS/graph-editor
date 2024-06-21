@@ -83,7 +83,7 @@ export class MacroNode extends Node {
   private macroInputs: Record<string, Input> = {};
   forward?: (output: string) => unknown;
 
-  graphId: UUID;
+  graphId: string;
 
   protected state: {
     [key: string]: unknown;
@@ -98,8 +98,8 @@ export class MacroNode extends Node {
   }: {
     factory: NodeFactory;
     saveData: NodeEditorSaveData;
-    graphId: UUID;
-    graphVersion: number;
+    graphId: string;
+    graphVersion?: number;
   }) {
     super({
       factory,
@@ -174,7 +174,7 @@ export class MacroNode extends Node {
   }
 
   async initialize(params: {
-    graphId: UUID;
+    graphId: string;
     saveData: NodeEditorSaveData;
     setHeight: (height: number) => void;
   }): Promise<void> {
