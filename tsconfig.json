@@ -1,29 +1,15 @@
 {
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./src",
-    "rootDir": "./src",
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "jsx": "react-jsx",
-    "types": ["vite/client", "node", "react"],
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "useDefineForClassFields": true,
-    "strict": true,
-    "skipLibCheck": false,
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "checkJs": true,
     "esModuleInterop": true,
-    "noEmit": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitReturns": false,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true
+    // "module": "ES2022",
+    // "moduleResolution": "Bundler"
+  }
 }

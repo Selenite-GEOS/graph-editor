@@ -1,0 +1,8 @@
+mutation GraphSetFavorite($params: GraphSetFavoriteInput!) {
+     graph {
+        setFavorite(setFavoriteInput: $params) {
+            id
+            result
+        }
+     }
+}

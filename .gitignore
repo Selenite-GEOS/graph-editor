@@ -2,6 +2,8 @@
 node_modules
 
 # production
+$houdini
+.svelte-kit
 build
 dist
 dist-ssr

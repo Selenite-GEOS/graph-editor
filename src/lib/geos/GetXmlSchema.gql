@@ -1,0 +1,22 @@
+query GeosXmlSchema {
+	geos @loading {
+		xmlSchema @loading {
+			simpleTypes @loading {
+				name
+				pattern
+			}
+			complexTypes @loading {
+				name
+				link
+				attributes {
+					name
+					type
+					required
+					default
+					description
+				}
+				childTypes
+			}
+		}
+	}
+}

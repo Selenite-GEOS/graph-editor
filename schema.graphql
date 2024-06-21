@@ -1,0 +1,414 @@
+input AccountCreateInput {
+  access_token: String
+  expires_at: Int
+  id_token: String
+  provider: String
+  providerAccountId: String
+  refresh_token: String
+  scope: String
+  session_state: String = null
+  token_type: String
+  type: String!
+  userId: UUID!
+}
+
+type AccountType {
+  access_token: String
+  expires_at: Int
+  id: UUID
+  id_token: String
+  provider: String
+  providerAccountId: String
+  refresh_token: String
+  scope: String
+  session_state: String
+  token_type: String
+  type: String!
+  userId: UUID!
+}
+
+type AssistantQuery {
+  health: HealthResponse!
+  test: String!
+}
+
+scalar Base64
+
+type BuiltinClassType {
+  name: String!
+}
+
+union BuiltinClassTypeMakutuClassType = BuiltinClassType | MakutuClassType
+
+input CreateGraphESInput {
+  authorId: String!
+  authorName: String = null
+  description: String = null
+  editorData: JSON = null
+  favorite: Boolean = null
+  geosVersion: String = null
+  id: String = null
+  inputProps: [MacroBlockInputPropInput!] = []
+  inputTypes: [String!] = null
+  name: String!
+  outputProps: [OutputPropInput!] = []
+  outputTypes: [String!] = null
+  public: Boolean = null
+  tags: [String!] = []
+  title: String = null
+}
+
+"""Date with time (isoformat)"""
+scalar DateTime
+
+"""
+The result of an elasticsearch create or update operation. One of 'created', 'updated', or 'noop'
+"""
+scalar ESCreateUpdateResultType
+
+type File {
+  isDir: Boolean!
+  name: String!
+  path: String!
+}
+
+type GeosQuery {
+  geosXsd: String!
+  numXmlComplexTypes: Int!
+  numXmlSimpleTypes: Int!
+  typesPaths: TypesPaths!
+  typesTree: TypesTree!
+  xmlComplexTypes(names: [String!] = null): [XMLComplexType!]!
+  xmlSchema: XMLSchema!
+  xmlSimpleTypes(names: [String!] = null): [XMLSimpleType!]!
+}
+
+input GetGraphsInput {
+  authorId: String = null
+  authors: [String!] = null
+  favorite: Boolean = null
+  public: Boolean = null
+  query: String = null
+  searchAsYouType: Boolean = false
+  size: Int = 100
+  skip: Int = null
+  tags: [String!] = null
+  userId: String = null
+}
+
+type GraphESType {
+  Score: Float
+  authorId: String!
+  authorName: String
+  createdAt: DateTime!
+  description: String
+  editorData: JSON
+  favorite: Boolean
+  favoriteOf: [String!]!
+  geosVersion: String
+  id: String!
+  inputProps: [MacroBlockInputProp!]!
+  inputTypes: [String!]!
+  name: String!
+  outputProps: [OutputProp!]!
+  outputTypes: [String!]!
+  public: Boolean
+  tags: [String!]!
+  title: String!
+  updatedAt: DateTime!
+  version: Int!
+}
+
+type GraphFromAuthorAndNameResult {
+  exists: Boolean!
+  graph: GraphESType
+  id: String
+}
+
+type GraphMutation {
+  """Add tags."""
+  addTags(tags: [String!]!): [TagType!]!
+
+  """Create a graph."""
+  createGraph(graph: CreateGraphESInput!): GraphMutationResult!
+
+  """Delete a graph."""
+  deleteGraph(id: String!): GraphMutationResult!
+
+  """Set the favorite status of a graph."""
+  setFavorite(setFavoriteInput: GraphSetFavoriteInput!): GraphMutationResult!
+
+  """Update a graph."""
+  updateGraph(graphUpdateInput: UpdateGraphInput!): GraphMutationResult!
+}
+
+type GraphMutationResult {
+  id: String!
+  result: ESCreateUpdateResultType!
+  version: Int!
+}
+
+type GraphQueryV2 {
+  graph(id: String!): GraphESType!
+  graphWithAuthordAndNameExists(authorId: String!, graphName: String!): GraphFromAuthorAndNameResult!
+  graphs(getGraphsInput: GetGraphsInput = null): [GraphESType!]!
+}
+
+input GraphSetFavoriteInput {
+  favorite: Boolean!
+  graphId: String!
+  userId: String!
+}
+
+type GraphType {
+  author: UserType!
+  authorId: UUID
+  createdAt: DateTime!
+  data: String!
+  description: String
+  id: UUID!
+  isPublic: Boolean!
+  name: String!
+  props: [MacroBlockInputProp!]!
+  updatedAt: DateTime!
+}
+
+type HealthResponse {
+  slotsIdle: Int!
+  slotsProcessing: Int!
+  status: String!
+}
+
+"""The `JSON` scalar type represents JSON values as specified by ECMA-404"""
+scalar JSON
+
+type MacroBlockInputProp {
+  bearer: MacroBlockPropBearer
+  default: JSON
+  isArray: Boolean!
+  key: String!
+  label: String!
+  options: [String!]
+
+  """HTML props"""
+  props: JSON
+  type: MacroBlockPropType!
+  xmlAttr: String
+  xmlElement: String
+}
+
+input MacroBlockInputPropInput {
+  bearer: MacroBlockPropBearer = null
+  default: JSON
+  isArray: Boolean!
+  key: String!
+  label: String!
+  options: [String!] = null
+
+  """HTML props"""
+  props: JSON = null
+  type: MacroBlockPropType!
+  xmlAttr: String = null
+  xmlElement: String = null
+}
+
+enum MacroBlockPropBearer {
+  node
+  variable
+}
+
+enum MacroBlockPropType {
+  any
+  boolean
+  integer
+  number
+  options
+  path
+  string
+  vector
+  xmlAttr
+  xmlElement
+}
+
+type MakutuClassType {
+  extends: [String!]!
+  getters: [MethodType!]!
+  members: [ParameterType!]!
+  methods: [MethodType!]!
+  name: String!
+  parentClass: BuiltinClassTypeMakutuClassType!
+}
+
+input Message {
+  content: String!
+  role: String!
+}
+
+type MethodType {
+  name: String!
+  parameters: [ParameterType!]!
+  returnType: String
+}
+
+type Mutation {
+  createAccount(account: AccountCreateInput!): AccountType!
+  createSession(session: SessionCreateInput!): SessionType!
+  createUser(user: UserCreateInput!): UserType!
+  deleteSession(sessionToken: String!): Boolean!
+  graph: GraphMutation!
+  updateSession(session: SessionCreateInput!): SessionType!
+}
+
+type OutputProp {
+  isArray: Boolean!
+  key: String!
+  label: String!
+  type: MacroBlockPropType!
+  xmlAttr: String
+  xmlElement: String
+}
+
+input OutputPropInput {
+  isArray: Boolean!
+  key: String!
+  label: String!
+  type: MacroBlockPropType!
+  xmlAttr: String = null
+  xmlElement: String = null
+}
+
+type ParameterType {
+  name: String!
+  type: String
+}
+
+input ProviderInput {
+  provider: String!
+  providerAccountId: String!
+}
+
+type Query {
+  assistant: AssistantQuery!
+  geos: GeosQuery!
+  graph: GraphQueryV2!
+  makutuClass(name: String!): MakutuClassType!
+  makutuClasses: [MakutuClassType!]!
+  remoteExplorer: RemoteExplorer!
+  security: Security!
+  session(sessionToken: String!): SessionType!
+  tags: [TagType!]!
+  user(email: String = null, id: UUID = null, provider: ProviderInput = null): UserType
+  users: [UserType!]!
+}
+
+type RemoteExplorer {
+  files(remoteExplorerInput: RemoteExplorerInput!): [File!]!
+}
+
+input RemoteExplorerInput {
+  encryptedPassword: Base64!
+  host: String!
+  path: String!
+  user: String!
+}
+
+type Security {
+  encrypt(data: String!): Base64!
+  publicKey: Base64!
+}
+
+input SessionCreateInput {
+  expires: DateTime = null
+  sessionToken: UUID
+  userId: UUID
+}
+
+type SessionType {
+  expires: DateTime
+  id: UUID
+  sessionToken: UUID
+  user: UserType!
+  userId: UUID
+}
+
+type Subscription {
+  chat(messages: [Message!]!): String!
+}
+
+type TagType {
+  tag: String!
+  timesAdded: Int!
+}
+
+"""TypesPaths give the types path for every element"""
+scalar TypesPaths
+
+"""
+A types tree represents a hierarchical structure of all types in the XML schema.
+"""
+scalar TypesTree
+
+scalar UUID
+
+input UpdateGraphInput {
+  authorId: String!
+  authorName: String = null
+  description: String = null
+  editorData: JSON = null
+  favorite: Boolean = null
+  geosVersion: String = null
+  id: String!
+  inputProps: [MacroBlockInputPropInput!] = []
+  inputTypes: [String!] = null
+  keepNullKeys: [String!] = []
+  name: String = null
+  outputProps: [OutputPropInput!] = []
+  outputTypes: [String!] = null
+  public: Boolean = null
+  tags: [String!] = []
+  title: String = null
+}
+
+input UserCreateInput {
+  email: String = null
+  image: String = null
+  isActive: Boolean! = true
+  name: String = null
+}
+
+type UserType {
+  email: String
+  graphs: [GraphType!]!
+  id: UUID
+  image: String
+  name: String
+}
+
+type XMLAttribute {
+  default: String
+  description: String!
+  name: String!
+  required: Boolean!
+  type: String!
+}
+
+union XMLAttributeXMLComplexType = XMLAttribute | XMLComplexType
+
+type XMLComplexType {
+  attributes: [XMLAttribute!]!
+  childTypes: [String!]!
+  link: String!
+  name: String!
+  properties: [XMLAttributeXMLComplexType!]!
+}
+
+type XMLSchema {
+  complexTypes: [XMLComplexType!]!
+  simpleTypes: [XMLSimpleType!]!
+}
+
+type XMLSimpleType {
+  enum: [String!]
+  name: String!
+  pattern: String!
+}

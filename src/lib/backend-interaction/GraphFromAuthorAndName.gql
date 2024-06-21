@@ -1,0 +1,20 @@
+query GraphFromAuthorAndName($authorId: String!, $graphName: String!) @cache(policy: NetworkOnly) {
+    graph {
+        graphWithAuthordAndNameExists(authorId: $authorId, graphName: $graphName) {
+            graph {
+                id
+                favorite
+                name
+                public
+                description
+                tags
+                inputTypes
+                outputTypes
+                editorData
+            }
+            exists
+            id
+
+        }
+    }
+}

@@ -1,0 +1,8 @@
+mutation UpdateSession($session: SessionCreateInput!) {
+	updateSession(session: $session) {
+		id
+		sessionToken
+		userId
+		expires
+	}
+}
