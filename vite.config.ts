@@ -6,6 +6,9 @@ export default defineConfig({
   plugins: [houdini(), sveltekit()],
   build: {
     target: "esnext",
+    // rollupOptions: {
+    //   external: ["src/**/*.svelte"]
+    // }
   },
   test: {
     include: ["src/**/*.{test,spec}.{js,ts}"],
