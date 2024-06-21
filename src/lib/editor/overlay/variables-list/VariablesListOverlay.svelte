@@ -5,7 +5,6 @@
 	import {persisted as localStorageStore} from 'svelte-persisted-store';
 	import { _, keyboardShortcut, modeCurrent } from '$lib/global';
 	import Fa from 'svelte-fa';
-	import { browser } from '$app/environment';
 	import { onMount, tick } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';

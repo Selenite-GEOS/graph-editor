@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { HoudiniClient } from '$houdini';
 
 export default new HoudiniClient({

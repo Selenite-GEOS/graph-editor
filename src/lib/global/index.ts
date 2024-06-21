@@ -1,8 +1,8 @@
 import { readable, writable } from "svelte/store";
 import { get } from 'svelte/store';
-import { browser } from '$app/environment';
 import type { GeosSchema } from "$lib/geos";
 import type { Action } from "svelte/action";
+import { browser } from "$app/environment";
 
 export {getContext} from 'svelte'
 export type NewGeosContext = { geosSchema: GeosSchema };
@@ -49,6 +49,7 @@ export class ErrorWNotif extends Error {
         else ({ title, message: msg, emessage: emsg } = params);
 
         super(emsg);
+        const browser = typeof window !== 'undefined';
         if (browser)
             notifications.show({
                 title: title ?? get(_)('notifications.error.title'),
