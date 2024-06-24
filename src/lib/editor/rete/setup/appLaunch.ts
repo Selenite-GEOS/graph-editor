@@ -32,6 +32,7 @@ export async function setupClasses() {
 
     // TODO: Move somewhere else or rename file
     nodeClasses.forEach((nodeClass) => {
+      console.log("Registering class", nodeClass.id, "from", menuPath);
       nodeClass.id = menuPath.slice(0, -3);
       NodeFactory.registerClass(nodeClass.id, nodeClass);
     });

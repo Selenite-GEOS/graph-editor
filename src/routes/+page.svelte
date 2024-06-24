@@ -1,7 +1,6 @@
 <script lang="ts">
   import { GetGraphStore } from "$houdini";
-
-  import { Editor } from "$lib/editor";
+  import Editor from "$lib/editor/Editor.svelte";
   import type { NodeEditor, NodeEditorSaveData } from "$rete";
   import { sumExample } from "$rete/example";
 

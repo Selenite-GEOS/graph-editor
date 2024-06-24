@@ -20,10 +20,21 @@ import type History from "rete-history-plugin/_types/history";
 
 import type { CommentPlugin } from "$rete/plugin/CommentPlugin";
 import { _, type getModalStore } from "$lib/global";
-import { persisted} from "svelte-persisted-store"
+import { persisted } from "svelte-persisted-store"
 
 import { defaultConnectionPath, type ConnectionPathType } from "$lib/editor";
 import type { HistoryPlugin } from "$rete/plugin/history";
+import { MacroNode } from "./MacroNode";
+import { XmlNode } from "./XML/XmlNode";
+import { GetNameNode } from "./XML/GetNameNode";
+import { VariableNode } from "./XML/VariableNode";
+import { EveryNode } from "./control/EveryNode";
+import { SequenceNode } from "./control/SequenceNode";
+import { ForEachNode } from "./control/ForEachNode";
+import { StartNode } from "./control/StartNode";
+import { TimeLoopNode } from "./control/TimeLoopNode";
+import * as nodes from "."
+import { clone } from "lodash-es";
 
 function createDataflowEngine() {
   return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -90,9 +101,47 @@ export class NodeFactory {
     persisted("connectionPathType", defaultConnectionPath);
   public readonly modalStore?: ReturnType<typeof getModalStore>;
 
-  private static classRegistry: Record<string, typeof Node> = {};
+  // private static classRegistry: Record<string, typeof Node> = {};
+
+  static get classRegistry(): Record<string, typeof Node> {
+    const res = {
+      "MacroNode": MacroNode,
+      "XML/GetNameNode": GetNameNode,
+      "XML/VariableNode": VariableNode,
+      "XML/XmlNode": XmlNode,
+      "control/EveryNode": EveryNode,
+      "control/SequenceNode": SequenceNode,
+      "control/ForEachNode": ForEachNode,
+      "control/StartNode": StartNode,
+      "control/TimeLoopNode": TimeLoopNode,
+      "data/MakeArrayNode": nodes.MakeArrayNode,
+      "data/NumberNode": nodes.NumberNode,
+      "data/StringNode": nodes.StringNode,
+      "io/AppendNode": nodes.AppendNode,
+      "io/DisplayNode": nodes.DisplayNode,
+      "io/DownloadNode": nodes.DownloadNode,
+      "io/FormatNode": nodes.FormatNode,
+      "io/LogNode": nodes.LogNode,
+      "makutu/acquisition/SEGYAcquisitionNode": nodes.SEGYAcquisitionNode,
+      "makutu/acquisition/BreakNode": nodes.BreakNode,
+      "makutu/solver/AcousticSEMNode": nodes.AcousticSEMNode,
+      "makutu/solver/ApplyInitialConditionsNode": nodes.ApplyInitialConditionsNode,
+      "makutu/solver/ExecuteNode": nodes.ExecuteNode,
+      "makutu/solver/GetPressureAtReceiversNode": nodes.GetPressuresAtReceiversNode,
+      "makutu/solver/InitializeSolverNode": nodes.InitializeSolverNode,
+      "makutu/solver/OutputVtk": nodes.OutputVtkNode,
+      "makutu/solver/ReinitSolverNode": nodes.ReinitSolverNode,
+      "makutu/solver/SolverAPINode": nodes.SolverAPINode,
+      "makutu/solver/SolverLoopNode": nodes.SolverLoopNode,
+      "makutu/solver/UpdateSourceAndReceivers": nodes.UpdateSourcesAndReceiversNode,
+      "makutu/solver/UpdateVtkOutput": nodes.UpdateVtkOutputNode,
+      "math/AddNode": nodes.AddNode,
+    }
+    return clone(res) as Record<string, typeof Node>;
+  }
+
   static registerClass(id: string, nodeClass: typeof Node) {
-    this.classRegistry[id] = nodeClass;
+    // this.classRegistry[id] = nodeClass;
   }
   private state: Map<string, unknown> = new Map();
 
@@ -343,7 +392,7 @@ export class NodeFactory {
       {
         id,
         label: "connection",
-        translate() {},
+        translate() { },
         unselect: () => {
           connection.selected = false;
           this?.getArea()?.update("connection", connection.id);
@@ -504,6 +553,6 @@ export class NodeFactory {
         .forEach((n) => {
           this.dataflowEngine.fetch(n.id);
         });
-    } catch (e) {}
+    } catch (e) { }
   }
 }

@@ -87,6 +87,9 @@ input GetGraphsInput {
   authorId: String = null
   authors: [String!] = null
   favorite: Boolean = null
+
+  """Ids of graphs to get. Take precedence over all other options."""
+  ids: [String!] = null
   public: Boolean = null
   query: String = null
   searchAsYouType: Boolean = false
