@@ -11,7 +11,10 @@ export interface MoonMenuItem {
 	action: (factory: NodeFactory) => Node;
 }
 
-export const moonMenuPositionStore = writable<{ x: number; y: number }>({ x: 500, y: 500 });
+export const moonMenuPositionStore = writable<{ x: number; y: number }>({
+	x: 500,
+	y: 500
+});
 export const moonMenuVisibleStore = writable<boolean>(false);
 export const moonMenuDropConnectionStore = writable<() => void>(() => {}); // eslint-disable-line @typescript-eslint/no-empty-function
 export const moonMenuHideDelayStore = writable<number>(100);

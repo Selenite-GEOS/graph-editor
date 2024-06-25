@@ -104,10 +104,10 @@ export function isActionMenuItem(menuItem: IMenuItem): menuItem is IActionMenuIt
 export type IMenuItem<T extends MenuItemType = MenuItemType.Base> = T extends MenuItemType.Base
 	? IBaseMenuItem
 	: T extends MenuItemType.Node
-		? INodeMenuItem
-		: T extends MenuItemType.Action
-			? IActionMenuItem
-			: never;
+	? INodeMenuItem
+	: T extends MenuItemType.Action
+	? IActionMenuItem
+	: never;
 
 /**
  * Returns a new INodeMenuItem

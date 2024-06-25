@@ -21,7 +21,10 @@ export function getTranslateValues(element: HTMLElement): {
 	// return { translateX: 0, translateY: 0 };
 }
 
-export function getScale(element: HTMLElement): { scaleX: number; scaleY: number } {
+export function getScale(element: HTMLElement): {
+	scaleX: number;
+	scaleY: number;
+} {
 	const style = window.getComputedStyle(element);
 	const transform = style.transform;
 

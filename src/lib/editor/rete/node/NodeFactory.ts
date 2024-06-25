@@ -1,558 +1,539 @@
-import { AreaExtensions, AreaPlugin } from "rete-area-plugin";
-import type { NodeEditor, NodeEditorSaveData } from "../NodeEditor";
-import type { AreaExtra } from "./AreaExtra";
-import type { Schemes } from "./Schemes";
-import { ControlFlowEngine, DataflowEngine } from "rete-engine";
-import { ExecSocket } from "../socket/ExecSocket";
-import { structures } from "rete-structures";
-import { Connection, Node, type NodeSaveData } from "./Node";
-import { ClassicPreset } from "rete";
-import { InputControl } from "$rete/control/Control";
-import { type Writable, writable, get } from "svelte/store";
-import { PythonDataflowEngine } from "$rete/engine/PythonDataflowEngine";
-import type { MakutuClassRepository } from "$lib/backend-interaction/types";
-import { newLocalId } from "$utils";
-import type { SelectorEntity } from "rete-area-plugin/_types/extensions/selectable";
-import { ErrorWNotif } from "$lib/global";
-import type { AutoArrangePlugin } from "rete-auto-arrange-plugin";
-import wu from "wu";
-import type History from "rete-history-plugin/_types/history";
+import { AreaExtensions, AreaPlugin } from 'rete-area-plugin';
+import type { NodeEditor, NodeEditorSaveData } from '../NodeEditor';
+import type { AreaExtra } from './AreaExtra';
+import type { Schemes } from './Schemes';
+import { ControlFlowEngine, DataflowEngine } from 'rete-engine';
+import { ExecSocket } from '../socket/ExecSocket';
+import { structures } from 'rete-structures';
+import { Connection, Node, type NodeSaveData } from './Node';
+import { ClassicPreset } from 'rete';
+import { InputControl } from '$rete/control/Control';
+import { type Writable, writable, get } from 'svelte/store';
+import { PythonDataflowEngine } from '$rete/engine/PythonDataflowEngine';
+import type { MakutuClassRepository } from '$lib/backend-interaction/types';
+import { newLocalId } from '$utils';
+import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
+import { ErrorWNotif } from '$lib/global';
+import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
+import wu from 'wu';
+import type History from 'rete-history-plugin/_types/history';
 
-import type { CommentPlugin } from "$rete/plugin/CommentPlugin";
-import { _, type getModalStore } from "$lib/global";
-import { persisted } from "svelte-persisted-store"
+import type { CommentPlugin } from '$rete/plugin/CommentPlugin';
+import { _, type getModalStore } from '$lib/global';
+import { persisted } from 'svelte-persisted-store';
 
-import { defaultConnectionPath, type ConnectionPathType } from "$lib/editor";
-import type { HistoryPlugin } from "$rete/plugin/history";
-import { MacroNode } from "./MacroNode";
-import { XmlNode } from "./XML/XmlNode";
-import { GetNameNode } from "./XML/GetNameNode";
-import { VariableNode } from "./XML/VariableNode";
-import { EveryNode } from "./control/EveryNode";
-import { SequenceNode } from "./control/SequenceNode";
-import { ForEachNode } from "./control/ForEachNode";
-import { StartNode } from "./control/StartNode";
-import { TimeLoopNode } from "./control/TimeLoopNode";
-import * as nodes from "."
-import { clone } from "lodash-es";
+import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
+import type { HistoryPlugin } from '$rete/plugin/history';
+import { MacroNode } from './MacroNode';
+import { XmlNode } from './XML/XmlNode';
+import { GetNameNode } from './XML/GetNameNode';
+import { VariableNode } from './XML/VariableNode';
+import { EveryNode } from './control/EveryNode';
+import { SequenceNode } from './control/SequenceNode';
+import { ForEachNode } from './control/ForEachNode';
+import { StartNode } from './control/StartNode';
+import { TimeLoopNode } from './control/TimeLoopNode';
+import * as Nodes from '.';
+import { clone } from 'lodash-es';
 
 function createDataflowEngine() {
-  return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
-    return {
-      inputs: () =>
-        Object.entries(inputs)
-          .filter(
-            ([_, input]) => input && !(input.socket instanceof ExecSocket),
-          )
-          .map(([name]) => name),
-      outputs: () =>
-        Object.entries(outputs)
-          .filter(
-            ([_, output]) => output && !(output.socket instanceof ExecSocket),
-          )
-          .map(([name]) => name),
-    };
-  });
+	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
+		return {
+			inputs: () =>
+				Object.entries(inputs)
+					.filter(([_, input]) => input && !(input.socket instanceof ExecSocket))
+					.map(([name]) => name),
+			outputs: () =>
+				Object.entries(outputs)
+					.filter(([_, output]) => output && !(output.socket instanceof ExecSocket))
+					.map(([name]) => name)
+		};
+	});
 }
 
 function createPythonDataflowEngine() {
-  return new PythonDataflowEngine<Schemes>(({ inputs, outputs }) => {
-    return {
-      inputs: () =>
-        Object.entries(inputs)
-          .filter(
-            ([_, input]) => input && !(input.socket instanceof ExecSocket),
-          )
-          .map(([name]) => name),
-      outputs: () =>
-        Object.entries(outputs)
-          .filter(
-            ([_, output]) => output && !(output.socket instanceof ExecSocket),
-          )
-          .map(([name]) => name),
-    };
-  });
+	return new PythonDataflowEngine<Schemes>(({ inputs, outputs }) => {
+		return {
+			inputs: () =>
+				Object.entries(inputs)
+					.filter(([_, input]) => input && !(input.socket instanceof ExecSocket))
+					.map(([name]) => name),
+			outputs: () =>
+				Object.entries(outputs)
+					.filter(([_, output]) => output && !(output.socket instanceof ExecSocket))
+					.map(([name]) => name)
+		};
+	});
 }
 
 function createControlflowEngine() {
-  return new ControlFlowEngine<Schemes>(({ inputs, outputs }) => {
-    return {
-      inputs: () =>
-        Object.entries(inputs)
-          .filter(([_, input]) => input && input.socket instanceof ExecSocket)
-          .map(([name]) => name),
-      outputs: () =>
-        Object.entries(outputs)
-          .filter(
-            ([_, output]) => output && output.socket instanceof ExecSocket,
-          )
-          .map(([name]) => name),
-    };
-  });
+	return new ControlFlowEngine<Schemes>(({ inputs, outputs }) => {
+		return {
+			inputs: () =>
+				Object.entries(inputs)
+					.filter(([_, input]) => input && input.socket instanceof ExecSocket)
+					.map(([name]) => name),
+			outputs: () =>
+				Object.entries(outputs)
+					.filter(([_, output]) => output && output.socket instanceof ExecSocket)
+					.map(([name]) => name)
+		};
+	});
 }
 
 // type ParamsConstraint = [Record<string, unknown> & { factory: NodeFactory }, ...unknown[]];
 type WithFactory<T extends Record<string, unknown>> = T & {
-  factory: NodeFactory;
+	factory: NodeFactory;
 };
-type WithoutFactory<T> = Omit<T, "factory">;
+type WithoutFactory<T> = Omit<T, 'factory'>;
 export class NodeFactory {
-  public readonly connectionPathType: Writable<ConnectionPathType> =
-    persisted("connectionPathType", defaultConnectionPath);
-  public readonly modalStore?: ReturnType<typeof getModalStore>;
+	public readonly connectionPathType: Writable<ConnectionPathType> = persisted(
+		'connectionPathType',
+		defaultConnectionPath
+	);
+	public readonly modalStore?: ReturnType<typeof getModalStore>;
 
-  // private static classRegistry: Record<string, typeof Node> = {};
+	// private static classRegistry: Record<string, typeof Node> = {};
 
-  static get classRegistry(): Record<string, typeof Node> {
-    const res = {
-      "MacroNode": MacroNode,
-      "XML/GetNameNode": GetNameNode,
-      "XML/VariableNode": VariableNode,
-      "XML/XmlNode": XmlNode,
-      "control/EveryNode": EveryNode,
-      "control/SequenceNode": SequenceNode,
-      "control/ForEachNode": ForEachNode,
-      "control/StartNode": StartNode,
-      "control/TimeLoopNode": TimeLoopNode,
-      "data/MakeArrayNode": nodes.MakeArrayNode,
-      "data/NumberNode": nodes.NumberNode,
-      "data/StringNode": nodes.StringNode,
-      "io/AppendNode": nodes.AppendNode,
-      "io/DisplayNode": nodes.DisplayNode,
-      "io/DownloadNode": nodes.DownloadNode,
-      "io/FormatNode": nodes.FormatNode,
-      "io/LogNode": nodes.LogNode,
-      "makutu/acquisition/SEGYAcquisitionNode": nodes.SEGYAcquisitionNode,
-      "makutu/acquisition/BreakNode": nodes.BreakNode,
-      "makutu/solver/AcousticSEMNode": nodes.AcousticSEMNode,
-      "makutu/solver/ApplyInitialConditionsNode": nodes.ApplyInitialConditionsNode,
-      "makutu/solver/ExecuteNode": nodes.ExecuteNode,
-      "makutu/solver/GetPressureAtReceiversNode": nodes.GetPressuresAtReceiversNode,
-      "makutu/solver/InitializeSolverNode": nodes.InitializeSolverNode,
-      "makutu/solver/OutputVtk": nodes.OutputVtkNode,
-      "makutu/solver/ReinitSolverNode": nodes.ReinitSolverNode,
-      "makutu/solver/SolverAPINode": nodes.SolverAPINode,
-      "makutu/solver/SolverLoopNode": nodes.SolverLoopNode,
-      "makutu/solver/UpdateSourceAndReceivers": nodes.UpdateSourcesAndReceiversNode,
-      "makutu/solver/UpdateVtkOutput": nodes.UpdateVtkOutputNode,
-      "math/AddNode": nodes.AddNode,
-    }
-    return clone(res) as Record<string, typeof Node>;
-  }
+	static get classRegistry(): Record<string, typeof Node> {
+		const classRegistry = {
+			MacroNode: Nodes.MacroNode,
+			'XML/GetNameNode': Nodes.GetNameNode,
+			'XML/VariableNode': Nodes.VariableNode,
+			'XML/XmlNode': Nodes.XmlNode,
+			'control/EveryNode': Nodes.EveryNode,
+			'control/SequenceNode': Nodes.SequenceNode,
+			'control/ForEachNode': Nodes.ForEachNode,
+			'control/StartNode': Nodes.StartNode,
+			'control/TimeLoopNode': Nodes.TimeLoopNode,
+			'data/MakeArrayNode': Nodes.MakeArrayNode,
+			'data/NumberNode': Nodes.NumberNode,
+			'data/StringNode': Nodes.StringNode,
+			'io/AppendNode': Nodes.AppendNode,
+			'io/DisplayNode': Nodes.DisplayNode,
+			'io/DownloadNode': Nodes.DownloadNode,
+			'io/FormatNode': Nodes.FormatNode,
+			'io/LogNode': Nodes.LogNode,
+			'makutu/acquisition/SEGYAcquisitionNode': Nodes.SEGYAcquisitionNode,
+			'makutu/acquisition/BreakNode': Nodes.BreakNode,
+			'makutu/solver/AcousticSEMNode': Nodes.AcousticSEMNode,
+			'makutu/solver/ApplyInitialConditionsNode': Nodes.ApplyInitialConditionsNode,
+			'makutu/solver/ExecuteNode': Nodes.ExecuteNode,
+			'makutu/solver/GetPressureAtReceiversNode': Nodes.GetPressuresAtReceiversNode,
+			'makutu/solver/InitializeSolverNode': Nodes.InitializeSolverNode,
+			'makutu/solver/OutputVtk': Nodes.OutputVtkNode,
+			'makutu/solver/ReinitSolverNode': Nodes.ReinitSolverNode,
+			'makutu/solver/SolverAPINode': Nodes.SolverAPINode,
+			'makutu/solver/SolverLoopNode': Nodes.SolverLoopNode,
+			'makutu/solver/UpdateSourceAndReceivers': Nodes.UpdateSourcesAndReceiversNode,
+			'makutu/solver/UpdateVtkOutput': Nodes.UpdateVtkOutputNode,
+			'math/AddNode': Nodes.AddNode,
+			'boolean/Not': Nodes.NotNode,
+			'choice/Select': Nodes.SelectNode,
+			'array/MergeArray': Nodes.MergeArrays
+		};
 
-  static registerClass(id: string, nodeClass: typeof Node) {
-    // this.classRegistry[id] = nodeClass;
-  }
-  private state: Map<string, unknown> = new Map();
+		return clone(classRegistry) as Record<string, typeof Node>;
+	}
 
-  public id = newLocalId("node-factory");
+	static registerClass(id: string, nodeClass: typeof Node) {
+		// this.classRegistry[id] = nodeClass;
+	}
+	private state: Map<string, unknown> = new Map();
 
-  useState<T = unknown>(
-    id: string,
-    key: string,
-    value?: T,
-  ): { get: () => T; set: (value: T) => void } {
-    const stateKey = id + "_" + key;
-    if (!this.state.has(stateKey)) this.state.set(stateKey, value);
-    return {
-      get: () => this.state.get(stateKey) as T,
-      set: (value: T) => this.state.set(stateKey, value),
-    };
-  }
+	public id = newLocalId('node-factory');
 
-  getState<T>(id: string, key: string, value?: T): T {
-    const stateKey = id + "_" + key;
-    if (!this.state.has(stateKey)) this.state.set(stateKey, value);
-    return this.state.get(stateKey) as T;
-  }
+	useState<T = unknown>(
+		id: string,
+		key: string,
+		value?: T
+	): { get: () => T; set: (value: T) => void } {
+		const stateKey = id + '_' + key;
+		if (!this.state.has(stateKey)) this.state.set(stateKey, value);
+		return {
+			get: () => this.state.get(stateKey) as T,
+			set: (value: T) => this.state.set(stateKey, value)
+		};
+	}
 
-  setState(id: string, key: string, value: unknown) {
-    this.state.set(id + "_" + key, value);
-  }
+	getState<T>(id: string, key: string, value?: T): T {
+		const stateKey = id + '_' + key;
+		if (!this.state.has(stateKey)) this.state.set(stateKey, value);
+		return this.state.get(stateKey) as T;
+	}
 
-  lastAddedNode?: Node;
-  async addNode<T extends Node, Params = Record<string, unknown>>(
-    nodeClass: new (params: Params) => T,
-    params: WithoutFactory<Params>,
-  ): Promise<T> {
-    const paramsWithFactory: Params = { ...params, factory: this } as Params;
+	setState(id: string, key: string, value: unknown) {
+		this.state.set(id + '_' + key, value);
+	}
 
-    await this.editor.addNode(new nodeClass(paramsWithFactory));
-    if (!this.lastAddedNode) throw new Error("lastAddedNode is undefined");
-    return this.lastAddedNode as T;
-  }
+	lastAddedNode?: Node;
+	async addNode<T extends Node, Params = Record<string, unknown>>(
+		nodeClass: new (params: Params) => T,
+		params: WithoutFactory<Params>
+	): Promise<T> {
+		const paramsWithFactory: Params = { ...params, factory: this } as Params;
 
-  getNodes(): Node[] {
-    return this.editor.getNodes();
-  }
+		await this.editor.addNode(new nodeClass(paramsWithFactory));
+		if (!this.lastAddedNode) throw new Error('lastAddedNode is undefined');
+		return this.lastAddedNode as T;
+	}
 
-  readonly pythonDataflowEngine: PythonDataflowEngine<Schemes> =
-    createPythonDataflowEngine();
+	getNodes(): Node[] {
+		return this.editor.getNodes();
+	}
 
-  async loadNode(nodeSaveData: NodeSaveData): Promise<Node> {
-    const nodeClass = NodeFactory.classRegistry[nodeSaveData.type];
-    if (nodeClass) {
-      const node = new nodeClass({ ...nodeSaveData.params, factory: this });
-      node.id = nodeSaveData.id;
-      if (node.initializePromise) {
-        await node.initializePromise;
-        if (node.afterInitialize) node.afterInitialize();
-      }
+	readonly pythonDataflowEngine: PythonDataflowEngine<Schemes> = createPythonDataflowEngine();
 
-      node.setState({ ...node.getState(), ...nodeSaveData.state });
-      node.applyState();
-      for (const key in nodeSaveData.inputControlValues) {
-        const inputControl = node.inputs[key]?.control;
-        if (
-          inputControl instanceof ClassicPreset.InputControl ||
-          inputControl instanceof InputControl
-        ) {
-          inputControl.setValue(nodeSaveData.inputControlValues[key]);
-        }
-      }
+	async loadNode(nodeSaveData: NodeSaveData): Promise<Node> {
+		const nodeClass = NodeFactory.classRegistry[nodeSaveData.type];
+		if (nodeClass) {
+			const node = new nodeClass({ ...nodeSaveData.params, factory: this });
+			node.id = nodeSaveData.id;
+			if (node.initializePromise) {
+				await node.initializePromise;
+				if (node.afterInitialize) node.afterInitialize();
+			}
 
-      for (const key of nodeSaveData.selectedInputs) {
-        node.selectInput(key);
-      }
+			node.setState({ ...node.getState(), ...nodeSaveData.state });
+			node.applyState();
+			for (const key in nodeSaveData.inputControlValues) {
+				const inputControl = node.inputs[key]?.control;
+				if (
+					inputControl instanceof ClassicPreset.InputControl ||
+					inputControl instanceof InputControl
+				) {
+					inputControl.setValue(nodeSaveData.inputControlValues[key]);
+				}
+			}
 
-      for (const key of nodeSaveData.selectedOutputs) {
-        node.selectOutput(key);
-      }
+			for (const key of nodeSaveData.selectedInputs) {
+				node.selectInput(key);
+			}
 
-      await this.editor.addNode(node);
-      if (nodeSaveData.position && this.area)
-        this.area.translate(nodeSaveData.id, {
-          x: nodeSaveData.position.x,
-          y: nodeSaveData.position.y,
-        });
-      return node;
-    } else {
-      console.debug("Node class not found", nodeSaveData);
-      throw new Error(`Node class ${nodeSaveData.type} not found`);
-    }
-  }
+			for (const key of nodeSaveData.selectedOutputs) {
+				node.selectOutput(key);
+			}
 
-  async loadGraph(editorSaveData: NodeEditorSaveData) {
-    console.log("loadGraph", editorSaveData.editorName);
-    await this.editor.clear();
-    this.editor.variables.set(editorSaveData.variables);
-    this.editor.setName(editorSaveData.editorName);
-    for (const nodeSaveData of editorSaveData.nodes) {
-      await this.loadNode(nodeSaveData);
-    }
+			await this.editor.addNode(node);
+			if (nodeSaveData.position && this.area)
+				this.area.translate(nodeSaveData.id, {
+					x: nodeSaveData.position.x,
+					y: nodeSaveData.position.y
+				});
+			return node;
+		} else {
+			console.debug('Node class not found', nodeSaveData);
+			throw new Error(`Node class ${nodeSaveData.type} not found`);
+		}
+	}
 
-    for (const commentSaveData of editorSaveData.comments ?? []) {
-      if (!this.comment) {
-        console.warn("No comment plugin");
-        return;
-      }
-      console.log("load comment ", commentSaveData.text);
-      this.comment.addFrame(commentSaveData.text, commentSaveData.links, {
-        id: commentSaveData.id,
-      });
-    }
+	async loadGraph(editorSaveData: NodeEditorSaveData) {
+		console.log('loadGraph', editorSaveData.editorName);
+		await this.editor.clear();
+		this.editor.variables.set(editorSaveData.variables);
+		this.editor.setName(editorSaveData.editorName);
+		for (const nodeSaveData of editorSaveData.nodes) {
+			await this.loadNode(nodeSaveData);
+		}
 
-    editorSaveData.connections.forEach(async (connectionSaveData) => {
-      const conn = new Connection(
-        this.editor.getNode(connectionSaveData.source),
-        connectionSaveData.sourceOutput,
-        this.editor.getNode(connectionSaveData.target),
-        connectionSaveData.targetInput,
-      );
-      conn.id = connectionSaveData.id;
-      conn.factory = this;
-      await this.editor.addConnection(conn);
-    });
-    setTimeout(() => {
-      if (this.area) AreaExtensions.zoomAt(this.area, this.editor.getNodes());
-    });
-  }
-  private area?: AreaPlugin<Schemes, AreaExtra>;
-  private editor: NodeEditor;
-  public readonly makutuClasses?: MakutuClassRepository;
+		for (const commentSaveData of editorSaveData.comments ?? []) {
+			if (!this.comment) {
+				console.warn('No comment plugin');
+				return;
+			}
+			console.log('load comment ', commentSaveData.text);
+			this.comment.addFrame(commentSaveData.text, commentSaveData.links, {
+				id: commentSaveData.id
+			});
+		}
 
-  public readonly dataflowEngine = createDataflowEngine();
-  private readonly controlflowEngine = createControlflowEngine();
-  public readonly selector?: AreaExtensions.Selector<SelectorEntity>;
-  public readonly accumulating?: ReturnType<
-    typeof AreaExtensions.accumulateOnCtrl
-  >;
-  public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
-  public readonly arrange?: AutoArrangePlugin<Schemes>;
-  public readonly history: HistoryPlugin<Schemes> | undefined;
-  public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
-  constructor(params: {
-    editor: NodeEditor;
-    area?: AreaPlugin<Schemes, AreaExtra>;
-    makutuClasses?: MakutuClassRepository;
-    selector?: AreaExtensions.Selector<SelectorEntity>;
-    arrange?: AutoArrangePlugin<Schemes>;
-    history?: HistoryPlugin<Schemes>;
-    modalStore?: ReturnType<typeof getModalStore>;
-    comment?: CommentPlugin<Schemes, AreaExtra>;
-    accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
-  }) {
-    const { editor, area, makutuClasses, selector, arrange } = params;
-    this.modalStore = params.modalStore;
-    this.comment = params.comment;
-    this.accumulating = params.accumulating;
-    this.history = params.history;
-    this.selector = selector;
-    this.area = area;
-    this.arrange = arrange;
-    this.makutuClasses = makutuClasses;
-    this.editor = editor;
-    this.editor.factory = this;
-    editor.use(this.dataflowEngine);
-    editor.use(this.controlflowEngine);
-    editor.use(this.pythonDataflowEngine);
+		editorSaveData.connections.forEach(async (connectionSaveData) => {
+			const conn = new Connection(
+				this.editor.getNode(connectionSaveData.source),
+				connectionSaveData.sourceOutput,
+				this.editor.getNode(connectionSaveData.target),
+				connectionSaveData.targetInput
+			);
+			conn.id = connectionSaveData.id;
+			conn.factory = this;
+			await this.editor.addConnection(conn);
+		});
+		setTimeout(() => {
+			if (this.area) AreaExtensions.zoomAt(this.area, this.editor.getNodes());
+		});
+	}
+	private area?: AreaPlugin<Schemes, AreaExtra>;
+	private editor: NodeEditor;
+	public readonly makutuClasses?: MakutuClassRepository;
 
-    // Assign connections to nodes
-    editor.addPipe((context) => {
-      if (context.type === "nodecreated") {
-        this.lastAddedNode = context.data;
-      }
+	public readonly dataflowEngine = createDataflowEngine();
+	private readonly controlflowEngine = createControlflowEngine();
+	public readonly selector?: AreaExtensions.Selector<SelectorEntity>;
+	public readonly accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
+	public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
+	public readonly arrange?: AutoArrangePlugin<Schemes>;
+	public readonly history: HistoryPlugin<Schemes> | undefined;
+	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
+	constructor(params: {
+		editor: NodeEditor;
+		area?: AreaPlugin<Schemes, AreaExtra>;
+		makutuClasses?: MakutuClassRepository;
+		selector?: AreaExtensions.Selector<SelectorEntity>;
+		arrange?: AutoArrangePlugin<Schemes>;
+		history?: HistoryPlugin<Schemes>;
+		modalStore?: ReturnType<typeof getModalStore>;
+		comment?: CommentPlugin<Schemes, AreaExtra>;
+		accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
+	}) {
+		const { editor, area, makutuClasses, selector, arrange } = params;
+		this.modalStore = params.modalStore;
+		this.comment = params.comment;
+		this.accumulating = params.accumulating;
+		this.history = params.history;
+		this.selector = selector;
+		this.area = area;
+		this.arrange = arrange;
+		this.makutuClasses = makutuClasses;
+		this.editor = editor;
+		this.editor.factory = this;
+		editor.use(this.dataflowEngine);
+		editor.use(this.controlflowEngine);
+		editor.use(this.pythonDataflowEngine);
 
-      if (
-        context.type !== "connectioncreated" &&
-        context.type !== "connectionremoved"
-      )
-        return context;
+		// Assign connections to nodes
+		editor.addPipe((context) => {
+			if (context.type === 'nodecreated') {
+				this.lastAddedNode = context.data;
+			}
 
-      const conn = context.data;
-      const sourceNode = editor.getNode(conn.source);
-      const targetNode = editor.getNode(conn.target);
-      this.pythonDataflowEngine.reset(targetNode.id);
-      const socket = sourceNode.outputs[conn.sourceOutput]?.socket;
-      const outgoingConnections =
-        socket instanceof ExecSocket || socket?.type == "exec"
-          ? sourceNode.outgoingExecConnections
-          : sourceNode.outgoingDataConnections;
+			if (context.type !== 'connectioncreated' && context.type !== 'connectionremoved')
+				return context;
 
-      const ingoingConnections =
-        socket instanceof ExecSocket || socket?.type == "exec"
-          ? targetNode.ingoingExecConnections
-          : targetNode.ingoingDataConnections;
+			const conn = context.data;
+			const sourceNode = editor.getNode(conn.source);
+			const targetNode = editor.getNode(conn.target);
+			this.pythonDataflowEngine.reset(targetNode.id);
+			const socket = sourceNode.outputs[conn.sourceOutput]?.socket;
+			const outgoingConnections =
+				socket instanceof ExecSocket || socket?.type == 'exec'
+					? sourceNode.outgoingExecConnections
+					: sourceNode.outgoingDataConnections;
 
-      if (context.type === "connectioncreated") {
-        if (!(conn.sourceOutput in outgoingConnections))
-          outgoingConnections[conn.sourceOutput] = [];
-        if (!(conn.targetInput in ingoingConnections))
-          ingoingConnections[conn.targetInput] = [];
-        outgoingConnections[conn.sourceOutput].push(conn);
-        ingoingConnections[conn.targetInput].push(conn);
-      } else if (context.type === "connectionremoved") {
-        if (targetNode.onRemoveIngoingConnection)
-          targetNode.onRemoveIngoingConnection(conn);
-        const outgoingIndex = outgoingConnections[conn.sourceOutput].findIndex(
-          (c) => c.id == conn.id,
-        );
-        if (outgoingIndex === -1)
-          throw new ErrorWNotif("Couldn't find outgoing connection");
-        outgoingConnections[conn.sourceOutput].splice(outgoingIndex, 1);
-        if (outgoingConnections[conn.sourceOutput].length === 0)
-          delete outgoingConnections[conn.sourceOutput];
+			const ingoingConnections =
+				socket instanceof ExecSocket || socket?.type == 'exec'
+					? targetNode.ingoingExecConnections
+					: targetNode.ingoingDataConnections;
 
-        const ingoingIndex = ingoingConnections[conn.targetInput].findIndex(
-          (c) => c.id == conn.id,
-        );
-        if (ingoingIndex === -1)
-          throw new ErrorWNotif("Couldn't find ingoing connection");
-        ingoingConnections[conn.targetInput].splice(ingoingIndex, 1);
-        if (ingoingConnections[conn.targetInput].length === 0)
-          delete ingoingConnections[conn.targetInput];
-      }
+			if (context.type === 'connectioncreated') {
+				if (!(conn.sourceOutput in outgoingConnections))
+					outgoingConnections[conn.sourceOutput] = [];
+				if (!(conn.targetInput in ingoingConnections)) ingoingConnections[conn.targetInput] = [];
+				outgoingConnections[conn.sourceOutput].push(conn);
+				ingoingConnections[conn.targetInput].push(conn);
+			} else if (context.type === 'connectionremoved') {
+				if (targetNode.onRemoveIngoingConnection) targetNode.onRemoveIngoingConnection(conn);
+				const outgoingIndex = outgoingConnections[conn.sourceOutput].findIndex(
+					(c) => c.id == conn.id
+				);
+				if (outgoingIndex === -1) throw new ErrorWNotif("Couldn't find outgoing connection");
+				outgoingConnections[conn.sourceOutput].splice(outgoingIndex, 1);
+				if (outgoingConnections[conn.sourceOutput].length === 0)
+					delete outgoingConnections[conn.sourceOutput];
 
-      return context;
-    });
-  }
+				const ingoingIndex = ingoingConnections[conn.targetInput].findIndex((c) => c.id == conn.id);
+				if (ingoingIndex === -1) throw new ErrorWNotif("Couldn't find ingoing connection");
+				ingoingConnections[conn.targetInput].splice(ingoingIndex, 1);
+				if (ingoingConnections[conn.targetInput].length === 0)
+					delete ingoingConnections[conn.targetInput];
+			}
 
-  commentSelectedNodes(params: { text?: string } = {}): void {
-    console.log("factory:commentSelectedNodes");
-    if (!this.comment) {
-      console.warn("No comment plugin");
-      return;
-    }
-    const nodes = this.getSelectedNodes();
-    if (!nodes) return;
-    this.comment.addFrame(
-      params.text,
-      nodes.map((node) => node.id),
-      { editPrompt: true },
-    );
-  }
+			return context;
+		});
+	}
 
-  selectConnection(id: string) {
-    // const factory = this;
-    const selector = this.selector;
-    if (!selector) throw new ErrorWNotif("No selector");
-    const connection = this.getEditor().getConnection(id);
-    console.log("selecting", connection);
-    selector.add(
-      {
-        id,
-        label: "connection",
-        translate() { },
-        unselect: () => {
-          connection.selected = false;
-          this?.getArea()?.update("connection", connection.id);
-        },
-      },
-      this.accumulating?.active() ?? false,
-    );
+	commentSelectedNodes(params: { text?: string } = {}): void {
+		console.log('factory:commentSelectedNodes');
+		if (!this.comment) {
+			console.warn('No comment plugin');
+			return;
+		}
+		const nodes = this.getSelectedNodes();
+		if (!nodes) return;
+		this.comment.addFrame(
+			params.text,
+			nodes.map((node) => node.id),
+			{ editPrompt: true }
+		);
+	}
 
-    connection.selected = true;
-    this?.getArea()?.update("connection", connection.id);
-  }
+	selectConnection(id: string) {
+		// const factory = this;
+		const selector = this.selector;
+		if (!selector) throw new ErrorWNotif('No selector');
+		const connection = this.getEditor().getConnection(id);
+		console.log('selecting', connection);
+		selector.add(
+			{
+				id,
+				label: 'connection',
+				translate() {},
+				unselect: () => {
+					connection.selected = false;
+					this?.getArea()?.update('connection', connection.id);
+				}
+			},
+			this.accumulating?.active() ?? false
+		);
 
-  selectAll() {
-    const selector = this.selector;
-    if (!selector) throw new ErrorWNotif("Missing selector");
-    if (!this.selectableNodes) {
-      console.warn("No selector");
-      return;
-    }
-    this.editor.getNodes().forEach((node) => {
-      this.selectableNodes?.select(node.id, true);
-    });
-    this.editor.getConnections().forEach((conn) => {
-      this.selectConnection(conn.id);
-    });
-    this.comment?.comments.forEach((comment) => {
-      this.comment?.select(comment.id);
-    });
-  }
+		connection.selected = true;
+		this?.getArea()?.update('connection', connection.id);
+	}
 
-  /** Delete all selected elements */
-  async deleteSelectedElements(): Promise<void> {
-    const selector = this.selector;
-    const editor = this.getEditor();
-    const selectedNodes = this.getSelectedNodes() || [];
-    if (!selectedNodes) {
-      console.warn("No selected nodes to delete");
-      return;
-    }
-    if (!selector) throw new ErrorWNotif("Missing selector");
-    const allComments = wu(selector.entities.values()).every(
-      ({ label }) => label === "comment",
-    );
-    for (const { id, label } of selector.entities.values()) {
-      switch (label) {
-        case "comment":
-          const comment = this.comment?.comments.get(id);
-          if (!comment) throw new ErrorWNotif("Comment not found");
-          const commentText = comment.text;
-          const links = comment.links;
-          const commentId = comment.id;
-          const redo = () => {
-            this.comment?.delete(id);
-          };
-          if (allComments)
-            this.history?.add({
-              redo,
-              undo: () => {
-                this.comment?.addFrame(commentText, links, { id: commentId });
-              },
-            });
-          redo();
-          // this.comment?.delete(id);
-          break;
-      }
-    }
-    // this.history?.separate();
+	selectAll() {
+		const selector = this.selector;
+		if (!selector) throw new ErrorWNotif('Missing selector');
+		if (!this.selectableNodes) {
+			console.warn('No selector');
+			return;
+		}
+		this.editor.getNodes().forEach((node) => {
+			this.selectableNodes?.select(node.id, true);
+		});
+		this.editor.getConnections().forEach((conn) => {
+			this.selectConnection(conn.id);
+		});
+		this.comment?.comments.forEach((comment) => {
+			this.comment?.select(comment.id);
+		});
+	}
 
-    for (const { id, label } of selector.entities.values()) {
-      switch (label) {
-        case "connection":
-          if (editor.getConnection(id)) await editor.removeConnection(id);
-          break;
-        case "node":
-          const node = editor.getNode(id);
-          if (!node) continue;
-          for (const conn of node.getConnections()) {
-            if (editor.getConnection(conn.id))
-              await editor.removeConnection(conn.id);
-          }
-          await editor.removeNode(id);
-          break;
-        // case 'comment':
-        // 	this.comment?.delete(id);
-        // 	break;
-        default:
-          console.warn(`Delete: Unknown label ${label}`);
-      }
-    }
-    this.selector.unselectAll();
-    // this.history?.separate();
-  }
+	/** Delete all selected elements */
+	async deleteSelectedElements(): Promise<void> {
+		const selector = this.selector;
+		const editor = this.getEditor();
+		const selectedNodes = this.getSelectedNodes() || [];
+		if (!selectedNodes) {
+			console.warn('No selected nodes to delete');
+			return;
+		}
+		if (!selector) throw new ErrorWNotif('Missing selector');
+		const allComments = wu(selector.entities.values()).every(({ label }) => label === 'comment');
+		for (const { id, label } of selector.entities.values()) {
+			switch (label) {
+				case 'comment':
+					const comment = this.comment?.comments.get(id);
+					if (!comment) throw new ErrorWNotif('Comment not found');
+					const commentText = comment.text;
+					const links = comment.links;
+					const commentId = comment.id;
+					const redo = () => {
+						this.comment?.delete(id);
+					};
+					if (allComments)
+						this.history?.add({
+							redo,
+							undo: () => {
+								this.comment?.addFrame(commentText, links, { id: commentId });
+							}
+						});
+					redo();
+					// this.comment?.delete(id);
+					break;
+			}
+		}
+		// this.history?.separate();
 
-  enable() {
-    Node.activeFactory = this;
-  }
+		for (const { id, label } of selector.entities.values()) {
+			switch (label) {
+				case 'connection':
+					if (editor.getConnection(id)) await editor.removeConnection(id);
+					break;
+				case 'node':
+					const node = editor.getNode(id);
+					if (!node) continue;
+					for (const conn of node.getConnections()) {
+						if (editor.getConnection(conn.id)) await editor.removeConnection(conn.id);
+					}
+					await editor.removeNode(id);
+					break;
+				// case 'comment':
+				// 	this.comment?.delete(id);
+				// 	break;
+				default:
+					console.warn(`Delete: Unknown label ${label}`);
+			}
+		}
+		this.selector.unselectAll();
+		// this.history?.separate();
+	}
 
-  disable() {
-    Node.activeFactory = undefined;
-  }
+	enable() {
+		Node.activeFactory = this;
+	}
 
-  getSelectedNodes(): Node[] | undefined {
-    if (!this.selector) return undefined;
-    const nodes = wu(this.selector.entities.values())
-      .filter(({ label }) => label === "node")
-      .map(({ id }) => this.editor.getNode(id))
-      .toArray();
-    return nodes.length ? nodes : undefined;
-  }
+	disable() {
+		Node.activeFactory = undefined;
+	}
 
-  getNode(id: string): Node | undefined {
-    return this.editor.getNode(id);
-  }
+	getSelectedNodes(): Node[] | undefined {
+		if (!this.selector) return undefined;
+		const nodes = wu(this.selector.entities.values())
+			.filter(({ label }) => label === 'node')
+			.map(({ id }) => this.editor.getNode(id))
+			.toArray();
+		return nodes.length ? nodes : undefined;
+	}
 
-  getSelectedNodesIds(): Set<Node["id"]> | undefined {
-    if (!this.selector) return undefined;
-    const ids = new Set<Node["id"]>();
-    wu(this.selector.entities.values())
-      .filter(({ label }) => label === "node")
-      .map(({ id }) => id)
-      .forEach((id) => ids.add(id));
-    return ids.size ? ids : undefined;
-  }
+	getNode(id: string): Node | undefined {
+		return this.editor.getNode(id);
+	}
 
-  create<T extends Node>(type: new () => T): T {
-    return new type();
-  }
+	getSelectedNodesIds(): Set<Node['id']> | undefined {
+		if (!this.selector) return undefined;
+		const ids = new Set<Node['id']>();
+		wu(this.selector.entities.values())
+			.filter(({ label }) => label === 'node')
+			.map(({ id }) => id)
+			.forEach((id) => ids.add(id));
+		return ids.size ? ids : undefined;
+	}
 
-  getEditor(): NodeEditor {
-    return this.editor;
-  }
+	create<T extends Node>(type: new () => T): T {
+		return new type();
+	}
 
-  getControlFlowEngine(): ControlFlowEngine<Schemes> {
-    return this.controlflowEngine;
-  }
+	getEditor(): NodeEditor {
+		return this.editor;
+	}
 
-  getArea(): AreaPlugin<Schemes, AreaExtra> | undefined {
-    return this.area;
-  }
+	getControlFlowEngine(): ControlFlowEngine<Schemes> {
+		return this.controlflowEngine;
+	}
 
-  resetSuccessors(node: Node) {
-    structures(this.editor)
-      .successors(node.id)
-      .nodes()
-      .forEach((n) => this.dataflowEngine.reset(n.id));
-  }
+	getArea(): AreaPlugin<Schemes, AreaExtra> | undefined {
+		return this.area;
+	}
 
-  process(node?: Node) {
-    if (node) {
-      this.dataflowEngine.reset(node.id);
-      // this.resetSuccessors(node);
-    }
-    // dataflowEngine.reset();
-    try {
-      this.editor
-        .getNodes()
-        // .filter((n) => n instanceof AddNode || n instanceof DisplayNode)
-        .forEach((n) => {
-          this.dataflowEngine.fetch(n.id);
-        });
-    } catch (e) { }
-  }
+	resetSuccessors(node: Node) {
+		structures(this.editor)
+			.successors(node.id)
+			.nodes()
+			.forEach((n) => this.dataflowEngine.reset(n.id));
+	}
+
+	process(node?: Node) {
+		if (node) {
+			this.dataflowEngine.reset(node.id);
+			// this.resetSuccessors(node);
+		}
+		// dataflowEngine.reset();
+		try {
+			this.editor
+				.getNodes()
+				// .filter((n) => n instanceof AddNode || n instanceof DisplayNode)
+				.forEach((n) => {
+					this.dataflowEngine.fetch(n.id);
+				});
+		} catch (e) {}
+	}
 }

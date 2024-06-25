@@ -1,8 +1,8 @@
-import { Control } from "$rete/control/Control";
-import type { XmlNode } from "./XmlNode";
+import { Control } from '$rete/control/Control';
+import type { XmlNode } from './XmlNode';
 
 export class AddXmlAttributeControl extends Control {
-  constructor(public readonly xmlNode: XmlNode) {
-    super();
-  }
+	constructor(public readonly xmlNode: XmlNode) {
+		super();
+	}
 }

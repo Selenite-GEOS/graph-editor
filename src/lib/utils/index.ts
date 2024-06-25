@@ -8,10 +8,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 let idCount = 0;
 export function newLocalId(baseName?: string) {
-  idCount += 1;
-  return `${baseName ?? "local-unique-id"}-${idCount}}`;
+	idCount += 1;
+	return `${baseName ?? 'local-unique-id'}-${idCount}}`;
 }
 
 export function newUuid(baseName?: string) {
-  return `${baseName ? baseName + '-' : ''}${uuidv4()}`;
+	return `${baseName ? baseName + '-' : ''}${uuidv4()}`;
 }

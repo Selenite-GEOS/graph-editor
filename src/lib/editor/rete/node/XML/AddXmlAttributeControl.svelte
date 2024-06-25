@@ -2,13 +2,14 @@
 	import Fa from 'svelte-fa';
 	import type { AddXmlAttributeControl } from './AddXmlAttributeControl';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
-	import {intersection} from 'lodash-es';
+	import intersection from 'lodash.intersection';
 
 	export let data: AddXmlAttributeControl;
 	const optAttrNames = [...data.xmlNode.optionalXmlAttributes];
 	let remainingAttrNames = optAttrNames.filter(
 		(attrName) => !data.xmlNode.state.usedOptionalAttrs.includes(attrName)
 	);
+	console.log('Creat', remainingAttrNames);
 	let selectedPropName = remainingAttrNames[0];
 
 	function onClickAddAttribute(event: Event) {

@@ -1,1 +1,1 @@
-import "./control/imports";
+import './control/imports';

@@ -9,15 +9,12 @@
 
 // import * as React from "react";
 // import { Button } from "@mantine/core"; -->
-import { ClassicPreset } from "rete";
+import { ClassicPreset } from 'rete';
 
 export class ButtonControl extends ClassicPreset.Control {
-  constructor(
-    public label: string,
-    public onClick: () => void,
-  ) {
-    super();
-  }
+	constructor(public label: string, public onClick: () => void) {
+		super();
+	}
 }
 
 // export function CustomButton(props: { data: ButtonControl }) {

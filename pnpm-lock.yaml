@@ -142,7 +142,7 @@ importers:
         specifier: ^3.1.1
         version: 3.3.2
       prettier-plugin-svelte:
-        specifier: ^3.1.2
+        specifier: ^3.2.5
         version: 3.2.5(prettier@3.3.2)(svelte@4.2.18)
       publint:
         specifier: ^0.1.9

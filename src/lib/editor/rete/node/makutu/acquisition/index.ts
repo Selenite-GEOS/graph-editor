@@ -1,2 +1,2 @@
-export {BreakNode} from "./BreakNode"
-export {SEGYAcquisitionNode} from "./SEGYAcquisitionNode"
+export { BreakNode } from './BreakNode';
+export { SEGYAcquisitionNode } from './SEGYAcquisitionNode';

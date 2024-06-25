@@ -123,13 +123,23 @@ export function findPossibleMergePositions({
 
 	function rec(elementPath: string[], path: T, xml: ParsedXmlNodes): T[] {
 		if (elementPath.length === 0)
-			return [{ ...path, withCursor: cursorTag ? path.withCursor || cursorTag in xml : false }];
+			return [
+				{
+					...path,
+					withCursor: cursorTag ? path.withCursor || cursorTag in xml : false
+				}
+			];
 
 		const possiblePathsEntryPoints = xml.filter(
 			(xmlNode) => getElementFromParsedXml(xmlNode) === elementPath[0]
 		);
 		if (possiblePathsEntryPoints.length === 0) {
-			return [{ ...path, withCursor: cursorTag ? path.withCursor || cursorTag in xml : false }];
+			return [
+				{
+					...path,
+					withCursor: cursorTag ? path.withCursor || cursorTag in xml : false
+				}
+			];
 		}
 
 		return wu(xml.entries())
@@ -196,7 +206,12 @@ export function mergeParsedXml({
 	wu(newXml).forEach((newXmlNode) => {
 		const element = getElementFromParsedXml(newXmlNode);
 
-		const mergePositions = findPossibleMergePositions({ baseXml, element, typesPaths, cursorTag });
+		const mergePositions = findPossibleMergePositions({
+			baseXml,
+			element,
+			typesPaths,
+			cursorTag
+		});
 
 		if (mergePositions.length === 0) throw new ErrorWNotif('No merge position found');
 		let selectedMergePosition = mergePositions[0];

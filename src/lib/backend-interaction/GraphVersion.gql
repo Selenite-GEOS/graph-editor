@@ -1,7 +1,7 @@
 query GraphVersion($id: String!) @cache(policy: NetworkOnly) {
-    graph {
-        graph(id: $id) {
-            version
-        }
-    }
+	graph {
+		graph(id: $id) {
+			version
+		}
+	}
 }

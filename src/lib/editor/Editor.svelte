@@ -372,5 +372,5 @@
     )
       event.preventDefault();
   }}
-  on:drop|preventDefault={onDrop}
+  on:drop|preventDefault={() => {}}
 />

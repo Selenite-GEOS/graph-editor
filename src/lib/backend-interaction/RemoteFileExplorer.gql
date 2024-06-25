@@ -1,10 +1,9 @@
 query RemoteFileExplorer($explorerInput: RemoteExplorerInput!) {
-    remoteExplorer {
-        files(remoteExplorerInput: $explorerInput) {
-            name
-            isDir
-            path
-        }
-    }
-
+	remoteExplorer {
+		files(remoteExplorerInput: $explorerInput) {
+			name
+			isDir
+			path
+		}
+	}
 }
