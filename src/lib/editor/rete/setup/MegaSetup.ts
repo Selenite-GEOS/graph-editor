@@ -29,8 +29,8 @@ export class MegaSetup extends Setup {
 		editor: NodeEditor,
 		area: AreaPlugin<Schemes, AreaExtra> | undefined,
 		factory: NodeFactory,
-		geos: GeosDataContext,
-		geosContextV2: NewGeosContext
+		geos?: GeosDataContext,
+		geosContextV2?: NewGeosContext
 	) {
 		// if (this.render) {
 		//   const { RenderSetup } = await import("../customization/render");

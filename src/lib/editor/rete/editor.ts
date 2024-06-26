@@ -20,8 +20,8 @@ export async function setupEditor(params: {
 	makutuClasses?: MakutuClassRepository;
 	loadExample?: EditorExample;
 	saveData?: NodeEditorSaveData;
-	geosContext: GeosDataContext;
-	geosContextV2: NewGeosContext;
+	geosContext?: GeosDataContext;
+	geosContextV2?: NewGeosContext;
 	modalStore?: ReturnType<typeof getModalStore>;
 	render?: boolean;
 }) {
