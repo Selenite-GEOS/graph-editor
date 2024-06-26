@@ -348,19 +348,22 @@ export class NodeFactory {
 				ingoingConnections[conn.targetInput].push(conn);
 			} else if (context.type === 'connectionremoved') {
 				if (targetNode && targetNode.onRemoveIngoingConnection) targetNode.onRemoveIngoingConnection(conn);
-				const outgoingIndex = outgoingConnections[conn.sourceOutput].findIndex(
-					(c) => c.id == conn.id
-				);
-				if (outgoingIndex === -1) throw new ErrorWNotif("Couldn't find outgoing connection");
-				outgoingConnections[conn.sourceOutput].splice(outgoingIndex, 1);
-				if (outgoingConnections[conn.sourceOutput].length === 0)
-					delete outgoingConnections[conn.sourceOutput];
-
-				const ingoingIndex = ingoingConnections[conn.targetInput].findIndex((c) => c.id == conn.id);
-				if (ingoingIndex === -1) throw new ErrorWNotif("Couldn't find ingoing connection");
-				ingoingConnections[conn.targetInput].splice(ingoingIndex, 1);
-				if (ingoingConnections[conn.targetInput].length === 0)
-					delete ingoingConnections[conn.targetInput];
+				if (conn.sourceOutput in outgoingConnections) {
+					const outgoingIndex: number = outgoingConnections[conn.sourceOutput]?.findIndex(
+						(c) => c.id == conn.id
+					);
+					if (outgoingIndex === -1) throw new ErrorWNotif("Couldn't find outgoing connection");
+					outgoingConnections[conn.sourceOutput].splice(outgoingIndex, 1);
+					if (outgoingConnections[conn.sourceOutput].length === 0)
+						delete outgoingConnections[conn.sourceOutput];
+				}
+				if (conn.targetInput in ingoingConnections) {
+					const ingoingIndex = ingoingConnections[conn.targetInput]?.findIndex((c) => c.id == conn.id);
+					if (ingoingIndex === -1) throw new ErrorWNotif("Couldn't find ingoing connection");
+					ingoingConnections[conn.targetInput].splice(ingoingIndex, 1);
+					if (ingoingConnections[conn.targetInput].length === 0)
+						delete ingoingConnections[conn.targetInput];
+				}
 			}
 
 			return context;
