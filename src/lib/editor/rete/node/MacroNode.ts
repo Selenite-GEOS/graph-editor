@@ -13,7 +13,7 @@ import type { Variable } from '$lib/editor/overlay/variables-list';
 import wu from 'wu';
 import { VariableNode } from './XML/VariableNode';
 
-class InputNode extends Node {
+export class InputNode extends Node {
 	private value: unknown;
 
 	constructor({ factory, isArray }: { factory: NodeFactory; isArray: boolean }) {
