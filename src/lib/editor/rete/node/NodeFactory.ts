@@ -248,10 +248,20 @@ export class NodeFactory {
 		}
 
 		editorSaveData.connections.forEach(async (connectionSaveData) => {
+			const source = this.editor.getNode(connectionSaveData.source)
+			if (!source) {
+				console.error('Source node not found for connection', connectionSaveData);
+				throw new ErrorWNotif('Source node not found for connection')
+			}
+			const target = this.editor.getNode(connectionSaveData.target)
+			if (!target) {
+				console.error('Target node not found for connection', connectionSaveData);
+				throw new ErrorWNotif('Target node not found for connection')
+			}
 			const conn = new Connection(
-				this.editor.getNode(connectionSaveData.source),
+				source,
 				connectionSaveData.sourceOutput,
-				this.editor.getNode(connectionSaveData.target),
+				target,
 				connectionSaveData.targetInput
 			);
 			conn.id = connectionSaveData.id;
@@ -312,26 +322,32 @@ export class NodeFactory {
 			const conn = context.data;
 			const sourceNode = editor.getNode(conn.source);
 			const targetNode = editor.getNode(conn.target);
-			this.pythonDataflowEngine.reset(targetNode.id);
-			const socket = sourceNode.outputs[conn.sourceOutput]?.socket;
+
+			if (targetNode)
+				this.pythonDataflowEngine.reset(targetNode.id);
+			const socket = sourceNode?.outputs[conn.sourceOutput]?.socket;
 			const outgoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
-					? sourceNode.outgoingExecConnections
-					: sourceNode.outgoingDataConnections;
+					? sourceNode?.outgoingExecConnections ?? {}
+					: sourceNode?.outgoingDataConnections ?? {};
 
 			const ingoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
-					? targetNode.ingoingExecConnections
-					: targetNode.ingoingDataConnections;
+					? targetNode?.ingoingExecConnections ?? {}
+					: targetNode?.ingoingDataConnections ?? {};
 
 			if (context.type === 'connectioncreated') {
+				if (!sourceNode || !targetNode) {
+					console.error('Connection created node not found', conn);
+					return context;
+				}
 				if (!(conn.sourceOutput in outgoingConnections))
 					outgoingConnections[conn.sourceOutput] = [];
 				if (!(conn.targetInput in ingoingConnections)) ingoingConnections[conn.targetInput] = [];
 				outgoingConnections[conn.sourceOutput].push(conn);
 				ingoingConnections[conn.targetInput].push(conn);
 			} else if (context.type === 'connectionremoved') {
-				if (targetNode.onRemoveIngoingConnection) targetNode.onRemoveIngoingConnection(conn);
+				if (targetNode && targetNode.onRemoveIngoingConnection) targetNode.onRemoveIngoingConnection(conn);
 				const outgoingIndex = outgoingConnections[conn.sourceOutput].findIndex(
 					(c) => c.id == conn.id
 				);
@@ -376,7 +392,7 @@ export class NodeFactory {
 			{
 				id,
 				label: 'connection',
-				translate() {},
+				translate() { },
 				unselect: () => {
 					connection.selected = false;
 					this?.getArea()?.update('connection', connection.id);
@@ -480,7 +496,8 @@ export class NodeFactory {
 		const nodes = wu(this.selector.entities.values())
 			.filter(({ label }) => label === 'node')
 			.map(({ id }) => this.editor.getNode(id))
-			.toArray();
+			.filter((node) => node !== undefined)
+			.toArray() as Node[];
 		return nodes.length ? nodes : undefined;
 	}
 
@@ -534,6 +551,6 @@ export class NodeFactory {
 				.forEach((n) => {
 					this.dataflowEngine.fetch(n.id);
 				});
-		} catch (e) {}
+		} catch (e) { }
 	}
 }

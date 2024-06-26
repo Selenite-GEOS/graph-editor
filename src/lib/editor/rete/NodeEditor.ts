@@ -53,6 +53,10 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return await this.addConnection(new Connection(source, 'exec', target, 'exec'));
 	}
 
+	getNode(id: string): Node | undefined {
+		return super.getNode(id) 
+	}
+
 	async addNewConnection(
 		source: Node | string,
 		sourceOutput: string,
