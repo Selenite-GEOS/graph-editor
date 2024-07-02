@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { EditMacroNodeChannel } from '$lib/broadcast-channels';
-	import type { NodeEditorSaveData } from '$rete/NodeEditor';
+	import type { NodeEditorSaveData } from '$graph-editor/NodeEditor';
 	import { faStar as faStarSolid, faUser } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 	import { ErrorWNotif, _, getContext } from '$lib/global';

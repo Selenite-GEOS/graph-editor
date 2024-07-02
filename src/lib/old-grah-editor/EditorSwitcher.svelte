@@ -10,8 +10,8 @@
 		ErrorWNotif,
 		keyboardShortcut
 	} from '$lib/global';
-	import type { NodeEditor, NodeEditorSaveData, NodeFactory } from '$rete';
-	import { isNodeEditorSaveData } from '$rete/utils';
+	import type { NodeEditor, NodeEditorSaveData, NodeFactory } from '$graph-editor';
+	import { isNodeEditorSaveData } from '$graph-editor/utils';
 
 	import { addContextFunction, newLocalId } from '$utils';
 	import {
@@ -25,7 +25,7 @@
 	import { fade } from 'svelte/transition';
 	import BoxSelection from './selection/BoxSelection.svelte';
 	import type { Area, AreaPlugin } from 'rete-area-plugin';
-	import type { Schemes } from '$rete/node/Schemes';
+	import type { Schemes } from '$graph-editor/node/Schemes';
 	import { clientToSurfacePos } from '$utils/html';
 	import type { Point } from '$lib/types/Point';
 	import wu from 'wu';

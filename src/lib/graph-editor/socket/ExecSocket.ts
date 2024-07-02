@@ -1,4 +1,4 @@
-import type { Node } from '$rete/node/Node';
+import type { Node } from '$graph-editor/node/Node';
 import { Socket } from './Socket';
 
 export class ExecSocket extends Socket {

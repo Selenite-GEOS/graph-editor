@@ -4,15 +4,15 @@
 	// import Ref from '../../../Ref.svelte';
 	// import type { ClassicScheme, SvelteArea2D } from '../types';
 	import { type ClassicScheme, Ref, type SvelteArea2D } from 'rete-svelte-plugin';
-	import { MacroNode } from '$rete/node/MacroNode';
+	import { MacroNode } from '$graph-editor/node/MacroNode';
 	import { faCubes } from '@fortawesome/free-solid-svg-icons';
-	import { XmlNode, type Node, type NodeEditorSaveData, Input } from '$rete';
+	import { XmlNode, type Node, type NodeEditorSaveData, Input } from '$graph-editor';
 	import Fa from 'svelte-fa';
 	import { EditMacroNodeChannel } from '$lib/broadcast-channels';
 	import { GetGraphStore } from '$houdini';
 	import { fade } from 'svelte/transition';
 	import { newLocalId } from '$lib/utils';
-	import { VariableNode } from '$rete/node/XML/VariableNode';
+	import { VariableNode } from '$graph-editor/node/XML/VariableNode';
 	import { faClock } from '@fortawesome/free-regular-svg-icons';
 	import { Popup } from '$lib/layout';
 	import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';

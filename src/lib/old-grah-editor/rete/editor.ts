@@ -3,7 +3,7 @@ import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-
 import type { Node } from './node/Node';
 import type { AreaExtra } from './node/AreaExtra';
 import type { Schemes } from './node/Schemes';
-import { TypedSocketsPlugin } from './plugin/typed-sockets';
+import { TypedSocketsPlugin } from '../../graph-editor/plugins/typed-sockets';
 import { NodeEditor, type NodeEditorSaveData } from './NodeEditor';
 import type { EditorExample } from './example/types';
 import { MegaSetup } from './setup/MegaSetup';
@@ -12,8 +12,8 @@ import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import type { GeosDataContext } from '$lib/geos';
 import type { NewGeosContext } from '$lib/global';
 import { Presets as HistoryPresets, type HistoryActions } from 'rete-history-plugin';
-import { HistoryPlugin } from '$rete/plugin/history';
-import { CommentPlugin, CommentExtensions } from '$rete/plugin/CommentPlugin';
+import { HistoryPlugin } from '$graph-editor/plugin/history';
+import { CommentPlugin, CommentExtensions } from '$graph-editor/plugin/CommentPlugin';
 import type { getModalStore } from '@skeletonlabs/skeleton';
 
 export async function setupEditor(params: {

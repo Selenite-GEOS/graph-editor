@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getModalStore } from '@skeletonlabs/skeleton';
-	import { assignControl } from '$rete/customization/utils';
-	import { InputControl, type InputControlTypes } from '$rete/control/Control';
-	import InputControlComponent from '$rete/customization/presets/classic/components/InputControl.svelte';
+	import { assignControl } from '$graph-editor/customization/utils';
+	import { InputControl, type InputControlTypes } from '$graph-editor/control/Control';
+	import InputControlComponent from '$graph-editor/customization/presets/classic/components/InputControl.svelte';
 	const modalStore = getModalStore();
 	let { array, title, type } = $modalStore[0].meta;
 	let controls: InputControl<'unknown'>[] = [];

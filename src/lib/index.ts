@@ -1,6 +1,6 @@
-export { setupEditor } from '$rete/editor';
-export { setupClasses } from '$rete/setup/appLaunch';
-export * from '$rete/node/MacroNode';
-export * from '$rete/node/XML/XmlNode';
-export * from '$rete';
+export { setupEditor } from '$graph-editor/editor';
+export { setupClasses } from '$graph-editor/setup/appLaunch';
+export * from '$graph-editor/node/MacroNode';
+export * from '$graph-editor/node/XML/XmlNode';
+export * from '$graph-editor';
 export * from '$utils';

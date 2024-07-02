@@ -18,16 +18,16 @@
 		getXmlAttributes
 	} from '$utils/xml';
 	import { AutoArrangePlugin, Presets as ArrangePresets } from 'rete-auto-arrange-plugin';
-	import type { Schemes } from '$rete/node/Schemes';
-	import type { Node, NodeSaveData } from '$rete';
+	import type { Schemes } from '$graph-editor/node/Schemes';
+	import type { Node, NodeSaveData } from '$graph-editor';
 	import { Area, AreaExtensions, AreaPlugin, NodeView } from 'rete-area-plugin';
-	import type { AreaExtra } from '$rete/node/AreaExtra';
-	import { XmlNode } from '$rete/node/XML/XmlNode';
+	import type { AreaExtra } from '$graph-editor/node/AreaExtra';
+	import { XmlNode } from '$graph-editor/node/XML/XmlNode';
 	import type { GeosSchema } from '$lib/geos';
 	import { get } from 'svelte/store';
-	import type { XmlAttributeDefinition } from '$rete/node/XML/types';
-	import { MakeArrayNode } from '$rete/node/data/MakeArrayNode';
-	import { GetNameNode } from '$rete/node/XML/GetNameNode';
+	import type { XmlAttributeDefinition } from '$graph-editor/node/XML/types';
+	import { MakeArrayNode } from '$graph-editor/node/data/MakeArrayNode';
+	import { GetNameNode } from '$graph-editor/node/XML/GetNameNode';
 
 	export let editorContext: EditorContext;
 	let codeEditorPromise: Promise<ICodeEditor>;
@@ -82,7 +82,7 @@
 	 * Pushes the selected text from the code editor to the graph editor
 	 */
 	async function push() {
-		const { NodeEditor, NodeFactory } = await import('$rete');
+		const { NodeEditor, NodeFactory } = await import('$graph-editor');
 		const geosSchema = newGeosContext.geosSchema;
 		const rootTypes = ['Problem', ...Object.keys(get(newGeosContext.typesTree)['Problem'] ?? {})];
 		console.log('pizza', get(newGeosContext.typesTree));

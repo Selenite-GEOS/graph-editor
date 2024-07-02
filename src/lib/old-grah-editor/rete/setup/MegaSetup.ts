@@ -6,7 +6,7 @@ import type { Schemes } from '../node/Schemes';
 import { Setup } from './Setup';
 import { MinimapSetup } from './MinimapSetup';
 import type { NodeFactory } from '../node/NodeFactory';
-import { ContextMenuSetup } from '../plugin/context-menu/context-menu';
+import { ContextMenuSetup } from '../../../graph-editor/plugins/context-menu/context-menu';
 import { AreaSetup } from './AreaSetup';
 import { ConnectionSetup } from './ConnectionSetup';
 import type { GeosDataContext } from '$lib/geos';

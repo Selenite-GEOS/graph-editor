@@ -1,4 +1,4 @@
-import type { NodeEditorSaveData } from '$rete/NodeEditor';
+import type { NodeEditorSaveData } from '$graph-editor/NodeEditor';
 import { BroadcastChannel } from 'broadcast-channel';
 
 export class EditMacroNodeChannel extends BroadcastChannel<{

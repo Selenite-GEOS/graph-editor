@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { InputControl, InputControlTypes } from '$rete/control/Control';
+	import type { InputControl, InputControlTypes } from '$graph-editor/control/Control';
 	import { FileButton } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	export let data: InputControl<InputControlTypes>;

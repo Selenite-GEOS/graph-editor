@@ -1,3 +1,3 @@
 <script lang="ts">
-    import '$lib/graph-editor'
+	import '$lib/graph-editor';
 </script>

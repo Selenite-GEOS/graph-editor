@@ -1,7 +1,6 @@
-
 /**
  * This file is the entry point for all the nodes in the graph editor.
- * 
+ *
  * Nodes autoregister themselves.
  * @module nodes
  */

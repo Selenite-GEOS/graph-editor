@@ -1,5 +1,5 @@
 import { Node } from '../Node';
-import { notifications } from '@mantine/notifications';
+// import { notifications } from '@mantine/notifications';
 import { getLeavesFromOutput } from '../utils';
 import type { NodeFactory } from '../../editor/NodeFactory';
 
@@ -113,7 +113,10 @@ while $(t) < $(end):
 			// console.log('start', start, 'end', end, 'step', step);
 			if (displayProgress && cycle % 100 === 0) {
 				console.log(this.currentTime);
-				notifications.show({ title: 'Time Loop', message: `Time: ${this.currentTime}s` });
+				this.factory.notifications.show({
+					title: 'Time Loop',
+					message: `Time: ${this.currentTime}s`
+				});
 			}
 
 			this.getDataflowEngine().reset(this.id);

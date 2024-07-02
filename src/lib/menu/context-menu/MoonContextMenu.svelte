@@ -15,10 +15,10 @@
 
 	import intersection from 'lodash.intersection';
 	import { translateNodeFromGlobal } from '$utils/html';
-	import { XmlNode } from '$rete/node/XML/XmlNode';
-	import { GetNameNode } from '$rete/node/XML/GetNameNode';
-	import { MakeArrayNode } from '$rete/node/data/MakeArrayNode';
-	import { StringNode } from '$rete/node/data/StringNode';
+	import { XmlNode } from '$graph-editor/node/XML/XmlNode';
+	import { GetNameNode } from '$graph-editor/node/XML/GetNameNode';
+	import { MakeArrayNode } from '$graph-editor/node/data/MakeArrayNode';
+	import { StringNode } from '$graph-editor/node/data/StringNode';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import { isAlphaNumChar } from '$utils/string';
 	import Menu from '../Menu.svelte';

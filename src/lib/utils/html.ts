@@ -1,4 +1,4 @@
-import type { NodeFactory, Node } from '$rete';
+import type { NodeFactory, Node } from '$graph-editor';
 
 export function getTranslateValues(element: HTMLElement): {
 	translateX: number;

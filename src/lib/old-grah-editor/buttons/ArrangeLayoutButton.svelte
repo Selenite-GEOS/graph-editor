@@ -5,8 +5,8 @@
 	import { AreaExtensions } from 'rete-area-plugin';
 	import wu from 'wu';
 	import { ArrangeAppliers } from 'rete-auto-arrange-plugin';
-	import type { Schemes } from '$rete/node/Schemes';
-	import type { AreaExtra } from '$rete/node/AreaExtra';
+	import type { Schemes } from '$graph-editor/node/Schemes';
+	import type { AreaExtra } from '$graph-editor/node/AreaExtra';
 	import { cubicInOut } from 'svelte/easing';
 
 	const exec: ButtonExec = async ({ factory }) => {

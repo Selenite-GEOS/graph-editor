@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { faCubes } from '@fortawesome/free-solid-svg-icons';
 	import EditorButton from './EditorButton.svelte';
-	import type { NodeEditor } from '$rete/NodeEditor';
+	import type { NodeEditor } from '$graph-editor/NodeEditor';
 
 	// export let editor: NodeEditor;
 

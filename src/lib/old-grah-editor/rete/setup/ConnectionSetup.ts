@@ -1,7 +1,7 @@
-import type { NodeEditor } from '$rete/NodeEditor';
-import type { AreaExtra } from '$rete/node/AreaExtra';
-import type { NodeFactory } from '$rete/node/NodeFactory';
-import type { Schemes } from '$rete/node/Schemes';
+import type { NodeEditor } from '$graph-editor/NodeEditor';
+import type { AreaExtra } from '$graph-editor/node/AreaExtra';
+import type { NodeFactory } from '$graph-editor/node/NodeFactory';
+import type { Schemes } from '$graph-editor/node/Schemes';
 import type { Area2D, AreaPlugin } from 'rete-area-plugin';
 import { Setup } from './Setup';
 import {
@@ -13,15 +13,15 @@ import {
 	type SocketData,
 	type ClassicParams
 } from 'rete-connection-plugin';
-import { isConnectionInvalid } from '$rete/plugin/typed-sockets';
-import type { Socket } from '$rete/socket/Socket';
+import { isConnectionInvalid } from '$graph-editor/plugin/typed-sockets';
+import type { Socket } from '$graph-editor/socket/Socket';
 import { notifications } from '@mantine/notifications';
 import type { Root } from 'rete';
-import { findSocket } from '$rete/socket/utils';
-import type { Connection, Node } from '$rete/node/Node';
+import { findSocket } from '$graph-editor/socket/utils';
+import type { Connection, Node } from '$graph-editor/node/Node';
 import { moonMenuVisibleStore } from '$lib/menu/context-menu/moonContextMenu';
-import { XmlNode } from '$rete/node/XML/XmlNode';
-import { MakeArrayNode } from '$rete/node/data/MakeArrayNode';
+import { XmlNode } from '$graph-editor/node/XML/XmlNode';
+import { MakeArrayNode } from '$graph-editor/node/data/MakeArrayNode';
 
 let dropMenuVisible = false;
 moonMenuVisibleStore.subscribe((value) => {

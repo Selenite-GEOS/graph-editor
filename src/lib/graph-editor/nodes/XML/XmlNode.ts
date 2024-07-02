@@ -1,15 +1,13 @@
 import { Node, type NodeParams, type OutDataParams } from '../Node';
-import type { XmlAttribute, XmlAttributeDefinition } from './types';
+import type { XmlAttributeDefinition } from './types';
 import { camlelcaseize, titlelize } from '$lib/utils/string';
-import type { Socket } from '../../socket/Socket';
-import type { SocketType, XMLAttrType } from '$rete/plugin/typed-sockets';
+import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
-import type { InputControl } from '$rete/control/Control';
-import { assignControl } from '$rete/customization/utils';
+import type { InputControl, assignControl, Socket } from '$graph-editor/socket';
 import { AddXmlAttributeControl } from './AddXmlAttributeControl';
 import { ErrorWNotif } from '$lib/global';
 import type { GeosSchema } from '$lib/geos';
-import type { NodeFactory } from '$rete';
+import type { NodeFactory } from '$graph-editor';
 import 'regenerator-runtime/runtime';
 import wu from 'wu';
 

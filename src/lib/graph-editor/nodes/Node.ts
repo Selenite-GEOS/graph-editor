@@ -1,29 +1,27 @@
-import { ClassicPreset, NodeEditor } from 'rete';
-import type { AreaPlugin } from 'rete-area-plugin';
+import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
-import type { AreaExtra } from './AreaExtra';
-import type { Schemes } from '../schemes';
+import type { AreaExtra } from '../area/AreaExtra';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
-import { Socket } from '../socket/Socket';
-import { ExecSocket } from '../socket/ExecSocket';
-import { Output } from '../Output';
-import { Input } from '../Input';
-import { format } from 'svelte-i18n';
 import { Stack } from '$lib/types/Stack';
-import type { SocketType, TypedSocketsPlugin } from '../plugin/typed-sockets';
+import type { SocketType } from '../plugins';
 import {
+	Socket,
+	ExecSocket,
+	Output,
+	Input,
 	Control,
 	InputControl,
 	type InputControlOptions,
 	type InputControlTypes,
 	type InputControlValueType
-} from '../control/Control';
-import type { NodeFactory } from '../editor/NodeFactory';
-import type { ComponentSupportInterface } from '$rete/components/ComponentSupportInterface';
-import type { BaseComponent } from '$rete/components/BaseComponent';
-import { PythonNodeComponent } from '$rete/components/Python_NC';
-import { R_SocketSelection_NC } from '$rete/components/R_SocketSelection_NC';
-import { GraphVersionStore } from '$houdini';
+} from '../socket';
+import type { NodeFactory } from '../editor';
+import {
+	type ComponentSupportInterface,
+	type BaseComponent,
+	PythonNodeComponent,
+	R_SocketSelection_NC
+} from '../components';
 import { ErrorWNotif } from '$lib/global';
 
 interface ControlParams<N> {

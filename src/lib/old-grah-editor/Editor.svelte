@@ -1,8 +1,14 @@
 <script lang="ts">
-	import type { NodeEditor, NodeEditorSaveData, NodeFactory, setupEditor, Node } from '$rete';
-	import { XmlNode } from '$rete/node/XML/XmlNode';
+	import type {
+		NodeEditor,
+		NodeEditorSaveData,
+		NodeFactory,
+		setupEditor,
+		Node
+	} from '$graph-editor';
+	import { XmlNode } from '$graph-editor/node/XML/XmlNode';
 
-	import type { EditorExample } from '$rete/example/types';
+	import type { EditorExample } from '$graph-editor/example/types';
 	import { capitalize, newLocalId, newUuid } from '$utils';
 	import { _, getContext, keyboardShortcut, notifications } from '$lib/global';
 	export let position = 'absolute';
@@ -14,16 +20,16 @@
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { draw, fade } from 'svelte/transition';
 	import { get } from 'svelte/store';
-	import { isNodeEditorSaveData } from '$rete/utils';
+	import { isNodeEditorSaveData } from '$graph-editor/utils';
 	import type { UUID } from 'crypto';
 	import { GetGraphStore } from '$houdini';
 	import { translateNodeFromGlobal } from '$utils/html';
-	import type { ConnectionDropEvent } from '$rete/setup/ConnectionSetup';
+	import type { ConnectionDropEvent } from '$graph-editor/setup/ConnectionSetup';
 	import type { spawnMoonMenu as t_spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
 	import { moonMenuFactoryStore, newMoonItemsStore } from '$lib/menu/context-menu/moonContextMenu';
-	import type { MacroNode as t_MacroNode } from '$rete/node/MacroNode';
+	import type { MacroNode as t_MacroNode } from '$graph-editor/node/MacroNode';
 	import { createNodeMenuItem, type IBaseMenuItem, type INodeMenuItem } from '$lib/menu';
-	import { VariableNode } from '$rete/node/XML/VariableNode';
+	import { VariableNode } from '$graph-editor/node/XML/VariableNode';
 	import { possibleTypes, type Variable } from './overlay/variables-list';
 	import { EditorType } from '.';
 	import { getModalStore } from '@skeletonlabs/skeleton';
@@ -35,7 +41,7 @@
 	const geosContextV2 = getContext('geos_v2');
 	onMount(async () => {
 		spawnMoonMenu = (await import('$lib/menu/context-menu/moonContextMenu')).spawnMoonMenu;
-		MacroNode = (await import('$rete/node/MacroNode')).MacroNode;
+		MacroNode = (await import('$graph-editor/node/MacroNode')).MacroNode;
 		AreaExtensions = (await import('rete-area-plugin')).AreaExtensions;
 	});
 
@@ -66,8 +72,8 @@
 	const tabsContext = getContext('tabs');
 	const modalStore = getModalStore();
 	onMount(async () => {
-		await import('$rete/setup/appLaunch');
-		const { setupEditor } = await import('$rete');
+		await import('$graph-editor/setup/appLaunch');
+		const { setupEditor } = await import('$graph-editor');
 		editorData = await setupEditor({
 			container,
 			makutuClasses: {

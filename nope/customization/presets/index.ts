@@ -1,4 +1,4 @@
-export * as classic from "./classic";
-export * as contextMenu from "./context-menu";
-export * as minimap from "./minimap";
-export * as reroute from "./reroute";
+export * as classic from './classic';
+export * as contextMenu from './context-menu';
+export * as minimap from './minimap';
+export * as reroute from './reroute';

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Socket } from '$rete/socket/Socket';
+	import type { Socket } from '$graph-editor/socket/Socket';
 	export let data: Socket;
-	import { assignColor } from '$rete/customization/utils';
+	import { assignColor } from '$graph-editor/customization/utils';
 	import cssVars from 'svelte-css-vars';
 
 	let socketVars = { background: assignColor(data) };

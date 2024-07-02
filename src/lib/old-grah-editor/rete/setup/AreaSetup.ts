@@ -1,7 +1,7 @@
-import type { NodeEditor } from '$rete/NodeEditor';
-import type { AreaExtra } from '$rete/node/AreaExtra';
-import type { NodeFactory } from '$rete/node/NodeFactory';
-import type { Schemes } from '$rete/node/Schemes';
+import type { NodeEditor } from '$graph-editor/NodeEditor';
+import type { AreaExtra } from '$graph-editor/node/AreaExtra';
+import type { NodeFactory } from '$graph-editor/node/NodeFactory';
+import type { Schemes } from '$graph-editor/node/Schemes';
 import type { Area2D, AreaPlugin } from 'rete-area-plugin';
 import { Setup } from './Setup';
 import type { Root } from 'rete';

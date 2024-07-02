@@ -1,4 +1,4 @@
-import type { NodeEditor, NodeFactory } from '$rete';
+import type { NodeEditor, NodeFactory } from '$graph-editor';
 import DownloadGraphButton from './DownloadGraphButton.svelte';
 import EditorButton from './EditorButton.svelte';
 import LoadGraphFromFileButton from './LoadGraphFromFileButton.svelte';

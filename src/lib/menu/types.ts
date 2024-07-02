@@ -1,6 +1,6 @@
 import { EditorType } from '$lib/editor/types';
-import type { NodeFactory } from '$rete';
-import type { Node } from '$rete/node/Node';
+import type { NodeFactory } from '$graph-editor';
+import type { Node } from '$graph-editor/node/Node';
 
 export interface IBaseMenuItem {
 	getLabel: () => string;
@@ -104,10 +104,10 @@ export function isActionMenuItem(menuItem: IMenuItem): menuItem is IActionMenuIt
 export type IMenuItem<T extends MenuItemType = MenuItemType.Base> = T extends MenuItemType.Base
 	? IBaseMenuItem
 	: T extends MenuItemType.Node
-	? INodeMenuItem
-	: T extends MenuItemType.Action
-	? IActionMenuItem
-	: never;
+		? INodeMenuItem
+		: T extends MenuItemType.Action
+			? IActionMenuItem
+			: never;
 
 /**
  * Returns a new INodeMenuItem

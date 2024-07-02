@@ -12,7 +12,7 @@
 	import type { Action } from 'svelte/action';
 	import { VariableItem, type Variable } from '.';
 	import { get, type Writable } from 'svelte/store';
-	import type { SocketType } from '$rete/plugin/typed-sockets';
+	import type { SocketType } from '$graph-editor/plugin/typed-sockets';
 	import { newLocalId, newUuid } from '$utils';
 
 	const collapsed = localStorageStore('variablesListCollapsed', true);

@@ -1,7 +1,7 @@
 import { Connection, Node } from '../Node';
 import { getLeavesFromOutput } from '../utils';
 import type { NodeFactory } from '../../editor/NodeFactory';
-import type { SocketType } from '../../plugin/typed-sockets';
+import type { SocketType } from '../../plugins/typed-sockets';
 
 // Class defining a For Each Node
 export class ForEachNode extends Node {

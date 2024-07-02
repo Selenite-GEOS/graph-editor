@@ -1,4 +1,4 @@
-import type { NodeFactory } from '$rete/node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/node/NodeFactory';
 import { SolverAPINode } from './SolverAPINode';
 
 export class SolverLoopNode extends SolverAPINode {

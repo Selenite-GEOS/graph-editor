@@ -9,24 +9,24 @@ import CustomNode from '$custom-components/Node.svelte';
 // import { CustomArraySocket } from './presets/classic/components/CustomArraySocket';
 import { ButtonControl } from '../control/button/button';
 import type { NodeFactory } from '../node/NodeFactory';
-import CustomButton from '../control/button/CustomButton.svelte';
+import CustomButton from '../../../graph-editor/socket/control/button/CustomButton.svelte';
 import CustomConnection from '$custom-components/Connection.svelte';
 import CustomExecSocket from '$custom-components/ExecSocket.svelte';
 import CustomSocket from '$custom-components/Socket.svelte';
 import type { Setup } from '../setup/Setup';
 import { SveltePlugin, Presets } from 'rete-svelte-plugin';
-import { InputControl } from '$rete/control/Control';
-import InputControlComponent from '$rete/customization/presets/classic/components/InputControl.svelte';
-import { Socket } from '$rete/socket/Socket';
-import AddXmlAttributeControlCmpnt from '$rete/node/XML/AddXmlAttributeControl.svelte';
-import { AddXmlAttributeControl } from '$rete/node/XML/AddXmlAttributeControl';
+import { InputControl } from '$graph-editor/control/Control';
+import InputControlComponent from '$graph-editor/customization/presets/classic/components/InputControl.svelte';
+import { Socket } from '$graph-editor/socket/Socket';
+import AddXmlAttributeControlCmpnt from '$graph-editor/node/XML/AddXmlAttributeControl.svelte';
+import { AddXmlAttributeControl } from '$graph-editor/node/XML/AddXmlAttributeControl';
 // import { ReactPlugin, Presets } from 'rete-react-plugin';
 
 import { ConnectionPathPlugin } from 'rete-connection-path-plugin';
 import { curveStep, type CurveFactory, curveBasis, curveLinear, curveMonotoneX } from 'd3-shape';
 import { get } from 'svelte/store';
 import { ErrorWNotif } from '$lib/global';
-import type { Connection } from '$rete';
+import type { Connection } from '$graph-editor';
 import { assignConnectionPath } from '$lib/editor/connection-path';
 
 export class RenderSetup implements Setup {

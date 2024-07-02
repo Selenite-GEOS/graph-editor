@@ -1,4 +1,4 @@
-import { Control } from '$rete/control/Control';
+import { Control } from '$graph-editor/socket';
 import type { XmlNode } from './XmlNode';
 
 export class AddXmlAttributeControl extends Control {

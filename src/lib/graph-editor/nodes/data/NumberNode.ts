@@ -1,6 +1,6 @@
 import { Node } from '../Node';
 import type { NodeFactory } from '../../editor/NodeFactory';
-import { InputControl } from '$rete/control/Control';
+import { InputControl } from '$graph-editor/control/Control';
 
 export class NumberNode extends Node {
 	height = 130;

@@ -1,5 +1,5 @@
-import type { Node, NodeFactory } from '$rete';
-import type { ConnectionDropEvent } from '$rete/setup/ConnectionSetup';
+import type { Node, NodeFactory } from '$graph-editor';
+import type { ConnectionDropEvent } from '$graph-editor/setup/ConnectionSetup';
 import { writable } from 'svelte/store';
 import type { IBaseMenuItem } from '../types';
 import type { Point } from '$lib/types/Point';

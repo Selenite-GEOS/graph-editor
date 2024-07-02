@@ -1,13 +1,13 @@
 import { GetGraphStore, GraphVersionStore } from '$houdini';
-import { Input, Node, NodeFactory, NodeEditor, Socket, Output, Connection } from '$rete';
-import type { NodeEditorSaveData } from '$rete/NodeEditor';
-import type { InputControl } from '$rete/control/Control';
-import { ExecSocket } from '$rete/socket/ExecSocket';
+import { Input, Node, NodeFactory, NodeEditor, Socket, Output, Connection } from '$graph-editor';
+import type { NodeEditorSaveData } from '$graph-editor/NodeEditor';
+import type { InputControl } from '$graph-editor/control/Control';
+import { ExecSocket } from '$graph-editor/socket/ExecSocket';
 import type { UUID } from 'crypto';
 import { DataflowEngine } from 'rete-engine';
 import type { Schemes } from '../schemes';
 import { getLeavesFromOutput } from './utils';
-import { assignControl } from '$rete/customization/utils';
+import { assignControl } from '$graph-editor/customization/utils';
 import { get } from 'svelte/store';
 import type { Variable } from '$lib/editor/overlay/variables-list';
 import wu from 'wu';

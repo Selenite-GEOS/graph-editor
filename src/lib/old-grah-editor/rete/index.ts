@@ -1,7 +1,7 @@
 import type { NodeEditorSaveData } from './NodeEditor';
 
-export * from './Input';
-export * from './Output';
+export * from '../../graph-editor/socket/Input';
+export * from '../../graph-editor/socket/Output';
 export * from './NodeEditor';
 export { setupEditor } from './editor';
 export * from './node/Node';

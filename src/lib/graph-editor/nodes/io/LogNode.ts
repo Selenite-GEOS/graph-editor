@@ -1,9 +1,5 @@
-import { Input } from '../../Input';
-import { Socket } from '../../socket/Socket';
 import { Node } from '../Node';
-import { notifications } from '@mantine/notifications';
 import type { NodeFactory } from '../../editor/NodeFactory';
-import { InputControl } from '$rete/control/Control';
 
 export class LogNode extends Node {
 	// protected state: Record<string, unknown>;
@@ -63,7 +59,7 @@ if (rank == 0):
 		const res = inputs.message ? inputs.message[0] : messageControl.value;
 		console.log(res);
 
-		notifications.show({
+		this.factory.notifications.show({
 			title: 'Log',
 			message: typeof res === 'string' ? res : JSON.stringify(res)
 		});

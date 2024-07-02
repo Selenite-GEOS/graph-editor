@@ -3,7 +3,7 @@
 	import { notifications } from '@mantine/notifications';
 	import EditorButton from './EditorButton.svelte';
 	import { _, getContext } from '$lib/global';
-	import type { NodeFactory } from '$rete/node/NodeFactory';
+	import type { NodeFactory } from '$graph-editor/node/NodeFactory';
 
 	let factory: NodeFactory;
 	let fileInput: HTMLInputElement;

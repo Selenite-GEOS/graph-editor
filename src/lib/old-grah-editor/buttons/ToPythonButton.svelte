@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { NodeFactory } from '$rete/node/NodeFactory';
+	import type { NodeFactory } from '$graph-editor/node/NodeFactory';
 	import { faPython } from '@fortawesome/free-brands-svg-icons';
 	import EditorButton from './EditorButton.svelte';
 	import { notifications } from '@mantine/notifications';
 	import { ErrorWNotif, _, getContext } from '$lib/global';
 	import type { Root } from 'rete';
 	import type { Area2D } from 'rete-area-plugin';
-	import type { AreaExtra } from '$rete/node/AreaExtra';
-	import type { Schemes } from '$rete/node/Schemes';
+	import type { AreaExtra } from '$graph-editor/node/AreaExtra';
+	import type { Schemes } from '$graph-editor/node/Schemes';
 	import { browser } from '$app/environment';
 	import { onDestroy } from 'svelte';
 	import { moonMenuVisibleStore } from '$lib/menu/context-menu/moonContextMenu';

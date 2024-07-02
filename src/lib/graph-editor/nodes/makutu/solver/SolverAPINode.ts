@@ -1,4 +1,4 @@
-import type { APINodeParams } from '$rete/node/APINode';
+import type { APINodeParams } from '$graph-editor/node/APINode';
 import type { NodeParams } from '../../Node';
 import { ObjectAPINode } from '../../ObjectAPINode';
 

@@ -1,5 +1,5 @@
 import type { InputControlTypes } from '../../control/Control';
-import type { SocketType } from '../../plugin/typed-sockets';
+import type { SocketType } from '../../plugins/typed-sockets';
 
 export type XmlData = {
 	name: string;

@@ -1,5 +1,5 @@
-import { Node, NodeFactory } from '$rete';
-import { InputControl } from '$rete/control/Control';
+import { Node, NodeFactory } from '$graph-editor';
+import { InputControl } from '$graph-editor/control/Control';
 
 export class StringNode extends Node {
 	state: { current: string } = { ...this.state, current: '' };

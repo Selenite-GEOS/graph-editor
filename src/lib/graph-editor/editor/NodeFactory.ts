@@ -1,15 +1,15 @@
 import { AreaExtensions, AreaPlugin } from 'rete-area-plugin';
 import type { NodeEditor, NodeEditorSaveData } from './NodeEditor';
-import type { AreaExtra } from '../nodes/AreaExtra';
+import type { AreaExtra } from '../area/AreaExtra';
 import type { Schemes } from '../schemes';
 import { ControlFlowEngine, DataflowEngine } from 'rete-engine';
 import { ExecSocket } from '../socket/ExecSocket';
 import { structures } from 'rete-structures';
 import { Connection, Node, type NodeSaveData } from '../nodes/Node';
 import { ClassicPreset } from 'rete';
-import { InputControl } from '$rete/control/Control';
+import { InputControl } from '$graph-editor/control/Control';
 import type { Writable } from 'svelte/store';
-import { PythonDataflowEngine } from '$rete/engine/PythonDataflowEngine';
+import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
@@ -17,10 +17,10 @@ import { ErrorWNotif, _ } from '$lib/global';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
 import wu from 'wu';
 import * as Nodes from '../nodes';
-import type { CommentPlugin } from '$rete/plugin/CommentPlugin';
-
+import type { CommentPlugin } from '$graph-editor/plugin/CommentPlugin';
+import { persisted } from 'svelte-persisted-store';
 import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
-import type { HistoryPlugin } from '$rete/plugin/history';
+import type { HistoryPlugin } from '$graph-editor/plugin/history';
 import { clone } from 'lodash-es';
 
 function createDataflowEngine() {
@@ -72,8 +72,13 @@ function createControlflowEngine() {
 type WithFactory<T extends Record<string, unknown>> = T & { factory: NodeFactory };
 type WithoutFactory<T> = Omit<T, 'factory'>;
 export class NodeFactory {
+	public notifications = {
+		show: (p: unknown) => {
+			console.error('notfications.show not implemented');
+		}
+	};
 	static classRegistrySetup = false;
-	public readonly connectionPathType: Writable<ConnectionPathType> = localStorageStore(
+	public readonly connectionPathType: Writable<ConnectionPathType> = persisted(
 		'connectionPathType',
 		defaultConnectionPath
 	);

@@ -1,4 +1,4 @@
-import { ButtonControl } from '$rete/control/button/button';
+import { ButtonControl } from '$graph-editor/control/button/button';
 import { formatXml } from '$utils';
 import { Node } from '../Node';
 import type { NodeFactory } from '../../editor/NodeFactory';

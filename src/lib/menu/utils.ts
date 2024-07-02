@@ -95,7 +95,10 @@ function addToMenuLayer(menuItem: IMenuItem, path: string[], menuLayer: MenuLaye
 }
 
 class HierachicalMenu implements IHierachicalMenu {
-	constructor(private readonly menuLayer: MenuLayer, private readonly label?: string) {}
+	constructor(
+		private readonly menuLayer: MenuLayer,
+		private readonly label?: string
+	) {}
 
 	getLabel(): string | undefined {
 		return this.label;

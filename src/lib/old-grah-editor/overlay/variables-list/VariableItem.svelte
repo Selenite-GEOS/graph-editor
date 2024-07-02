@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { assignControl, colorMap } from '$rete/customization/utils';
+	import { assignControl, colorMap } from '$graph-editor/customization/utils';
 	import { possibleTypes, type Variable } from '.';
 	import cssVars from 'svelte-css-vars';
 	import Color from 'color';
-	import InputControlComponent from '$rete/customization/presets/classic/components/InputControl.svelte';
-	import { InputControl, type InputControlTypes } from '$rete/control/Control';
-	import type { SocketType } from '$rete/plugin/typed-sockets';
+	import InputControlComponent from '$graph-editor/customization/presets/classic/components/InputControl.svelte';
+	import { InputControl, type InputControlTypes } from '$graph-editor/control/Control';
+	import type { SocketType } from '$graph-editor/plugin/typed-sockets';
 	import {
 		popup,
 		type PopupSettings,

@@ -1,7 +1,7 @@
 import { Connection } from '../Node';
 import type { Input } from '../../Input';
 import type { Socket } from '../../socket/Socket';
-import type { SocketType } from '../../plugin/typed-sockets';
+import type { SocketType } from '../../plugins/typed-sockets';
 import type { ClassicPreset } from 'rete';
 import { InputControl } from '../../control/Control';
 import { assignControl } from '../../customization/utils';

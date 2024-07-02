@@ -2,8 +2,8 @@
 	import { ErrorWNotif } from '$lib/global';
 	import { createActionMenuItem } from '$lib/menu';
 	import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
-	import type { NodeFactory } from '$rete';
-	import type { Schemes } from '$rete/node/Schemes';
+	import type { NodeFactory } from '$graph-editor';
+	import type { Schemes } from '$graph-editor/node/Schemes';
 	import type { Position } from 'rete-render-utils/_types/types';
 	import { _ } from '$lib/global';
 

@@ -3,5 +3,6 @@
  * @module editor
  */
 
-export * from './NodeEditor'
-export * from './NodeFactory'
+export * from './NodeEditor';
+export * from './NodeFactory';
+export * from '../setup';

@@ -1,4 +1,4 @@
-import type { NodeEditor, Output, Socket } from '$rete';
+import type { NodeEditor, Output, Socket } from '$graph-editor';
 import { get } from 'svelte/store';
 import { Node } from '../Node';
 import type { NodeFactory } from '../../editor/NodeFactory';

@@ -2,8 +2,7 @@
  * Global variables for graphs.
  */
 
-
-import type { SocketType } from '$rete/plugin/typed-sockets';
+import type { SocketType } from '$graph-editor/plugin/typed-sockets';
 
 export type Variable = {
 	name: string;

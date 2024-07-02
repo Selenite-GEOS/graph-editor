@@ -1,5 +1,5 @@
-import type { InputControlTypes } from '../control/Control';
-import type { SocketType } from '../plugin/typed-sockets';
+import type { InputControlTypes } from '../../../graph-editor/socket/control/Control';
+import type { SocketType } from '../../../graph-editor/plugins/typed-sockets';
 import type { Socket } from '../socket/Socket';
 import { $socketcolor } from './trash/vars';
 
