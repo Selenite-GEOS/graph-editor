@@ -1,4 +1,4 @@
-import type { NodeEditorSaveData } from './NodeEditor';
+import type { NodeEditorSaveData } from '$graph-editor/editor';
 
 export function isNodeEditorSaveData(a: unknown): a is NodeEditorSaveData {
 	if (typeof a !== 'object' || a === null) return false;
