@@ -8,4 +8,4 @@ export {
 	Editor__SvelteComponent_ as Editor
 };
 export * from './connection-path';
-export * from './types';
+export * from '../graph-editor/editor/types';

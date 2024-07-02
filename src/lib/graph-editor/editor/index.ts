@@ -4,5 +4,5 @@
  */
 
 export * from './NodeEditor';
+export * from './types'
 export * from './NodeFactory';
-export * from '../setup';

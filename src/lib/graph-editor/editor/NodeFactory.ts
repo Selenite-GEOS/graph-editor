@@ -236,10 +236,20 @@ export class NodeFactory {
 		}
 
 		editorSaveData.connections.forEach(async (connectionSaveData) => {
+			const source = this.editor.getNode(connectionSaveData.source);
+			if (!source) {
+				console.error('Source node not found for connection', connectionSaveData);
+				throw new ErrorWNotif('Source node not found for connection');
+			}
+			const target = this.editor.getNode(connectionSaveData.target);
+			if (!target) {
+				console.error('Target node not found for connection', connectionSaveData);
+				throw new ErrorWNotif('Target node not found for connection');
+			}
 			const conn = new Connection(
-				this.editor.getNode(connectionSaveData.source),
+				source,
 				connectionSaveData.sourceOutput,
-				this.editor.getNode(connectionSaveData.target),
+				target,
 				connectionSaveData.targetInput
 			);
 			conn.id = connectionSaveData.id;
@@ -307,39 +317,49 @@ export class NodeFactory {
 			const conn = context.data;
 			const sourceNode = editor.getNode(conn.source);
 			const targetNode = editor.getNode(conn.target);
-			this.pythonDataflowEngine.reset(targetNode.id);
-			const socket = sourceNode.outputs[conn.sourceOutput]?.socket;
+			if (targetNode) this.pythonDataflowEngine.reset(targetNode.id);
+			const socket = sourceNode?.outputs[conn.sourceOutput]?.socket;
 			const outgoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
-					? sourceNode.outgoingExecConnections
-					: sourceNode.outgoingDataConnections;
+					? sourceNode?.outgoingExecConnections ?? {}
+					: sourceNode?.outgoingDataConnections ?? {};
 
 			const ingoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
-					? targetNode.ingoingExecConnections
-					: targetNode.ingoingDataConnections;
+					? targetNode?.ingoingExecConnections ?? {}
+					: targetNode?.ingoingDataConnections ?? {};
 
 			if (context.type === 'connectioncreated') {
+				if (!sourceNode || !targetNode) {
+					console.error('Connection created node not found', conn);
+					return context;
+				}
 				if (!(conn.sourceOutput in outgoingConnections))
 					outgoingConnections[conn.sourceOutput] = [];
 				if (!(conn.targetInput in ingoingConnections)) ingoingConnections[conn.targetInput] = [];
 				outgoingConnections[conn.sourceOutput].push(conn);
 				ingoingConnections[conn.targetInput].push(conn);
 			} else if (context.type === 'connectionremoved') {
-				if (targetNode.onRemoveIngoingConnection) targetNode.onRemoveIngoingConnection(conn);
-				const outgoingIndex = outgoingConnections[conn.sourceOutput].findIndex(
-					(c) => c.id == conn.id
-				);
-				if (outgoingIndex === -1) throw new ErrorWNotif("Couldn't find outgoing connection");
-				outgoingConnections[conn.sourceOutput].splice(outgoingIndex, 1);
-				if (outgoingConnections[conn.sourceOutput].length === 0)
-					delete outgoingConnections[conn.sourceOutput];
-
-				const ingoingIndex = ingoingConnections[conn.targetInput].findIndex((c) => c.id == conn.id);
-				if (ingoingIndex === -1) throw new ErrorWNotif("Couldn't find ingoing connection");
-				ingoingConnections[conn.targetInput].splice(ingoingIndex, 1);
-				if (ingoingConnections[conn.targetInput].length === 0)
-					delete ingoingConnections[conn.targetInput];
+				if (targetNode && targetNode.onRemoveIngoingConnection)
+					targetNode.onRemoveIngoingConnection(conn);
+				if (conn.sourceOutput in outgoingConnections) {
+					const outgoingIndex: number = outgoingConnections[conn.sourceOutput]?.findIndex(
+						(c) => c.id == conn.id
+					);
+					if (outgoingIndex === -1) throw new ErrorWNotif("Couldn't find outgoing connection");
+					outgoingConnections[conn.sourceOutput].splice(outgoingIndex, 1);
+					if (outgoingConnections[conn.sourceOutput].length === 0)
+						delete outgoingConnections[conn.sourceOutput];
+				}
+				if (conn.targetInput in ingoingConnections) {
+					const ingoingIndex = ingoingConnections[conn.targetInput]?.findIndex(
+						(c) => c.id == conn.id
+					);
+					if (ingoingIndex === -1) throw new ErrorWNotif("Couldn't find ingoing connection");
+					ingoingConnections[conn.targetInput].splice(ingoingIndex, 1);
+					if (ingoingConnections[conn.targetInput].length === 0)
+						delete ingoingConnections[conn.targetInput];
+				}
 			}
 
 			return context;
@@ -475,7 +495,8 @@ export class NodeFactory {
 		const nodes = wu(this.selector.entities.values())
 			.filter(({ label }) => label === 'node')
 			.map(({ id }) => this.editor.getNode(id))
-			.toArray();
+			.filter((node) => node !== undefined)
+			.toArray() as Node[];
 		return nodes.length ? nodes : undefined;
 	}
 

@@ -1,5 +1,6 @@
-import { Node, NodeFactory } from '$graph-editor';
-import { InputControl } from '$graph-editor/control/Control';
+import { Node } from '..';
+import { InputControl } from '$graph-editor/socket';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export class StringNode extends Node {
 	state: { current: string } = { ...this.state, current: '' };

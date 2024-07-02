@@ -1,53 +1,40 @@
 import { ContextMenuPlugin, Presets } from 'rete-context-menu-plugin';
-import type { Schemes } from '../../node/Schemes';
+import type { Schemes } from '$graph-editor/schemes';
 import type { AreaPlugin } from 'rete-area-plugin';
-import type { AreaExtra } from '../../node/AreaExtra';
-import { Node } from '../../node/Node';
+import type { AreaExtra } from '$graph-editor/area';
 import { capitalize } from '$utils/string';
-import { Setup } from '../../../old-grah-editor/rete/setup/Setup';
+import { Setup } from '$graph-editor/setup';
 import { _, type NewGeosContext } from '$lib/global';
-import type { NodeEditor } from '../../../old-grah-editor/rete/NodeEditor';
-import type { NodeFactory } from '../../node/NodeFactory';
-
+import type { NodeEditor, NodeFactory, EditorType } from '$graph-editor/editor';
 import { GeosXmlSchemaStore as GetXmlSchemaStore, PendingValue } from '$houdini';
-import { XmlNode } from '$graph-editor/node/XML/XmlNode';
-import type { XmlAttributeDefinition } from '$graph-editor/node/XML/types';
+import type { XmlAttributeDefinition } from '$graph-editor/nodes/XML/types';
 import {
 	moonMenuItemsStore,
 	type MoonMenuItem,
-	moonMenuVisibleStore,
-	moonMenuPositionStore,
 	newMoonItemsStore,
 	moonMenuFactoryStore,
-	moonMenuSearchBarStore,
 	spawnMoonMenu
 } from '$lib/menu/context-menu/moonContextMenu';
-import { GetNameNode } from '$graph-editor/node/XML/GetNameNode';
-import { MakeArrayNode } from '$graph-editor/node/data/MakeArrayNode';
-import { StringNode } from '$graph-editor/node/data/StringNode';
-import { factory } from 'typescript';
-import { DownloadNode } from '$graph-editor/node/io/DownloadNode';
 import {
-	createActionMenuItem,
-	createNodeMenuItem,
-	type IBaseMenuItem,
-	type INodeMenuItem
-} from '$lib/menu/types';
+	Node,
+	GetNameNode,
+	MakeArrayNode,
+	StringNode,
+	DownloadNode,
+	XmlNode,
+	VariableNode,
+	FormatNode,
+	SelectNode,
+	DisplayNode,
+	MergeArrays,
+	NotNode
+} from '$graph-editor/nodes';
+import { createNodeMenuItem, type IBaseMenuItem, type INodeMenuItem } from '$lib/menu/types';
 import type { GeosDataContext } from '$lib/geos';
 import { get } from 'svelte/store';
 import wu from 'wu';
 import { ErrorWNotif } from '$lib/global';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
-import { t } from 'svelte-i18n';
-import { EditorType } from '$lib/editor';
-import { VariableNode } from '$graph-editor/node/XML/VariableNode';
-import type { Variable } from '$lib/editor/overlay/variables-list';
-import { newUuid } from '$utils';
-import { FormatNode } from '$graph-editor/node/io/FormatNode';
-import { SelectNode } from '$graph-editor/node/data/SelectNode';
-import { DisplayNode } from '$graph-editor/node/io/DisplayNode';
-import { MergeArrays } from '$graph-editor/node/data/array';
-import { NotNode } from '$graph-editor/node/data';
 
 type Entry = Map<string, Entry | (() => Node | Promise<Node>)>;
 function isClassConstructor(obj: unknown): boolean {

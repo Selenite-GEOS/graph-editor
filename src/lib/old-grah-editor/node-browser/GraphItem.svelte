@@ -5,7 +5,7 @@
 	import Fa from 'svelte-fa';
 	import { ErrorWNotif, _, getContext } from '$lib/global';
 	import { draggable } from '@neodrag/svelte';
-	import type { DragData } from '../types';
+	import type { DragData } from '../../graph-editor/editor/types';
 	import { locale } from 'svelte-i18n';
 	import type { GraphSearchPanel$result } from '$houdini';
 	import { faStar as faStarRegular } from '@fortawesome/free-regular-svg-icons';

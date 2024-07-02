@@ -1,19 +1,14 @@
-import { GetGraphStore, GraphVersionStore } from '$houdini';
-import { Input, Node, NodeFactory, NodeEditor, Socket, Output, Connection } from '$graph-editor';
-import type { NodeEditorSaveData } from '$graph-editor/NodeEditor';
-import type { InputControl } from '$graph-editor/control/Control';
+import { GraphVersionStore } from '$houdini';
+import { NodeFactory, NodeEditor } from '$graph-editor/editor';
+import type { NodeEditorSaveData } from '$graph-editor/editor';
+import  { type InputControl, type Input, assignControl } from '$graph-editor/socket';
 import { ExecSocket } from '$graph-editor/socket/ExecSocket';
-import type { UUID } from 'crypto';
-import { DataflowEngine } from 'rete-engine';
-import type { Schemes } from '../schemes';
 import { getLeavesFromOutput } from './utils';
-import { assignControl } from '$graph-editor/customization/utils';
 import { get } from 'svelte/store';
-import type { Variable } from '$lib/editor/overlay/variables-list';
 import wu from 'wu';
-import { VariableNode } from './XML/VariableNode';
+import { VariableNode, Node, Connection } from '$graph-editor/nodes';
 
-class InputNode extends Node {
+export class InputNode extends Node {
 	private value: unknown;
 
 	constructor({ factory, isArray }: { factory: NodeFactory; isArray: boolean }) {
@@ -58,7 +53,7 @@ export class MacroNode extends Node {
 	private macroInputs: Record<string, Input> = {};
 	forward?: (output: string) => unknown;
 
-	graphId: UUID;
+	graphId: string;
 
 	protected state: {
 		[key: string]: unknown;
@@ -73,7 +68,7 @@ export class MacroNode extends Node {
 	}: {
 		factory: NodeFactory;
 		saveData: NodeEditorSaveData;
-		graphId: UUID;
+		graphId: string;
 		graphVersion: number;
 	}) {
 		super({ factory, params: { saveData, graphId, graphVersion }, height: 60, width: 200 });
@@ -141,7 +136,7 @@ export class MacroNode extends Node {
 	}
 
 	async initialize(params: {
-		graphId: UUID;
+		graphId: string;
 		saveData: NodeEditorSaveData;
 		setHeight: (height: number) => void;
 	}): Promise<void> {

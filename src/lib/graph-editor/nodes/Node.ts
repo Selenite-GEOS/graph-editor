@@ -1,9 +1,16 @@
 import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
-import type { AreaExtra } from '../area/AreaExtra';
+import type { AreaExtra } from '$graph-editor/area';
+import type { SocketType } from '$graph-editor/plugins';
+import type { NodeFactory } from '$graph-editor/editor';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
 import { Stack } from '$lib/types/Stack';
-import type { SocketType } from '../plugins';
+import {
+	type ComponentSupportInterface,
+	type BaseComponent,
+	PythonNodeComponent,
+	R_SocketSelection_NC
+} from '$graph-editor/components';
 import {
 	Socket,
 	ExecSocket,
@@ -14,14 +21,8 @@ import {
 	type InputControlOptions,
 	type InputControlTypes,
 	type InputControlValueType
-} from '../socket';
-import type { NodeFactory } from '../editor';
-import {
-	type ComponentSupportInterface,
-	type BaseComponent,
-	PythonNodeComponent,
-	R_SocketSelection_NC
-} from '../components';
+} from '$graph-editor/socket';
+
 import { ErrorWNotif } from '$lib/global';
 
 interface ControlParams<N> {

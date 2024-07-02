@@ -49,6 +49,10 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	onChangeNameListeners: ((name: string) => void)[] = [];
 	id = newLocalId('node-editor');
 
+	getNode(id: string): Node | undefined {
+		return super.getNode(id);
+	}
+
 	async addExecConnection(source: Node, target: Node): Promise<boolean> {
 		return await this.addConnection(new Connection(source, 'exec', target, 'exec'));
 	}
