@@ -31,13 +31,13 @@
 		return entries as [K, Exclude<I, undefined>][];
 	}
 
-	export let data: Node & NodeExtraData;
+	let {data, emit}: { data: Node & NodeExtraData, emit: (props: SvelteArea2D<ClassicScheme>) => void} = $props();
 
-	$: node = data;
-	$: factory = node.getFactory();
+	let node = $derived(data);
+	let factory = $derived(node.getFactory());
 
 	const firstNameGiven = data instanceof XmlNode ? data.name : undefined;
-	$: macroNode = data instanceof MacroNode ? data : undefined;
+	let macroNode = $derived(data instanceof MacroNode ? data : undefined);
 	const isMacroNode = data instanceof MacroNode;
 
 	if (isMacroNode) {
@@ -55,14 +55,14 @@
 	const isNamedXmlNode = data instanceof XmlNode && data.name !== undefined;
 	const isXmlnode = data instanceof XmlNode;
 	// console.log('isMacroNode', isMacroNode);
-	export let emit: (props: SvelteArea2D<ClassicScheme>) => void;
+	
 
-	$: width = Number.isFinite(data.width) ? `${data.width}px` : '';
-	$: height = Number.isFinite(data.height) ? `${data.height}px` : '';
-	$: inputs = sortByIndex(Object.entries(data.inputs));
+	let width = $derived(Number.isFinite(data.width) ? `${data.width}px` : '');
+	let height = $derived(Number.isFinite(data.height) ? `${data.height}px` : '');
+	let inputs = $derived(sortByIndex(Object.entries(data.inputs)));
 
-	$: controls = sortByIndex(Object.entries(data.controls));
-	$: outputs = sortByIndex(Object.entries(data.outputs));
+	let controls = $derived(sortByIndex(Object.entries(data.controls)));
+	let outputs = $derived(sortByIndex(Object.entries(data.outputs)));
 	function any<T>(arg: T): unknown {
 		return arg;
 	}
@@ -95,20 +95,29 @@
 	const disableEditing = (ev: KeyboardEvent) => {
 		if (ev.key === 'Escape') editingName = false;
 	};
-	$: if (nameInput) {
+	$effect(() => { if (nameInput) {
 		nameInput.focus();
 		nameInput.select();
 	}
-	$: if (editingName) {
+})
+$effect(() => {
+	if (editingName) {
 		document.addEventListener('keydown', disableEditing);
 	} else document.removeEventListener('keydown', disableEditing);
+});
 
 	let startDragPos: { x: number; y: number } | undefined;
 	let dragDistance: number | undefined = undefined;
 	const dragThreshold = 2;
-	$: if (editingName === false && isNamedXmlNode && data.name.trim() === '') {
-		data.name = firstNameGiven;
-	}
+	
+	$effect(() => {
+		 if (editingName === false && isNamedXmlNode && data.name.trim() === '') {
+
+			untrack(() => {
+				data.name = firstNameGiven;
+			})
+		 }
+	});
 
 	const outdatedPopupId = newLocalId('outdated-popup');
 	let showPopup = false;
@@ -162,6 +171,8 @@
 		});
 	}
 	let isSelectedByRightClick = false;
+	console.log('Node', data);
+	window.n = data
 </script>
 
 <div
@@ -210,6 +221,7 @@
 			<Fa icon={faClock} size="lg" secondaryColor="white" secondaryOpacity="100" />
 		</button>
 	{/if}
+	{node.c}
 	<div class="flex justify-{isVariable ? 'center' : ' between'} items-center">
 		{#if node instanceof XmlNode && node.name !== undefined}
 			<div class="title flex flex-col w-full">
