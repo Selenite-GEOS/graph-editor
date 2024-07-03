@@ -1,5 +1,5 @@
-import * as ClassicPreset from './classic'
+import * as ClassicPreset from './classic';
 
 export const Presets = {
-    classic: ClassicPreset
-}
+	classic: ClassicPreset
+};

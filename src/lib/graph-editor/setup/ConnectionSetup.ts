@@ -121,121 +121,117 @@ export class ConnectionSetup extends SetupClass {
 		//     console.log("pointerdown", lastButtonClicked)
 		//     return false;
 		// }, false);
-		setupConnections({editor, area, factory});
+		setupConnections({ editor, area, factory });
 	}
 }
 
 export const setupConnections: SetupFunction = (params: SetupParams) => {
-			console.log("Setting up connection plugin")
-			const {factory, editor, area} = params;
+	console.log('Setting up connection plugin');
+	const { factory, editor, area } = params;
 
-			if (!area) {
-				console.warn("Area plugin is not defined, can't setup connections plugin.");
-				return params;
-			}
+	if (!area) {
+		console.warn("Area plugin is not defined, can't setup connections plugin.");
+		return params;
+	}
 
-			const connectionPlugin = new MyConnectionPlugin(factory);
-			Presets.classic.setup();
+	const connectionPlugin = new MyConnectionPlugin(factory);
+	Presets.classic.setup();
+	// @ts-expect-error
+	connectionPlugin.addPreset((socketData: SocketData & { payload: Socket }) => {
+		// console.log("connectionPlugin", socketData)
+		const params: ClassicParams<Schemes> = {
+			makeConnection(from, to, context) {
+				const forward = from.side === 'output' && to.side === 'input';
+				const backward = from.side === 'input' && to.side === 'output';
+				const [source, target] = forward ? [from, to] : backward ? [to, from] : [];
+				if (!source || !target) return false;
+				const sourceNode = editor.getNode(source.nodeId);
+				const targetNode = editor.getNode(target.nodeId);
+				if (!sourceNode || !targetNode) {
+					console.warn("Can't find source or target node in makeConnection function");
+					return false;
+				}
+				editor.addNewConnection(sourceNode, source.key, targetNode, target.key);
+				return true;
+			},
 			// @ts-expect-error
-			connectionPlugin.addPreset((socketData: SocketData & { payload: Socket }) => {
-				// console.log("connectionPlugin", socketData)
-				const params: ClassicParams<Schemes> = {
-					makeConnection(from, to, context) {
-						const forward = from.side === 'output' && to.side === 'input';
-						const backward = from.side === 'input' && to.side === 'output';
-						const [source, target] = forward ? [from, to] : backward ? [to, from] : [];
-						if (!source || !target) return false;
-						const sourceNode = editor.getNode(source.nodeId);
-						const targetNode = editor.getNode(target.nodeId);
-						if (!sourceNode || !targetNode) {
-							console.warn("Can't find source or target node in makeConnection function")
-							return false;
-						}
-						editor.addNewConnection(
-							sourceNode,
-							source.key,
-							targetNode,
-							target.key
-						);
-						return true;
-					},
-					// @ts-expect-error
-					canMakeConnection(from: SocketData & {payload: Socket}, to: SocketData & {payload: Socket}) {
-						connectionPlugin.drop();
+			canMakeConnection(
+				from: SocketData & { payload: Socket },
+				to: SocketData & { payload: Socket }
+			) {
+				connectionPlugin.drop();
 
-						const forward = from.side === 'output' && to.side === 'input';
-						const backward = from.side === 'input' && to.side === 'output';
-						const [source, target] = forward ? [from, to] : backward ? [to, from] : [];
-						if (!source || !target) return false;
+				const forward = from.side === 'output' && to.side === 'input';
+				const backward = from.side === 'input' && to.side === 'output';
+				const [source, target] = forward ? [from, to] : backward ? [to, from] : [];
+				if (!source || !target) return false;
 
-						const sourceNode = editor.getNode(source.nodeId);
-						const targetNode = editor.getNode(target.nodeId);
-						if (!sourceNode || !targetNode) {
-							console.warn("Can't find source or target node in canMakeConnection function")
-							return false;
-						}
-						const conns =
-							source.key in sourceNode.outgoingDataConnections
-								? sourceNode.outgoingDataConnections[source.key]
-								: source.key in sourceNode.outgoingExecConnections
-									? sourceNode.outgoingExecConnections[source.key]
-									: undefined;
-						if (conns) {
-							if (
-								conns.some(
-									(conn) => conn.target === target.nodeId && conn.targetInput === target.key
-								)
-							) {
-								console.log('Connection already exists');
-								return false;
-							}
-						}
-
-						// this function checks if the old connection should be removed
-						if (
-							isConnectionInvalid(
-								(from as unknown as { payload: Socket }).payload,
-								(to as unknown as { payload: Socket }).payload
-							)
-						) {
-							console.log(
-								`Connection between ${from.nodeId} and ${to.nodeId} is not allowed. From socket type is ${from.payload.type} and to socket type is ${to.payload.type}`
-							);
-							factory.notifications.show({
-								title: 'Erreur',
-								message: `Connection invalide entre types "${from.payload.type}" et "${to.payload.type}" !`,
-								color: 'red'
-							});
-							return false;
-						} else return true;
+				const sourceNode = editor.getNode(source.nodeId);
+				const targetNode = editor.getNode(target.nodeId);
+				if (!sourceNode || !targetNode) {
+					console.warn("Can't find source or target node in canMakeConnection function");
+					return false;
+				}
+				const conns =
+					source.key in sourceNode.outgoingDataConnections
+						? sourceNode.outgoingDataConnections[source.key]
+						: source.key in sourceNode.outgoingExecConnections
+							? sourceNode.outgoingExecConnections[source.key]
+							: undefined;
+				if (conns) {
+					if (
+						conns.some((conn) => conn.target === target.nodeId && conn.targetInput === target.key)
+					) {
+						console.log('Connection already exists');
+						return false;
 					}
-				};
-				return new (
-					socketData.payload.isArray &&
-					socketData.payload.node instanceof XmlNode &&
-					socketData.key === 'children'
-						? BidirectFlow
-						: ClassicFlow
-				)(params);
-			});
-
-			connectionPlugin.addPipe(async (ctx) => {
-				// prevent the connection from moving when the drop menu is visible
-				if (ctx.type === 'pointermove' && dropMenuVisible) {
-					return;
 				}
 
-				if (ctx.type === 'connectionpick') {
-					connectionPlugin.lastPickedSockedData = ctx.data.socket as SocketData & { payload: Socket };
-				}
-				if (ctx.type === 'contextmenu' && connectionPlugin.lastClickedSocket) {
-					connectionPlugin.lastClickedSocket = false;
-					ctx.data.event.preventDefault();
-					ctx.data.event.stopPropagation();
-					return;
-				}
-				return ctx;
-			});
-			area.use(connectionPlugin);
+				// this function checks if the old connection should be removed
+				if (
+					isConnectionInvalid(
+						(from as unknown as { payload: Socket }).payload,
+						(to as unknown as { payload: Socket }).payload
+					)
+				) {
+					console.log(
+						`Connection between ${from.nodeId} and ${to.nodeId} is not allowed. From socket type is ${from.payload.type} and to socket type is ${to.payload.type}`
+					);
+					factory.notifications.show({
+						title: 'Erreur',
+						message: `Connection invalide entre types "${from.payload.type}" et "${to.payload.type}" !`,
+						color: 'red'
+					});
+					return false;
+				} else return true;
+			}
+		};
+		return new (
+			socketData.payload.isArray &&
+			socketData.payload.node instanceof XmlNode &&
+			socketData.key === 'children'
+				? BidirectFlow
+				: ClassicFlow
+		)(params);
+	});
+
+	connectionPlugin.addPipe(async (ctx) => {
+		// prevent the connection from moving when the drop menu is visible
+		if (ctx.type === 'pointermove' && dropMenuVisible) {
+			return;
+		}
+
+		if (ctx.type === 'connectionpick') {
+			connectionPlugin.lastPickedSockedData = ctx.data.socket as SocketData & { payload: Socket };
+		}
+		if (ctx.type === 'contextmenu' && connectionPlugin.lastClickedSocket) {
+			connectionPlugin.lastClickedSocket = false;
+			ctx.data.event.preventDefault();
+			ctx.data.event.stopPropagation();
+			return;
+		}
+		return ctx;
+	});
+	area.use(connectionPlugin);
 	return params;
-}
+};

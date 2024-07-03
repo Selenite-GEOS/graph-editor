@@ -48,10 +48,10 @@ export async function setupGraphEditor(
 		params = (await setupFunction({ editor, factory, ...params })) ?? params;
 	}
 	const { AreaExtensions } = await import('rete-area-plugin');
-	await tick()
+	await tick();
 	setTimeout(async () => {
-	if (factory.getArea()) await AreaExtensions.zoomAt(factory.getArea()!, editor.getNodes());
-	}, 0)
+		if (factory.getArea()) await AreaExtensions.zoomAt(factory.getArea()!, editor.getNodes());
+	}, 0);
 	return {
 		editor,
 		factory

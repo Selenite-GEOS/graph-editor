@@ -38,11 +38,13 @@ export class RenderSetup implements SetupClass {
 export const setupSvelteRender: SetupFunction = async (params) => {
 	const isBrowser = typeof window !== 'undefined';
 	if (!isBrowser) {
-		console.warn('Skipping setup of svelte render, svelte render plugin can only be used in browser');
+		console.warn(
+			'Skipping setup of svelte render, svelte render plugin can only be used in browser'
+		);
 		return params;
 	}
 
-	const {editor, factory, area} = params;
+	const { editor, factory, area } = params;
 
 	if (!area) {
 		console.warn("AreaPlugin is not defined, can't setup svelte render plugin.");

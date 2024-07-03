@@ -1,18 +1,21 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
-	import { NodeEditor, NumberNode, setupFullGraphEditor, setupGraphEditor } from '$lib/graph-editor';
+	import {
+		NodeEditor,
+		NumberNode,
+		setupFullGraphEditor,
+		setupGraphEditor
+	} from '$lib/graph-editor';
 
 	let editor = $state<NodeEditor>();
 	// On mount
 	$effect(() => {
 		if (!container) return;
-		setupFullGraphEditor({container, setups: [
-			setupSvelteRender
-		]}).then((res) => {
+		setupFullGraphEditor({ container, setups: [setupSvelteRender] }).then((res) => {
 			editor = res.editor;
-			const factory = res.factory
+			const factory = res.factory;
 			console.log('Editor setup complete');
-			factory.addNode(NumberNode, {initial: 0})
+			factory.addNode(NumberNode, { initial: 0 });
 		});
 	});
 	$inspect('GraphEditor', editor);

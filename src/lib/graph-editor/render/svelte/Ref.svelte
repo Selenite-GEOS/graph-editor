@@ -1,24 +1,24 @@
 <script lang="ts">
-  type RefUpdate = (ref: HTMLElement) => void;
+	type RefUpdate = (ref: HTMLElement) => void;
 
-  import { onMount } from "svelte";
+	import { onMount } from 'svelte';
 
-  export let init: RefUpdate;
-  export let unmount: RefUpdate;
+	export let init: RefUpdate;
+	export let unmount: RefUpdate;
 
-  let ref: HTMLElement;
+	let ref: HTMLElement;
 
-  $: {
-    // trigger 'rendered' on update
-    if (ref) init(ref);
-  }
+	$: {
+		// trigger 'rendered' on update
+		if (ref) init(ref);
+	}
 
-  onMount(() => {
-    init(ref);
-    return () => {
-      unmount(ref);
-    };
-  });
+	onMount(() => {
+		init(ref);
+		return () => {
+			unmount(ref);
+		};
+	});
 </script>
 
 <span {...$$restProps} bind:this={ref} />

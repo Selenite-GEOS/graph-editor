@@ -3,8 +3,8 @@
 	// import { focusTrap, modeCurrent, popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	// import Ref from '../../../Ref.svelte';
 	// import type { ClassicScheme, SvelteArea2D } from '../types';
-	import type {  ClassicScheme, SvelteArea2D } from 'rete-svelte-plugin';
-	import Ref from '../../../Ref.svelte'
+	import type { ClassicScheme, SvelteArea2D } from 'rete-svelte-plugin';
+	import Ref from '../../../Ref.svelte';
 	import { MacroNode, VariableNode, XmlNode, type Node } from '$graph-editor/nodes';
 	import { faCubes } from '@fortawesome/free-solid-svg-icons';
 	import type { NodeEditorSaveData } from '$graph-editor/editor';

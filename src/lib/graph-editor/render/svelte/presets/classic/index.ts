@@ -1,4 +1,4 @@
-import type { RenderPreset } from "../../setup";
+import type { RenderPreset } from '../../setup';
 import { ClassicPreset, Scope } from 'rete';
 import {
 	classicConnectionPath,

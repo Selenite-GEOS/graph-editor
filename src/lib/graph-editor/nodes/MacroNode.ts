@@ -1,12 +1,12 @@
 import { GraphVersionStore } from '$houdini';
 import { NodeFactory, NodeEditor } from '$graph-editor/editor';
 import type { NodeEditorSaveData } from '$graph-editor/editor';
-import  { type InputControl, type Input, assignControl } from '$graph-editor/socket';
+import { type InputControl, type Input, assignControl } from '$graph-editor/socket';
 import { ExecSocket } from '$graph-editor/socket/ExecSocket';
 import { getLeavesFromOutput } from './utils';
 import { get } from 'svelte/store';
 import wu from 'wu';
-import {Node, Connection} from '$Node';
+import { Node, Connection } from '$Node';
 
 import { VariableNode } from '$graph-editor/nodes/XML/VariableNode';
 export class InputNode extends Node {

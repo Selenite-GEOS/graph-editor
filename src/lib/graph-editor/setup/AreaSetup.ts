@@ -29,8 +29,8 @@ export class AreaSetup extends SetupClass {
 }
 
 export const setupArea: SetupFunction = (params) => {
-	console.log("Setting up area plugin");
-	const {factory} = params;
+	console.log('Setting up area plugin');
+	const { factory } = params;
 	const container = params.container;
 	if (!container) {
 		console.warn("Container is not defined, can't setup area plugin.");
@@ -42,6 +42,5 @@ export const setupArea: SetupFunction = (params) => {
 	return {
 		...params,
 		area
-	}
-
-}
+	};
+};

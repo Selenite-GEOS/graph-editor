@@ -25,5 +25,5 @@ export const setupMinimap: SetupFunction = (params) => {
 	return {
 		...params,
 		minimap
-	}
-}
+	};
+};

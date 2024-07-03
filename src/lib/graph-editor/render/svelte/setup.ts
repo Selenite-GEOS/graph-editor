@@ -151,9 +151,9 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	// @ts-expect-error
 	sveltePlugin.use(pathPlugin);
 	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
-    const { Presets} = await import('./presets');
+	const { Presets } = await import('./presets');
 	sveltePlugin.addPreset(minimapPreset({ size: 200 }));
-    sveltePlugin.addPreset(Presets.classic.setup())
+	sveltePlugin.addPreset(Presets.classic.setup());
 	area.use(sveltePlugin);
 
 	return params;

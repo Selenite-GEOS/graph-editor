@@ -1,5 +1,5 @@
 import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
-import type {Output} from '$graph-editor/socket'
+import type { Output } from '$graph-editor/socket';
 import { get } from 'svelte/store';
 import { Node } from '$Node';
 import { isEqual } from 'lodash-es';

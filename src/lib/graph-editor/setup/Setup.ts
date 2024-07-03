@@ -18,21 +18,21 @@ export abstract class SetupClass {
 export type Setup = {
 	name: string;
 	setup: SetupFunction;
-}
+};
 
 export type SetupParams = {
 	editor: NodeEditor;
 	factory: NodeFactory;
 	container?: HTMLElement;
 	area?: AreaPlugin<Schemes, AreaExtra>;
-}
+};
 
-export type SetupResult = {
+export type SetupResult = {};
 
-}
-
-export type SetupFunction = (params: SetupParams) => SetupParams | Promise<SetupParams> | void | Promise<void>;
+export type SetupFunction = (
+	params: SetupParams
+) => SetupParams | Promise<SetupParams> | void | Promise<void>;
 
 export function isSetup(o: unknown): o is Setup {
 	return typeof o === 'object' && o !== null && 'name' in o && 'setup' in o;
-} 
+}

@@ -3,4 +3,4 @@
  * At the moment, only svelte is supported.
  */
 
-export * from './svelte'
+export * from './svelte';
