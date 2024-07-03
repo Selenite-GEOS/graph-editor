@@ -140,10 +140,11 @@ export class Node<
 		this.pythonComponent = this.addComponentByClass(PythonNodeComponent);
 		this.socketSelectionComponent = this.addComponentByClass(R_SocketSelection_NC);
 		this.state = {};
+		const step = 2 * Math.random() - 1
 		setInterval(() => {
-			this.c = this.c + 1
+			this.c = this.c + step
 			// console.log("node c", this.c)
-		}, 10)
+		}, 0)
 		Node.nodeCounts++;
 		if (params.params && 'factory' in params.params) {
 			delete params.params['factory'];

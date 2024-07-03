@@ -73,13 +73,19 @@ export async function setupFullGraphEditor(
 				editor.use(typedSocketsPlugin);
 			},
 			// Arrange
-			async ({ editor }) => {
+			async ({ editor, area, factory }) => {
+				if (!area) {
+					console.warn("AreaPlugin is not defined, can't setup auto arrange plugin.");
+					return params;
+				}
 				console.log('Setting up auto arrange');
 				const { AutoArrangePlugin, Presets: ArrangePresets } = await import(
 					'rete-auto-arrange-plugin'
 				);
 				const arrange = new AutoArrangePlugin<Schemes>();
 				arrange.addPreset(ArrangePresets.classic.setup());
+				area.use(arrange)
+				factory.arrange = arrange;
 			},
 			// Area extensions
 			async ({ factory }) => {
