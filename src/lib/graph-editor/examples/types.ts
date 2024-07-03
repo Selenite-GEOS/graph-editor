@@ -1,6 +1,5 @@
-import { NodeEditor } from '../NodeEditor';
-import type { Node } from '../node/Node';
-import type { NodeFactory } from '../node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
+import type { Node } from '$graph-editor/nodes';
 
 export interface EditorExample {
 	(factory: NodeFactory): Promise<Node[]>;

@@ -1,4 +1,4 @@
-import { Node, type NodeParams } from '../Node';
+import { Node, type NodeParams } from '$Node';
 
 export class NotNode extends Node {
 	constructor(params: NodeParams) {

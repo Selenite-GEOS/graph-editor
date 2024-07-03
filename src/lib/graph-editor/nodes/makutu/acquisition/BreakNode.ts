@@ -1,6 +1,6 @@
 import { PythonObject, PythonProperty } from '$lib/backend-interaction/python';
 import { Node } from '../../Node';
-import type { NodeFactory } from '../../../editor/NodeFactory';
+import type { NodeFactory } from '../$graph-editor/editor';
 
 // TODO : autogenerate outputs from the python object
 export class BreakNode extends Node {

@@ -1,9 +1,9 @@
 import { ClassicPreset as Classic, ClassicPreset, NodeEditor } from 'rete';
 import { DataflowEngine } from 'rete-engine';
 import type DataflowNode from 'rete-engine';
-import { Node } from '../Node';
+import { Node } from '$Node';
 import { Socket } from '../../socket/Socket';
-import { NodeFactory } from '../../editor/NodeFactory';
+import { NodeFactory } from '$graph-editor/editor';
 
 export class AddNode extends Node {
 	constructor({ factory, a = 0, b = 0 }: { factory: NodeFactory; a?: number; b?: number }) {

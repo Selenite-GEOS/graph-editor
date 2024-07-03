@@ -3,7 +3,7 @@ import { AddNode } from '../node/math/AddNode';
 import { Connection } from '../node/Node';
 import { DisplayNode } from '../node/io/DisplayNode';
 import type { EditorExample } from './types';
-import type { NodeFactory } from '../node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export const sumExample: EditorExample = async (factory: NodeFactory) => {
 	const editor = factory.getEditor();

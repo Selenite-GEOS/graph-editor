@@ -1,5 +1,5 @@
 import { AddPinNode } from '../AddPinNode';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 import { getLeavesFromOutput } from '../utils';
 
 export class SequenceNode extends AddPinNode {

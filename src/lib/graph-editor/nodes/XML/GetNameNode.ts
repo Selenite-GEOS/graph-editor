@@ -1,6 +1,6 @@
 import type { Socket } from '../../socket/Socket';
-import { Node } from '../Node';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import { Node } from '$Node';
+import type { NodeFactory } from '$graph-editor/editor';
 import type { XmlData } from './types';
 
 export class GetNameNode extends Node<{ xml: Socket }, { name: Socket }> {

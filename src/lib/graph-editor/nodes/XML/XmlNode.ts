@@ -1,15 +1,20 @@
-import { Node, type NodeParams, type OutDataParams } from '../Node';
+import { Node, type NodeParams, type OutDataParams } from '$Node';
 import type { XmlAttributeDefinition } from './types';
 import { camlelcaseize, titlelize } from '$lib/utils/string';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
-import type { InputControl, assignControl, Socket } from '$graph-editor/socket';
-import { AddXmlAttributeControl } from './AddXmlAttributeControl';
+import { type InputControl, type assignControl, type Socket, Control } from '$graph-editor/socket';
 import { ErrorWNotif } from '$lib/global';
 import type { GeosSchema } from '$lib/geos';
-import type { NodeFactory } from '$graph-editor';
+import type { NodeFactory } from '$graph-editor/editor';
 import 'regenerator-runtime/runtime';
 import wu from 'wu';
+
+export class AddXmlAttributeControl extends Control {
+	constructor(public readonly xmlNode: XmlNode) {
+		super();
+	}
+}
 
 export type XmlConfig = {
 	noName?: boolean;

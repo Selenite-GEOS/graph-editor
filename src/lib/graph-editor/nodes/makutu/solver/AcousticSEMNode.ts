@@ -1,5 +1,5 @@
 import { APINode } from '../../APINode';
-import type { NodeFactory } from '../../../editor/NodeFactory';
+import type { NodeFactory } from '../$graph-editor/editor';
 
 /**
  * This node displays the value of the input.

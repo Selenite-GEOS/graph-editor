@@ -1,22 +1,21 @@
 import type { AreaPlugin } from 'rete-area-plugin';
-import type { NodeEditor } from '../editor/NodeEditor';
-import { RenderSetup } from '../customization/render';
-import type { AreaExtra } from '../node/AreaExtra';
-import type { Schemes } from '../node/Schemes';
-import { Setup } from './Setup';
+// import { RenderSetup } from '$graph-editor../customization/render';
+import type { AreaExtra } from '$graph-editor/area';
+import type { Schemes } from '$graph-editor/schemes';
+import { SetupClass } from './Setup';
 import { MinimapSetup } from './MinimapSetup';
-import type { NodeFactory } from '../node/NodeFactory';
-import { ContextMenuSetup } from '../plugins/context-menu/context-menu';
+import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
+import { ContextMenuSetup } from '$graph-editor/plugins/context-menu/context-menu';
 import { AreaSetup } from './AreaSetup';
 import { ConnectionSetup } from './ConnectionSetup';
 import type { GeosDataContext } from '$lib/geos';
 import type { NewGeosContext } from '$lib/global';
 
-export class MegaSetup extends Setup {
-	toSetup: Setup[] = [
+export class MegaSetup extends SetupClass {
+	toSetup: SetupClass[] = [
 		new ConnectionSetup(),
 		new AreaSetup(),
-		new RenderSetup(),
+		// new RenderSetup(),
 		new MinimapSetup(),
 		new ContextMenuSetup()
 	];

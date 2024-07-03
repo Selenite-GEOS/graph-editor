@@ -1,6 +1,6 @@
-import { EditorType } from '$lib/editor/types';
+import { EditorType } from '$graph-editor/editor';
 import type { NodeFactory } from '$graph-editor';
-import type { Node } from '$graph-editor/node/Node';
+import type { Node } from '$graph-editor/nodes';
 
 export interface IBaseMenuItem {
 	getLabel: () => string;

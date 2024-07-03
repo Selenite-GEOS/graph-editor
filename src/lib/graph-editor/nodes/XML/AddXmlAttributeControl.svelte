@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
-	import type { AddXmlAttributeControl } from './AddXmlAttributeControl';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
-	import intersection from 'lodash.intersection';
+	import type { AddXmlAttributeControl } from './XmlNode';
 
 	export let data: AddXmlAttributeControl;
 	const optAttrNames = [...data.xmlNode.optionalXmlAttributes];

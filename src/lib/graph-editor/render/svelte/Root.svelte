@@ -1,0 +1,17 @@
+<script lang="ts">
+	import type { Component } from 'svelte';
+
+    type Props = {
+        component: Component;
+        props: Record<string, unknown>;
+        onRendered: () => void;
+    };
+    
+	let {component, onRendered, props}: Props = $props()
+	$effect(() => {
+		onRendered();
+	});
+
+</script>
+
+<svelte:component this={component} {...props} />

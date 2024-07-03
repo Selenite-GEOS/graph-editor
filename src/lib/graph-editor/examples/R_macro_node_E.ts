@@ -1,6 +1,6 @@
 import { GetGraphStore } from '$houdini';
 import type { NodeEditorSaveData, NodeFactory } from '$graph-editor';
-import { MacroNode } from '$graph-editor/node/MacroNode';
+import { MacroNode } from '$graph-editor/nodes';
 import type { EditorExample } from './types';
 
 export const macroNodeExample: EditorExample = async (factory: NodeFactory) => {

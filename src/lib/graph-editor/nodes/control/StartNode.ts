@@ -1,6 +1,6 @@
 import { Node } from '../Node';
-import { ButtonControl } from '../../control/button/button';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import { ButtonControl } from '$graph-editor/socket';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export class StartNode extends Node {
 	constructor({ factory }: { factory: NodeFactory }) {

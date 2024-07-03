@@ -17,7 +17,7 @@ import { ExecuteNode } from '../node/makutu/solver/ExecuteNode';
 import { FormatNode } from '../node/io/FormatNode';
 import { GetPressuresAtReceiversNode } from '../node/makutu/solver/GetPressureAtReceiversNode';
 import type { EditorExample } from './types';
-import type { NodeFactory } from '../node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 import { ReinitSolverNode } from '$graph-editor/node/makutu/solver/ReinitSolverNode';
 import { SolverLoopNode } from '$graph-editor/node/makutu/solver/SolverLoopNode';
 

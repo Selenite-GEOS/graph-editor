@@ -1,6 +1,6 @@
 import { Connection, Node } from '../Node';
 import { getLeavesFromOutput } from '../utils';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 import type { SocketType } from '../../plugins/typed-sockets';
 
 // Class defining a For Each Node

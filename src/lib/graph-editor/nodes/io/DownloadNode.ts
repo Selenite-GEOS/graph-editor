@@ -1,7 +1,7 @@
-import { ButtonControl } from '$graph-editor/control/button/button';
+import { ButtonControl } from '$graph-editor/socket';
 import { formatXml } from '$utils';
-import { Node } from '../Node';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import { Node } from '$Node';
+import type { NodeFactory } from '$graph-editor/editor';
 import type { XMLData } from '../XML/XMLData';
 
 export class DownloadNode extends Node {

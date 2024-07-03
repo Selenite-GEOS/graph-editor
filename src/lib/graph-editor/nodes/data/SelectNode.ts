@@ -1,5 +1,5 @@
-import { Node } from '../Node';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import { Node } from '$Node';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export class SelectNode extends Node {
 	state: { pickA: boolean } = { ...this.state, pickA: '' };

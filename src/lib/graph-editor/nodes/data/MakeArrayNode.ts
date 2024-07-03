@@ -1,13 +1,9 @@
-import { Connection } from '../Node';
-import type { Input } from '../../Input';
-import type { Socket } from '../../socket/Socket';
-import type { SocketType } from '../../plugins/typed-sockets';
+import { Connection } from '$Node';
+import type { Socket, Input, InputControl, assignControl } from '$graph-editor/socket';
+import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import type { ClassicPreset } from 'rete';
-import { InputControl } from '../../control/Control';
-import { assignControl } from '../../customization/utils';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 import { AddPinNode, type AddPinNodeState } from '../AddPinNode';
-import { ErrorWNotif } from '$lib/global';
 
 export type MakeArrayNodeState = {
 	// Add any additional properties that you need

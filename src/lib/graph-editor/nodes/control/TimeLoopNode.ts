@@ -1,7 +1,7 @@
 import { Node } from '../Node';
 // import { notifications } from '@mantine/notifications';
 import { getLeavesFromOutput } from '../utils';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export class TimeLoopNode extends Node {
 	currentTime?: number;

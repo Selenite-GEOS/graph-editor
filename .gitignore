@@ -1,6 +1,6 @@
 # dependencies
 node_modules
-
+vite.config*timestamp*
 # production
 $houdini
 .svelte-kit

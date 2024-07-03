@@ -1,6 +1,6 @@
 import { createActionMenuItem } from '$lib/menu';
 import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
-import type { NodeFactory } from '$graph-editor';
+import type { NodeFactory } from '$graph-editor/editor';
 import type { Scope } from 'rete';
 import type { BaseArea } from 'rete-area-plugin';
 export { CommentExtensions } from 'rete-comment-plugin';
@@ -13,7 +13,6 @@ import {
 } from 'rete-comment-plugin';
 import { get } from 'svelte/store';
 import { _ } from '$lib/global';
-import { getModalStore } from '@skeletonlabs/skeleton';
 import wu from 'wu';
 
 export class CommentPlugin<

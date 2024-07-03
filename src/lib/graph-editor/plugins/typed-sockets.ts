@@ -1,7 +1,6 @@
 import { type BaseSchemes, NodeEditor, type Root, Scope } from 'rete';
-import type { Connection } from '../node/Node';
-import type { Socket } from '../../old-grah-editor/rete/socket/Socket';
-import { ExecSocket } from '../../old-grah-editor/rete/socket/ExecSocket';
+import type { Connection } from '$graph-editor/nodes';
+import { ExecSocket, type Socket } from '$graph-editor/socket';
 import { ErrorWNotif } from '$lib/global';
 
 export type XMLAttrType = `xmlAttr:${string}`;

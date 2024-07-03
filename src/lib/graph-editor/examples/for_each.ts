@@ -7,7 +7,7 @@ import { MakeArrayNode } from '../node/data/MakeArrayNode';
 import { NumberNode } from '../node/data/NumberNode';
 import { ForEachNode } from '../node/control/ForEachNode';
 import type { EditorExample } from './types';
-import type { NodeFactory } from '../node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export const forEachExample: EditorExample = async (factory: NodeFactory) => {
 	const editor = factory.getEditor();

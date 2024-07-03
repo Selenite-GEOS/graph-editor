@@ -1,7 +1,7 @@
 import { ClassicPreset } from 'rete';
-import { Node } from '../Node';
+import { Node } from '$Node';
 import { Socket } from '../../socket/Socket';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 
 /**
  * This node displays the value of the input.

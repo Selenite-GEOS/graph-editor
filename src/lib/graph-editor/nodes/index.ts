@@ -14,3 +14,5 @@ export * from './APINode';
 export * from './makutu';
 export * from './math';
 export * from './Node';
+
+export {Node as GraphNode} from './Node'

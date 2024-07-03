@@ -6,8 +6,9 @@ import { ExecSocket } from '$graph-editor/socket/ExecSocket';
 import { getLeavesFromOutput } from './utils';
 import { get } from 'svelte/store';
 import wu from 'wu';
-import { VariableNode, Node, Connection } from '$graph-editor/nodes';
+import {Node, Connection} from '$Node';
 
+import { VariableNode } from '$graph-editor/nodes/XML/VariableNode';
 export class InputNode extends Node {
 	private value: unknown;
 

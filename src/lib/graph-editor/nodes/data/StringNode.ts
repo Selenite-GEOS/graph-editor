@@ -1,4 +1,4 @@
-import { Node } from '..';
+import { Node } from '../Node';
 import { InputControl } from '$graph-editor/socket';
 import type { NodeFactory } from '$graph-editor/editor';
 

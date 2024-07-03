@@ -148,7 +148,7 @@ export class Node<
 		if (factory === undefined) {
 			throw new Error(name + ': Factory is undefined');
 		}
-		format.subscribe((_) => (this.label = _(label)));
+		// format.subscribe((_) => (this.label = _(label)));
 		this.width = width;
 		this.height = height;
 	}

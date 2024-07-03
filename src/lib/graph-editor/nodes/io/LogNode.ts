@@ -1,5 +1,5 @@
-import { Node } from '../Node';
-import type { NodeFactory } from '../../editor/NodeFactory';
+import { Node } from '$Node';
+import type { NodeFactory } from '$graph-editor/editor';
 
 export class LogNode extends Node {
 	// protected state: Record<string, unknown>;

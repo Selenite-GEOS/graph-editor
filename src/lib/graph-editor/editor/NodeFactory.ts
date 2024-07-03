@@ -7,7 +7,7 @@ import { ExecSocket } from '../socket/ExecSocket';
 import { structures } from 'rete-structures';
 import { Connection, Node, type NodeSaveData } from '../nodes/Node';
 import { ClassicPreset } from 'rete';
-import { InputControl } from '$graph-editor/control/Control';
+import { InputControl } from '$graph-editor/socket';
 import type { Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
@@ -17,11 +17,12 @@ import { ErrorWNotif, _ } from '$lib/global';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
 import wu from 'wu';
 import * as Nodes from '../nodes';
-import type { CommentPlugin } from '$graph-editor/plugin/CommentPlugin';
+import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';
-import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
-import type { HistoryPlugin } from '$graph-editor/plugin/history';
+// import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
+import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { clone } from 'lodash-es';
+import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {

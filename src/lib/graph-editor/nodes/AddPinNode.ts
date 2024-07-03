@@ -1,4 +1,4 @@
-import { ButtonControl } from '../control/button/button';
+import { ButtonControl } from '$graph-editor/socket';
 import { Node } from './Node';
 import { type NodeParams } from './Node';
 

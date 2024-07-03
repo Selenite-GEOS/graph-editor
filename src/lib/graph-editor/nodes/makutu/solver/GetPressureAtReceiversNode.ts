@@ -1,5 +1,5 @@
 import { Node } from '../../Node';
-import type { NodeFactory } from '../../../editor/NodeFactory';
+import type { NodeFactory } from '../$graph-editor/editor';
 import { SolverAPINode } from './SolverAPINode';
 
 export class GetPressuresAtReceiversNode extends SolverAPINode {

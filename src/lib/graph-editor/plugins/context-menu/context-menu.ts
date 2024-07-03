@@ -3,7 +3,7 @@ import type { Schemes } from '$graph-editor/schemes';
 import type { AreaPlugin } from 'rete-area-plugin';
 import type { AreaExtra } from '$graph-editor/area';
 import { capitalize } from '$utils/string';
-import { Setup } from '$graph-editor/setup';
+import { SetupClass } from '$graph-editor/setup';
 import { _, type NewGeosContext } from '$lib/global';
 import type { NodeEditor, NodeFactory, EditorType } from '$graph-editor/editor';
 import { GeosXmlSchemaStore as GetXmlSchemaStore, PendingValue } from '$houdini';
@@ -84,7 +84,7 @@ function getMenuArray(items: Map<string, Entry>) {
 	});
 }
 
-export class ContextMenuSetup extends Setup {
+export class ContextMenuSetup extends SetupClass {
 	selectedNodes: SelectorEntity[] = [];
 	async setup(
 		editor: NodeEditor,

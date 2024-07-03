@@ -4,7 +4,7 @@ import { TimeLoopNode } from '../node/control/TimeLoopNode';
 import { LogNode } from '../node/io/LogNode';
 import { OutputVtkNode } from '../node/makutu/solver/OutputVtk';
 import { EveryNode } from '../node/control/EveryNode';
-import type { NodeFactory } from '../node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/editor';
 import type { EditorExample } from './types';
 
 export const timeloopExample: EditorExample = async (factory: NodeFactory) => {
