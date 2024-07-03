@@ -31,7 +31,10 @@
 		return entries as [K, Exclude<I, undefined>][];
 	}
 
-	let {data, emit}: { data: Node & NodeExtraData, emit: (props: SvelteArea2D<ClassicScheme>) => void} = $props();
+	let {
+		data,
+		emit
+	}: { data: Node & NodeExtraData; emit: (props: SvelteArea2D<ClassicScheme>) => void } = $props();
 
 	let node = $derived(data);
 	let factory = $derived(node.getFactory());
@@ -55,7 +58,6 @@
 	const isNamedXmlNode = data instanceof XmlNode && data.name !== undefined;
 	const isXmlnode = data instanceof XmlNode;
 	// console.log('isMacroNode', isMacroNode);
-	
 
 	let width = $derived(Number.isFinite(data.width) ? `${data.width}px` : '');
 	let height = $derived(Number.isFinite(data.height) ? `${data.height}px` : '');
@@ -95,28 +97,28 @@
 	const disableEditing = (ev: KeyboardEvent) => {
 		if (ev.key === 'Escape') editingName = false;
 	};
-	$effect(() => { if (nameInput) {
-		nameInput.focus();
-		nameInput.select();
-	}
-})
-$effect(() => {
-	if (editingName) {
-		document.addEventListener('keydown', disableEditing);
-	} else document.removeEventListener('keydown', disableEditing);
-});
+	$effect(() => {
+		if (nameInput) {
+			nameInput.focus();
+			nameInput.select();
+		}
+	});
+	$effect(() => {
+		if (editingName) {
+			document.addEventListener('keydown', disableEditing);
+		} else document.removeEventListener('keydown', disableEditing);
+	});
 
 	let startDragPos: { x: number; y: number } | undefined;
 	let dragDistance: number | undefined = undefined;
 	const dragThreshold = 2;
-	
-	$effect(() => {
-		 if (editingName === false && isNamedXmlNode && data.name.trim() === '') {
 
+	$effect(() => {
+		if (editingName === false && isNamedXmlNode && data.name.trim() === '') {
 			untrack(() => {
 				data.name = firstNameGiven;
-			})
-		 }
+			});
+		}
 	});
 
 	const outdatedPopupId = newLocalId('outdated-popup');
@@ -172,7 +174,7 @@ $effect(() => {
 	}
 	let isSelectedByRightClick = false;
 	console.log('Node', data);
-	window.n = data
+	window.n = data;
 </script>
 
 <div

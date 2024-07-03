@@ -70,8 +70,6 @@ class SveltePlugin<T = Requires<Schemes>> extends Scope<Schemes, [T | Requires<S
 	}
 
 	private unmount(element: HTMLElement) {
-		console.log('unmount', element);
-		return;
 		this.owners.delete(element);
 		this.renderer.unmount(element);
 	}
