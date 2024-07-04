@@ -1,4 +1,4 @@
-import type { InputControlTypes } from '../../../graph-editor/socket/control/Control';
+import type { InputControlTypes } from '../../../graph-editor/socket/control/Control.svelte';
 import type { SocketType } from '../../../graph-editor/plugins/typed-sockets';
 import type { Socket } from '$graph-editor/socket';
 import { $socketcolor } from './presets/classic/vars';

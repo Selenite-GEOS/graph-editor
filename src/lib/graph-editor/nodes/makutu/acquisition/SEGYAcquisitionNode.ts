@@ -5,7 +5,7 @@ export class SEGYAcquisitionNode extends APINode {
 	constructor({ factory }: { factory: NodeFactory }) {
 		super({ label: 'SEGY Acquisition', factory, url: '/makutu/acquisition/segy' });
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'segdir',
 			displayName: 'Seg Directory',
 			type: 'string',

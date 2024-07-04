@@ -1,5 +1,5 @@
 import { assignConnectionPath } from '$graph-editor/connection-path';
-import type { Connection } from '$graph-editor/nodes';
+import { AddXmlAttributeControl, type Connection } from '$graph-editor/nodes';
 import type { Schemes } from '$graph-editor/schemes';
 import type { SetupFunction } from '$graph-editor/setup';
 import { Scope, type BaseSchemes, type CanAssignSignal } from 'rete';
@@ -9,6 +9,7 @@ import { ConnectionPathPlugin } from 'rete-connection-path-plugin';
 import { get } from 'svelte/store';
 import type { Component } from 'svelte';
 import { getSvelteRenderer, type SvelteRenderer } from './renderer.svelte';
+import { ButtonControl, InputControl, Socket } from '$graph-editor/socket';
 
 type ComponentProps = Record<string, any> | undefined | void | null;
 type RenderResult = { component: Component; props: ComponentProps } | undefined | void | null;
@@ -151,7 +152,32 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
 	const { Presets } = await import('./presets');
 	sveltePlugin.addPreset(minimapPreset({ size: 200 }));
-	sveltePlugin.addPreset(Presets.classic.setup());
+	sveltePlugin.addPreset(
+		Presets.classic.setup({
+			customize: {
+				socket(context) {
+					if (context.payload instanceof Socket) {
+						if (context.payload.type === 'exec') return Presets.classic.ExecSocket;
+						return Presets.classic.Socket;
+					}
+
+					return Presets.classic.Socket;
+				},
+				control(data) {
+					if (data.payload instanceof InputControl) {
+						return Presets.classic.InputControl;
+					}
+					if (data.payload instanceof ButtonControl) {
+						return Presets.classic.Button;
+					}
+					if (data.payload instanceof AddXmlAttributeControl)
+						return Presets.classic.AddXmlAttributeControl;
+
+					return Presets.classic.Control;
+				}
+			}
+		})
+	);
 	area.use(sveltePlugin);
 
 	return params;

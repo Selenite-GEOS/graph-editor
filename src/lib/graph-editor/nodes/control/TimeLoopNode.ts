@@ -13,7 +13,7 @@ export class TimeLoopNode extends Node {
 
 		this.addInExec();
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'start',
 			displayName: 'Start',
 			socketLabel: 'Start',
@@ -27,7 +27,7 @@ export class TimeLoopNode extends Node {
 			}
 		});
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'end',
 			displayName: 'End',
 			socketLabel: 'End',
@@ -40,7 +40,7 @@ export class TimeLoopNode extends Node {
 				}
 			}
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'step',
 			displayName: 'Step',
 			socketLabel: 'Step',
@@ -53,7 +53,7 @@ export class TimeLoopNode extends Node {
 				}
 			}
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'displayProgress',
 			displayName: 'Display Progress',
 			type: 'boolean',

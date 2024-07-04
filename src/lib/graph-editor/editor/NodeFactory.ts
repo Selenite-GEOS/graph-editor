@@ -21,7 +21,7 @@ import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';
 // import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
 import type { HistoryPlugin } from '$graph-editor/plugins/history';
-import { clone } from 'lodash-es';
+import { clone, debounce } from 'lodash-es';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 
 function createDataflowEngine() {
@@ -158,7 +158,7 @@ export class NodeFactory {
 	lastAddedNode?: Node;
 	async addNode<T extends Node, Params = Record<string, unknown>>(
 		nodeClass: new (params: Params) => T,
-		params: WithoutFactory<Params>
+		params: WithoutFactory<Params> = {} as WithoutFactory<Params>
 	): Promise<T> {
 		const paramsWithFactory: Params = { ...params, factory: this } as Params;
 
@@ -314,11 +314,13 @@ export class NodeFactory {
 
 			if (context.type !== 'connectioncreated' && context.type !== 'connectionremoved')
 				return context;
-
 			const conn = context.data;
 			const sourceNode = editor.getNode(conn.source);
 			const targetNode = editor.getNode(conn.target);
-			if (targetNode) this.pythonDataflowEngine.reset(targetNode.id);
+			if (targetNode) {
+				this.pythonDataflowEngine.reset(targetNode.id);
+				this.resetDataflow(targetNode);
+			}
 			const socket = sourceNode?.outputs[conn.sourceOutput]?.socket;
 			const outgoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
@@ -571,12 +573,8 @@ export class NodeFactory {
 		if (this.area) AreaExtensions.zoomAt(this.area, [node], { scale: undefined });
 	}
 
-	process(node?: Node) {
-		if (node) {
-			this.dataflowEngine.reset(node.id);
-			// this.resetSuccessors(node);
-		}
-		// dataflowEngine.reset();
+	runDataflowEngines() {
+		console.log('Running dataflow engines');
 		try {
 			this.editor
 				.getNodes()
@@ -584,6 +582,13 @@ export class NodeFactory {
 				.forEach((n) => {
 					this.dataflowEngine.fetch(n.id);
 				});
-		} catch (e) {}
+		} catch (e) {
+			console.error('Dataflow engine cancelled');
+		}
+	}
+
+	resetDataflow(node?: Node) {
+		this.dataflowEngine.reset(node?.id);
+		this.runDataflowEngines();
 	}
 }

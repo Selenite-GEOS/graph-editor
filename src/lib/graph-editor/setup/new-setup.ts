@@ -84,15 +84,20 @@ export async function setupFullGraphEditor(
 				);
 				const arrange = new AutoArrangePlugin<Schemes>();
 				arrange.addPreset(ArrangePresets.classic.setup());
-				area.use(arrange)
+				area.use(arrange);
 				factory.arrange = arrange;
 			},
 			// Area extensions
-			async ({ factory }) => {
+			async ({ factory, area }) => {
+				if (!area) {
+					console.warn("AreaPlugin is not defined, can't setup area extensions.");
+					return params;
+				}
 				console.log('Setting up area extensions');
 				const { AreaExtensions } = await import('rete-area-plugin');
 				const selector = AreaExtensions.selector();
 				const accumulating = AreaExtensions.accumulateOnCtrl();
+				AreaExtensions.showInputControl(area);
 				factory.accumulating = accumulating;
 				factory.selector = selector;
 			},

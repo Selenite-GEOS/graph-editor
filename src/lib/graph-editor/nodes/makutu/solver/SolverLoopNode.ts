@@ -10,7 +10,7 @@ export class SolverLoopNode extends SolverAPINode {
 			defaultOutExec: false,
 			height: 290
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'outputVTK',
 			displayName: 'Output VTK',
 			socketLabel: 'Output VTK',

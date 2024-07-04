@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	// import { focusTrap, modeCurrent, popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	// import Ref from '../../../Ref.svelte';
 	// import type { ClassicScheme, SvelteArea2D } from '../types';
@@ -223,7 +223,6 @@
 			<Fa icon={faClock} size="lg" secondaryColor="white" secondaryOpacity="100" />
 		</button>
 	{/if}
-	{node.c}
 	<div class="flex justify-{isVariable ? 'center' : ' between'} items-center">
 		{#if node instanceof XmlNode && node.name !== undefined}
 			<div class="title flex flex-col w-full">
@@ -352,7 +351,7 @@
 			<div
 				class="rete-input text-md items-center flex"
 				data-testid={'input-' + key}
-				style={input.control && !input.control.options?.label
+				style={input.control && !input.control?.label
 					? 'height: 55px'
 					: !input.socket.isArray
 						? 'height: 65px;'

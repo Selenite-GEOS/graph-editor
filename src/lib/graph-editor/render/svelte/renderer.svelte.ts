@@ -2,6 +2,7 @@ import { mount, unmount, type Component } from 'svelte';
 
 import Root from './Root.svelte';
 import { isEqual } from 'lodash-es';
+import { Node } from '$graph-editor/nodes';
 
 type Payload = Record<string, unknown> | null | void | undefined;
 
@@ -45,13 +46,13 @@ export function getSvelteRenderer(): SvelteRenderer<Component> {
 			if (!props.props || !payload) {
 				return;
 			}
+			if (payload.data instanceof Node) console.log(payload);
 			for (const [k, v] of Object.entries(payload)) {
 				props.props[k] = v;
 			}
 		},
 		unmount(element) {
 			const app = instances.get(element);
-
 			if (app) {
 				unmount(app);
 				instances.delete(element);

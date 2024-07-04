@@ -1,6 +1,6 @@
 import { ClassicPreset } from 'rete';
 import type { SocketType } from '../plugins/typed-sockets';
-import type { Node } from '$graph-editor/node/Node';
+import type { Node } from '$graph-editor/nodes/Node';
 
 export class Socket extends ClassicPreset.Socket {
 	public readonly isArray: boolean;
@@ -24,7 +24,7 @@ export class Socket extends ClassicPreset.Socket {
 		isRequired?: boolean;
 		type?: SocketType;
 		node: Node;
-		displayLabel: boolean;
+		displayLabel?: boolean;
 	}) {
 		super(name);
 		this.isArray = isArray;

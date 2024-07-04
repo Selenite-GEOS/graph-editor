@@ -20,7 +20,11 @@ export { default as Connection } from './components/Connection.svelte';
 export { default as Control } from './components/Control.svelte';
 export { default as Node } from './components/Node.svelte';
 export { default as Socket } from './components/Socket.svelte';
-
+export { default as Button } from './components/Button.svelte';
+// export {default as InputControl} from './components/InputControl.svelte'
+export { default as InputControl } from './components/InputControl.svelte';
+export { default as ExecSocket } from './components/ExecSocket.svelte';
+export { default as AddXmlAttributeControl } from './components/AddXmlAttributeControl.svelte';
 type Component<Props extends Record<string, any>> = ComponentType<SvelteComponent<Props>>;
 
 type CustomizationProps<Schemes extends ClassicScheme> = {

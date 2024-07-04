@@ -4,7 +4,7 @@ import { SolverAPINode } from './SolverAPINode';
 export class ExecuteNode extends SolverAPINode {
 	constructor({ factory }: { factory: NodeFactory }) {
 		super({ label: 'Execute Solver', url: '/execute', factory, height: 280 });
-		this.addInData({
+		this.oldAddInData({
 			name: 'time',
 			displayName: 'Time',
 			socketLabel: 'Time',

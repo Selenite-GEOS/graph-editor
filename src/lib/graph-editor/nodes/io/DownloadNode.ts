@@ -7,7 +7,7 @@ import type { XMLData } from '../XML/XMLData';
 export class DownloadNode extends Node {
 	constructor({ factory }: { factory: NodeFactory }) {
 		super({ label: 'Download', factory, height: 160 });
-		this.addInData({
+		this.oldAddInData({
 			name: 'data',
 			displayName: 'Data',
 			socketLabel: 'Data',

@@ -12,7 +12,7 @@ export class EveryNode extends Node {
 		this.addInExec();
 		this.addInExec('reset', 'Reset');
 		this.addOutExec();
-		this.addInData({
+		this.oldAddInData({
 			name: 'count',
 			displayName: 'Count',
 			socketLabel: 'Count',

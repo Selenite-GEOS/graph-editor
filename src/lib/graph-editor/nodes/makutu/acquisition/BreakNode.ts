@@ -9,7 +9,7 @@ export class BreakNode extends Node {
 	constructor({ factory }: { factory: NodeFactory }) {
 		super({ label: 'Break Shot', factory, height: 225 });
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'object',
 			displayName: 'Shot',
 			socketLabel: 'Shot',

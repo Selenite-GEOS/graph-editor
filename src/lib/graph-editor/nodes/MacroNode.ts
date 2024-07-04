@@ -154,7 +154,7 @@ export class MacroNode extends Node {
 				console.error('unhandled socket type', v.type, 'for variable', v.id, 'with value', v.value);
 				continue;
 			}
-			this.addInData({
+			this.oldAddInData({
 				name: v.id,
 				displayName: v.name,
 				initial: v.value,
@@ -231,7 +231,7 @@ export class MacroNode extends Node {
 
 				const baseInputControl = input.control as InputControl<'text'> | undefined;
 
-				this.macroInputs[macroKey] = this.addInData({
+				this.macroInputs[macroKey] = this.oldAddInData({
 					name: macroKey,
 					displayName: input.socket.name,
 					type: input.socket.type,

@@ -14,7 +14,7 @@ export class ObjectAPINode extends APINode {
 
 		super(params);
 		this.objectKey = objectKey;
-		this.addInData({
+		this.oldAddInData({
 			name: objectKey,
 			displayName: objectLabel,
 			socketLabel: objectLabel,

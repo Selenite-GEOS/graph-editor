@@ -1,27 +1,39 @@
 <script lang="ts">
-	import type { InputControl, InputControlTypes } from '$graph-editor/socket';
+	import type { InputControl, InputControlType } from '$graph-editor/socket';
 	// import { FileButton } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
-	export let data: InputControl<InputControlTypes>;
-	let isReady = false;
-	let type: InputControlTypes;
-	$: type = data.type;
-	$: readonly = data.readonly;
-	$: value = data.value;
+	import { untrack } from 'svelte';
+
+	type Props = {
+		data: InputControl<InputControlType>;
+		width?: string;
+		inputTextSize?: string;
+	};
+
+	let { data: inputControl, width = 'w-full', inputTextSize = 'text-md' }: Props = $props();
+
+	let type = $derived(inputControl.type);
+	let readonly = $derived(inputControl.readonly);
+	let value = $state(inputControl.value);
+
 	let debouncedValue = value;
 	let debouncedTimer: NodeJS.Timeout | undefined;
-	$: options = data.options;
-	$: pattern = options?.pattern;
+	let options = $derived(inputControl.options);
 	let isFirstSet = true;
-	export let width = 'w-full';
 	let fileList: FileList | undefined;
 
 	// Debounce value
-	$: if (!isFirstSet) {
-		console.log('debounced', debouncedValue);
-		data.setValue(debouncedValue);
-		if (data?.options?.debouncedOnChange) data.options.debouncedOnChange(debouncedValue);
-	}
+	$effect(() => {
+		if (!isFirstSet) {
+			console.log('debounced', debouncedValue);
+			untrack(() => {
+				inputControl.setValue(debouncedValue);
+			});
+			if (inputControl?.options?.debouncedOnChange)
+				untrack(() => {
+					inputControl.options!.debouncedOnChange!(debouncedValue);
+				});
+		}
+	});
 
 	function onChange(val: unknown) {
 		if (isFirstSet) {
@@ -31,7 +43,7 @@
 
 		value = val;
 
-		if (data.options?.change !== undefined) data.options.change(val);
+		if (inputControl.options?.change !== undefined) inputControl.options.change(val);
 		clearTimeout(debouncedTimer);
 		debouncedTimer = setTimeout(() => {
 			debouncedValue = val;
@@ -49,8 +61,8 @@
 		console.log(typeof val);
 		onChange(val);
 	}
-	export let inputTextSize = 'text-md';
-	console.log(data.options?.pattern);
+
+	console.log(inputControl.options?.pattern);
 </script>
 
 {#if type == 'select'}

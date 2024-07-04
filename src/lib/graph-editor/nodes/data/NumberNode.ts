@@ -1,26 +1,16 @@
-import { Node } from '$Node';
+import { Node, type NodeParams } from '$Node';
 import type { NodeFactory } from '$graph-editor/editor';
-import { InputControl } from '$graph-editor/socket';
+import { InputControl, Socket } from '$graph-editor/socket';
 
-export class NumberNode extends Node {
-	height = 130;
-	width = 180;
-
-	constructor({
-		factory,
-		initial = 0,
-		change
-	}: {
-		factory: NodeFactory;
-		initial: number;
-		change?: () => void;
-	}) {
-		// super('Number', { factory });
-		super({ label: 'Number', factory, params: { initial, change } });
-		this.addControl(
-			'value',
-			new InputControl('number', { initial, debouncedOnChange: this.processDataflow })
-		);
+export class NumberNode extends Node<{}, { value: Socket }, { value: InputControl<'number'> }> {
+	constructor(
+		params: NodeParams & {
+			initial?: number;
+			change?: () => void;
+		}
+	) {
+		super({ label: 'Number', ...params });
+		this.addInputControl('value', { type: 'number', initial: params.initial });
 		this.addOutData({ name: 'value', type: 'number' });
 	}
 

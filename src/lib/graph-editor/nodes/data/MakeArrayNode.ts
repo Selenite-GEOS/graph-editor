@@ -133,7 +133,7 @@ export class MakeArrayNode extends AddPinNode {
 
 		// console.log('Adding input pin with key data-' + Object.keys(this.inputs).length);
 
-		this.addInData({
+		this.oldAddInData({
 			name: `data-${index}`,
 			displayName: '',
 			isArray: false,

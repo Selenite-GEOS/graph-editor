@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import { assignControl } from '$graph-editor/customization/utils';
-	import { InputControl, type InputControlTypes } from '$graph-editor/socket';
+	import { InputControl, type InputControlType } from '$graph-editor/socket';
 	import InputControlComponent from '$graph-editor/customization/presets/classic/components/InputControl.svelte';
 	const modalStore = getModalStore();
 	let { array, title, type } = $modalStore[0].meta;

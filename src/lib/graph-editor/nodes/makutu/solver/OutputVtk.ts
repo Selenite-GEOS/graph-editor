@@ -6,7 +6,7 @@ export class OutputVtkNode extends SolverAPINode {
 		// super('Output VTK', '/output_vtk', { factory });
 		super({ label: 'Output VTK', url: '/output_vtk', factory });
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'time',
 			displayName: 'Time',
 			socketLabel: 'Time',

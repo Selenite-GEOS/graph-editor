@@ -7,7 +7,7 @@ export class InitializeSolverNode extends SolverAPINode {
 
 		this.pythonComponent.addCode('$(solver).initialize(rank, $(xml))');
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'xml',
 			displayName: 'XML',
 			socketLabel: 'XML',

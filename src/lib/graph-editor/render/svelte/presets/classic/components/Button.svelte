@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ButtonControl } from './button';
+	import type { ButtonControl } from '../../../../../socket/control/button/button';
 
 	export let data: ButtonControl;
 </script>

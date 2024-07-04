@@ -101,7 +101,7 @@ export async function setupEditor(params: {
 		destroy: () => area.destroy(),
 		firstDisplay: async () => {
 			nodeFactory.dataflowEngine.reset();
-			nodeFactory.process();
+			nodeFactory.processDataflow();
 			editor.addPipe((context) => {
 				if (context.type === 'connectioncreated' || context.type === 'connectionremoved') {
 					const conn = context.data;

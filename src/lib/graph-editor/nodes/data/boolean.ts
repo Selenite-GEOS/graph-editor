@@ -8,7 +8,12 @@ export class NotNode extends Node {
 			height: 135,
 			...params
 		});
-		this.addInData({ name: 'value', displayName: 'Value', socketLabel: 'Value', type: 'boolean' });
+		this.oldAddInData({
+			name: 'value',
+			displayName: 'Value',
+			socketLabel: 'Value',
+			type: 'boolean'
+		});
 		this.addOutData({ name: 'value', type: 'boolean' });
 	}
 

@@ -11,13 +11,13 @@ export class UpdateSourcesAndReceiversNode extends SolverAPINode {
 			width: 180
 		});
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'sourceCoords',
 			displayName: 'Source Coords',
 			socketLabel: 'Sources Coords',
 			type: 'pythonObject'
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'receiverCoords',
 			displayName: 'Receiver Coords',
 			socketLabel: 'Receivers Coords',

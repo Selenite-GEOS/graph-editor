@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
 	import {
+		AddNode,
+		DisplayNode,
 		NodeEditor,
 		NumberNode,
 		setupFullGraphEditor,
@@ -16,10 +18,15 @@
 			editor = res.editor;
 			const factory = res.factory;
 			console.log('Editor setup complete');
-			await factory.addNode(NumberNode, { initial: 0 });
-			await factory.addNode(NumberNode, { initial: 2 });
-			await factory.arrange.layout()
-			AreaExtensions.zoomAt(factory.getArea(), editor.getNodes())
+			const a = await factory.addNode(NumberNode);
+			const b = await factory.addNode(NumberNode, { initial: 2 });
+			const sum = await factory.addNode(AddNode, {});
+			await editor.addNewConnection(a, 'value', sum, 'a');
+			await editor.addNewConnection(b, 'value', sum, 'b');
+			const display = await factory.addNode(DisplayNode, {});
+			await editor.addNewConnection(sum, 'value', display, 'input');
+			await factory.arrange.layout();
+			AreaExtensions.zoomAt(factory.getArea(), editor.getNodes());
 		});
 	});
 	$inspect('GraphEditor', editor);

@@ -21,7 +21,7 @@ if (rank == 0):
 		);
 		this.addInExec();
 		this.addOutExec();
-		this.addInData({
+		this.oldAddInData({
 			name: 'message',
 			displayName: 'Message',
 			socketLabel: 'Message',

@@ -4,7 +4,7 @@
 	import cssVars from 'svelte-css-vars';
 	import Color from 'color';
 	import InputControlComponent from '$graph-editor/customization/presets/classic/components/InputControl.svelte';
-	import { InputControl, type InputControlTypes } from '$graph-editor/socket';
+	import { InputControl, type InputControlType } from '$graph-editor/socket';
 	import type { SocketType } from '$graph-editor/plugin/typed-sockets';
 	import {
 		popup,
@@ -46,7 +46,7 @@
 			color = `hsl(${Math.random() * 360}, 100%, 50%)`;
 		}, 230);
 	else clearInterval(discoInterval);
-	let inputControl: InputControl<InputControlTypes> | undefined;
+	let inputControl: InputControl<InputControlType> | undefined;
 
 	let firstSet = true;
 	$: if (!firstSet) dispatch('change', { variable: v });

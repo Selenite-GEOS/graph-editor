@@ -9,7 +9,7 @@ import CustomNode from '$custom-components/Node.svelte';
 // import { CustomArraySocket } from './presets/classic/components/CustomArraySocket';
 import { ButtonControl } from '$graph-editor/socket';
 import type { NodeFactory } from '$graph-editor/editor';
-import CustomButton from '../../../graph-editor/socket/control/button/CustomButton.svelte';
+import CustomButton from '../../../graph-editor/render/svelte/presets/classic/components/Button.svelte';
 import CustomConnection from '$custom-components/Connection.svelte';
 import CustomExecSocket from '$custom-components/ExecSocket.svelte';
 import CustomSocket from '$custom-components/Socket.svelte';
@@ -18,7 +18,7 @@ import type { SetupClass, SetupFunction } from '$graph-editor/setup/Setup';
 import { InputControl } from '$graph-editor/socket';
 import InputControlComponent from '$custom-components/InputControl.svelte';
 import { Socket } from '$graph-editor/socket/Socket';
-import AddXmlAttributeControlCmpnt from '$graph-editor/nodes/XML/AddXmlAttributeControl.svelte';
+import AddXmlAttributeControlCmpnt from '$graph-editor/render/svelte/presets/classic/components/AddXmlAttributeControl.svelte';
 // import { AddXmlAttributeControl } from '$graph-editor/nodes/XML/AddXmlAttributeControl';
 // import { ReactPlugin, Presets } from 'rete-react-plugin';
 

@@ -7,18 +7,18 @@ export class SelectNode extends Node {
 	constructor({ factory }: { factory: NodeFactory }) {
 		super({ factory, label: 'Select', height: 255 });
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'a',
 			displayName: 'A',
 			type: 'any'
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'b',
 			displayName: 'B',
 			type: 'any'
 		});
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'pickA',
 			socketLabel: 'Pick A',
 			displayName: 'Pick A',

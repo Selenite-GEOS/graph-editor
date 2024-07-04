@@ -10,7 +10,7 @@ export class AppendNode extends Node {
 	constructor({ a = '', sep = ' ', b = '', factory }: AppendNodeParams) {
 		// super('Append', { height: 220, factory });
 		super({ label: 'Append', height: 220, factory, params: { a, b, sep } });
-		this.addInData({
+		this.oldAddInData({
 			name: 'a',
 			displayName: 'A',
 			type: 'any',
@@ -21,7 +21,7 @@ export class AppendNode extends Node {
 				}
 			}
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'sep',
 			displayName: 'Separator',
 			type: 'string',
@@ -33,7 +33,7 @@ export class AppendNode extends Node {
 				}
 			}
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'b',
 			displayName: 'B',
 			type: 'any',

@@ -9,8 +9,20 @@ export class MergeArrays extends Node {
 			height: 160,
 			...params
 		});
-		this.addInData({ name: 'a', displayName: 'A', socketLabel: 'A', isArray: true, type: 'any' });
-		this.addInData({ name: 'b', displayName: 'B', socketLabel: 'B', isArray: true, type: 'any' });
+		this.oldAddInData({
+			name: 'a',
+			displayName: 'A',
+			socketLabel: 'A',
+			isArray: true,
+			type: 'any'
+		});
+		this.oldAddInData({
+			name: 'b',
+			displayName: 'B',
+			socketLabel: 'B',
+			isArray: true,
+			type: 'any'
+		});
 		this.addOutData({ name: 'value', isArray: true, type: 'any' });
 	}
 

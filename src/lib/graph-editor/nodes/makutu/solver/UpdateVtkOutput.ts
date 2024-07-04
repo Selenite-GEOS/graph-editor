@@ -16,7 +16,7 @@ export class UpdateVtkOutputNode extends SolverAPINode {
 			width: 180
 		});
 
-		this.addInData({
+		this.oldAddInData({
 			name: 'directory',
 			displayName: 'Directory',
 			socketLabel: 'Directory',

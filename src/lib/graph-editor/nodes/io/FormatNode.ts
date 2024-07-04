@@ -29,7 +29,7 @@ export class FormatNode extends Node {
 			displayName: '',
 			type: 'groupNameRef'
 		});
-		this.addInData({
+		this.oldAddInData({
 			name: 'format',
 			displayName: 'Format',
 			socketLabel: 'Format',
@@ -107,7 +107,7 @@ export class FormatNode extends Node {
 					if (!(key in this.inputs)) {
 						const varData = this.getData(varName, inputs);
 						anyChange = true;
-						this.addInData({
+						this.oldAddInData({
 							name: key,
 							displayName: capitalize(varName),
 							socketLabel: capitalize(varName),

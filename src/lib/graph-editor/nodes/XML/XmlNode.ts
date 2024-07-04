@@ -231,7 +231,7 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 
 		if (type === 'vector') this.xmlVectorProperties.add(name);
 
-		const { control: attrInputControl } = this.addInData({
+		const { control: attrInputControl } = this.oldAddInData({
 			name: name,
 			displayName: titlelize(name),
 			socketLabel: titlelize(name),
@@ -345,7 +345,7 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 		index?: number;
 	}) {
 		this.xmlInputs[name] = { tag: tag };
-		this.addInData({
+		this.oldAddInData({
 			name: name,
 			displayName: titlelize(name),
 			socketLabel: titlelize(name),
