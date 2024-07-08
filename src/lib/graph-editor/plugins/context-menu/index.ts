@@ -10,7 +10,7 @@ import type { Position } from '$graph-editor/common';
 import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
 
-export * from './context-menu.svelte'
+export * from './context-menu.svelte';
 // export class ContextMenuSetup extends SetupClass {
 // 	selectedNodes: SelectorEntity[] = [];
 // 	async setup(

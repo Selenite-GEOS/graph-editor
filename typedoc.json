@@ -2,5 +2,5 @@
 	"$schema": "https://typedoc.org/schema.json",
 	"entryPoints": ["src/lib/index.ts"],
 	"out": "docs",
-	"skipErrorChecking": true,
+	"skipErrorChecking": true
 }

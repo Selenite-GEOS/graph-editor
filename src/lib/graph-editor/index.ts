@@ -3,7 +3,6 @@
  * @module graph-editor
  */
 
-
 export * as Nodes from './nodes';
 export * as Editor from './editor';
 export * from './variables';
