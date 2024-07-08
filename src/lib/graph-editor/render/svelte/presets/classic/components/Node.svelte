@@ -10,13 +10,13 @@
 	import type { NodeEditorSaveData } from '$graph-editor/editor';
 	import Fa from 'svelte-fa';
 	import { EditMacroNodeChannel } from '$lib/broadcast-channels';
-	import { GetGraphStore } from '$houdini';
+	// import { GetGraphStore } from '$houdini';
 	import { fade } from 'svelte/transition';
 	import { newLocalId } from '$lib/utils';
 	import { faClock } from '@fortawesome/free-regular-svg-icons';
 	// import { Popup } from '$lib/layout';
-	import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
-	import { createActionMenuItem } from '$lib/menu';
+	import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
+	import { createActionMenuItem } from '$lib/oldMenu';
 	import { _ } from '$lib/global';
 	import { writable } from 'svelte/store';
 

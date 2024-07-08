@@ -26,7 +26,7 @@
 	import BoxSelection from './selection/BoxSelection.svelte';
 	import type { Area, AreaPlugin } from 'rete-area-plugin';
 	import type { Schemes } from '$graph-editor/node/Schemes';
-	import { clientToSurfacePos } from '$utils/html';
+	import { oldClientToSurfacePos } from '$utils/html';
 	import type { Point } from '$lib/types/Point';
 	import wu from 'wu';
 	import { browser } from '$app/environment';

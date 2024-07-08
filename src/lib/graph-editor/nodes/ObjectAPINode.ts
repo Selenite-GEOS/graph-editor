@@ -20,7 +20,7 @@ export class ObjectAPINode extends APINode {
 			socketLabel: objectLabel,
 			type: 'pythonObject'
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: objectKey,
 			socketLabel: objectLabel,
 			displayName: objectLabel,

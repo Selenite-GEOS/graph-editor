@@ -7,7 +7,7 @@
 	import { localStorageStore } from '@skeletonlabs/skeleton';
 	import { writable } from 'svelte/store';
 	import { browser } from '$app/environment';
-	import { moonMenuVisibleStore } from '$lib/menu/context-menu/moonContextMenu';
+	import { moonMenuVisibleStore } from '$lib/oldMenu/context-menu/moonContextMenu';
 	const mainRightSideBar = getContext<'mainRightSideBar', CodeEditorIntegration>(
 		'mainRightSideBar'
 	);

@@ -14,7 +14,7 @@ export class NotNode extends Node {
 			socketLabel: 'Value',
 			type: 'boolean'
 		});
-		this.addOutData({ name: 'value', type: 'boolean' });
+		this.oldAddOutData({ name: 'value', type: 'boolean' });
 	}
 
 	data(inputs?: Record<string, unknown> | undefined): Record<string, unknown> {

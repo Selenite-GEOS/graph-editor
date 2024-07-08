@@ -10,7 +10,7 @@ export class GetPressuresAtReceiversNode extends SolverAPINode {
 			factory,
 			height: 250
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'seismos',
 			type: 'pythonObject',
 			displayName: 'Seismos'

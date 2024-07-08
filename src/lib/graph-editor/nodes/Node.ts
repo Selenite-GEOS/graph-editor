@@ -55,7 +55,7 @@ export interface NodeParams {
 	name?: string;
 	width?: number;
 	height?: number;
-	factory: NodeFactory;
+	factory?: NodeFactory;
 	params?: Record<string, unknown>;
 }
 
@@ -69,6 +69,44 @@ export type NodeSaveData = {
 	selectedInputs: string[];
 	selectedOutputs: string[];
 };
+
+export type NodeConstructor<N extends Node = Node> = {
+	new (params?: NodeParams): N;
+	id?: string;
+	/** Menu path of the node. */
+	path?: string[];
+	/** Search tags of the node. */
+	tags?: string[];
+	/** Description of the node. */
+	description?: string;
+};
+
+/**
+ * Decorator that adds a path to a node.
+ */
+export function path(...path: string[]) {
+	return function (target: NodeConstructor) {
+		target.path = path;
+	};
+}
+
+/**
+ * Decorator that adds tags to a node
+ */
+export function tags(...tags: string[]) {
+	return function (target: NodeConstructor) {
+		target.tags = tags;
+	};
+}
+
+/**
+ * Decorator that adds a description to a node.
+ */
+export function description(description: string) {
+	return function (target: NodeConstructor) {
+		target.description = description;
+	};
+}
 
 export class Node<
 		Inputs extends {
@@ -90,15 +128,18 @@ export class Node<
 	extends ClassicPreset.Node<Inputs, Outputs, Controls>
 	implements DataflowNode, ComponentSupportInterface
 {
+	static description: string = '';
+	static inputTypes?: string[];
+	static outputTypes?: string[];
+
 	width = 190;
 	height = 120;
-
 	private components: BaseComponent[] = [];
 	static activeFactory: NodeFactory | undefined;
 	private outData: Record<string, unknown> = {};
 	private resolveEndExecutes = new Stack<() => void>();
 	private naturalFlowExec: string | undefined = 'exec';
-	protected factory: NodeFactory;
+	protected factory?: NodeFactory;
 	protected params: Record<string, unknown>;
 	static id: string;
 	static nodeCounts = BigInt(0);
@@ -116,7 +157,7 @@ export class Node<
 	initializePromise?: Promise<void>;
 	afterInitialize?: () => void;
 
-	getFactory(): NodeFactory {
+	getFactory(): NodeFactory | undefined {
 		return this.factory;
 	}
 	getState(): Record<string, unknown> {
@@ -132,7 +173,7 @@ export class Node<
 		].flat();
 	}
 
-	constructor(params: NodeParams) {
+	constructor(params: NodeParams = {}) {
 		const { label = '', width = 190, height = 120, factory } = params;
 		super(label);
 		this.pythonComponent = this.addComponentByClass(PythonNodeComponent);
@@ -145,9 +186,9 @@ export class Node<
 		}
 		this.params = params.params || {};
 		this.factory = factory;
-		if (factory === undefined) {
-			throw new Error(name + ': Factory is undefined');
-		}
+		// if (factory === undefined) {
+		// 	throw new Error(name + ': Factory is undefined');
+		// }
 		// format.subscribe((_) => (this.label = _(label)));
 		this.width = width;
 		this.height = height;
@@ -297,7 +338,32 @@ export class Node<
 		this.addInput(name, input as unknown as Input<Exclude<Inputs[keyof Inputs], undefined>>);
 	}
 
-	addOutData({
+	addOutData(
+		key: keyof Outputs,
+		params: {
+			showLabel?: boolean;
+			type?: SocketType;
+			isArray?: boolean;
+			label?: string;
+		}
+	) {
+		if (key in this.outputs) {
+			throw new Error(`Output ${String(key)} already exists`);
+		}
+		const output = new Output(
+			new Socket({
+				name: params.label,
+				isArray: params.isArray,
+				type: params.type,
+				node: this,
+				displayLabel: params.showLabel
+			}),
+			params.label
+		);
+		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
+	}
+
+	oldAddOutData({
 		name = 'data',
 		displayName = '',
 		socketLabel = '',

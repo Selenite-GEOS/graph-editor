@@ -3,7 +3,22 @@ import { defineConfig } from 'vitest/config';
 import houdini from 'houdini/vite';
 
 export default defineConfig({
-	plugins: [houdini(), sveltekit()],
+	plugins: [
+		,
+		// houdini()
+		// .map((plugin) => {
+		// 	return () => {
+		// 		try {
+		// 			plugin()
+		// 		}
+		// 		catch {
+		// 			console.error("aie")
+		// 		}
+		// 		}
+
+		// })
+		sveltekit()
+	],
 	build: {
 		target: 'esnext'
 		// rollupOptions: {

@@ -33,7 +33,7 @@ export class MakeArrayNode extends AddPinNode {
 		});
 		this.initialValues = params.initialValues;
 
-		this.addOutData({ name: 'array', isArray: true, type: this.state.type });
+		this.oldAddOutData({ name: 'array', isArray: true, type: this.state.type });
 		this.changeType(this.state.type);
 		this.loadInitialValues();
 

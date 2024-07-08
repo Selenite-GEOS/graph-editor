@@ -3,7 +3,9 @@
  * @module graph-editor
  */
 
-export * from './nodes';
-export * from './editor';
+
+export * as Nodes from './nodes';
+export * as Editor from './editor';
 export * from './variables';
-export * from './setup/new-setup';
+export * as Setup from './setup/new-setup';
+export * as Plugins from './plugins';

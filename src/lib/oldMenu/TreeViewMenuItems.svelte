@@ -6,11 +6,11 @@
 		type INodeMenuItem,
 		type IBaseMenuItem,
 		isActionMenuItem
-	} from '$lib/menu';
+	} from '$lib/oldMenu';
 	import {
 		moonMenuFactoryStore,
 		moonMenuVisibleStore
-	} from '$lib/menu/context-menu/moonContextMenu';
+	} from '$lib/oldMenu/context-menu/moonContextMenu';
 	import { ErrorWNotif, getContext } from '$lib/global';
 	export let menu: IHierachicalMenu;
 

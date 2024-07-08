@@ -14,7 +14,7 @@ export class VariableNode extends Node {
 		this.variableId = variableId;
 		this.editor = factory.getEditor();
 		const variable = get(this.editor.variables)[variableId];
-		this.addOutData({ ...variable, name: 'value' });
+		this.oldAddOutData({ ...variable, name: 'value' });
 		this.editor.variables.subscribe(async (variables) => {
 			if (variableId in variables) {
 				this.label = variables[variableId].name;

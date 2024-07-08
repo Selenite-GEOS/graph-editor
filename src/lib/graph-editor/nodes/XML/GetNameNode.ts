@@ -12,7 +12,7 @@ export class GetNameNode extends Node<{ xml: Socket }, { name: Socket }> {
 			socketLabel: 'XML',
 			type: 'xmlElement:*'
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'name',
 			displayName: 'Name',
 			socketLabel: 'Name',

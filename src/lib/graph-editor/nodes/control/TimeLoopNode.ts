@@ -66,7 +66,7 @@ export class TimeLoopNode extends Node {
 			}
 		});
 		this.addOutExec('loop', 'Loop');
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'time',
 			displayName: 'Time',
 			socketLabel: 'Time',

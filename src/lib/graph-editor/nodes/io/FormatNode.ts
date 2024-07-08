@@ -24,7 +24,7 @@ export class FormatNode extends Node {
 			return `$(format).format(${var_bindings})`;
 		});
 
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'result',
 			displayName: '',
 			type: 'groupNameRef'

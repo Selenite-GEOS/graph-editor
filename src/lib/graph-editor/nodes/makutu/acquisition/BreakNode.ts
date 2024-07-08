@@ -16,24 +16,24 @@ export class BreakNode extends Node {
 			type: 'pythonObject'
 		});
 
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'xml',
 			displayName: 'XML',
 			type: 'pythonProperty'
 		});
 
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'sourceCoords',
 			displayName: 'Source Coords',
 			type: 'pythonProperty'
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'receiverCoords',
 			displayName: 'Receiver Coords',
 			type: 'pythonProperty'
 		});
 
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'id',
 			displayName: 'ID',
 			type: 'pythonProperty'

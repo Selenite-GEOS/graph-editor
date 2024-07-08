@@ -16,7 +16,7 @@ import { isConnectionInvalid } from '$graph-editor/plugins/typed-sockets';
 import type { Socket } from '$graph-editor/socket/Socket';
 import { findSocket } from '$graph-editor/socket/utils';
 import { XmlNode, type Node } from '$graph-editor/nodes';
-import { moonMenuVisibleStore } from '$lib/menu/context-menu/moonContextMenu';
+import { moonMenuVisibleStore } from '$lib/oldMenu/context-menu/moonContextMenu';
 
 let dropMenuVisible = false;
 moonMenuVisibleStore.subscribe((value) => {

@@ -134,7 +134,7 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 
 		// Add XML output
 		if (outData) {
-			this.addOutData({
+			this.oldAddOutData({
 				name: 'value',
 				displayName: noName ? undefined : this.name,
 				displayLabel: false,

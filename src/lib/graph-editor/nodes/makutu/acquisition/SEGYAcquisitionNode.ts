@@ -16,7 +16,7 @@ export class SEGYAcquisitionNode extends APINode {
 				}
 			}
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'shots',
 			displayName: 'Shots',
 			type: 'pythonObject',

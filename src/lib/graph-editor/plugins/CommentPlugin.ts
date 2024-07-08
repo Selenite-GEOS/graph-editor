@@ -1,5 +1,5 @@
-import { createActionMenuItem } from '$lib/menu';
-import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
+import { createActionMenuItem } from '$lib/oldMenu';
+import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
 import type { NodeFactory } from '$graph-editor/editor';
 import type { Scope } from 'rete';
 import type { BaseArea } from 'rete-area-plugin';

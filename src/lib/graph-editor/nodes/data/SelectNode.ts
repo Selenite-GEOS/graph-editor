@@ -33,7 +33,7 @@ export class SelectNode extends Node {
 			}
 		});
 
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'value',
 			type: 'any'
 		});

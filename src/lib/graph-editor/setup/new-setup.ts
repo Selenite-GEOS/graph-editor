@@ -1,7 +1,7 @@
 import { NodeEditor, NodeFactory, type NodeEditorSaveData } from '$graph-editor/editor';
 import type { EditorExample } from '$graph-editor/examples';
 import type { Writable } from 'svelte/store';
-import { isSetup, type Setup, type SetupFunction } from './Setup';
+import { isSetup, type Setup, type SetupAreaFunction, type SetupFunction } from './Setup';
 import { setupConnections } from './ConnectionSetup';
 import { setupArea } from './AreaSetup';
 import { setupMinimap } from './MinimapSetup';
@@ -9,6 +9,7 @@ import { TypedSocketsPlugin } from '$graph-editor/plugins';
 import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';
+import { contextMenuSetup, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
 
 export type XmlContext = {};
 
@@ -40,12 +41,24 @@ export async function setupGraphEditor(
 		params = (await setupArea({ editor, factory, ...params })) ?? params;
 	}
 
+	const areaSetups: SetupAreaFunction[] = [];
 	for (const setup of params.setups ?? []) {
-		const setupFunction = isSetup(setup) ? setup.setup : setup;
-		if (isSetup(setup)) {
-			console.log(`Setting up ${setup.name}`);
+		// Handle the case where setup is a function
+		if (!isSetup(setup)) {
+			params = (await setup({ editor, factory, ...params })) ?? params;
+			continue;
 		}
-		params = (await setupFunction({ editor, factory, ...params })) ?? params;
+		console.log(`Setting up ${setup.name}`);
+		if (setup.type === undefined || setup.type === 'editor') {
+			params = (await setup.setup({ editor, factory, ...params })) ?? params;
+		} else if (setup.type === 'area') {
+			areaSetups.push(setup.setup);
+		} else {
+			console.error(`Unknown setup type: ${setup.type}`);
+		}
+	}
+	for (const areaSetup of areaSetups) {
+		await areaSetup({ editor, factory, area: factory.getArea()! });
 	}
 	const { AreaExtensions } = await import('rete-area-plugin');
 	await tick();
@@ -59,7 +72,7 @@ export async function setupGraphEditor(
 }
 
 export async function setupFullGraphEditor(
-	params: SetupGraphEditorParams = {}
+	params: SetupGraphEditorParams & { showContextMenu?: ShowContextMenu } = {}
 ): Promise<SetupGraphEditorResult> {
 	return setupGraphEditor({
 		...params,
@@ -76,7 +89,7 @@ export async function setupFullGraphEditor(
 			async ({ editor, area, factory }) => {
 				if (!area) {
 					console.warn("AreaPlugin is not defined, can't setup auto arrange plugin.");
-					return params;
+					return;
 				}
 				console.log('Setting up auto arrange');
 				const { AutoArrangePlugin, Presets: ArrangePresets } = await import(
@@ -91,13 +104,14 @@ export async function setupFullGraphEditor(
 			async ({ factory, area }) => {
 				if (!area) {
 					console.warn("AreaPlugin is not defined, can't setup area extensions.");
-					return params;
+					return;
 				}
 				console.log('Setting up area extensions');
 				const { AreaExtensions } = await import('rete-area-plugin');
 				const selector = AreaExtensions.selector();
 				const accumulating = AreaExtensions.accumulateOnCtrl();
 				AreaExtensions.showInputControl(area);
+				AreaExtensions.selectableNodes(area, selector, { accumulating });
 				factory.accumulating = accumulating;
 				factory.selector = selector;
 			},
@@ -105,7 +119,7 @@ export async function setupFullGraphEditor(
 			async ({ area, factory }) => {
 				if (!area) {
 					console.warn("AreaPlugin is not defined, can't setup history plugin.");
-					return params;
+					return;
 				}
 				console.log('Setting up history');
 				const { HistoryPlugin, Presets: HistoryPresets } = await import('rete-history-plugin');
@@ -116,12 +130,8 @@ export async function setupFullGraphEditor(
 			},
 			{
 				name: 'comments',
+				type: 'area',
 				setup: async ({ factory, area }) => {
-					if (!area) {
-						console.warn("AreaPlugin is not defined, can't setup comments plugin.");
-						return;
-					}
-
 					const { CommentPlugin, CommentExtensions } = await import(
 						'$graph-editor/plugins/CommentPlugin'
 					);
@@ -134,7 +144,17 @@ export async function setupFullGraphEditor(
 					factory.comment = comment;
 					area.use(comment);
 				}
-			}
+			},
+			contextMenuSetup({
+				showContextMenu: (params_) => {
+					console.debug('showContextMenu', params_);
+					if (!params.showContextMenu) {
+						console.warn('Missing show context menu function');
+						return;
+					}
+					params.showContextMenu(params_);
+				}
+			})
 
 			// new RenderSetup(),
 			// new ContextMenuSetup()

@@ -1,5 +1,7 @@
-import * as ClassicPreset from './classic';
+// import * as ClassicPreset from './classic';
 
-export const Presets = {
-	classic: ClassicPreset
-};
+// export const Presets = {
+// 	classic: ClassicPreset,
+// };
+
+export * as classic from './classic';

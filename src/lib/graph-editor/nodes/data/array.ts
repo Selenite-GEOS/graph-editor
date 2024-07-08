@@ -23,7 +23,7 @@ export class MergeArrays extends Node {
 			isArray: true,
 			type: 'any'
 		});
-		this.addOutData({ name: 'value', isArray: true, type: 'any' });
+		this.oldAddOutData({ name: 'value', isArray: true, type: 'any' });
 	}
 
 	data(inputs?: Record<string, unknown> | undefined): Record<string, unknown> {

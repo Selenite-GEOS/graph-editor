@@ -25,10 +25,13 @@
 	import { GetGraphStore } from '$houdini';
 	import { translateNodeFromGlobal } from '$utils/html';
 	import type { ConnectionDropEvent } from '$graph-editor/setup/ConnectionSetup';
-	import type { spawnMoonMenu as t_spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
-	import { moonMenuFactoryStore, newMoonItemsStore } from '$lib/menu/context-menu/moonContextMenu';
+	import type { spawnMoonMenu as t_spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
+	import {
+		moonMenuFactoryStore,
+		newMoonItemsStore
+	} from '$lib/oldMenu/context-menu/moonContextMenu';
 	import type { MacroNode as t_MacroNode } from '$graph-editor/node/MacroNode';
-	import { createNodeMenuItem, type IBaseMenuItem, type INodeMenuItem } from '$lib/menu';
+	import { createNodeMenuItem, type IBaseMenuItem, type INodeMenuItem } from '$lib/oldMenu';
 	import { VariableNode } from '$graph-editor/node/XML/VariableNode';
 	import { possibleTypes, type Variable } from './overlay/variables-list';
 	import { EditorType } from '.';
@@ -40,7 +43,7 @@
 	const geosContext = getContext('geos');
 	const geosContextV2 = getContext('geos_v2');
 	onMount(async () => {
-		spawnMoonMenu = (await import('$lib/menu/context-menu/moonContextMenu')).spawnMoonMenu;
+		spawnMoonMenu = (await import('$lib/oldMenu/context-menu/moonContextMenu')).spawnMoonMenu;
 		MacroNode = (await import('$graph-editor/node/MacroNode')).MacroNode;
 		AreaExtensions = (await import('rete-area-plugin')).AreaExtensions;
 	});

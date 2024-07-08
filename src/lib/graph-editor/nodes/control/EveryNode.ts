@@ -31,7 +31,7 @@ export class EveryNode extends Node {
 				}
 			}
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'current',
 			displayName: 'Current',
 			socketLabel: 'Current',

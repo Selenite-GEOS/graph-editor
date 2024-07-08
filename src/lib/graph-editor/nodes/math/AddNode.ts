@@ -1,10 +1,11 @@
 import { ClassicPreset } from 'rete';
-import { Node } from '$Node';
+import { Node, type NodeParams } from '$Node';
 import { Socket } from '../../socket/Socket';
-import { NodeFactory } from '$graph-editor/editor';
+import { NodeFactory, registerNode } from '$graph-editor/editor';
 
+@registerNode('math.AddNode')
 export class AddNode extends Node<{ a: Socket; b: Socket }, { value: Socket }> {
-	constructor({ factory, a = 0, b = 0 }: { factory: NodeFactory; a?: number; b?: number }) {
+	constructor({ factory, a = 0, b = 0 }: NodeParams & { a?: number; b?: number } = {}) {
 		// super('Add', { factory });
 		super({ label: 'Add', factory });
 		this.height = 160;

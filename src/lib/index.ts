@@ -1,2 +1,2 @@
 export * from '$graph-editor';
-export * from '$utils';
+export * as Utils from '$utils';

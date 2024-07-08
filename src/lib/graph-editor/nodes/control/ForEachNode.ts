@@ -24,8 +24,8 @@ for $(index), $(item) in enumerate($(array)):
 		this.addInExec();
 		this.addOutExec('loop', 'Loop');
 		this.oldAddInData({ name: 'array', displayName: 'Array', isArray: true });
-		this.addOutData({ name: 'item', displayName: 'Item' });
-		this.addOutData({ name: 'index', displayName: 'Index', type: 'number' });
+		this.oldAddOutData({ name: 'item', displayName: 'Item' });
+		this.oldAddOutData({ name: 'index', displayName: 'Index', type: 'number' });
 		this.addOutExec('exec', 'Done');
 
 		this.getEditor().addPipe((context) => {

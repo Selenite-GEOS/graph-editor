@@ -1,4 +1,5 @@
 import type { NodeFactory, Node } from '$graph-editor';
+import type { Position } from '$graph-editor/common';
 
 export function getTranslateValues(element: HTMLElement): {
 	translateX: number;
@@ -42,7 +43,7 @@ export function getScale(element: HTMLElement): {
 	return { scaleX, scaleY };
 }
 
-export function clientToSurfacePos({
+export function oldClientToSurfacePos({
 	x,
 	y,
 	factory
@@ -65,6 +66,17 @@ export function clientToSurfacePos({
 	return [scaledX, scaledY];
 }
 
+export function clientToSurfacePos({
+	pos,
+	factory
+}: {
+	pos: Position;
+	factory: NodeFactory;
+}): Position {
+	const [x, y] = oldClientToSurfacePos({ ...pos, factory });
+	return { x, y };
+}
+
 export function translateNodeFromGlobal({
 	globalPos,
 	node,
@@ -82,7 +94,7 @@ export function translateNodeFromGlobal({
 	if (!nodeView) throw new Error('Node view not found');
 	const rect = nodeView.element.getBoundingClientRect();
 	nodeView.translate(
-		...clientToSurfacePos({
+		...oldClientToSurfacePos({
 			x: globalPos.x - (center ? rect.width / 2 : 0),
 			y: globalPos.y - (center ? rect.height / 2 : 0),
 			factory: factory

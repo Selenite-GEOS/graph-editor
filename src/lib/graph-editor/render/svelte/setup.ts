@@ -61,7 +61,7 @@ class SveltePlugin<T = Requires<Schemes>> extends Scope<Schemes, [T | Requires<S
 			return context;
 		});
 	}
-
+	apps = new Map<HTMLElement, Node>();
 	setParent(scope: Scope<Requires<Schemes>>): void {
 		super.setParent(scope);
 
@@ -111,15 +111,8 @@ class SveltePlugin<T = Requires<Schemes>> extends Scope<Schemes, [T | Requires<S
 	 * Adds a preset to the plugin.
 	 * @param preset Preset that can render nodes, connections and other elements.
 	 */
-	public addPreset<K>(
-		preset: RenderPreset<
-			Schemes,
-			CanAssignSignal<T, K> extends true
-				? K
-				: 'Cannot apply preset. Provided signals are not compatible'
-		>
-	) {
-		const local = preset as RenderPreset<Schemes, Requires<Schemes>>;
+	public addPreset<K>(preset: RenderPreset) {
+		const local = preset as RenderPreset;
 
 		if (local.attach) local.attach(this);
 		this.presets.push(local);
@@ -150,8 +143,9 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	// @ts-expect-error
 	sveltePlugin.use(pathPlugin);
 	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
-	const { Presets } = await import('./presets');
+	const Presets = await import('./presets');
 	sveltePlugin.addPreset(minimapPreset({ size: 200 }));
+	// sveltePlugin.addPreset(Presets.contextMenu.setup())
 	sveltePlugin.addPreset(
 		Presets.classic.setup({
 			customize: {

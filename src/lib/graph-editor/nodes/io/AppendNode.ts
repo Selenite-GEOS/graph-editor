@@ -45,7 +45,7 @@ export class AppendNode extends Node {
 			},
 			initial: b
 		});
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'result',
 			type: 'string'
 		});

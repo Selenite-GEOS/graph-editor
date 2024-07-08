@@ -10,7 +10,7 @@
 	import type { Schemes } from '$graph-editor/node/Schemes';
 	import { browser } from '$app/environment';
 	import { onDestroy } from 'svelte';
-	import { moonMenuVisibleStore } from '$lib/menu/context-menu/moonContextMenu';
+	import { moonMenuVisibleStore } from '$lib/oldMenu/context-menu/moonContextMenu';
 
 	let factory: NodeFactory;
 	let editorViewport: HTMLElement;

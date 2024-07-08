@@ -42,6 +42,17 @@ export const defaultInputControlValues = {
 	select: '',
 	'group-name-ref': ''
 };
+export const inputControlSocketType: Record<InputControlType, SocketType> = {
+	'group-name-ref': 'groupNameRef',
+	'remote-file': 'path',
+	checkbox: 'boolean',
+	integer: 'integer',
+	number: 'number',
+	select: 'options',
+	text: 'string',
+	textarea: 'string',
+	vector: 'vector'
+};
 
 const socketToControl = {
 	path: 'remote-file',
@@ -85,7 +96,7 @@ export class InputControl<T extends InputControlType> extends Control {
 	readonly = $state(false);
 	onChange?: InputControlParams<T>['onChange'];
 	label = $state('');
-	type = $state<InputControlType>();
+	type = $state<InputControlType>('text');
 
 	constructor(params: InputControlParams<T>) {
 		super();

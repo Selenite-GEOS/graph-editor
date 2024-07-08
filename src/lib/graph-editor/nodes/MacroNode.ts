@@ -1,4 +1,4 @@
-import { GraphVersionStore } from '$houdini';
+// import { GraphVersionStore } from '$houdini';
 import { NodeFactory, NodeEditor } from '$graph-editor/editor';
 import type { NodeEditorSaveData } from '$graph-editor/editor';
 import { type InputControl, type Input, assignControl } from '$graph-editor/socket';
@@ -14,7 +14,7 @@ export class InputNode extends Node {
 
 	constructor({ factory, isArray }: { factory: NodeFactory; isArray: boolean }) {
 		super({ factory });
-		this.addOutData({
+		this.oldAddOutData({
 			name: 'value',
 			isArray
 		});
@@ -286,7 +286,7 @@ export class MacroNode extends Node {
 					setHeight(this.height + 33);
 					continue;
 				}
-				this.addOutData({
+				this.oldAddOutData({
 					name: macroKey,
 					displayName: output.socket.name,
 					type: output.socket.type,

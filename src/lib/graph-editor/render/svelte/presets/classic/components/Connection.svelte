@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { ErrorWNotif, _ } from '$lib/global';
-	import { createActionMenuItem } from '$lib/menu';
-	import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
+	import { createActionMenuItem } from '$lib/oldMenu';
+	import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
 	import type { NodeFactory } from '$graph-editor';
 	import type { Schemes } from '$graph-editor/node/Schemes';
 	import type { Position } from 'rete-render-utils/_types/types';

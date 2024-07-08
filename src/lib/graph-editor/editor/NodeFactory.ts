@@ -5,7 +5,7 @@ import type { Schemes } from '../schemes';
 import { ControlFlowEngine, DataflowEngine } from 'rete-engine';
 import { ExecSocket } from '../socket/ExecSocket';
 import { structures } from 'rete-structures';
-import { Connection, Node, type NodeSaveData } from '../nodes/Node';
+import { Connection, Node, type NodeConstructor, type NodeSaveData } from '../nodes/Node';
 import { ClassicPreset } from 'rete';
 import { InputControl } from '$graph-editor/socket';
 import type { Writable } from 'svelte/store';
@@ -69,9 +69,19 @@ function createControlflowEngine() {
 	});
 }
 
+export function registerNode<N extends Node>(id: string) {
+	// this is the decorator factory, it sets up
+	// the returned decorator function
+	return function (target: NodeConstructor<N>) {
+		NodeFactory.registerNode(id, target);
+	};
+}
+
 // type ParamsConstraint = [Record<string, unknown> & { factory: NodeFactory }, ...unknown[]];
 type WithFactory<T extends Record<string, unknown>> = T & { factory: NodeFactory };
 type WithoutFactory<T> = Omit<T, 'factory'>;
+
+// export function registerNode() {}
 export class NodeFactory {
 	public notifications = {
 		show: (p: unknown) => {
@@ -83,6 +93,24 @@ export class NodeFactory {
 		'connectionPathType',
 		defaultConnectionPath
 	);
+
+	/**
+	 * A map of node classes indexed by their id.
+	 */
+	static nodeRegistry = new Map<string, NodeConstructor>();
+	/**
+	 * Registers a node class with the NodeFactory.
+	 * @throws Error if the node is already registered.
+	 */
+	static registerNode<N extends Node>(id: string, n: NodeConstructor<N>): void {
+		n.id = id;
+		if (NodeFactory.nodeRegistry.has(id)) {
+			throw new Error('Node already registered');
+		}
+		console.debug('Registering node', n.id);
+		NodeFactory.nodeRegistry.set(n.id, n);
+	}
+
 	public readonly modalStore?: ReturnType<typeof getModalStore>;
 
 	static get classRegistry(): Record<string, typeof Node> {
@@ -98,7 +126,7 @@ export class NodeFactory {
 			'control/TimeLoopNode': Nodes.TimeLoopNode,
 			'data/MakeArrayNode': Nodes.MakeArrayNode,
 			'data/NumberNode': Nodes.NumberNode,
-			'data/StringNode': Nodes.StringNode,
+			// 'data/StringNode': Nodes.StringNode,
 			'io/AppendNode': Nodes.AppendNode,
 			'io/DisplayNode': Nodes.DisplayNode,
 			'io/DownloadNode': Nodes.DownloadNode,

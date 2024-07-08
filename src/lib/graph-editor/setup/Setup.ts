@@ -17,8 +17,7 @@ export abstract class SetupClass {
 
 export type Setup = {
 	name: string;
-	setup: SetupFunction;
-};
+} & ({ setup: SetupFunction; type?: 'editor' } | { setup: SetupAreaFunction; type: 'area' });
 
 export type SetupParams = {
 	editor: NodeEditor;
@@ -27,11 +26,19 @@ export type SetupParams = {
 	area?: AreaPlugin<Schemes, AreaExtra>;
 };
 
+export type SetupParamsWithArea = SetupParams & {
+	area: AreaPlugin<Schemes, AreaExtra>;
+};
+
 export type SetupResult = {};
 
 export type SetupFunction = (
 	params: SetupParams
 ) => SetupParams | Promise<SetupParams> | void | Promise<void>;
+
+export type SetupAreaFunction = (
+	params: SetupParamsWithArea
+) => SetupParamsWithArea | Promise<SetupParamsWithArea> | void | Promise<void>;
 
 export function isSetup(o: unknown): o is Setup {
 	return typeof o === 'object' && o !== null && 'name' in o && 'setup' in o;

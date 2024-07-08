@@ -17,9 +17,9 @@
 	} from '@skeletonlabs/skeleton';
 	import { newLocalId, capitalize } from '$utils';
 	import { createEventDispatcher } from 'svelte';
-	import { spawnMoonMenu } from '$lib/menu/context-menu/moonContextMenu';
+	import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
 	import type { Point } from '$lib/types/Point';
-	import { createActionMenuItem } from '$lib/menu';
+	import { createActionMenuItem } from '$lib/oldMenu';
 	import { ErrorWNotif, _ } from '$lib/global';
 	import ArrayEditor from './ArrayEditorModal.svelte';
 
