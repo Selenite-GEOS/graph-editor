@@ -5,7 +5,7 @@
 	// import type { ClassicScheme, SvelteArea2D } from '../types';
 	import type { ClassicScheme, SvelteArea2D } from 'rete-svelte-plugin';
 	import Ref from '../../../Ref.svelte';
-	import { MacroNode, VariableNode, XmlNode, type Node } from '$graph-editor/nodes';
+	import type { Node } from '$graph-editor/nodes';
 	import { faCubes } from '@fortawesome/free-solid-svg-icons';
 	import type { NodeEditorSaveData } from '$graph-editor/editor';
 	import Fa from 'svelte-fa';
@@ -19,6 +19,9 @@
 	import { createActionMenuItem } from '$lib/oldMenu';
 	import { _ } from '$lib/global';
 	import { writable } from 'svelte/store';
+	import { XmlNode } from '$graph-editor/nodes/XML/XmlNode';
+	import { MacroNode } from '$graph-editor/nodes/MacroNode';
+	import { VariableNode } from '$graph-editor/nodes/XML';
 
 	type NodeExtraData = { width?: number; height?: number };
 	const modeCurrent = writable(true);

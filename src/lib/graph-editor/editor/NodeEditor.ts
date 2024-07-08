@@ -22,6 +22,11 @@ export type NodeEditorSaveData = {
 	comments?: CommentSaveData[];
 };
 
+/**
+ * A graph editor for visual programming.
+ *
+ * A low level class that manages nodes and connections.
+ */
 export class NodeEditor extends BaseNodeEditor<Schemes> {
 	public factory?: NodeFactory;
 	variables: Writable<Record<string, Variable>> = writable({});

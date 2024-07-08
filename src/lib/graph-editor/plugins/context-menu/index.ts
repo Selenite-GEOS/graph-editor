@@ -2,7 +2,7 @@ import { capitalizeWords } from '$utils/string';
 import { type Setup } from '$graph-editor/setup';
 import { _ } from '$lib/global';
 import { NodeFactory } from '$graph-editor/editor';
-import { Node } from '$graph-editor/nodes';
+import { Node, nodeRegistry } from '$graph-editor/nodes';
 import { get } from 'svelte/store';
 import wu from 'wu';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
@@ -11,6 +11,7 @@ import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
 
 export * from './context-menu.svelte';
+export { default as ContextMenuComponent } from './ContextMenu.svelte';
 // export class ContextMenuSetup extends SetupClass {
 // 	selectedNodes: SelectorEntity[] = [];
 // 	async setup(
@@ -312,15 +313,22 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 		type: 'area',
 		setup: ({ area, factory, editor }) => {
 			const baseNodeMenuItems: NodeMenuItem[] = [];
-			for (const [id, nodeClass] of NodeFactory.nodeRegistry.entries()) {
+			for (const [id, nodeClass] of nodeRegistry.entries()) {
+				if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
+				const pieces = id.split('.').map(capitalizeWords);
+
+				/** Name of node in id. */
+				const idName = pieces.at(-1)!;
+
 				// Autogenerate menu path from id if unspecified
 				if (nodeClass.path === undefined) {
-					const path = id.split('.').map(capitalizeWords).slice(0, -1);
+					const path = pieces.slice(0, -1);
 					nodeClass.path = path;
 				}
+
 				const node = new nodeClass();
 				baseNodeMenuItems.push({
-					label: node.label,
+					label: node.label === undefined || node.label.trim() === '' ? idName : node.label,
 					create: () => new nodeClass({ factory }),
 					path: nodeClass.path,
 					tags: nodeClass.tags ?? [],
@@ -402,7 +410,6 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 						items.push({
 							...nodeItem,
 							async action() {
-								console.debug('Hey');
 								const node = nodeItem.create();
 								await editor.addNode(node);
 								const localPos = clientToSurfacePos({ pos, factory });

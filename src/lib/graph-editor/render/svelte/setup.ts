@@ -1,5 +1,5 @@
 import { assignConnectionPath } from '$graph-editor/connection-path';
-import { AddXmlAttributeControl, type Connection } from '$graph-editor/nodes';
+import type { Connection } from '$graph-editor/nodes';
 import type { Schemes } from '$graph-editor/schemes';
 import type { SetupFunction } from '$graph-editor/setup';
 import { Scope, type BaseSchemes, type CanAssignSignal } from 'rete';
@@ -143,6 +143,7 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	// @ts-expect-error
 	sveltePlugin.use(pathPlugin);
 	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
+	const { AddXmlAttributeControl } = await import('$graph-editor/nodes/XML');
 	const Presets = await import('./presets');
 	sveltePlugin.addPreset(minimapPreset({ size: 200 }));
 	// sveltePlugin.addPreset(Presets.contextMenu.setup())

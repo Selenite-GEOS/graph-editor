@@ -66,11 +66,9 @@ const socketToControl = {
 } as const;
 export type ControlOfSocket<S extends SocketType> = S extends keyof typeof socketToControl
 	? (typeof socketToControl)[S]
-	: undefined;
+	: 'text';
 export type SocketValueType<S extends SocketType> =
-	ControlOfSocket<S> extends InputControlType
-		? InputControlValueType<ControlOfSocket<S>>
-		: undefined;
+	ControlOfSocket<S> extends InputControlType ? InputControlValueType<ControlOfSocket<S>> : string;
 let testa: SocketValueType<'boolean'>;
 export function assignControl(
 	socketType: SocketType,
@@ -92,7 +90,7 @@ export type InputControlParams<T extends InputControlType> = {
 	label?: string;
 };
 export class InputControl<T extends InputControlType> extends Control {
-	#value? = $state<InputControlValueType<T>>();
+	#value = $state() as InputControlValueType<T>;
 	readonly = $state(false);
 	onChange?: InputControlParams<T>['onChange'];
 	label = $state('');
@@ -108,7 +106,7 @@ export class InputControl<T extends InputControlType> extends Control {
 		this.type = params.type;
 	}
 
-	get value(): InputControlValueType<T> | undefined {
+	get value(): InputControlValueType<T> {
 		return this.#value;
 	}
 

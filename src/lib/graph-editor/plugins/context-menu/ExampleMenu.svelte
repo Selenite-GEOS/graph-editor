@@ -12,6 +12,7 @@
 	<button
 		type="button"
 		class="bg-slate-300 p-2 rounded-sm"
+		title={item.description}
 		on:click={() => {
 			if (onclick) onclick();
 			item.action();

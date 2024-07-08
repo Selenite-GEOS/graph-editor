@@ -69,14 +69,6 @@ function createControlflowEngine() {
 	});
 }
 
-export function registerNode<N extends Node>(id: string) {
-	// this is the decorator factory, it sets up
-	// the returned decorator function
-	return function (target: NodeConstructor<N>) {
-		NodeFactory.registerNode(id, target);
-	};
-}
-
 // type ParamsConstraint = [Record<string, unknown> & { factory: NodeFactory }, ...unknown[]];
 type WithFactory<T extends Record<string, unknown>> = T & { factory: NodeFactory };
 type WithoutFactory<T> = Omit<T, 'factory'>;
@@ -88,74 +80,56 @@ export class NodeFactory {
 			console.error('notfications.show not implemented');
 		}
 	};
-	static classRegistrySetup = false;
 	public readonly connectionPathType: Writable<ConnectionPathType> = persisted(
 		'connectionPathType',
 		defaultConnectionPath
 	);
 
-	/**
-	 * A map of node classes indexed by their id.
-	 */
-	static nodeRegistry = new Map<string, NodeConstructor>();
-	/**
-	 * Registers a node class with the NodeFactory.
-	 * @throws Error if the node is already registered.
-	 */
-	static registerNode<N extends Node>(id: string, n: NodeConstructor<N>): void {
-		n.id = id;
-		if (NodeFactory.nodeRegistry.has(id)) {
-			throw new Error('Node already registered');
-		}
-		console.debug('Registering node', n.id);
-		NodeFactory.nodeRegistry.set(n.id, n);
-	}
-
 	public readonly modalStore?: ReturnType<typeof getModalStore>;
 
-	static get classRegistry(): Record<string, typeof Node> {
-		const classRegistry = {
-			MacroNode: Nodes.MacroNode,
-			'XML/GetNameNode': Nodes.GetNameNode,
-			'XML/VariableNode': Nodes.VariableNode,
-			'XML/XmlNode': Nodes.XmlNode,
-			'control/EveryNode': Nodes.EveryNode,
-			'control/SequenceNode': Nodes.SequenceNode,
-			'control/ForEachNode': Nodes.ForEachNode,
-			'control/StartNode': Nodes.StartNode,
-			'control/TimeLoopNode': Nodes.TimeLoopNode,
-			'data/MakeArrayNode': Nodes.MakeArrayNode,
-			'data/NumberNode': Nodes.NumberNode,
-			// 'data/StringNode': Nodes.StringNode,
-			'io/AppendNode': Nodes.AppendNode,
-			'io/DisplayNode': Nodes.DisplayNode,
-			'io/DownloadNode': Nodes.DownloadNode,
-			'io/FormatNode': Nodes.FormatNode,
-			'io/LogNode': Nodes.LogNode,
-			'makutu/acquisition/SEGYAcquisitionNode': Nodes.SEGYAcquisitionNode,
-			'makutu/acquisition/BreakNode': Nodes.BreakNode,
-			'makutu/solver/AcousticSEMNode': Nodes.AcousticSEMNode,
-			'makutu/solver/ApplyInitialConditionsNode': Nodes.ApplyInitialConditionsNode,
-			'makutu/solver/ExecuteNode': Nodes.ExecuteNode,
-			'makutu/solver/GetPressureAtReceiversNode': Nodes.GetPressuresAtReceiversNode,
-			'makutu/solver/InitializeSolverNode': Nodes.InitializeSolverNode,
-			'makutu/solver/OutputVtk': Nodes.OutputVtkNode,
-			'makutu/solver/ReinitSolverNode': Nodes.ReinitSolverNode,
-			'makutu/solver/SolverAPINode': Nodes.SolverAPINode,
-			'makutu/solver/SolverLoopNode': Nodes.SolverLoopNode,
-			'makutu/solver/UpdateSourceAndReceivers': Nodes.UpdateSourcesAndReceiversNode,
-			'makutu/solver/UpdateVtkOutput': Nodes.UpdateVtkOutputNode,
-			'math/AddNode': Nodes.AddNode,
-			'boolean/Not': Nodes.NotNode,
-			'choice/Select': Nodes.SelectNode,
-			'array/MergeArray': Nodes.MergeArrays
-		};
+	// static get classRegistry(): Record<string, typeof Node> {
+	// 	const classRegistry = {
+	// 		MacroNode: Nodes.MacroNode,
+	// 		'XML/GetNameNode': Nodes.GetNameNode,
+	// 		'XML/VariableNode': Nodes.VariableNode,
+	// 		'XML/XmlNode': Nodes.XmlNode,
+	// 		'control/EveryNode': Nodes.EveryNode,
+	// 		'control/SequenceNode': Nodes.SequenceNode,
+	// 		'control/ForEachNode': Nodes.ForEachNode,
+	// 		'control/StartNode': Nodes.StartNode,
+	// 		'control/TimeLoopNode': Nodes.TimeLoopNode,
+	// 		'data/MakeArrayNode': Nodes.MakeArrayNode,
+	// 		'data/NumberNode': Nodes.NumberNode,
+	// 		// 'data/StringNode': Nodes.StringNode,
+	// 		'io/AppendNode': Nodes.AppendNode,
+	// 		'io/DisplayNode': Nodes.DisplayNode,
+	// 		'io/DownloadNode': Nodes.DownloadNode,
+	// 		'io/FormatNode': Nodes.FormatNode,
+	// 		'io/LogNode': Nodes.LogNode,
+	// 		'makutu/acquisition/SEGYAcquisitionNode': Nodes.SEGYAcquisitionNode,
+	// 		'makutu/acquisition/BreakNode': Nodes.BreakNode,
+	// 		'makutu/solver/AcousticSEMNode': Nodes.AcousticSEMNode,
+	// 		'makutu/solver/ApplyInitialConditionsNode': Nodes.ApplyInitialConditionsNode,
+	// 		'makutu/solver/ExecuteNode': Nodes.ExecuteNode,
+	// 		'makutu/solver/GetPressureAtReceiversNode': Nodes.GetPressuresAtReceiversNode,
+	// 		'makutu/solver/InitializeSolverNode': Nodes.InitializeSolverNode,
+	// 		'makutu/solver/OutputVtk': Nodes.OutputVtkNode,
+	// 		'makutu/solver/ReinitSolverNode': Nodes.ReinitSolverNode,
+	// 		'makutu/solver/SolverAPINode': Nodes.SolverAPINode,
+	// 		'makutu/solver/SolverLoopNode': Nodes.SolverLoopNode,
+	// 		'makutu/solver/UpdateSourceAndReceivers': Nodes.UpdateSourcesAndReceiversNode,
+	// 		'makutu/solver/UpdateVtkOutput': Nodes.UpdateVtkOutputNode,
+	// 		'math/AddNode': Nodes.AddNode,
+	// 		'boolean/Not': Nodes.NotNode,
+	// 		'choice/Select': Nodes.SelectNode,
+	// 		'array/MergeArray': Nodes.MergeArrays
+	// 	};
 
-		return clone(classRegistry) as Record<string, typeof Node>;
-	}
-	static registerClass(id: string, nodeClass: typeof Node) {
-		// this.classRegistry[id] = nodeClass;
-	}
+	// 	return clone(classRegistry) as Record<string, typeof Node>;
+	// }
+	// static registerClass(id: string, nodeClass: typeof Node) {
+	// 	// this.classRegistry[id] = nodeClass;
+	// }
 	private state: Map<string, unknown> = new Map();
 
 	public id = newLocalId('node-factory');
@@ -313,13 +287,6 @@ export class NodeFactory {
 		accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
 	}) {
 		const { editor, area, makutuClasses, selector, arrange } = params;
-		if (!NodeFactory.classRegistrySetup) {
-			for (const [id, nodeClass] of Object.entries(NodeFactory.classRegistry)) {
-				nodeClass.id = id;
-				// console.log("registered", nodeClass, nodeClass.id)
-			}
-			NodeFactory.classRegistrySetup = true;
-		}
 		this.modalStore = params.modalStore;
 		this.comment = params.comment;
 		this.accumulating = params.accumulating;

@@ -1,16 +1,15 @@
-import { description, Node, path, type NodeParams } from '$Node';
-import { registerNode } from '$graph-editor/editor';
+import { description, Node, path, registerNode, type NodeParams } from '$Node';
 import { InputControl, type Socket } from '$graph-editor/socket';
 
 /**
- * This node displays the value of the input.
+ * This node displays the value of an input.
  */
-@registerNode('io.DisplayNode')
 @path('I/O')
 @description('Displays an input.')
+@registerNode('io.DisplayNode')
 export class DisplayNode extends Node<{ input: Socket }, {}, { display: InputControl<'text'> }> {
 	height = 120;
-	width = 180;
+	width = 300;
 
 	constructor(
 		params: NodeParams & {
@@ -23,7 +22,7 @@ export class DisplayNode extends Node<{ input: Socket }, {}, { display: InputCon
 		});
 		this.addInData('input', { type: 'any', initial: params.initial });
 
-		// Display value
+		// Value display
 		this.addInputControl('display', { type: 'text', readonly: true });
 	}
 

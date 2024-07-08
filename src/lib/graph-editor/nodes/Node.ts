@@ -1,7 +1,7 @@
 import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
 import type { AreaExtra } from '$graph-editor/area';
-import type { SocketType } from '$graph-editor/plugins';
+import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import type { NodeFactory } from '$graph-editor/editor';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
 import { Stack } from '$lib/types/Stack';
@@ -28,6 +28,55 @@ import {
 } from '$graph-editor/socket';
 
 import { ErrorWNotif } from '$lib/global';
+import type { ConverterNode } from './data/common';
+
+/**
+ * A map of node classes indexed by their id.
+ */
+export const nodeRegistry = new Map<string, NodeConstructor>();
+
+/**
+ * Registers a node class.
+ */
+export function registerNode<
+	Inputs extends { [x: string]: Socket<SocketType> },
+	Outputs extends { [x: string]: Socket<SocketType> },
+	Controls extends { [x: string]: Control }
+>(id: string) {
+	// this is the decorator factory, it sets up
+	// the returned decorator function
+	return function (target: NodeConstructor<Node<Inputs, Outputs, Controls>>) {
+		target.id = id;
+		if (nodeRegistry.has(id)) {
+			console.warn('Node already registered', id);
+		}
+		console.debug('Registering node', target.id);
+		nodeRegistry.set(target.id, target as NodeConstructor);
+	};
+}
+
+/**
+ * Registered converter nodes, from source to target.
+ */
+export const converters = new Map<SocketType, Map<SocketType, NodeConstructor>>();
+
+/**
+ * Registers a converter node.
+ */
+export function registerConverter<S extends SocketType, T extends SocketType>(
+	source: S,
+	target: T
+) {
+	return function (nodeClass: typeof ConverterNode<S, T>) {
+		console.debug(`Registering converter from ${source} to ${target}`);
+		if (!converters.has(source)) converters.set(source, new Map());
+		converters.get(source)!.set(target, nodeClass);
+	};
+}
+
+export function hidden(nodeClass: NodeConstructor) {
+	nodeClass.visible = false;
+}
 
 export interface OutDataParams {
 	socketLabel?: string;
@@ -70,7 +119,7 @@ export type NodeSaveData = {
 	selectedOutputs: string[];
 };
 
-export type NodeConstructor<N extends Node = Node> = {
+export type NodeConstructor<N> = {
 	new (params?: NodeParams): N;
 	id?: string;
 	/** Menu path of the node. */
@@ -79,13 +128,15 @@ export type NodeConstructor<N extends Node = Node> = {
 	tags?: string[];
 	/** Description of the node. */
 	description?: string;
+	/** Visibility of node */
+	visible?: boolean;
 };
 
 /**
  * Decorator that adds a path to a node.
  */
-export function path(...path: string[]) {
-	return function (target: NodeConstructor) {
+export function path<N>(...path: string[]) {
+	return function (target: NodeConstructor<N>) {
 		target.path = path;
 	};
 }
@@ -93,8 +144,8 @@ export function path(...path: string[]) {
 /**
  * Decorator that adds tags to a node
  */
-export function tags(...tags: string[]) {
-	return function (target: NodeConstructor) {
+export function tags<N>(...tags: string[]) {
+	return function (target: NodeConstructor<N>) {
 		target.tags = tags;
 	};
 }
@@ -102,12 +153,16 @@ export function tags(...tags: string[]) {
 /**
  * Decorator that adds a description to a node.
  */
-export function description(description: string) {
-	return function (target: NodeConstructor) {
+export function description<N>(description: string) {
+	return function (target: NodeConstructor<N>) {
 		target.description = description;
 	};
 }
-
+export type SocketsValues<
+	Sockets extends {
+		[key in string]: Socket;
+	}
+> = { [K in keyof Sockets]: SocketValueType<Sockets[K]['type']> };
 export class Node<
 		Inputs extends {
 			[key in string]: Socket;
@@ -132,8 +187,8 @@ export class Node<
 	static inputTypes?: string[];
 	static outputTypes?: string[];
 
-	width = 190;
-	height = 120;
+	// width = 190;
+	// height = 120;
 	private components: BaseComponent[] = [];
 	static activeFactory: NodeFactory | undefined;
 	private outData: Record<string, unknown> = {};
@@ -338,11 +393,11 @@ export class Node<
 		this.addInput(name, input as unknown as Input<Exclude<Inputs[keyof Inputs], undefined>>);
 	}
 
-	addOutData(
-		key: keyof Outputs,
+	addOutData<K extends keyof Outputs>(
+		key: K,
 		params: {
 			showLabel?: boolean;
-			type?: SocketType;
+			type: Outputs[K]['type'];
 			isArray?: boolean;
 			label?: string;
 		}
@@ -380,8 +435,8 @@ export class Node<
 
 	addInData<K extends keyof Inputs, T extends SocketType>(
 		key: K,
-		params: {
-			type: T;
+		params?: {
+			type?: T;
 			label?: string;
 			isArray?: boolean;
 			isRequired?: boolean;
@@ -396,19 +451,19 @@ export class Node<
 		const input = new Input({
 			socket: new Socket({
 				node: this,
-				displayLabel: params.isLabelDisplayed ?? true,
-				isArray: params.isArray ?? false,
-				type: params.type
+				displayLabel: params?.isLabelDisplayed ?? true,
+				isArray: params?.isArray ?? false,
+				type: params?.type ?? 'any'
 			}),
-			index: params.index,
-			multipleConnections: params.isArray,
-			isRequired: params.isRequired,
-			label: params.label
+			index: params?.index,
+			multipleConnections: params?.isArray,
+			isRequired: params?.isRequired,
+			label: params?.label
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
-		const controlType = assignControl(params.type);
+		const controlType = assignControl(params?.type ?? 'any');
 		if (controlType) {
-			const inputControl = this.makeInputControl({ type: controlType, initial: params.initial });
+			const inputControl = this.makeInputControl({ type: controlType, initial: params?.initial });
 			input.addControl(inputControl);
 		}
 	}
@@ -491,10 +546,10 @@ export class Node<
 		return nodes.map((node) => node.waitForEndExecutePromise());
 	}
 
-	getData<T extends InputControlType, N = InputControlValueType<T>>(
-		key: string,
-		inputs?: Record<string, unknown>
-	): N | undefined {
+	getData<K extends keyof Inputs>(
+		key: K,
+		inputs?: Record<keyof Inputs, unknown>
+	): SocketValueType<Inputs[K]['type']> {
 		// const checkedInputs2 = inputs as Record<string, N>;
 		// if (checkedInputs2 && key in checkedInputs2) {
 		// 	console.log("get", checkedInputs2[key]);
@@ -510,9 +565,9 @@ export class Node<
 			// console.log(checkedInputs);
 			// console.log("get0", checkedInputs[key][0]);
 			if (checkedInputs[key].length > 1) {
-				return checkedInputs[key] as N;
+				return checkedInputs[key] as SocketValueType<Inputs[K]['type']>;
 			}
-			return checkedInputs[key][0] as N;
+			return checkedInputs[key][0] as SocketValueType<Inputs[K]['type']>;
 		}
 
 		const inputControl = this.inputs[key]?.control as InputControl<T, N>;
@@ -520,18 +575,21 @@ export class Node<
 		if (inputControl) {
 			return inputControl.value;
 		}
-		return undefined;
+		return undefined as SocketValueType<Inputs[K]['type']>;
 	}
 
+	// @ts-expect-error
 	data(
-		inputs?: Record<string, unknown> | undefined
-	): Record<string, unknown> | Promise<Record<string, unknown>> {
+		inputs?: { [K in keyof Inputs]: SocketValueType<Inputs[K]['type']> } | undefined
+	): SocketsValues<Outputs> | Promise<SocketsValues<Outputs>> {
 		const res: Record<string, unknown> = {};
 		for (const key in this.outputs) {
 			if (!(this.outputs[key]?.socket instanceof ExecSocket)) res[key] = undefined;
 		}
 
-		return { ...res, ...this.getOutData() };
+		return { ...res, ...this.getOutData() } as {
+			[K in keyof Outputs]: SocketValueType<Outputs[K]['type']>;
+		};
 	}
 
 	setData(key: string, value: unknown) {

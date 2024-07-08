@@ -1,7 +1,6 @@
 import { ClassicPreset } from 'rete';
-import { Node, type NodeParams } from '$Node';
+import { Node, registerNode, type NodeParams } from '$Node';
 import { Socket } from '../../socket/Socket';
-import { NodeFactory, registerNode } from '$graph-editor/editor';
 
 @registerNode('math.AddNode')
 export class AddNode extends Node<{ a: Socket; b: Socket }, { value: Socket }> {

@@ -5,7 +5,7 @@ import { isSetup, type Setup, type SetupAreaFunction, type SetupFunction } from 
 import { setupConnections } from './ConnectionSetup';
 import { setupArea } from './AreaSetup';
 import { setupMinimap } from './MinimapSetup';
-import { TypedSocketsPlugin } from '$graph-editor/plugins';
+import { TypedSocketsPlugin } from '$graph-editor/plugins/typed-sockets';
 import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';

@@ -1,5 +1,11 @@
-export * from './array';
-export * from './MakeArrayNode';
-export * from './SelectNode';
-export * from './boolean';
-export * from './scalars';
+/**
+ * This namespace contains nodes that are used for basic data manipulation.
+ * @module
+ */
+export * as MakeArray from './MakeArrayNode';
+export * as Select from './SelectNode';
+export * as Number from './number';
+export * as Array from './array';
+export * as String from './string';
+export * as Boolean from './boolean';
+export * as Vector from './vector';

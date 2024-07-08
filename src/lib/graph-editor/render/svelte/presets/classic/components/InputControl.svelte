@@ -39,6 +39,10 @@
 			inputControl.value = value as InputControlValueType<InputControlType>;
 		}
 	});
+
+	let vector = $derived(
+		type === 'vector' ? (inputControl.value as { x: number; y: number; z: number }) : undefined
+	);
 </script>
 
 <!-- TODO maybe move pointerdown and dblclick stop propagation to framework agnostic logic -->
@@ -51,19 +55,43 @@
 	/>
 {/snippet}
 
-{#if type === 'vector'}
-	Vector
+{#if vector}
+	<div class="vector">
+		{#each ['x', 'y', 'z'] as k, i (k)}
+			{@render input({
+				type: 'number',
+				value: vector[k as 'x' | 'y' | 'z'],
+				style: 'border-radius: 0;',
+				oninput: (e) => {
+					const res = parseFloat(e.currentTarget.value);
+					if (isNaN(res)) {
+						return;
+					}
+					inputControl.value = {
+						...(inputControl.value as { x: number; y: number; z: number }),
+						[k]: res
+					};
+				}
+			})}
+		{/each}
+	</div>
 {:else}
 	{@render input(inputProps)}
 {/if}
 
 <style>
+	.vector {
+		display: flex;
+	}
+
 	input {
 		width: 100%;
 		padding: 0.25rem 0.5rem;
 		border-radius: 5px;
 	}
-
+	/* .vector input {
+		border-radius: 0;
+	} */
 	input[type='checkbox'] {
 		height: 1.25rem;
 	}

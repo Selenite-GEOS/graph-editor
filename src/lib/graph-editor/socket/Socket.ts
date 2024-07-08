@@ -2,10 +2,10 @@ import { ClassicPreset } from 'rete';
 import type { SocketType } from '../plugins/typed-sockets';
 import type { Node } from '$graph-editor/nodes/Node';
 
-export class Socket extends ClassicPreset.Socket {
+export class Socket<T extends SocketType = SocketType> extends ClassicPreset.Socket {
 	public readonly isArray: boolean;
 	public readonly isRequired: boolean;
-	public type: SocketType;
+	public type: T;
 	public value: unknown;
 	public selected: boolean;
 	public readonly node: Node;
@@ -15,14 +15,14 @@ export class Socket extends ClassicPreset.Socket {
 		name = '',
 		isArray = false,
 		isRequired = false,
-		type = 'any',
+		type = 'any' as T,
 		displayLabel = true,
 		node
 	}: {
 		name?: string;
 		isArray?: boolean;
 		isRequired?: boolean;
-		type?: SocketType;
+		type?: T;
 		node: Node;
 		displayLabel?: boolean;
 	}) {
