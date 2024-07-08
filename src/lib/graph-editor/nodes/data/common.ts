@@ -40,6 +40,13 @@ export class InputControlNode<S extends SocketType = SocketType> extends Node<
 	}
 }
 
+/**
+ * Base class for converter nodes.
+ * 
+ * Converter nodes are used to convert data from one type to another type.
+ * @template S Source type.
+ * @template T Target type.
+ */
 export class ConverterNode<S extends SocketType = 'any', T extends SocketType = 'any'> extends Node<
 	{ value: Socket<S> },
 	{ value: Socket<T> }
