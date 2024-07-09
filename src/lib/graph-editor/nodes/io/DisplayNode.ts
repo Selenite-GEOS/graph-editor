@@ -1,4 +1,4 @@
-import { description, Node, path, registerNode, type NodeParams } from '$Node';
+import { description, Node, path, registerNode, type NodeParams, type SocketsValues } from '$Node';
 import { InputControl, type Socket } from '$graph-editor/socket';
 
 /**
@@ -7,7 +7,11 @@ import { InputControl, type Socket } from '$graph-editor/socket';
 @path('I/O')
 @description('Displays an input.')
 @registerNode('io.DisplayNode')
-export class DisplayNode extends Node<{ input: Socket }, {}, { display: InputControl<'text'> }> {
+export class DisplayNode extends Node<
+	{ input: Socket<'any'> },
+	{},
+	{ display: InputControl<'text'> }
+> {
 	height = 120;
 	width = 300;
 
@@ -26,17 +30,11 @@ export class DisplayNode extends Node<{ input: Socket }, {}, { display: InputCon
 		this.addInputControl('display', { type: 'text', readonly: true });
 	}
 
-	data(inputs: { input?: number[] }): Record<string, unknown> | Promise<Record<string, unknown>> {
+	data(inputs?: { input: string } | undefined): SocketsValues<{}> {
 		const inputValue = this.getData('input', inputs);
-
-		if (this.controls.display instanceof InputControl) {
-			this.controls.display.value =
-				typeof inputValue === 'string' ? inputValue : JSON.stringify(inputValue);
-			this.updateElement('control', this.controls.display.id);
-		} else {
-			console.error('DisplayNode', 'this.controls.display is not an InputControl');
-		}
-
+		this.controls.display.value =
+			typeof inputValue === 'string' ? inputValue : JSON.stringify(inputValue);
+		this.updateElement('control', this.controls.display.id);
 		return {};
 	}
 }

@@ -30,6 +30,9 @@
 				inputControl.value = e.currentTarget.checked;
 				return;
 			}
+			if (type === 'number' && isNaN(parseFloat(e.currentTarget.value))) {
+				return;
+			}
 			let value: unknown;
 			try {
 				value = JSON.parse(e.currentTarget.value);

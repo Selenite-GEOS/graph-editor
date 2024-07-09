@@ -1,19 +1,18 @@
 <script lang="ts">
-	import { NodeFactory } from '$graph-editor';
-	import { setupClasses } from '$graph-editor/setup/appLaunch';
+	import { Nodes } from '$graph-editor';
+
 	import { onMount } from 'svelte';
 
-	let classRegistry: Record<string, string>;
-	onMount(async () => {
-		await setupClasses();
-		classRegistry = NodeFactory.classRegistry;
-		console.log(NodeFactory.classRegistry);
+	let nodeRegistry: Map<string, unknown>;
+	onMount(() => {
+		nodeRegistry = Nodes.nodeRegistry;
+		console.log(Nodes.nodeRegistry);
 	});
 </script>
 
-{#if classRegistry}
-	<div class="grid grid-cols-2">
-		{#each Object.entries(classRegistry) as [k, v]}
+{#if nodeRegistry}
+	<div class="grid grid-cols-2 text-white gap-2 p-4">
+		{#each nodeRegistry.keys() as k}
 			<p>{k}</p>
 		{/each}
 	</div>

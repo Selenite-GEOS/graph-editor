@@ -119,7 +119,7 @@ export type NodeSaveData = {
 	selectedOutputs: string[];
 };
 
-export type NodeConstructor<N> = {
+export type NodeConstructor<N = Node> = {
 	new (params?: NodeParams): N;
 	id?: string;
 	/** Menu path of the node. */

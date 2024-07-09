@@ -5,7 +5,9 @@
 
 export * as Nodes from './nodes';
 export * as Editor from './editor';
-// export {NodeEditor, NodeFactory} from './editor'
 export * from './variables';
 export * as Setup from './setup/new-setup';
 export * as Plugins from './plugins';
+
+/** @ignore */
+export {NodeEditor, NodeFactory} from './editor'

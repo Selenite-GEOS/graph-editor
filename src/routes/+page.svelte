@@ -24,8 +24,9 @@
 				await editor.addNewConnection(b, 'value', sum, 'b');
 				const display = await factory.addNode(DisplayNode, {});
 				await editor.addNewConnection(sum, 'value', display, 'input');
-				await factory.arrange.layout();
-				AreaExtensions.zoomAt(factory.getArea(), editor.getNodes());
+				await factory.arrange?.layout();
+				if (factory.area)
+					AreaExtensions.zoomAt(factory.area, editor.getNodes());
 			}
 		);
 	});

@@ -263,7 +263,7 @@ export class NodeFactory {
 			if (this.area) AreaExtensions.zoomAt(this.area, this.editor.getNodes());
 		});
 	}
-	private area?: AreaPlugin<Schemes, AreaExtra>;
+	area?: AreaPlugin<Schemes, AreaExtra>;
 	private editor: NodeEditor;
 	public readonly makutuClasses?: MakutuClassRepository;
 
