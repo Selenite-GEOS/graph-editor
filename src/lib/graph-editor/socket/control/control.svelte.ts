@@ -1,6 +1,7 @@
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { cloneDeep } from 'lodash-es';
 import { ClassicPreset, getUID } from 'rete';
+import type { Socket, SocketDatastructure, SocketValueWithDatastructure } from '../Socket.svelte';
 
 /**
  * A control represents objects the users can interact with.
@@ -54,7 +55,7 @@ export const inputControlSocketType: Record<InputControlType, SocketType> = {
 	vector: 'vector'
 };
 
-const socketToControl = {
+export const socketToControl = {
 	path: 'remote-file',
 	string: 'text',
 	integer: 'integer',
@@ -64,11 +65,15 @@ const socketToControl = {
 	any: 'text',
 	groupNameRef: 'group-name-ref'
 } as const;
+export const socketTypesWithControl = Object.keys(socketToControl) as SocketType[];
 export type ControlOfSocket<S extends SocketType> = S extends keyof typeof socketToControl
 	? (typeof socketToControl)[S]
 	: 'text';
-export type SocketValueType<S extends SocketType> =
-	ControlOfSocket<S> extends InputControlType ? InputControlValueType<ControlOfSocket<S>> : string;
+export type SocketValueType<S extends SocketType> = S extends 'any'
+	? unknown
+	: ControlOfSocket<S> extends InputControlType
+		? InputControlValueType<ControlOfSocket<S>>
+		: unknown;
 let testa: SocketValueType<'boolean'>;
 export function assignControl(
 	socketType: SocketType,
@@ -82,37 +87,70 @@ export function assignControl(
 export type InputControlValueType<T extends InputControlType> =
 	(typeof defaultInputControlValues)[T];
 
-export type InputControlParams<T extends InputControlType> = {
+export type InputControlParams<
+	T extends InputControlType,
+	D extends SocketDatastructure = SocketDatastructure
+> = {
 	type: T;
-	initial?: InputControlValueType<T>;
+	datastructure: D;
+	initial?: SocketValueWithDatastructure<InputControlValueType<T>, D>;
 	readonly?: boolean;
 	onChange?: (value: InputControlValueType<T>) => void;
 	label?: string;
+	changeType?: (type: SocketType) => void;
+	// socket?: (typeof inputControlSocketType)[T];
 };
-export class InputControl<T extends InputControlType> extends Control {
-	#value = $state() as InputControlValueType<T>;
+export function getDatastructure<T extends InputControlType, D extends SocketDatastructure>({
+	datastructure,
+	type
+}: {
+	datastructure: D;
+	type: T;
+}): SocketValueWithDatastructure<InputControlValueType<T>, D> {
+	const defaultValue = defaultInputControlValues[type] as InputControlValueType<T>;
+	switch (datastructure) {
+		case 'scalar':
+			return defaultValue as SocketValueWithDatastructure<InputControlValueType<T>, D>;
+		case 'array':
+			return [defaultValue] as SocketValueWithDatastructure<InputControlValueType<T>, D>;
+		default:
+			throw new Error('Invalid datastructure');
+	}
+}
+
+export class InputControl<
+	T extends InputControlType = InputControlType,
+	D extends SocketDatastructure = SocketDatastructure
+> extends Control {
+	#value = $state() as SocketValueWithDatastructure<InputControlValueType<T>, D>;
 	readonly = $state(false);
 	onChange?: InputControlParams<T>['onChange'];
 	label = $state('');
 	type = $state<InputControlType>('text');
+	datastructure: D;
+	changeType?: (type: SocketType) => void = $state();
+	// socket? = $state<typeof inputControlSocketType[T]>();
 
-	constructor(params: InputControlParams<T>) {
+	constructor(params: InputControlParams<T, D>) {
 		super();
 		this.id = getUID();
+		this.datastructure = params.datastructure;
 		this.readonly = params.readonly ?? false;
 		this.label = params.label ?? '';
 		this.onChange = params.onChange;
-		this.#value = cloneDeep(params.initial ?? defaultInputControlValues[params.type]);
+		this.#value = params.initial ?? getDatastructure(params);
 		this.type = params.type;
+		this.changeType = params.changeType;
+		// this.socket = params.socket;
 	}
 
-	get value(): InputControlValueType<T> {
+	get value(): SocketValueWithDatastructure<InputControlValueType<T>, D> {
 		return this.#value;
 	}
 
-	set value(v: InputControlValueType<T>) {
-		this.#value = cloneDeep(v);
+	set value(v: SocketValueWithDatastructure<InputControlValueType<T>, D>) {
+		this.#value = v;
 		if (this.onChange && v !== undefined && !this.readonly) this.onChange(v);
 	}
 }
-const test = new InputControl({ type: 'checkbox', initial: true });
+// const test = new InputControl({ type: 'checkbox', initial: true });

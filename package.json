@@ -30,6 +30,8 @@
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
+		"@skeletonlabs/skeleton": "3.0.0-next.1",
+		"@skeletonlabs/skeleton-svelte": "1.0.0-next.3",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/package": "^2.0.0",
@@ -37,6 +39,7 @@
 		"@types/color": "^3.0.6",
 		"@types/eslint": "^8.56.7",
 		"@types/lodash-es": "^4.17.12",
+		"@types/node": "^20.14.10",
 		"@types/uuid": "^10.0.0",
 		"@types/wu": "^2.1.44",
 		"eslint": "^9.0.0",
@@ -86,7 +89,7 @@
 		"rete-structures": "^2.0.1",
 		"rete-svelte-plugin": "^2.0.1",
 		"sass": "^1.77.6",
-		"svelte": "5.0.0-next.176",
+		"svelte": "5.0.0-next.178",
 		"svelte-css-vars": "^0.0.3",
 		"svelte-fa": "^4.0.2",
 		"svelte-i18n": "^4.0.0",

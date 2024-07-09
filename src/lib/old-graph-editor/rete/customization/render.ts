@@ -17,7 +17,7 @@ import type { SetupClass, SetupFunction } from '$graph-editor/setup/Setup';
 
 import { InputControl } from '$graph-editor/socket';
 import InputControlComponent from '$custom-components/InputControl.svelte';
-import { Socket } from '$graph-editor/socket/Socket';
+import { Socket } from '$graph-editor/socket/Socket.svelte';
 import AddXmlAttributeControlCmpnt from '$graph-editor/render/svelte/presets/classic/components/AddXmlAttributeControl.svelte';
 // import { AddXmlAttributeControl } from '$graph-editor/nodes/XML/AddXmlAttributeControl';
 // import { ReactPlugin, Presets } from 'rete-react-plugin';

@@ -24,7 +24,9 @@ import {
 	inputControlTypes,
 	isInputControlType,
 	assignControl,
-	type SocketValueType
+	type SocketValueType,
+	type SocketValueWithDatastructure,
+	type SocketDatastructure
 } from '$graph-editor/socket';
 
 import { ErrorWNotif } from '$lib/global';
@@ -99,13 +101,30 @@ export interface InDataParams<N> {
 	index?: number;
 }
 
-export interface NodeParams {
+export interface NodeParams
+// <Inputs extends {
+// 			[key in string]: Socket;
+// 		} = {
+// 			[key in string]: Socket;
+// 		},
+// 		Outputs extends {
+// 			[key in string]: Socket;
+// 		} = {
+// 			[key in string]: Socket;
+// 		},
+// 		Controls extends {
+// 			[key in string]: Control;
+// 		} = {
+// 			[key in string]: Control;
+// 		}> 
+{
 	label?: string;
 	name?: string;
 	width?: number;
 	height?: number;
 	factory?: NodeFactory;
 	params?: Record<string, unknown>;
+	initialValues?: Node["initialValues"]
 }
 
 export type NodeSaveData = {
@@ -114,7 +133,7 @@ export type NodeSaveData = {
 	type: string;
 	position?: { x: number; y: number };
 	state: Record<string, unknown>;
-	inputControlValues: Record<string, unknown>;
+	inputControlValues: Node["initialValues"];
 	selectedInputs: string[];
 	selectedOutputs: string[];
 };
@@ -158,11 +177,12 @@ export function description<N>(description: string) {
 		target.description = description;
 	};
 }
+type Sockets<Inputs extends {[key in string]?: Input | undefined}> = {[K in keyof Inputs]: Inputs[K] extends Input ? Inputs[K]["socket"]: never}
 export type SocketsValues<
 	Sockets extends {
 		[key in string]: Socket;
 	}
-> = { [K in keyof Sockets]: SocketValueType<Sockets[K]['type']> };
+> = { [K in keyof Sockets]: SocketValueWithDatastructure<SocketValueType<Sockets[K]['type']>, Sockets[K]['datastructure']> };
 export class Node<
 		Inputs extends {
 			[key in string]: Socket;
@@ -210,6 +230,10 @@ export class Node<
 	onRemoveIngoingConnection?: (conn: Connection) => void;
 
 	initializePromise?: Promise<void>;
+	initialValues?: {
+		inputs: Record<string, unknown>;
+		controls: Record<string, unknown>;
+	};
 	afterInitialize?: () => void;
 
 	getFactory(): NodeFactory | undefined {
@@ -231,6 +255,7 @@ export class Node<
 	constructor(params: NodeParams = {}) {
 		const { label = '', width = 190, height = 120, factory } = params;
 		super(label);
+		this.initialValues = params.initialValues;
 		this.pythonComponent = this.addComponentByClass(PythonNodeComponent);
 		this.socketSelectionComponent = this.addComponentByClass(R_SocketSelection_NC);
 		this.state = {};
@@ -288,18 +313,24 @@ export class Node<
 				`A node can't be saved as it's missing in the node registry. Node : ${this.label}`
 			);
 		}
-		const inputControlValues: Record<string, unknown> = {};
+		const inputControlValues: Node['initialValues'] = { inputs: {}, controls: {} };
 		const selectedInputs: string[] = [];
 		const selectedOutputs: string[] = [];
 		for (const key in this.inputs) {
 			const value = this.getData(key);
 			if (value !== undefined) {
-				inputControlValues[key] = value;
+				inputControlValues.inputs[key] = value;
 			}
 			if (this.inputs[key]?.socket.selected) selectedInputs.push(key);
 		}
 		for (const key in this.outputs) {
 			if (this.outputs[key]?.socket.selected) selectedOutputs.push(key);
+		}
+
+		for (const key in this.controls) {
+			const control = this.controls[key];
+			if (!(control instanceof InputControl)) continue;
+			inputControlValues.controls[key] = control.value;
 		}
 
 		return {
@@ -396,6 +427,7 @@ export class Node<
 	addOutData<K extends keyof Outputs>(
 		key: K,
 		params: {
+			datastructure: Outputs[K]['datastructure'];
 			showLabel?: boolean;
 			type: Outputs[K]['type'];
 			isArray?: boolean;
@@ -408,7 +440,7 @@ export class Node<
 		const output = new Output(
 			new Socket({
 				name: params.label,
-				isArray: params.isArray,
+				datastructure: params.datastructure ?? 'scalar',
 				type: params.type,
 				node: this,
 				displayLabel: params.showLabel
@@ -416,6 +448,7 @@ export class Node<
 			params.label
 		);
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
+		return output.socket;
 	}
 
 	oldAddOutData({
@@ -433,16 +466,19 @@ export class Node<
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}
 
-	addInData<K extends keyof Inputs, T extends SocketType>(
+	addInData<K extends keyof Inputs>(
 		key: K,
 		params?: {
-			type?: T;
+			type?: Inputs[K]['type'];
+			datastructure: Inputs[K]['datastructure'] extends 'scalar'
+				? 'scalar' | undefined
+				: Inputs[K]['datastructure'];
 			label?: string;
-			isArray?: boolean;
 			isRequired?: boolean;
 			isLabelDisplayed?: boolean;
-			initial?: SocketValueType<T>;
+			initial?: SocketValueType<Inputs[K]['type']>;
 			index?: number;
+			changeType?: (type: SocketType) => void;
 		}
 	) {
 		if (key in this.inputs) {
@@ -452,7 +488,7 @@ export class Node<
 			socket: new Socket({
 				node: this,
 				displayLabel: params?.isLabelDisplayed ?? true,
-				isArray: params?.isArray ?? false,
+				datastructure: params?.datastructure,
 				type: params?.type ?? 'any'
 			}),
 			index: params?.index,
@@ -463,7 +499,12 @@ export class Node<
 		this.addInput(key, input);
 		const controlType = assignControl(params?.type ?? 'any');
 		if (controlType) {
-			const inputControl = this.makeInputControl({ type: controlType, initial: params?.initial });
+			const inputControl = this.makeInputControl({
+				type: controlType,
+				datastructure: params?.datastructure ?? 'scalar',
+				initial: this.initialValues?.inputs[key] ?? params?.initial,
+				changeType: params?.changeType
+			});
 			input.addControl(inputControl);
 		}
 	}
@@ -511,7 +552,9 @@ export class Node<
 		return input;
 	}
 
-	makeInputControl<T extends InputControlType>(params: InputControlParams<T>): InputControl<T> {
+	makeInputControl<T extends InputControlType, D extends SocketDatastructure = SocketDatastructure>(
+		params: InputControlParams<T, D>
+	): InputControl<T> {
 		return new InputControl<T>({
 			...params,
 			onChange: (v) => {
@@ -527,7 +570,11 @@ export class Node<
 		key: keyof Controls,
 		params: InputControlParams<T>
 	): InputControl<T> {
-		const inputControl = this.makeInputControl(params);
+		const inputControl = this.makeInputControl({
+			...params,
+			datastructure: params.datastructure ?? 'scalar',
+			initial: this.initialValues?.controls[key as string] ?? params.initial
+		});
 		this.addControl(key, inputControl as unknown as Controls[string]);
 		return inputControl;
 	}
@@ -549,7 +596,7 @@ export class Node<
 	getData<K extends keyof Inputs>(
 		key: K,
 		inputs?: Record<keyof Inputs, unknown>
-	): SocketValueType<Inputs[K]['type']> {
+	): SocketValueWithDatastructure<SocketValueType<Inputs[K]['type']>, Inputs[K]['datastructure']> {
 		// const checkedInputs2 = inputs as Record<string, N>;
 		// if (checkedInputs2 && key in checkedInputs2) {
 		// 	console.log("get", checkedInputs2[key]);
@@ -559,7 +606,7 @@ export class Node<
 		// if ()
 
 		const checkedInputs = inputs as Record<string, unknown[]>;
-		const isArray = this.inputs[key]?.socket.isArray;
+		// const isArray = this.inputs[key]?.socket.isArray;
 
 		if (checkedInputs && key in checkedInputs) {
 			// console.log(checkedInputs);
@@ -580,7 +627,7 @@ export class Node<
 
 	// @ts-expect-error
 	data(
-		inputs?: { [K in keyof Inputs]: SocketValueType<Inputs[K]['type']> } | undefined
+		inputs?: SocketsValues<Inputs> | undefined
 	): SocketsValues<Outputs> | Promise<SocketsValues<Outputs>> {
 		const res: Record<string, unknown> = {};
 		for (const key in this.outputs) {

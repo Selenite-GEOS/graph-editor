@@ -5,7 +5,13 @@ import type { Schemes } from '../schemes';
 import { ControlFlowEngine, DataflowEngine } from 'rete-engine';
 import { ExecSocket } from '../socket/ExecSocket';
 import { structures } from 'rete-structures';
-import { Connection, Node, type NodeConstructor, type NodeSaveData } from '../nodes/Node';
+import {
+	Connection,
+	Node,
+	nodeRegistry,
+	type NodeConstructor,
+	type NodeSaveData
+} from '../nodes/Node';
 import { ClassicPreset } from 'rete';
 import { InputControl } from '$graph-editor/socket';
 import type { Writable } from 'svelte/store';
@@ -86,50 +92,6 @@ export class NodeFactory {
 	);
 
 	public readonly modalStore?: ReturnType<typeof getModalStore>;
-
-	// static get classRegistry(): Record<string, typeof Node> {
-	// 	const classRegistry = {
-	// 		MacroNode: Nodes.MacroNode,
-	// 		'XML/GetNameNode': Nodes.GetNameNode,
-	// 		'XML/VariableNode': Nodes.VariableNode,
-	// 		'XML/XmlNode': Nodes.XmlNode,
-	// 		'control/EveryNode': Nodes.EveryNode,
-	// 		'control/SequenceNode': Nodes.SequenceNode,
-	// 		'control/ForEachNode': Nodes.ForEachNode,
-	// 		'control/StartNode': Nodes.StartNode,
-	// 		'control/TimeLoopNode': Nodes.TimeLoopNode,
-	// 		'data/MakeArrayNode': Nodes.MakeArrayNode,
-	// 		'data/NumberNode': Nodes.NumberNode,
-	// 		// 'data/StringNode': Nodes.StringNode,
-	// 		'io/AppendNode': Nodes.AppendNode,
-	// 		'io/DisplayNode': Nodes.DisplayNode,
-	// 		'io/DownloadNode': Nodes.DownloadNode,
-	// 		'io/FormatNode': Nodes.FormatNode,
-	// 		'io/LogNode': Nodes.LogNode,
-	// 		'makutu/acquisition/SEGYAcquisitionNode': Nodes.SEGYAcquisitionNode,
-	// 		'makutu/acquisition/BreakNode': Nodes.BreakNode,
-	// 		'makutu/solver/AcousticSEMNode': Nodes.AcousticSEMNode,
-	// 		'makutu/solver/ApplyInitialConditionsNode': Nodes.ApplyInitialConditionsNode,
-	// 		'makutu/solver/ExecuteNode': Nodes.ExecuteNode,
-	// 		'makutu/solver/GetPressureAtReceiversNode': Nodes.GetPressuresAtReceiversNode,
-	// 		'makutu/solver/InitializeSolverNode': Nodes.InitializeSolverNode,
-	// 		'makutu/solver/OutputVtk': Nodes.OutputVtkNode,
-	// 		'makutu/solver/ReinitSolverNode': Nodes.ReinitSolverNode,
-	// 		'makutu/solver/SolverAPINode': Nodes.SolverAPINode,
-	// 		'makutu/solver/SolverLoopNode': Nodes.SolverLoopNode,
-	// 		'makutu/solver/UpdateSourceAndReceivers': Nodes.UpdateSourcesAndReceiversNode,
-	// 		'makutu/solver/UpdateVtkOutput': Nodes.UpdateVtkOutputNode,
-	// 		'math/AddNode': Nodes.AddNode,
-	// 		'boolean/Not': Nodes.NotNode,
-	// 		'choice/Select': Nodes.SelectNode,
-	// 		'array/MergeArray': Nodes.MergeArrays
-	// 	};
-
-	// 	return clone(classRegistry) as Record<string, typeof Node>;
-	// }
-	// static registerClass(id: string, nodeClass: typeof Node) {
-	// 	// this.classRegistry[id] = nodeClass;
-	// }
 	private state: Map<string, unknown> = new Map();
 
 	public id = newLocalId('node-factory');
@@ -176,9 +138,13 @@ export class NodeFactory {
 	readonly pythonDataflowEngine: PythonDataflowEngine<Schemes> = createPythonDataflowEngine();
 
 	async loadNode(nodeSaveData: NodeSaveData): Promise<Node> {
-		const nodeClass = NodeFactory.classRegistry[nodeSaveData.type];
+		const nodeClass = nodeRegistry.get(nodeSaveData.type);
 		if (nodeClass) {
-			const node = new nodeClass({ ...nodeSaveData.params, factory: this });
+			const node = new nodeClass({
+				...nodeSaveData.params,
+				factory: this,
+				initialValues: nodeSaveData.inputControlValues
+			});
 			node.id = nodeSaveData.id;
 			if (node.initializePromise) {
 				await node.initializePromise;
@@ -187,15 +153,16 @@ export class NodeFactory {
 
 			node.setState({ ...node.getState(), ...nodeSaveData.state });
 			node.applyState();
-			for (const key in nodeSaveData.inputControlValues) {
-				const inputControl = node.inputs[key]?.control;
-				if (
-					inputControl instanceof ClassicPreset.InputControl ||
-					inputControl instanceof InputControl
-				) {
-					inputControl.setValue(nodeSaveData.inputControlValues[key]);
-				}
-			}
+			// for (const key in nodeSaveData.inputControlValues) {
+			// 	const inputControl = node.inputs[key]?.control;
+			// 	if (
+			// 		inputControl instanceof ClassicPreset.InputControl ||
+			// 		inputControl instanceof InputControl
+			// 	) {
+			// 		console.log("key", key)
+			// 		inputControl.value = nodeSaveData.inputControlValues[key];
+			// 	}
+			// }
 
 			for (const key of nodeSaveData.selectedInputs) {
 				node.selectInput(key);
@@ -219,48 +186,50 @@ export class NodeFactory {
 	}
 
 	async loadGraph(editorSaveData: NodeEditorSaveData) {
-		console.log('loadGraph', editorSaveData.editorName);
-		await this.editor.clear();
-		this.editor.variables.set(editorSaveData.variables);
-		this.editor.setName(editorSaveData.editorName);
-		for (const nodeSaveData of editorSaveData.nodes) {
-			await this.loadNode(nodeSaveData);
-		}
-
-		for (const commentSaveData of editorSaveData.comments ?? []) {
-			if (!this.comment) {
-				console.warn('No comment plugin');
-				return;
+		await this.bulkOperation(async () => {
+			console.log('loadGraph', editorSaveData.editorName);
+			await this.editor.clear();
+			this.editor.variables.set(editorSaveData.variables);
+			this.editor.setName(editorSaveData.editorName);
+			for (const nodeSaveData of editorSaveData.nodes) {
+				await this.loadNode(nodeSaveData);
 			}
-			console.log('load comment ', commentSaveData.text);
-			this.comment.addFrame(commentSaveData.text, commentSaveData.links, {
-				id: commentSaveData.id
+
+			for (const commentSaveData of editorSaveData.comments ?? []) {
+				if (!this.comment) {
+					console.warn('No comment plugin');
+					return;
+				}
+				console.log('load comment ', commentSaveData.text);
+				this.comment.addFrame(commentSaveData.text, commentSaveData.links, {
+					id: commentSaveData.id
+				});
+			}
+
+			editorSaveData.connections.forEach(async (connectionSaveData) => {
+				const source = this.editor.getNode(connectionSaveData.source);
+				if (!source) {
+					console.error('Source node not found for connection', connectionSaveData);
+					throw new ErrorWNotif('Source node not found for connection');
+				}
+				const target = this.editor.getNode(connectionSaveData.target);
+				if (!target) {
+					console.error('Target node not found for connection', connectionSaveData);
+					throw new ErrorWNotif('Target node not found for connection');
+				}
+				const conn = new Connection(
+					source,
+					connectionSaveData.sourceOutput,
+					target,
+					connectionSaveData.targetInput
+				);
+				conn.id = connectionSaveData.id;
+				conn.factory = this;
+				await this.editor.addConnection(conn);
 			});
-		}
-
-		editorSaveData.connections.forEach(async (connectionSaveData) => {
-			const source = this.editor.getNode(connectionSaveData.source);
-			if (!source) {
-				console.error('Source node not found for connection', connectionSaveData);
-				throw new ErrorWNotif('Source node not found for connection');
-			}
-			const target = this.editor.getNode(connectionSaveData.target);
-			if (!target) {
-				console.error('Target node not found for connection', connectionSaveData);
-				throw new ErrorWNotif('Target node not found for connection');
-			}
-			const conn = new Connection(
-				source,
-				connectionSaveData.sourceOutput,
-				target,
-				connectionSaveData.targetInput
-			);
-			conn.id = connectionSaveData.id;
-			conn.factory = this;
-			await this.editor.addConnection(conn);
-		});
-		setTimeout(() => {
-			if (this.area) AreaExtensions.zoomAt(this.area, this.editor.getNodes());
+			setTimeout(() => {
+				if (this.area) AreaExtensions.zoomAt(this.area, this.editor.getNodes());
+			});
 		});
 	}
 	area?: AreaPlugin<Schemes, AreaExtra>;
@@ -275,6 +244,26 @@ export class NodeFactory {
 	public readonly arrange?: AutoArrangePlugin<Schemes>;
 	public readonly history: HistoryPlugin<Schemes> | undefined;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
+	#isDataflowEnabled = true;
+
+	reactivateDataflowTimeout: NodeJS.Timeout | null = null;
+	/**
+	 * Executes callback without running dataflow engines.
+	 *
+	 * It is useful to execute multiple operations without unnecessarily running dataflow engines.
+	 * @param callback Callback to execute
+	 */
+	async bulkOperation(callback: () => void | Promise<void>) {
+		this.#isDataflowEnabled = false;
+		await callback();
+		if (this.reactivateDataflowTimeout) clearTimeout(this.reactivateDataflowTimeout);
+		this.reactivateDataflowTimeout = setTimeout(() => {
+			this.reactivateDataflowTimeout = null;
+			this.#isDataflowEnabled = true;
+			this.runDataflowEngines();
+		}, 100);
+	}
+
 	constructor(params: {
 		editor: NodeEditor;
 		area?: AreaPlugin<Schemes, AreaExtra>;
@@ -569,6 +558,10 @@ export class NodeFactory {
 	}
 
 	runDataflowEngines() {
+		if (!this.#isDataflowEnabled) {
+			console.warn('Dataflow engines are disabled');
+			return;
+		}
 		console.log('Running dataflow engines');
 		try {
 			this.editor

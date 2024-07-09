@@ -1,5 +1,5 @@
 import { ClassicPreset } from 'rete';
-import type { Socket } from './Socket';
+import type { Socket } from './Socket.svelte';
 import type { Control } from './control';
 
 export class Input<S extends Socket = Socket>

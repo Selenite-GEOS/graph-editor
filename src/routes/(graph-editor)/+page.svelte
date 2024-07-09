@@ -6,9 +6,12 @@
 	import { Setup } from '$lib/graph-editor';
 	import { showContextMenu, ContextMenuComponent } from '$graph-editor/plugins/context-menu';
 	import { AreaExtensions } from 'rete-area-plugin';
-	import type { NodeEditor } from '$graph-editor/editor';
+	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
+	import { persisted } from 'svelte-persisted-store';
 
 	let editor = $state<NodeEditor>();
+	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
+	let editorReady = $state(false)
 	// On mount
 	$effect(() => {
 		if (!container) return;
@@ -17,6 +20,11 @@
 				editor = res.editor;
 				const factory = res.factory;
 				console.log('Editor setup complete');
+				if ($saveData) {
+					await factory.loadGraph($saveData);
+					editorReady = true;
+					return;
+				}
 				const a = await factory.addNode(NumberNode);
 				const b = await factory.addNode(NumberNode, { initial: 2 });
 				const sum = await factory.addNode(AddNode, {});
@@ -25,21 +33,40 @@
 				const display = await factory.addNode(DisplayNode, {});
 				await editor.addNewConnection(sum, 'value', display, 'input');
 				await factory.arrange?.layout();
-				if (factory.area)
-					AreaExtensions.zoomAt(factory.area, editor.getNodes());
+				if (factory.area) await AreaExtensions.zoomAt(factory.area, editor.getNodes());
+				editorReady = true
+
 			}
 		);
 	});
 	$inspect('GraphEditor', editor);
+	function save() {
+		if (!editor) {
+			console.warn('No editor to save');
+			return;
+		}
+		const saveData = editor.toJSON();
+		console.debug('Save');
+		$saveData = saveData;
+	}
 	let container = $state<HTMLDivElement>();
 	let screenProportion = $state(95);
 </script>
 
 <ContextMenuComponent />
-<div class="h-[100vh] grid">
+<div class="h-[100vh] grid relative">
+	<button
+		type="button"
+		disabled={!editorReady}
+		class="absolute top-4 left-4 hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all"
+		onclick={() => save()}
+	>
+		Save
+	</button>
 	<div
-		bind:this={container}
 		class="m-auto bg-slate-800"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"
-	></div>
+	>
+		<div class="h-full w-full transition-all opacity-0" class:!opacity-100={editorReady}  bind:this={container}></div>
+	</div>
 </div>

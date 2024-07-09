@@ -2,10 +2,14 @@ import { ClassicPreset } from 'rete';
 import type { SocketType } from '../plugins/typed-sockets';
 import type { Node } from '$graph-editor/nodes/Node';
 
-export class Socket<T extends SocketType = SocketType> extends ClassicPreset.Socket {
-	public readonly isArray: boolean;
+const socketDatastructures = ["scalar", "array"] as const
+export type SocketDatastructure = typeof socketDatastructures[number];
+export type SocketValueWithDatastructure<T, D extends SocketDatastructure> = D extends 'scalar' ? T : D extends 'array' ? T[] : never;
+export class Socket<S extends SocketType = SocketType, D extends SocketDatastructure = SocketDatastructure> extends ClassicPreset.Socket {
+	// public readonly isArray: boolean;
+	public readonly datastructure: D;
 	public readonly isRequired: boolean;
-	public type: T;
+	public type: S = $state('any' as S);
 	public value: unknown;
 	public selected: boolean;
 	public readonly node: Node;
@@ -13,21 +17,21 @@ export class Socket<T extends SocketType = SocketType> extends ClassicPreset.Soc
 
 	constructor({
 		name = '',
-		isArray = false,
+		datastructure = 'scalar' as D,
 		isRequired = false,
-		type = 'any' as T,
+		type = 'any' as S,
 		displayLabel = true,
 		node
 	}: {
 		name?: string;
-		isArray?: boolean;
 		isRequired?: boolean;
-		type?: T;
+		datastructure?: D
+		type?: S;
 		node: Node;
 		displayLabel?: boolean;
 	}) {
 		super(name);
-		this.isArray = isArray;
+		this.datastructure = datastructure;
 		this.isRequired = isRequired;
 		this.type = type;
 		this.selected = false;

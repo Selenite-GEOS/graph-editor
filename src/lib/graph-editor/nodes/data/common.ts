@@ -1,34 +1,50 @@
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import {
 	inputControlSocketType,
+	socketToControl,
 	type ControlOfSocket,
 	type InputControl,
 	type InputControlType,
 	type InputControlValueType,
 	type Socket,
+	type SocketDatastructure,
 	type SocketValueType
 } from '$graph-editor/socket';
 import { Node, type NodeParams } from '../Node';
 
-export type InputControlNodeParams<T extends InputControlType> = NodeParams & {
+export type InputControlNodeParams<T extends InputControlType, D extends SocketDatastructure = SocketDatastructure> = NodeParams & {
 	type: T;
+	datastructure?: D;
 	initial?: InputControlValueType<T>;
 };
 
-export class InputControlNode<S extends SocketType = SocketType> extends Node<
+export class InputControlNode<S extends SocketType = SocketType, D extends SocketDatastructure = SocketDatastructure> extends Node<
 	{},
 	{ value: Socket<S> },
 	{ value: InputControl<ControlOfSocket<S>> }
 > {
+	inputControl: InputControl<ControlOfSocket<S>>;
+	outSocket: Socket;
 	constructor(params: InputControlNodeParams<ControlOfSocket<S>>) {
 		super(params);
-
-		this.addInputControl('value', {
+		const {datastructure = "scalar"} = params;
+		this.inputControl = this.addInputControl('value', {
 			type: params.type,
-			initial: params.initial
+			datastructure,
+			initial: params.initial,
+			changeType: (type) => {
+				console.warn("Change type", type)
+				const controlType = socketToControl[type as keyof typeof socketToControl]
+				if (!controlType) {
+					console.error("No control type for", type)
+					return;
+				}
+				this.inputControl.type = controlType;
+				this.outSocket.type = type;
+			}
 		});
 
-		this.addOutData('value', { type: inputControlSocketType[params.type] as S });
+		this.outSocket = this.addOutData('value', { type: inputControlSocketType[params.type] as S, datastructure });
 	}
 
 	data(inputs?: {} | undefined): {
