@@ -4,7 +4,13 @@
  */
 
 import type { Socket } from '$graph-editor/socket';
-import { Node, registerConverter, registerNode, type NodeParams, type SocketsValues } from '$graph-editor/nodes/Node.svelte';
+import {
+	Node,
+	registerConverter,
+	registerNode,
+	type NodeParams,
+	type SocketsValues
+} from '$graph-editor/nodes/Node.svelte';
 import { ConverterNode, InputControlNode } from './common-data-nodes.svelte';
 
 @registerNode('boolean.BooleanNode')

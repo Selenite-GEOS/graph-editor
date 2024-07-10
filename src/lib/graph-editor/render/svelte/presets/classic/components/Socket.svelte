@@ -3,21 +3,22 @@
 	import { assignColor } from '$rete/customization/utils';
 	import { capitalize } from 'lodash-es';
 	import cssVars from 'svelte-css-vars';
-	let {data}: {data: Socket} = $props();
+	let { data }: { data: Socket } = $props();
 	let socketVars = $derived({ background: assignColor(data) });
 
 	const datastructureClasses: Record<SocketDatastructure, string> = {
 		array: 'array',
-		scalar: '',
-	}
+		scalar: ''
+	};
 	if (!(data.datastructure in datastructureClasses)) {
-		console.error("Unsupported datastructure type for socket component :", data.datastructure)
+		console.error('Unsupported datastructure type for socket component :', data.datastructure);
 	}
 
 	const datastructureClass = $derived(datastructureClasses[data.datastructure]);
-	const title = $derived(data.datastructure === "scalar" ? data.type : `${capitalize(data.datastructure)}<${data.type}>`);
+	const title = $derived(
+		data.datastructure === 'scalar' ? data.type : `${capitalize(data.datastructure)}<${data.type}>`
+	);
 
-	
 	// setInterval(() => {
 	// 	socketVars = { background: assignColor(data) };
 	// }, 200);
@@ -32,7 +33,6 @@
 	use:cssVars={socketVars}
 	on:contextmenu|stopPropagation|preventDefault
 ></div>
-
 
 <style lang="scss" scoped>
 	@use 'sass:math';

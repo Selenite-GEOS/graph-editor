@@ -42,9 +42,7 @@
 		<span class="text-end">{i}</span>
 		<span>—</span>
 		<span class="text-center">
-			<InputControlComponent
-				data={control}
-			/>
+			<InputControlComponent data={control} />
 		</span>
 		<!-- Delete row button -->
 		<button

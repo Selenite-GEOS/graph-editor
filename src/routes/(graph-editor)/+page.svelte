@@ -11,7 +11,7 @@
 
 	let editor = $state<NodeEditor>();
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
-	let editorReady = $state(false)
+	let editorReady = $state(false);
 	// On mount
 	$effect(() => {
 		if (!container) return;
@@ -34,8 +34,7 @@
 				await editor.addNewConnection(sum, 'value', display, 'input');
 				await factory.arrange?.layout();
 				if (factory.area) await AreaExtensions.zoomAt(factory.area, editor.getNodes());
-				editorReady = true
-
+				editorReady = true;
 			}
 		);
 	});
@@ -67,6 +66,10 @@
 		class="m-auto bg-slate-800"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"
 	>
-		<div class="h-full w-full transition-all opacity-0" class:!opacity-100={editorReady}  bind:this={container}></div>
+		<div
+			class="h-full w-full transition-all opacity-0"
+			class:!opacity-100={editorReady}
+			bind:this={container}
+		></div>
 	</div>
 </div>

@@ -5,7 +5,7 @@
  * @module
  */
 export * as Data from './data';
-export * from './data'
+export * from './data';
 export * as IO from './io';
 export * as Control from './control';
 export * as XML from './XML';
@@ -18,6 +18,3 @@ export * as Math from './math';
 export * from './Node.svelte';
 
 // export { Node as GraphNode } from './Node';
-
-
-

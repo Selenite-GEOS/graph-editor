@@ -111,7 +111,9 @@ export class ConverterNode<
 		this.addOutData('value', { type: params.target });
 	}
 
-	data(inputs?: SocketsValues<{ value: Socket<S, D>; }> | undefined): SocketsValues<{ value: Socket<T, D>; }>  {
+	data(
+		inputs?: SocketsValues<{ value: Socket<S, D> }> | undefined
+	): SocketsValues<{ value: Socket<T, D> }> {
 		return {
 			value: this.convert(this.getData('value', inputs))
 		};

@@ -7,20 +7,24 @@
 	let component = $derived(lastModal?.component);
 	let props = $derived(lastModal?.props);
 	let snippet = $derived(lastModal?.snippet);
-	let params = $derived(lastModal?.params); 
+	let params = $derived(lastModal?.params);
 	let title = $derived(lastModal?.title);
 	let buttons = $derived(lastModal?.buttons);
-	let resolvedButtons = $derived(buttons === undefined ? undefined : buttons.map((btn) => {
-		switch (btn) {
-			case "cancel":
-				return {
-					label: "Cancel",
-					onclick: () => modal.close()
-				};
-			default:
-				return btn;
-		}
-	}))
+	let resolvedButtons = $derived(
+		buttons === undefined
+			? undefined
+			: buttons.map((btn) => {
+					switch (btn) {
+						case 'cancel':
+							return {
+								label: 'Cancel',
+								onclick: () => modal.close()
+							};
+						default:
+							return btn;
+					}
+				})
+	);
 	$effect(() => {
 		if (!dialog) return;
 		if (modal.queue.length > 0) {
@@ -36,9 +40,9 @@
 				<h1>{title}</h1>
 			{/if}
 			{#if component}
-			<svelte:component this={component} {...props} />
+				<svelte:component this={component} {...props} />
 			{:else if snippet}
-			{@render snippet(params)}
+				{@render snippet(params)}
 			{/if}
 			{#if resolvedButtons}
 				<div class="divider"></div>

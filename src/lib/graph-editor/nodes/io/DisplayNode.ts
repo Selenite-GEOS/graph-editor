@@ -1,4 +1,11 @@
-import { description, Node, path, registerNode, type NodeParams, type SocketsValues } from '$graph-editor/nodes/Node.svelte';
+import {
+	description,
+	Node,
+	path,
+	registerNode,
+	type NodeParams,
+	type SocketsValues
+} from '$graph-editor/nodes/Node.svelte';
 import { InputControl, type Socket } from '$graph-editor/socket';
 
 /**

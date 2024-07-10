@@ -181,7 +181,7 @@ export class InputControl<
 	set socketType(t) {
 		console.debug(`Converting values from ${this.#socketType} to ${t}`);
 		const converter = valueConverters[t];
-		let values: unknown[]
+		let values: unknown[];
 		if (!converter) {
 			console.warn('No converter for', t);
 		} else {
@@ -190,7 +190,11 @@ export class InputControl<
 				data: this.value
 			}).map(converter);
 		}
-		this.value = getDatastructure({ datastructure: this.datastructure, values, type: socketToControl[t] });
+		this.value = getDatastructure({
+			datastructure: this.datastructure,
+			values,
+			type: socketToControl[t]
+		});
 		this.#socketType = t;
 	}
 }

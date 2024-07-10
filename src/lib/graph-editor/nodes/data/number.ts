@@ -3,7 +3,13 @@
  * @module
  */
 
-import { description, path, registerNode, tags, type NodeParams } from '$graph-editor/nodes/Node.svelte';
+import {
+	description,
+	path,
+	registerNode,
+	tags,
+	type NodeParams
+} from '$graph-editor/nodes/Node.svelte';
 import { InputControlNode } from './common-data-nodes.svelte';
 
 /**

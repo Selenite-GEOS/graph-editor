@@ -3,11 +3,14 @@ import type { Component, Snippet } from 'svelte';
 type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
 export type ModalSettings<Props extends Record<string, any> = {}, Params extends unknown[] = []> = {
 	title?: string;
-	buttons?: ({
-		level?: ButtonLevel;
-		label: string;
-		onclick: () => void;
-	} | "cancel")[];
+	buttons?: (
+		| {
+				level?: ButtonLevel;
+				label: string;
+				onclick: () => void;
+		  }
+		| 'cancel'
+	)[];
 } & ({ component: Component<Props>; props: Props } | { snippet: Snippet<Params>; params: Params });
 export class Modal {
 	static #instance: Modal | undefined;

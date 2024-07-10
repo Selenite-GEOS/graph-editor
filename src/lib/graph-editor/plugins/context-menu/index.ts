@@ -383,18 +383,20 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 						if (!(context.data.context instanceof Node)) return context;
 						console.debug('Context menu on node');
 						showContextMenu({
-							items: [{
-								label: 'Delete',
-								description: 'Delete a node from the editor, removing its connections.',
-								action() {
-									factory.removeNode(context.data.context as Node)
-								},
-								path: [],
-								tags: ['delete', 'deletion'],
-							}],
+							items: [
+								{
+									label: 'Delete',
+									description: 'Delete a node from the editor, removing its connections.',
+									action() {
+										factory.removeNode(context.data.context as Node);
+									},
+									path: [],
+									tags: ['delete', 'deletion']
+								}
+							],
 							pos: { x: context.data.event.clientX, y: context.data.event.clientY },
 							searchbar: false
-						})
+						});
 						context.data.event.preventDefault();
 						context.data.event.stopImmediatePropagation();
 						return;

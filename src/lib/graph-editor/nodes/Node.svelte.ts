@@ -101,31 +101,30 @@ export interface InDataParams<N> {
 	index?: number;
 }
 
-export interface NodeParams
-// <Inputs extends {
-// 			[key in string]: Socket;
-// 		} = {
-// 			[key in string]: Socket;
-// 		},
-// 		Outputs extends {
-// 			[key in string]: Socket;
-// 		} = {
-// 			[key in string]: Socket;
-// 		},
-// 		Controls extends {
-// 			[key in string]: Control;
-// 		} = {
-// 			[key in string]: Control;
-// 		}> 
-{
+export interface NodeParams {
+	// <Inputs extends {
+	// 			[key in string]: Socket;
+	// 		} = {
+	// 			[key in string]: Socket;
+	// 		},
+	// 		Outputs extends {
+	// 			[key in string]: Socket;
+	// 		} = {
+	// 			[key in string]: Socket;
+	// 		},
+	// 		Controls extends {
+	// 			[key in string]: Control;
+	// 		} = {
+	// 			[key in string]: Control;
+	// 		}>
 	label?: string;
 	name?: string;
 	width?: number;
 	height?: number;
 	factory?: NodeFactory;
 	params?: Record<string, unknown>;
-	initialValues?: Node["initialValues"]
-	state?: Record<string, unknown>
+	initialValues?: Node['initialValues'];
+	state?: Record<string, unknown>;
 }
 
 export type NodeSaveData = {
@@ -134,8 +133,8 @@ export type NodeSaveData = {
 	type: string;
 	position?: { x: number; y: number };
 	state: Record<string, unknown>;
-	inputControlValues: Node["initialValues"];
-	
+	inputControlValues: Node['initialValues'];
+
 	selectedInputs: string[];
 	selectedOutputs: string[];
 };
@@ -179,12 +178,19 @@ export function description<N>(description: string) {
 		target.description = description;
 	};
 }
-type Sockets<Inputs extends {[key in string]?: Input | undefined}> = {[K in keyof Inputs]: Inputs[K] extends Input ? Inputs[K]["socket"]: never}
+type Sockets<Inputs extends { [key in string]?: Input | undefined }> = {
+	[K in keyof Inputs]: Inputs[K] extends Input ? Inputs[K]['socket'] : never;
+};
 export type SocketsValues<
 	Sockets extends {
 		[key in string]: Socket;
 	}
-> = { [K in keyof Sockets]: SocketValueWithDatastructure<SocketValueType<Sockets[K]['type']>, Sockets[K]['datastructure']> };
+> = {
+	[K in keyof Sockets]: SocketValueWithDatastructure<
+		SocketValueType<Sockets[K]['type']>,
+		Sockets[K]['datastructure']
+	>;
+};
 export class Node<
 		Inputs extends {
 			[key in string]: Socket;
@@ -316,7 +322,7 @@ export class Node<
 				`A node can't be saved as it's missing in the node registry. Node : ${this.label}`
 			);
 		}
-		console.debug("Saving", this)
+		console.debug('Saving', this);
 		const inputControlValues: Node['initialValues'] = { inputs: {}, controls: {} };
 		const selectedInputs: string[] = [];
 		const selectedOutputs: string[] = [];
