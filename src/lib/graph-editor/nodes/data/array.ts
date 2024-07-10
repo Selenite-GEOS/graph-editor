@@ -1,14 +1,14 @@
-import { Node, registerNode, type NodeParams, type SocketsValues } from '../Node';
+import { Node, registerNode, type NodeParams, type SocketsValues } from '../Node.svelte';
 import type { Socket } from '$graph-editor/socket';
-import { InputControlNode } from './common';
+import { InputControlNode } from './common-data-nodes.svelte';
+import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 
 @registerNode('array.Array')
-export class ArrayNode extends InputControlNode<"any", "array"> {
+export class ArrayNode extends InputControlNode<SocketType, "array"> {
 	constructor(params: NodeParams = {}) {
-		super({label: "Array", ...params, type: "text", datastructure: "array"})
+		super({label: "Array", ...params, controlType: "text", datastructure: "array", socketType: "string" })
 	}
 }
-
 
 @registerNode('array.MergeArrays')
 export class MergeArraysNode extends Node<{a: Socket<"any", "array">, b: Socket<"any", "array">}, {value: Socket<"any", "array">}> {

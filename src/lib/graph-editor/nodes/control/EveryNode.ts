@@ -1,5 +1,5 @@
 import { _ } from 'svelte-i18n';
-import { Node } from '$graph-editor/nodes/Node';
+import { Node } from '$graph-editor/nodes/Node.svelte';
 import type { NodeFactory } from '$graph-editor/editor';
 
 export class EveryNode extends Node {

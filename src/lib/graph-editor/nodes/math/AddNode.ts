@@ -1,4 +1,4 @@
-import { Node, registerNode, type NodeParams, type SocketsValues } from '$Node';
+import { Node, registerNode, type NodeParams, type SocketsValues } from '$graph-editor/nodes/Node.svelte';
 import { Socket } from '../../socket/Socket.svelte';
 
 @registerNode('math.AddNode')

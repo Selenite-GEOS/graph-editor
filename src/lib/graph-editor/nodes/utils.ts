@@ -1,5 +1,5 @@
 import { structures } from 'rete-structures';
-import { Connection, Node } from './Node';
+import { Connection, Node } from './Node.svelte';
 
 // TODO : make the leave every or every leave based on every node current
 export function getLeavesFromOutput(node: Node, key: string): Node[] {

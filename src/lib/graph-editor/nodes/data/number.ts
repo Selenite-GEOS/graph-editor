@@ -3,8 +3,8 @@
  * @module
  */
 
-import { description, path, registerNode, tags, type NodeParams } from '$Node';
-import { InputControlNode } from './common';
+import { description, path, registerNode, tags, type NodeParams } from '$graph-editor/nodes/Node.svelte';
+import { InputControlNode } from './common-data-nodes.svelte';
 
 /**
  * A node that outputs a number.
@@ -14,6 +14,6 @@ import { InputControlNode } from './common';
 @tags('float', 'real', 'x')
 export class NumberNode extends InputControlNode<'number'> {
 	constructor(params?: NodeParams) {
-		super({ label: 'Number', ...params, type: 'number' });
+		super({ label: 'Number', ...params, controlType: 'number' });
 	}
 }

@@ -1,4 +1,4 @@
-import { Node } from '../../Node';
+import { Node } from '../../Node.svelte';
 import type { NodeFactory } from '../$graph-editor/editor';
 import { SolverAPINode } from './SolverAPINode';
 

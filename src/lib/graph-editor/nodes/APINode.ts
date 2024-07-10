@@ -1,5 +1,5 @@
 import { getBackendAddress } from '$utils/config';
-import { Node, type NodeParams } from './Node';
+import { Node, type NodeParams } from './Node.svelte';
 // import { env } from '$env/dynamic/public';
 export interface APINodeParams extends NodeParams {
 	url: string;

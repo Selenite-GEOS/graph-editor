@@ -2,6 +2,7 @@ import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { cloneDeep } from 'lodash-es';
 import { ClassicPreset, getUID } from 'rete';
 import type { Socket, SocketDatastructure, SocketValueWithDatastructure } from '../Socket.svelte';
+import { valueConverters } from '$graph-editor/common';
 
 /**
  * A control represents objects the users can interact with.
@@ -98,21 +99,41 @@ export type InputControlParams<
 	onChange?: (value: InputControlValueType<T>) => void;
 	label?: string;
 	changeType?: (type: SocketType) => void;
-	// socket?: (typeof inputControlSocketType)[T];
+	socketType: SocketType;
+	// socket?: Socket<(typeof inputControlSocketType)[T]>;
 };
 export function getDatastructure<T extends InputControlType, D extends SocketDatastructure>({
 	datastructure,
-	type
+	type,
+	values
 }: {
 	datastructure: D;
 	type: T;
+	values?: InputControlValueType<T>[];
 }): SocketValueWithDatastructure<InputControlValueType<T>, D> {
 	const defaultValue = defaultInputControlValues[type] as InputControlValueType<T>;
+	if (!values || values.length === 0) values = [defaultValue];
 	switch (datastructure) {
 		case 'scalar':
-			return defaultValue as SocketValueWithDatastructure<InputControlValueType<T>, D>;
+			return values[0] as SocketValueWithDatastructure<InputControlValueType<T>, D>;
 		case 'array':
-			return [defaultValue] as SocketValueWithDatastructure<InputControlValueType<T>, D>;
+			return [...values] as SocketValueWithDatastructure<InputControlValueType<T>, D>;
+		default:
+			throw new Error('Invalid datastructure');
+	}
+}
+export function getDatastructureValues<T, D extends SocketDatastructure>({
+	datastructure,
+	data
+}: {
+	datastructure: D;
+	data: SocketValueWithDatastructure<T, D>;
+}): T[] {
+	switch (datastructure) {
+		case 'scalar':
+			return [data as T];
+		case 'array':
+			return [...(data as T[])];
 		default:
 			throw new Error('Invalid datastructure');
 	}
@@ -128,8 +149,8 @@ export class InputControl<
 	label = $state('');
 	type = $state<InputControlType>('text');
 	datastructure: D;
+	#socketType: SocketType = $state('any');
 	changeType?: (type: SocketType) => void = $state();
-	// socket? = $state<typeof inputControlSocketType[T]>();
 
 	constructor(params: InputControlParams<T, D>) {
 		super();
@@ -141,7 +162,7 @@ export class InputControl<
 		this.#value = params.initial ?? getDatastructure(params);
 		this.type = params.type;
 		this.changeType = params.changeType;
-		// this.socket = params.socket;
+		this.#socketType = params.socketType;
 	}
 
 	get value(): SocketValueWithDatastructure<InputControlValueType<T>, D> {
@@ -151,6 +172,26 @@ export class InputControl<
 	set value(v: SocketValueWithDatastructure<InputControlValueType<T>, D>) {
 		this.#value = v;
 		if (this.onChange && v !== undefined && !this.readonly) this.onChange(v);
+	}
+
+	get socketType() {
+		return this.#socketType;
+	}
+
+	set socketType(t) {
+		console.debug(`Converting values from ${this.#socketType} to ${t}`);
+		const converter = valueConverters[t];
+		let values: unknown[]
+		if (!converter) {
+			console.warn('No converter for', t);
+		} else {
+			values = getDatastructureValues({
+				datastructure: this.datastructure,
+				data: this.value
+			}).map(converter);
+		}
+		this.value = getDatastructure({ datastructure: this.datastructure, values, type: socketToControl[t] });
+		this.#socketType = t;
 	}
 }
 // const test = new InputControl({ type: 'checkbox', initial: true });

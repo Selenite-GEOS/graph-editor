@@ -1,7 +1,7 @@
 import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import type { Output } from '$graph-editor/socket';
 import { get } from 'svelte/store';
-import { Node } from '$Node';
+import { Node } from '$graph-editor/nodes/Node.svelte';
 import { isEqual } from 'lodash-es';
 
 export class VariableNode extends Node {

@@ -1,5 +1,5 @@
 import type { Socket } from '../../socket/Socket.svelte';
-import { Node } from '$Node';
+import { Node } from '$graph-editor/nodes/Node.svelte';
 import type { NodeFactory } from '$graph-editor/editor';
 import type { XmlData } from './types';
 

@@ -8,60 +8,45 @@
 	} from '$graph-editor/socket';
 	import Fa from 'svelte-fa';
 	import { InputControl as InputControlComponent } from '..';
-	import { faCross, faTimes } from '@fortawesome/free-solid-svg-icons';
-	import type { SocketType } from '$graph-editor/plugins/typed-sockets';
+	import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 	type Props = {
 		array: unknown[];
 		type: InputControlType;
 		onchange?: (array: unknown[]) => void;
-		changeType?: (type: SocketType) => void;
 	};
-	let { array, type, onchange, changeType }: Props = $props();
+	let { array, type, onchange }: Props = $props();
 	$inspect('editarray', array).with(console.debug);
 
-	function onTypeChange(k: keyof typeof socketToControl) {
-		if (!changeType) {
-			console.error("Missing change type function")
-			return;
-		}
-		changeType(k);
-		type = socketToControl[k];
-	}
-</script>
-
-{#snippet changeTypeModal()}
-	<div class="flex flex-col">
-		<span class="preset-tonal-warning p-2 rounded-t"
-			>Warning : Changing type will get rid of unconvertible values.</span
-		>
-		<select class="rounded-b p-2" oninput={(e) => {onTypeChange(e.currentTarget.value as keyof typeof socketToControl)}}>
-			{#each Object.entries(socketToControl) as [k, v] (k)}
-				<option value={k} selected={k === inputControlSocketType[type]}>{k}</option>
-			{/each}
-		</select>
-	</div>
-{/snippet}
-
-{@render changeTypeModal()}
-
-<div class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center">
-	{#each array as item, i}
-		<span class="text-end">{i}</span>
-		<span>—</span>
-		<span class="text-center">
-			<InputControlComponent
-				data={new InputControl({
+	const controls = $derived(
+		array.map(
+			(v, i) =>
+				new InputControl({
 					datastructure: 'scalar',
+					socketType: inputControlSocketType[type],
 					onChange: (v) => {
 						array[i] = v;
 						if (onchange) onchange(array);
 					},
 					type,
-					initial: item as InputControlValueType<typeof type>
-				})}
+					get initial() {
+						return v as InputControlValueType<typeof type>;
+					}
+				})
+		)
+	);
+</script>
+
+<div class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center">
+	{#each controls as control, i (i)}
+		<span class="text-end">{i}</span>
+		<span>—</span>
+		<span class="text-center">
+			<InputControlComponent
+				data={control}
 			/>
 		</span>
+		<!-- Delete row button -->
 		<button
 			type="button"
 			class="btn-icon"
@@ -74,9 +59,3 @@
 		</button>
 	{/each}
 </div>
-
-<style lang="scss">
-	select {
-		color: black;
-	}
-</style>

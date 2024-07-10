@@ -1,4 +1,4 @@
-import { Node, type NodeParams } from '$Node';
+import { Node, type NodeParams } from '$graph-editor/nodes/Node.svelte';
 
 interface AppendNodeParams extends NodeParams {
 	a?: string;

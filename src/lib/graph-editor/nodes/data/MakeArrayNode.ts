@@ -1,4 +1,4 @@
-import { Connection } from '$Node';
+import { Connection } from '$graph-editor/nodes/Node.svelte';
 import type { Socket, Input, InputControl, assignControl } from '$graph-editor/socket';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import type { ClassicPreset } from 'rete';

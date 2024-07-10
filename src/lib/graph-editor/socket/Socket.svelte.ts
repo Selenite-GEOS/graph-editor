@@ -1,6 +1,6 @@
 import { ClassicPreset } from 'rete';
 import type { SocketType } from '../plugins/typed-sockets';
-import type { Node } from '$graph-editor/nodes/Node';
+import type { Node } from '$graph-editor/nodes/Node.svelte';
 
 const socketDatastructures = ["scalar", "array"] as const
 export type SocketDatastructure = typeof socketDatastructures[number];

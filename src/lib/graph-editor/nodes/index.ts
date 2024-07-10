@@ -15,7 +15,7 @@ export * as Macro from './MacroNode';
 // import * as API from './APINode';
 // export * from './makutu';
 export * as Math from './math';
-export * from './Node';
+export * from './Node.svelte';
 
 // export { Node as GraphNode } from './Node';
 

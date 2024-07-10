@@ -1,4 +1,4 @@
-import { Node } from '../Node';
+import { Node } from '../Node.svelte';
 // import { notifications } from '@mantine/notifications';
 import { getLeavesFromOutput } from '../utils';
 import type { NodeFactory } from '$graph-editor/editor';

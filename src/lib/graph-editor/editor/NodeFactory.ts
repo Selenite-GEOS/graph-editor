@@ -11,7 +11,7 @@ import {
 	nodeRegistry,
 	type NodeConstructor,
 	type NodeSaveData
-} from '../nodes/Node';
+} from '../nodes/Node.svelte';
 import { ClassicPreset } from 'rete';
 import { InputControl } from '$graph-editor/socket';
 import type { Writable } from 'svelte/store';
@@ -143,7 +143,8 @@ export class NodeFactory {
 			const node = new nodeClass({
 				...nodeSaveData.params,
 				factory: this,
-				initialValues: nodeSaveData.inputControlValues
+				initialValues: nodeSaveData.inputControlValues,
+				state: nodeSaveData.state
 			});
 			node.id = nodeSaveData.id;
 			if (node.initializePromise) {
@@ -151,7 +152,7 @@ export class NodeFactory {
 				if (node.afterInitialize) node.afterInitialize();
 			}
 
-			node.setState({ ...node.getState(), ...nodeSaveData.state });
+			// node.setState({ ...node.getState(), ...nodeSaveData.state });
 			node.applyState();
 			// for (const key in nodeSaveData.inputControlValues) {
 			// 	const inputControl = node.inputs[key]?.control;
@@ -467,6 +468,28 @@ export class NodeFactory {
 		}
 		this.selector.unselectAll();
 		// this.history?.separate();
+	}
+
+	/**
+	 * Removes a node from the editor, as well as its connections.
+	 * @param target node or node id
+	 */
+	async removeNode(target: string | Node) {
+		let node: Node;
+		if (typeof target === 'string') {
+			const attempt = this.editor.getNode(target);
+			if (!attempt) {
+				console.warn("Can't remove, node not found");
+				return;
+			}
+			node = attempt;
+		} else {
+			node = target;
+		}
+		for (const conn of node.getConnections()) {
+			if (this.editor.getConnection(conn.id)) await this.editor.removeConnection(conn.id);
+		}
+		await this.editor.removeNode(node.id);
 	}
 
 	enable() {

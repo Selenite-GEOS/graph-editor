@@ -1,5 +1,5 @@
 import type { APINodeParams } from '$graph-editor/node/APINode';
-import type { NodeParams } from '../../Node';
+import type { NodeParams } from '../../Node.svelte';
 import { ObjectAPINode } from '../../ObjectAPINode';
 
 export class SolverAPINode extends ObjectAPINode {

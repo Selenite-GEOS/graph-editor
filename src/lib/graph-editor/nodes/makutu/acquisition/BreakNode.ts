@@ -1,5 +1,5 @@
 import { PythonObject, PythonProperty } from '$lib/backend-interaction/python';
-import { Node } from '../../Node';
+import { Node } from '../../Node.svelte';
 import type { NodeFactory } from '../$graph-editor/editor';
 
 // TODO : autogenerate outputs from the python object

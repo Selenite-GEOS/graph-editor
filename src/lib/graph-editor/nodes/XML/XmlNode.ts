@@ -1,4 +1,4 @@
-import { Node, type NodeParams, type OutDataParams } from '$Node';
+import { Node, type NodeParams, type OutDataParams } from '$graph-editor/nodes/Node.svelte';
 import type { XmlAttributeDefinition } from './types';
 import { camlelcaseize, titlelize } from '$lib/utils/string';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';

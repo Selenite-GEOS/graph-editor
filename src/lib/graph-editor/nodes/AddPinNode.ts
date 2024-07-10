@@ -1,6 +1,6 @@
 import { ButtonControl } from '$graph-editor/socket';
-import { Node } from './Node';
-import { type NodeParams } from './Node';
+import { Node } from './Node.svelte';
+import { type NodeParams } from './Node.svelte';
 
 interface AddPinNodeParams extends NodeParams {
 	numPins?: number;

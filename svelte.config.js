@@ -15,7 +15,7 @@ const config = {
 		alias: {
 			$rete: 'src/lib/old-graph-editor/rete',
 			'$graph-editor': 'src/lib/graph-editor',
-			$Node: 'src/lib/graph-editor/nodes/Node',
+			$Node: 'src/lib/graph-editor/nodes/Node.svelte',
 			// '$graph-editor/**': "src/lib/graph-editor/**",
 			$utils: 'src/lib/utils',
 			$houdini: path.resolve('.', '$houdini'),

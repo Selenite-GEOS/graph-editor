@@ -1,4 +1,4 @@
-import { Node } from '../Node';
+import { Node } from '../Node.svelte';
 import { ButtonControl } from '$graph-editor/socket';
 import type { NodeFactory } from '$graph-editor/editor';
 

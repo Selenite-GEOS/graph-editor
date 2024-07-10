@@ -1,5 +1,5 @@
 import { getMessageFormatter, t } from 'svelte-i18n';
-import { Node, type NodeParams } from '$Node';
+import { Node, type NodeParams } from '$graph-editor/nodes/Node.svelte';
 import { capitalize, getVarsFromFormatString } from '$lib/utils/string';
 
 export interface FormatNodeParams extends NodeParams {

@@ -1,4 +1,4 @@
-import { Connection, Node } from '../Node';
+import { Connection, Node } from '../Node.svelte';
 import { getLeavesFromOutput } from '../utils';
 import type { NodeFactory } from '$graph-editor/editor';
 import type { SocketType } from '../../plugins/typed-sockets';

@@ -72,7 +72,7 @@
 		background-color: hsl(0, 0%, 50%, 0.5);
 		min-width: 10rem;
 		max-width: 20rem;
-		min-height: 5rem;
+		min-height: 1rem;
 		max-height: 30rem;
 	}
 </style>

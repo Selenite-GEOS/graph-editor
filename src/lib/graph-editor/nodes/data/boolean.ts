@@ -4,13 +4,13 @@
  */
 
 import type { Socket } from '$graph-editor/socket';
-import { Node, registerConverter, registerNode, type NodeParams, type SocketsValues } from '$Node';
-import { ConverterNode, InputControlNode } from './common';
+import { Node, registerConverter, registerNode, type NodeParams, type SocketsValues } from '$graph-editor/nodes/Node.svelte';
+import { ConverterNode, InputControlNode } from './common-data-nodes.svelte';
 
 @registerNode('boolean.BooleanNode')
 export class BooleanNode extends InputControlNode {
 	constructor(params?: NodeParams) {
-		super({ label: 'Boolean', ...params, type: 'checkbox' });
+		super({ label: 'Boolean', ...params, controlType: 'checkbox' });
 	}
 }
 

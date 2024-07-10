@@ -12,7 +12,8 @@
 		"test": "vitest",
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
-		"docgen": "typedoc"
+		"docgen": "typedoc",
+		"prepare": "husky install"
 	},
 	"module": "./dist/index.js",
 	"exports": {
@@ -46,13 +47,10 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.36.0",
 		"globals": "^15.0.0",
-		"houdini": "0.0.0-20240707155617",
-		"houdini-svelte": "^1.2.47",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.2.5",
 		"publint": "^0.1.9",
 		"svelte-check": "^3.6.0",
-		"svelte@canary": "link:houdini/svelte@canary",
 		"tailwindcss": "^3.4.4",
 		"tslib": "^2.4.1",
 		"typedoc": "^0.26.3",
@@ -97,5 +95,9 @@
 		"svelte-portal": "^2.2.1",
 		"uuid": "^10.0.0",
 		"wu": "^2.1.0"
+	},
+	"lint-staged": {
+		"*.js": "eslint --cache --fix",
+		"*.{js,css,md}": "prettier --write"
 	}
 }

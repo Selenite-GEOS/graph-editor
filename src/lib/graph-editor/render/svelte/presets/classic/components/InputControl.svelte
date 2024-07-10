@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { Modal } from '$graph-editor/plugins/modal';
-	import { defaultInputControlValues, type InputControl, type InputControlType, type InputControlValueType } from '$graph-editor/socket';
+	import {
+		defaultInputControlValues,
+		inputControlSocketType,
+		socketToControl,
+		type InputControl,
+		type InputControlType,
+		type InputControlValueType
+	} from '$graph-editor/socket';
 	import { stopPropagation } from '$utils';
 	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
 	import EditArray from './EditArray.svelte';
-	import { mount } from 'svelte';
 
 	type Props = {
 		data: InputControl<InputControlType>;
@@ -29,6 +35,7 @@
 			? inputType[type as (typeof simpleTypes)[number]]
 			: 'text',
 		checked: type === 'checkbox' ? (inputControl.value as boolean) : undefined,
+		step: type === 'number' ? 0.01 : type === 'integer' ? 1 : undefined,
 		oninput: (e) => {
 			if (type === 'checkbox') {
 				inputControl.value = e.currentTarget.checked;
@@ -51,6 +58,17 @@
 		type === 'vector' ? (inputControl.value as { x: number; y: number; z: number }) : undefined
 	);
 	const datastructure = $derived(inputControl.datastructure);
+
+	function onTypeChange(k: keyof typeof socketToControl) {
+		if (!inputControl.changeType) {
+			console.error('Missing change type function');
+			return;
+		}
+		inputControl.changeType(k);
+		inputControl.type = socketToControl[k];
+		console.debug('control type', inputControl.type);
+	}
+	$inspect('InputControl:Type', inputControl.type);
 </script>
 
 <!-- TODO maybe move pointerdown and dblclick stop propagation to framework agnostic logic -->
@@ -63,12 +81,35 @@
 	/>
 {/snippet}
 
+{#snippet changeTypeModal()}
+	<div class="flex flex-col">
+		<div class="preset-tonal-warning p-2 rounded-t grid grid-cols-[0fr,1fr] gap-2 max-w-[30rem]">
+			<span>Warning&nbsp;:</span>
+			<span class="text-wrap">
+				Changing type will get rid of unconvertible values and may break connections.</span
+			>
+		</div>
+		<select
+			class="rounded-b p-2 text-black"
+			oninput={(e) => {
+				onTypeChange(e.currentTarget.value as keyof typeof socketToControl);
+				modal.close();
+			}}
+		>
+			{#each Object.entries(socketToControl) as [k, v] (k)}
+				<option value={k} selected={k === inputControl.socketType}>{k}</option>
+			{/each}
+		</select>
+	</div>
+{/snippet}
+
 {#if inputControl.datastructure === 'scalar'}
 	{#if vector}
 		<div class="vector">
 			{#each ['x', 'y', 'z'] as k, i (k)}
 				{@render input({
 					type: 'number',
+					step: 0.01,
 					value: vector[k as 'x' | 'y' | 'z'],
 					style: 'border-radius: 0;',
 					oninput: (e) => {
@@ -96,29 +137,37 @@
 		onclick={() => {
 			modal.show({
 				component: EditArray,
-				title: 'Edit array',
+				title: `Edit ${inputControl.socketType} array`,
 				buttons: [
 					{
 						label: 'Change type',
 						level: 'warning',
 						onclick() {
-							console.debug('Change type');
+							modal.show({
+								snippet: changeTypeModal,
+								params: [],
+								title: 'Change type',
+								buttons: ['cancel']
+							});
 						}
 					},
 					{
 						label: 'Add row',
 						onclick() {
 							(inputControl.value as []).push(defaultInputControlValues[type]);
-							if (inputControl.onChange) inputControl.onChange(inputControl.value) ;
+							if (inputControl.onChange) inputControl.onChange(inputControl.value);
 						}
 					}
 				],
 				props: {
-					changeType: inputControl.changeType,
-					array: inputControl.value as unknown[],
-					type,
+					get array() {
+						return inputControl.value as unknown[];
+					},
+					get type() {
+						return inputControl.type;
+					},
 					onchange: (v) => {
-						if (inputControl.onChange) inputControl.onChange(v)
+						if (inputControl.onChange) inputControl.onChange(v);
 					}
 				}
 			});
