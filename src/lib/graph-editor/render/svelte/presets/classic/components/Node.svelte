@@ -10,7 +10,7 @@
 </script>
 
 <section
-	class="bg-base-300 grid grid-cols-2 select-none p-4 rounded-md cursor-pointer gap-2 "
+	class="bg-base-300 grid select-none p-4 rounded-md cursor-pointer gap-2 grid-flow-row-dense"
 	bind:clientWidth={node.width}
 	bind:clientHeight={node.height}
 >
@@ -32,8 +32,8 @@
 			unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 		/>
 	{/each}
-
-	{#each node.sortedInputs as [key, input] (key)}
+	<div class="grid grid-flow-dense gap-2">
+	{#each node.sortedInputs as [key, input], i (key)}
 		<div class="text-md items-center flex col-start-1" data-testid={key}>
 			<Ref
 				data-testid="input-socket"
@@ -78,7 +78,7 @@
 		</div>
 	{/each}
 	{#each node.sortedOutputs as [key, output] (key)}
-		<div class="text-md items-center flex col-start-2" data-testid={key}>
+		<div class="text-md justify-end items-center flex col-start-2" data-testid={key}>
 			<Ref
 				data-testid="output-socket"
 				init={(element) =>
@@ -121,6 +121,7 @@
 			{/if}
 		</div>
 	{/each}
+	</div>
 </section>
 
 <!-- <div class="mt-[10rem]" onpointerdown={stopPropagation}>

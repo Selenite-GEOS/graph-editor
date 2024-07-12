@@ -8,6 +8,7 @@
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
+	import { shortcut } from '@selenite/commons';
 
 	let editor = $state<NodeEditor>();
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
@@ -67,6 +68,16 @@
 		Save
 	</button>
 	<div
+	use:shortcut={{
+		shortcuts: {key: 'a'},
+		async action(e) {
+			await editor?.factory?.arrange?.layout()
+			const area = editor?.factory?.area
+			if (!area) return;
+			await AreaExtensions.zoomAt(area, editor?.getNodes() ?? [])
+		},
+	}
+	}
 		class="m-auto"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"
 	>
