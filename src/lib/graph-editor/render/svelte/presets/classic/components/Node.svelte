@@ -58,8 +58,7 @@
 							title="required">*</span
 						>{/if}
 				</div>
-			{/if}
-			{#if input.control && input.showControl}
+			{:else}
 				<Ref
 					class="h-full !flex items-center input-control"
 					data-testid="input-control"
@@ -102,8 +101,7 @@
 							title="required">*</span
 						>{/if}
 				</div>
-			{/if}
-			{#if output.control && output.showControl}
+			{:else}
 				<Ref
 					class="h-full !flex items-center output-control"
 					data-testid="output-control"
