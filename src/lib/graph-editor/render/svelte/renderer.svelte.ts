@@ -46,7 +46,6 @@ export function getSvelteRenderer(): SvelteRenderer<Component> {
 			if (!props.props || !payload) {
 				return;
 			}
-			if (payload.data instanceof Node) console.log(payload);
 			for (const [k, v] of Object.entries(payload)) {
 				props.props[k] = v;
 			}

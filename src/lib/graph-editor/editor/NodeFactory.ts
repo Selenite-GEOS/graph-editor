@@ -186,9 +186,14 @@ export class NodeFactory {
 		}
 	}
 
+	destroyArea() {
+		console.log("Destroying area.")
+		this.area?.destroy()
+	}
+
 	async loadGraph(editorSaveData: NodeEditorSaveData) {
 		await this.bulkOperation(async () => {
-			console.log('loadGraph', editorSaveData.editorName);
+			console.log('Load graph :', editorSaveData.editorName);
 			await this.editor.clear();
 			this.editor.variables.set(editorSaveData.variables);
 			this.editor.setName(editorSaveData.editorName);

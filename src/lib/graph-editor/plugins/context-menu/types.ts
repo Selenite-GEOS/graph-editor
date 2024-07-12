@@ -2,6 +2,7 @@
  * A menu item contains the necessary information to render a menu item in the context menu.
  */
 export type MenuItem = {
+	id: string;
 	/** The label of the menu item */
 	label: string;
 	/** The description of the menu item */

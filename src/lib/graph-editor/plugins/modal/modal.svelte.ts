@@ -26,12 +26,12 @@ export class Modal {
 	private constructor() {}
 
 	show<Props extends Record<string, any>>(params: ModalSettings<Props>) {
-		console.log('Show modal');
+		console.debug('Show modal');
 		this.queue.push(params as unknown as ModalSettings);
 	}
 
 	close() {
-		console.log('Close modal');
+		console.debug('Close modal');
 		this.queue.pop();
 	}
 }

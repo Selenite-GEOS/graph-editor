@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { ErrorWNotif, _ } from '$lib/global';
-	import { createActionMenuItem } from '$lib/oldMenu';
-	import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
 	import type { NodeFactory } from '$graph-editor';
-	import type { Schemes } from '$graph-editor/node/Schemes';
+	import type { Schemes } from '$graph-editor/schemes';
 	import type { Position } from 'rete-render-utils/_types/types';
 
 	// svelte-ignore unused-export-let
@@ -38,19 +36,19 @@
 	}
 
 	function openContextMenu(event: MouseEvent) {
-		spawnMoonMenu({
-			pos: { x: event.clientX, y: event.clientY },
-			items: [
-				createActionMenuItem({
-					label: $_('button.delete'),
-					description: $_('menu.delete-selected.descr'),
-					executeAction: () => {
-						if (!factory) throw new ErrorWNotif('No factory');
-						factory.deleteSelectedElements();
-					}
-				})
-			]
-		});
+		// spawnMoonMenu({
+		// 	pos: { x: event.clientX, y: event.clientY },
+		// 	items: [
+		// 		createActionMenuItem({
+		// 			label: $_('button.delete'),
+		// 			description: $_('menu.delete-selected.descr'),
+		// 			executeAction: () => {
+		// 				if (!factory) throw new ErrorWNotif('No factory');
+		// 				factory.deleteSelectedElements();
+		// 			}
+		// 		})
+		// 	]
+		// });
 	}
 </script>
 

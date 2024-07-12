@@ -1,12 +1,14 @@
 import {
 	Node,
 	registerNode,
+	tags,
 	type NodeParams,
 	type SocketsValues
 } from '$graph-editor/nodes/Node.svelte';
 import { Socket } from '../../socket/Socket.svelte';
 
 @registerNode('math.AddNode')
+@tags('+', 'sum')
 export class AddNode extends Node<{ a: Socket<'number'>; b: Socket<'number'> }, { value: Socket }> {
 	constructor(params: NodeParams & { a?: number; b?: number } = {}) {
 		super({ label: 'Add', height: 190, ...params });

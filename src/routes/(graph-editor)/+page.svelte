@@ -37,8 +37,12 @@
 				editorReady = true;
 			}
 		);
+
+		return () => {
+			editor?.factory?.destroyArea()
+		}
 	});
-	$inspect('GraphEditor', editor);
+	// $inspect('GraphEditor', editor);
 	function save() {
 		if (!editor) {
 			console.warn('No editor to save');
@@ -53,7 +57,7 @@
 </script>
 
 <ContextMenuComponent />
-<div class="h-[100vh] grid relative">
+<div class="h-[100vh] grid relative bg-base-200">
 	<button
 		type="button"
 		disabled={!editorReady}
@@ -63,11 +67,11 @@
 		Save
 	</button>
 	<div
-		class="m-auto bg-slate-800"
+		class="m-auto"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"
 	>
 		<div
-			class="h-full w-full transition-all opacity-0"
+			class="h-full w-full transition-all opacity-0 bg-neutral"
 			class:!opacity-100={editorReady}
 			bind:this={container}
 		></div>

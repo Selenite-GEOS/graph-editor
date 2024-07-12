@@ -33,8 +33,8 @@
 	});
 </script>
 
-<dialog bind:this={dialog} class="modal" onclose={() => modal.close()}>
-	{#if lastModal}
+{#if lastModal}
+	<dialog bind:this={dialog} class="modal" onclose={() => modal.close()}>
 		<div class="modal-box">
 			{#if title}
 				<h1>{title}</h1>
@@ -53,11 +53,11 @@
 				</div>
 			{/if}
 		</div>
-	{/if}
-	<form method="dialog" class="backdrop">
-		<button></button>
-	</form>
-</dialog>
+		<form method="dialog" class="backdrop">
+			<button></button>
+		</form>
+	</dialog>
+{/if}
 
 <style lang="scss">
 	form[method='dialog'] {

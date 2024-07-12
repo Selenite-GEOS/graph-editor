@@ -5,7 +5,6 @@
 
 import {
 	description,
-	path,
 	registerNode,
 	tags,
 	type NodeParams
@@ -17,7 +16,7 @@ import { InputControlNode } from './common-data-nodes.svelte';
  */
 @registerNode('number.NumberNode')
 @description('A node that outputs a number.')
-@tags('float', 'real', 'x')
+@tags('float', 'real', 'x', 'y', 'z', 't')
 export class NumberNode extends InputControlNode<'number'> {
 	constructor(params?: NodeParams) {
 		super({ label: 'Number', ...params, controlType: 'number' });

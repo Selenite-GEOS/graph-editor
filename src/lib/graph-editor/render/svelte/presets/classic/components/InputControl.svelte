@@ -8,7 +8,7 @@
 		type InputControlType,
 		type InputControlValueType
 	} from '$graph-editor/socket';
-	import { stopPropagation } from '$utils';
+	import { stopPropagation } from '@selenite/commons';
 	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
 	import EditArray from './EditArray.svelte';
 
@@ -19,7 +19,8 @@
 	};
 	let { data: inputControl, width = 'w-full', inputTextSize = 'text-md' }: Props = $props();
 	let type = $derived(inputControl.type);
-	$inspect(inputControl.value);
+	const isCheckbox = $derived(type === 'checkbox');
+	$inspect(inputControl.value).with(console.debug);
 	const modal = Modal.instance;
 	const simpleTypes = ['checkbox', 'group-name-ref', 'integer', 'number', 'text'] as const;
 	const inputType: Record<(typeof simpleTypes)[number], HTMLInputTypeAttribute> = {
@@ -30,6 +31,7 @@
 		'group-name-ref': 'text'
 	};
 	let inputProps: HTMLInputAttributes = $derived({
+		class: `${isCheckbox ? 'checkbox' : 'input input-bordered'}`,
 		readonly: inputControl.readonly,
 		type: simpleTypes.includes(type as (typeof simpleTypes)[number])
 			? inputType[type as (typeof simpleTypes)[number]]
@@ -68,7 +70,7 @@
 		inputControl.type = socketToControl[k];
 		console.debug('control type', inputControl.type);
 	}
-	$inspect('InputControl:Type', inputControl.type);
+	$inspect('InputControl:Type', inputControl.type).with(console.debug);
 </script>
 
 <!-- TODO maybe move pointerdown and dblclick stop propagation to framework agnostic logic -->
@@ -83,7 +85,7 @@
 
 {#snippet changeTypeModal()}
 	<div class="flex flex-col">
-		<div class="preset-tonal-warning p-2 rounded-t grid grid-cols-[0fr,1fr] gap-2 max-w-[30rem]">
+		<div class="p-2 rounded-t grid grid-cols-[0fr,1fr] gap-2 max-w-[30rem]">
 			<span>Warning&nbsp;:</span>
 			<span class="text-wrap">
 				Changing type will get rid of unconvertible values and may break connections.</span
@@ -182,12 +184,12 @@
 		display: flex;
 	}
 
-	input {
+	/*input {
 		width: 100%;
 		padding: 0.25rem 0.5rem;
 		border-radius: 5px;
 		color: black;
-	}
+	}*/
 	/* .vector input {
 		border-radius: 0;
 	} */

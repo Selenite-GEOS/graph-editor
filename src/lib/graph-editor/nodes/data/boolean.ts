@@ -8,6 +8,7 @@ import {
 	Node,
 	registerConverter,
 	registerNode,
+	tags,
 	type NodeParams,
 	type SocketsValues
 } from '$graph-editor/nodes/Node.svelte';
@@ -21,6 +22,7 @@ export class BooleanNode extends InputControlNode {
 }
 
 @registerNode('boolean.NotNode')
+@tags('!', 'negate', 'invert')
 export class NotNode extends Node<{ value: Socket<'boolean'> }, { value: Socket<'boolean'> }> {
 	constructor(params: NodeParams = {}) {
 		super({

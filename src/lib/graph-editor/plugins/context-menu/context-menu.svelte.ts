@@ -8,6 +8,18 @@ import type { MenuItem } from '$graph-editor/plugins/context-menu/types';
  * It autohides based on the hovered state and filters items based on a query.
  */
 export class ContextMenu {
+	triggerFirstItem() {
+		this.triggerItem(0);
+	}
+	triggerItem(i: number) {
+		const item = this.filteredItems.at(i);
+		if (!item) {
+			console.warn(`Tried to trigger a non existing item at ${i}.`);
+			return;
+		}
+		item.action();
+		this.visible = false;
+	}
 	/** Singleton instance */
 	static #instance: ContextMenu;
 
@@ -23,7 +35,22 @@ export class ContextMenu {
 	pos = $state<Position>({ x: 0, y: 0 });
 
 	/** Visibility of the menu. */
-	visible = $state(false);
+	#visible = $state(false);
+
+	get visible() {
+		return this.#visible;
+	}
+	set visible(v: boolean) {
+		this.#visible = v;
+		if (!v) {
+			if (this.onHide) {
+				this.onHide();
+				this.onHide = undefined;
+			}
+			this.query = '';
+			this.expanded = false;
+		}
+	}
 
 	/** Delay before hiding menu in miliseconds. */
 	hidingDelay = $state(100);
@@ -31,11 +58,23 @@ export class ContextMenu {
 	/** Visibility of the searchbar. */
 	searchbar = $state(false);
 
+	onHide = $state<() => void>();
+
 	/** Items of the menu. */
 	items = $state<MenuItem[]>([]);
 
+	/** Is menu fully expanded */
+	expanded = $state(false);
+
 	/** Query string to filter items. */
-	query = $state('');
+	#query = $state('');
+	get query() {
+		return this.#query;
+	}
+	set query(q: string) {
+		this.#query = q.trim();
+		this.expanded = q.trim() !== '';
+	}
 
 	/** Filtered items. */
 	filteredItems = $derived.by(() => {
@@ -62,18 +101,26 @@ export class ContextMenu {
 		);
 	});
 
+	#focused = $state(false);
+	get focused() {
+		return this.#focused;
+	}
+	set focused(f: boolean) {
+		this.#focused = f;
+		// this.updateAutohide();
+	}
 	/** Is the context menu hovered. */
 	#hovered = $state(false);
 
 	/** Timeout to hide the menu. */
 	#hideTimeout: NodeJS.Timeout | null = null;
 
-	/** Sets hovered state and manages autohide. */
-	set hovered(v: boolean) {
-		this.#hovered = v;
-		if (v && this.#hideTimeout) {
-			clearTimeout(this.#hideTimeout);
-			this.#hideTimeout = null;
+	private updateAutohide() {
+		if (this.#hovered) {
+			if (this.#hideTimeout) {
+				clearTimeout(this.#hideTimeout);
+				this.#hideTimeout = null;
+			}
 		} else {
 			this.#hideTimeout = setTimeout(() => {
 				if (!this.#hovered) {
@@ -81,6 +128,12 @@ export class ContextMenu {
 				}
 			}, this.hidingDelay);
 		}
+	}
+
+	/** Sets hovered state and manages autohide. */
+	set hovered(v: boolean) {
+		this.#hovered = v;
+		this.updateAutohide();
 	}
 
 	/** Returns hovered state. */
@@ -96,10 +149,11 @@ export class ContextMenu {
  *
  * Helper function to use the context menu singleton.
  */
-export const showContextMenu: ShowContextMenu = ({ items, pos, searchbar }) => {
+export const showContextMenu: ShowContextMenu = ({ items, pos, searchbar, onHide }) => {
 	const menu = ContextMenu.instance;
 	menu.visible = true;
 	menu.pos = pos;
 	menu.searchbar = searchbar;
 	menu.items = items;
+	menu.onHide = onHide;
 };

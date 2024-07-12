@@ -1,5 +1,3 @@
-import { createActionMenuItem } from '$lib/oldMenu';
-import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
 import type { NodeFactory } from '$graph-editor/editor';
 import type { Scope } from 'rete';
 import type { BaseArea } from 'rete-area-plugin';
@@ -50,36 +48,36 @@ export class CommentPlugin<
 					console.warn('ContextMenu: Comment not found');
 					return;
 				}
-				spawnMoonMenu({
-					searchbar: false,
-					pos: { x: this.lastPointerEvent?.clientX ?? 0, y: this.lastPointerEvent?.clientY ?? 0 },
-					items: [
-						createActionMenuItem({
-							label: get(_)('menu.comment.edit.label'),
+				// spawnMoonMenu({
+				// 	searchbar: false,
+				// 	pos: { x: this.lastPointerEvent?.clientX ?? 0, y: this.lastPointerEvent?.clientY ?? 0 },
+				// 	items: [
+				// 		createActionMenuItem({
+				// 			label: get(_)('menu.comment.edit.label'),
 
-							description: get(_)('menu.comment.edit.description'),
-							executeAction: () => {
-								this.openEditPrompt(comment);
-							}
-						}),
-						createActionMenuItem({
-							label: get(_)('menu.comment.delete.label'),
-							description: get(_)('menu.comment.delete.description'),
-							executeAction: () => {
-								const comment = this.comments.get(id);
-								if (!comment) {
-									console.warn('Comment to delete not found');
-									return;
-								}
-								this.factory.history?.add({
-									redo: () => this.delete(id),
-									undo: () => this.addFrame(comment.text, comment?.links, { id })
-								});
-								this.delete(id);
-							}
-						})
-					]
-				});
+				// 			description: get(_)('menu.comment.edit.description'),
+				// 			executeAction: () => {
+				// 				this.openEditPrompt(comment);
+				// 			}
+				// 		}),
+				// 		createActionMenuItem({
+				// 			label: get(_)('menu.comment.delete.label'),
+				// 			description: get(_)('menu.comment.delete.description'),
+				// 			executeAction: () => {
+				// 				const comment = this.comments.get(id);
+				// 				if (!comment) {
+				// 					console.warn('Comment to delete not found');
+				// 					return;
+				// 				}
+				// 				this.factory.history?.add({
+				// 					redo: () => this.delete(id),
+				// 					undo: () => this.addFrame(comment.text, comment?.links, { id })
+				// 				});
+				// 				this.delete(id);
+				// 			}
+				// 		})
+				// 	]
+				// });
 			},
 			pick: async (data) => {
 				this.area.area.content.reorder(comment.element, this.area.area.content.holder.firstChild);

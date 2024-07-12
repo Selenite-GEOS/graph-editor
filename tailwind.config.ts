@@ -1,6 +1,5 @@
 import { join } from 'path';
-import { skeleton } from '@skeletonlabs/skeleton/plugin';
-import * as themes from '@skeletonlabs/skeleton/themes';
+import daisyui from 'daisyui';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -13,8 +12,6 @@ export default {
 		extend: {}
 	},
 	plugins: [
-		skeleton({
-			themes: [themes.cerberus, themes.rose]
-		})
+		daisyui
 	]
 };

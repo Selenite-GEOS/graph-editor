@@ -32,9 +32,9 @@ export class Input<S extends Socket = Socket>
 		index?: number;
 	}) {
 		super(socket, label, multipleConnections);
-		$effect.root(() => {
-			console.log('showcontrol', this.showControl);
-		});
+		// $effect.root(() => {
+		// 	console.log('showcontrol', this.showControl);
+		// });
 		this.index = index;
 		this.isRequired = isRequired;
 	}

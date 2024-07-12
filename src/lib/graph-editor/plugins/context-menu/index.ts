@@ -2,14 +2,15 @@ import { capitalizeWords } from '$utils/string';
 import { type Setup } from '$graph-editor/setup';
 import { _ } from '$lib/global';
 import { NodeFactory } from '$graph-editor/editor';
-import { Node, nodeRegistry } from '$graph-editor/nodes';
+import { Node, nodeRegistry, type NodeConstructor } from '$graph-editor/nodes';
 import { get } from 'svelte/store';
 import wu from 'wu';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
 import type { Position } from '$graph-editor/common';
 import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
-
+// Ensure all nodes are registered
+import '$graph-editor/nodes';
 export * from './context-menu.svelte';
 export { default as ContextMenuComponent } from './ContextMenu.svelte';
 // export class ContextMenuSetup extends SetupClass {
@@ -290,11 +291,11 @@ export { default as ContextMenuComponent } from './ContextMenu.svelte';
 // 	}
 // }
 
-export type NodeMenuItem<N extends Node = Node> = {
+export type NodeMenuItem = {
 	/** Label of the node. */
 	label: string;
 	/** Function that creates the node. */
-	create: () => N;
+	nodeClass: typeof Node;
 	/** Menu path of the node. */
 	path: string[];
 	/** Search tags of the node. */
@@ -302,39 +303,64 @@ export type NodeMenuItem<N extends Node = Node> = {
 	/** Description of the node. */
 	description: string;
 };
+
+
+const baseNodeMenuItems: NodeMenuItem[] = [];
+for (const [id, nodeClass] of nodeRegistry.entries()) {
+	if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
+	const pieces = id.split('.').map(capitalizeWords);
+
+	/** Name of node in id. */
+	const idName = pieces.at(-1)!;
+
+	// Autogenerate menu path from id if unspecified
+	if (nodeClass.path === undefined) {
+		const path = pieces.slice(0, -1);
+		nodeClass.path = path;
+	}
+
+	const node = new nodeClass();
+	baseNodeMenuItems.push({
+		label: node.label === undefined || node.label.trim() === '' ? idName : node.label,
+		nodeClass: nodeClass as typeof Node,
+		path: nodeClass.path,
+		tags: nodeClass.tags ?? [],
+		description: nodeClass.description ?? ''
+	});
+}
+function getMenuItemsFromNodeItems({ factory, pos, nodeItems }: { factory: NodeFactory; pos: Position, nodeItems: NodeMenuItem[] }): MenuItem[] {
+	const editor = factory.getEditor();
+	const area = factory.getArea();
+	const res: MenuItem[] = [];
+
+	for (const {description, label, path, tags, nodeClass} of nodeItems) {
+		res.push({
+			id: nodeClass.id.replaceAll('.', '-'),
+			description,
+			label,
+			path,
+			tags,
+			action: async () => {
+				const node = new nodeClass({ factory });
+				await editor.addNode(node);
+				const localPos = clientToSurfacePos({ pos, factory });
+				await area?.translate(node.id, localPos);
+			},
+		});
+	}
+	return res;
+}
 export type ShowContextMenu = (params: {
 	pos: Position;
 	items: MenuItem[];
 	searchbar: boolean;
+	onHide?: () => void;
 }) => void;
 export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowContextMenu }): Setup {
 	return {
 		name: 'Context Menu',
 		type: 'area',
 		setup: ({ area, factory, editor }) => {
-			const baseNodeMenuItems: NodeMenuItem[] = [];
-			for (const [id, nodeClass] of nodeRegistry.entries()) {
-				if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
-				const pieces = id.split('.').map(capitalizeWords);
-
-				/** Name of node in id. */
-				const idName = pieces.at(-1)!;
-
-				// Autogenerate menu path from id if unspecified
-				if (nodeClass.path === undefined) {
-					const path = pieces.slice(0, -1);
-					nodeClass.path = path;
-				}
-
-				const node = new nodeClass();
-				baseNodeMenuItems.push({
-					label: node.label === undefined || node.label.trim() === '' ? idName : node.label,
-					create: () => new nodeClass({ factory }),
-					path: nodeClass.path,
-					tags: nodeClass.tags ?? [],
-					description: nodeClass.description ?? ''
-				});
-			}
 			let lastSelectedNodes: SelectorEntity[] = [];
 			area.addPipe((context) => {
 				// React to pointerdown and contextmenu events only
@@ -385,6 +411,7 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 						showContextMenu({
 							items: [
 								{
+									id: 'delete',
 									label: 'Delete',
 									description: 'Delete a node from the editor, removing its connections.',
 									action() {
@@ -419,19 +446,9 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 						// );
 					}
 
-					const items: MenuItem[] = [];
 					const pos: Position = { x: context.data.event.clientX, y: context.data.event.clientY };
-					for (const nodeItem of baseNodeMenuItems) {
-						items.push({
-							...nodeItem,
-							async action() {
-								const node = nodeItem.create();
-								await editor.addNode(node);
-								const localPos = clientToSurfacePos({ pos, factory });
-								await area.translate(node.id, localPos);
-							}
-						});
-					}
+					const items: MenuItem[] = getMenuItemsFromNodeItems({factory, pos, nodeItems: baseNodeMenuItems});
+					
 					// Spawn context menu
 					showContextMenu({
 						items,

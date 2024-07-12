@@ -16,13 +16,9 @@ import { isConnectionInvalid } from '$graph-editor/plugins/typed-sockets';
 import type { Socket } from '$graph-editor/socket/Socket.svelte';
 import { findSocket } from '$graph-editor/socket/utils';
 import type { Node } from '$graph-editor/nodes';
-import { moonMenuVisibleStore } from '$lib/oldMenu/context-menu/moonContextMenu';
 import { XmlNode } from '$graph-editor/nodes/XML';
+import { ContextMenu, showContextMenu } from '$graph-editor/plugins/context-menu';
 
-let dropMenuVisible = false;
-moonMenuVisibleStore.subscribe((value) => {
-	dropMenuVisible = value;
-});
 
 export class ConnectionDropEvent extends Event {
 	public readonly pos: { x: number; y: number };
@@ -47,59 +43,58 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 		super();
 	}
 
+	/**
+	 * Handles pointer down and up events to control interactive connection creation.
+	 * @param event 
+	 * @param type 
+	 */
 	override async pick(event: PointerEvent, type: EventType): Promise<void> {
+		const pointedElements = document.elementsFromPoint(event.clientX, event.clientY);
+
+		// @ts-expect-error
+		const socketData = findSocket(this.socketsCache, pointedElements) as
+			| (SocketData & { payload: Socket })
+			| undefined;
+
 		// select socket on right click
 		if (event.button == 0) {
-			const pointedElements = document.elementsFromPoint(event.clientX, event.clientY);
-			// @ts-expect-error
-			const droppedSocketData = findSocket(this.socketsCache, pointedElements) as
-				| (SocketData & { payload: Socket })
-				| undefined;
-			const node = droppedSocketData?.payload.node;
+			const node = socketData?.payload.node;
 
 			if (type === 'down') {
-				if (droppedSocketData) {
-					this.picked = true;
-				}
+				if (socketData === undefined) return;
+				console.debug('Pick connection');
+				this.picked = true;
 			}
 
 			if (type === 'up' && this.picked && this.lastPickedSockedData) {
 				this.picked = false;
 				// Check if the pointer is over a socket
 
-				if (!droppedSocketData) {
+				if (!socketData) {
 					const area: AreaPlugin<Schemes, AreaExtra> = this.parent;
-					area.container.dispatchEvent(
-						new ConnectionDropEvent(
-							event,
-							() => this.drop(),
-							this.lastPickedSockedData as unknown as SocketData & { payload: Socket },
-							this.factory
-						)
-					);
+					showContextMenu({
+						pos: {x: event.clientX, y: event.clientY},
+						searchbar: true,
+						items: [],
+						onHide: () => {
+							this.drop()
+						}
+					})
 					return;
 				}
 			}
 		}
-
 		if (event.button == 2) {
 			if (type === 'up') return;
-			const pointedElements = document.elementsFromPoint(event.clientX, event.clientY);
-
-			// @ts-expect-error
-			const pickedSocketData = findSocket(this.socketsCache, pointedElements);
-			if (pickedSocketData === undefined) return;
 
 			// pickedSocket.selected = !pickedSocket.selected;
 			// @ts-expect-error
-			const node: Node = this.editor.getNode(pickedSocketData.nodeId);
+			const node: Node = this.editor.getNode(socketData.nodeId);
 			const socket = (
-				pickedSocketData.side === 'input'
-					? node.inputs[pickedSocketData.key]
-					: node.outputs[pickedSocketData.key]
+				socketData.side === 'input' ? node.inputs[socketData.key] : node.outputs[socketData.key]
 			)?.socket;
 			if (socket === undefined)
-				throw new Error(`Socket not found for node ${node.id} and key ${pickedSocketData.key}`);
+				throw new Error(`Socket not found for node ${node.id} and key ${socketData.key}`);
 
 			this.lastClickedSocket = true;
 			event.preventDefault();
@@ -208,7 +203,7 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 			}
 		};
 		return new (
-			socketData.payload.isArray &&
+			socketData.payload.datastructure === 'array' &&
 			socketData.payload.node instanceof XmlNode &&
 			socketData.key === 'children'
 				? BidirectFlow
@@ -218,7 +213,7 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 
 	connectionPlugin.addPipe(async (ctx) => {
 		// prevent the connection from moving when the drop menu is visible
-		if (ctx.type === 'pointermove' && dropMenuVisible) {
+		if (ctx.type === 'pointermove' && ContextMenu.instance.visible) {
 			return;
 		}
 

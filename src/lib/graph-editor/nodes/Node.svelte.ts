@@ -101,6 +101,10 @@ export interface InDataParams<N> {
 	index?: number;
 }
 
+function sortedByIndex<K extends string | number, V extends {index?:number}>(entries: [K, V][]): [K, V][] {
+	return entries.toSorted((a, b) => (a[1].index ?? 0) - (b[1].index ?? 0));
+}
+
 export interface NodeParams {
 	// <Inputs extends {
 	// 			[key in string]: Socket;
@@ -212,7 +216,10 @@ export class Node<
 	extends ClassicPreset.Node<Inputs, Outputs, Controls>
 	implements DataflowNode, ComponentSupportInterface
 {
+	width = $state();
+	height = $state();
 	static description: string = '';
+	static visible: boolean = true;
 	static inputTypes?: string[];
 	static outputTypes?: string[];
 
@@ -228,8 +235,12 @@ export class Node<
 	static id: string;
 	static nodeCounts = BigInt(0);
 	state = $state<Partial<State>>({} as State);
-	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = {};
-	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } = {};
+	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = $state({});
+	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } = $state({});
+
+	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)));
+	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)));
+	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)));
 	readonly pythonComponent: PythonNodeComponent;
 	readonly socketSelectionComponent: R_SocketSelection_NC;
 	readonly ingoingDataConnections: Record<string, Connection<Node, Node>[]> = {};
