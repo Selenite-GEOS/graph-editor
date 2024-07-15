@@ -4,3 +4,5 @@ export * from './utils';
 export * from './Output';
 export * from './Input.svelte';
 export * from './control';
+
+export type Side = 'input' | 'output'

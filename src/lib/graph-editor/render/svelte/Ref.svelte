@@ -2,6 +2,7 @@
 	type RefUpdate = (ref: HTMLElement) => void;
 
 	import { onMount } from 'svelte';
+	import { fade, slide } from 'svelte/transition';
 
 	export let init: RefUpdate;
 	export let unmount: RefUpdate;
@@ -21,4 +22,4 @@
 	});
 </script>
 
-<span {...$$restProps} bind:this={ref} />
+<span {...$$restProps} bind:this={ref} class="grid {$$restProps.class}" />

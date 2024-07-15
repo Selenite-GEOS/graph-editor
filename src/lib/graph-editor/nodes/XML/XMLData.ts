@@ -1,4 +1,4 @@
-import { ErrorWNotif } from '$lib/global';
+import { ErrorWNotif } from '$lib/global/index.svelte';
 
 function arrayToXml(obj: object): string {
 	if (obj instanceof Array) {

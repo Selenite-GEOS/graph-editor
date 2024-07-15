@@ -3,7 +3,7 @@
 	import type { NodeEditorSaveData } from '$graph-editor/NodeEditor';
 	import { faStar as faStarSolid, faUser } from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
-	import { ErrorWNotif, _, getContext } from '$lib/global';
+	import { ErrorWNotif, _, getContext } from '$lib/global/index.svelte';
 	import { draggable } from '@neodrag/svelte';
 	import type { DragData } from '../../graph-editor/editor/types';
 	import { locale } from 'svelte-i18n';

@@ -9,7 +9,7 @@ import type { EditorExample } from '$graph-editor/examples';
 import { MegaSetup } from './MegaSetup';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import type { GeosDataContext } from '$lib/geos';
-import type { NewGeosContext, getModalStore } from '$lib/global';
+import type { NewGeosContext, getModalStore } from '$lib/global/index.svelte';
 import { Presets as HistoryPresets, type HistoryActions } from 'rete-history-plugin';
 import { HistoryPlugin } from '$graph-editor/plugins/history';
 import { CommentPlugin, CommentExtensions } from '$graph-editor/plugins/CommentPlugin';

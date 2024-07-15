@@ -15,7 +15,7 @@
 	import { newLocalId } from '$lib/utils';
 	import { faClock } from '@fortawesome/free-regular-svg-icons';
 	// import { Popup } from '$lib/layout';
-	import { _ } from '$lib/global';
+	import { _ } from '$lib/global/index.svelte';
 	import { writable } from 'svelte/store';
 	import { XmlNode } from '$graph-editor/nodes/XML/XmlNode';
 	import { MacroNode } from '$graph-editor/nodes/MacroNode';

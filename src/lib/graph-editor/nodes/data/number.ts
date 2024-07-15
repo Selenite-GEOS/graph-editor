@@ -15,7 +15,7 @@ import { InputControlNode } from './common-data-nodes.svelte';
  * A node that outputs a number.
  */
 @registerNode('number.NumberNode')
-@description('A node that outputs a number.')
+@description('Produces a number.')
 @tags('float', 'real', 'x', 'y', 'z', 't')
 export class NumberNode extends InputControlNode<'number'> {
 	constructor(params?: NodeParams) {

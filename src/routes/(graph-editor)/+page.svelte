@@ -8,7 +8,8 @@
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
-	import { shortcut } from '@selenite/commons';
+	import { capitalize, shortcut } from '@selenite/commons';
+	import { themeControl } from '$lib/global/index.svelte';
 
 	let editor = $state<NodeEditor>();
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
@@ -40,8 +41,8 @@
 		);
 
 		return () => {
-			editor?.factory?.destroyArea()
-		}
+			editor?.factory?.destroyArea();
+		};
 	});
 	// $inspect('GraphEditor', editor);
 	function save() {
@@ -54,35 +55,69 @@
 		$saveData = saveData;
 	}
 	let container = $state<HTMLDivElement>();
-	let screenProportion = $state(95);
+	let screenProportion = $state(100);
+	$effect(() => {
+		themeControl.isLight;
+		editor?.area?.emit({ type: 'gridline-update' });
+	});
+	let isGridlinesVisible = $state(true)
+	function toggleGridlinesVisibility() {
+		isGridlinesVisible = !isGridlinesVisible
+		editor?.factory?.getArea()?.emit({ type: 'gridline-toggle-visibility' })
+	}
 </script>
 
 <ContextMenuComponent />
 <div class="h-[100vh] grid relative bg-base-200">
-	<button
-		type="button"
-		disabled={!editorReady}
-		class="absolute top-4 left-4 hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all"
-		onclick={() => save()}
-	>
-		Save
-	</button>
+	<div class="z-10 absolute top-4 left-4 flex gap-2 items-end">
+		<button
+			type="button"
+			disabled={!editorReady}
+			class=" hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all"
+			onclick={() => save()}
+		>
+			Save
+		</button>
+		<button
+			class:btn-secondary={isGridlinesVisible}
+			type="button"
+			class="btn"
+			onclick={toggleGridlinesVisibility}
+		>
+			Grid
+		</button>
+		<select class="select select-bordered" bind:value={themeControl.theme}>
+			<option value="">Default</option>
+			{#each themeControl.themes as theme}
+				<option value={theme}>{capitalize(theme)}</option>
+			{/each}
+		</select>
+	</div>
 	<div
-	use:shortcut={{
-		shortcuts: {key: 'a'},
-		async action(e) {
-			await editor?.factory?.arrange?.layout()
-			const area = editor?.factory?.area
-			if (!area) return;
-			await AreaExtensions.zoomAt(area, editor?.getNodes() ?? [])
-		},
-	}
-	}
+		use:shortcut={{
+			shortcuts: { key: 'a' },
+			async action(e) {
+				await editor?.factory?.arrange?.layout();
+				const area = editor?.factory?.area;
+				if (!area) return;
+				await AreaExtensions.zoomAt(area, editor?.getNodes() ?? []);
+			}
+		}}
+		use:shortcut={{
+			shortcuts: { key: 'g' },
+			action: toggleGridlinesVisibility
+		}}
+		use:shortcut={{
+			shortcuts: { key: 't' },
+			action(e) {
+				themeControl.theme = themeControl.nextTheme;
+			}
+		}}
 		class="m-auto"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"
 	>
 		<div
-			class="h-full w-full transition-all opacity-0 bg-neutral"
+			class="h-full w-full transition-all opacity-0 bg-base-100"
 			class:!opacity-100={editorReady}
 			bind:this={container}
 		></div>

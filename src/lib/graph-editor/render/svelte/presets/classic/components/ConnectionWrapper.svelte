@@ -1,25 +1,39 @@
 <script lang="ts">
-	import type { ComponentType } from 'svelte';
-	import { type SvelteComponent, onMount } from 'svelte';
-	import type { ClassicScheme } from '../types';
-	import type { Position } from '../../../types';
+	import type { Position } from '$graph-editor/common';
+	import type { Schemes } from '$graph-editor/schemes';
+	import { type Component, onMount } from 'svelte';
 	type PositionWatcher = (cb: (value: Position) => void) => () => void;
 
-	export let component: ComponentType<SvelteComponent>;
-	export let data: ClassicScheme['Connection'] & { isLoop?: boolean };
-	export let start: Position | PositionWatcher;
-	export let end: Position | PositionWatcher;
-	export let path: (start: Position, end: Position) => Promise<string>;
+	type Props = {
+		component: Component;
+		data: Schemes['Connection'] & { isLoop?: boolean };
+		start: Position | PositionWatcher;
+		end: Position | PositionWatcher;
+		path: (start: Position, end: Position) => Promise<string>;
+	};
+	let { component, data, start, end, path }: Props = $props();
+	const conn = $derived(data)
+	const factory = $derived(conn.factory)
+	
+	const sourceType = $derived(factory?.getNode(conn.source)?.outputs[conn.sourceOutput]?.socket.type)
+	// const targetType = $derived(factory?.getNode(conn.target)?.inputs[conn.targetInput]?.socket.type)
 
-	let observedStart = { x: 0, y: 0 };
-	let observedEnd = { x: 0, y: 0 };
-	let observedPath = '';
+	// const connType = $derived(sourceType)
 
-	$: startPosition = start && 'x' in start ? start : observedStart;
-	$: endPosition = end && 'x' in end ? end : observedEnd;
-	$: {
+	let observedStart = $state({ x: 0, y: 0 });
+	let observedEnd = $state({ x: 0, y: 0 });
+	let observedPath = $state('');
+
+
+	const startPosition = $derived(start && 'x' in start ? start : observedStart);
+	const endPosition = $derived(end && 'x' in end ? end : observedEnd);
+
+	$effect(() => {
+		startPosition;
+		endPosition;
 		fetchPath(startPosition, endPosition);
-	}
+	})	
+
 
 	async function fetchPath(start: Position, end: Position) {
 		observedPath = await path(start, end);
@@ -40,7 +54,9 @@
 <svelte:component
 	this={component}
 	{...data}
+	type={sourceType}
 	start={observedStart}
 	end={observedEnd}
 	path={observedPath}
+
 />

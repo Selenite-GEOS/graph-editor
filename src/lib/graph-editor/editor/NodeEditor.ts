@@ -6,7 +6,7 @@ import type { Variable } from '../variables';
 import { get, writable, type Readable, type Writable } from 'svelte/store';
 import { NodeFactory } from './NodeFactory';
 import wu from 'wu';
-import { _ } from '$lib/global';
+import { _ } from '$lib/global/index.svelte';
 
 export type CommentSaveData = {
 	id: string;
@@ -29,6 +29,9 @@ export type NodeEditorSaveData = {
  */
 export class NodeEditor extends BaseNodeEditor<Schemes> {
 	public factory?: NodeFactory;
+	get area() {
+		return this.factory?.getArea();
+	}
 	variables: Writable<Record<string, Variable>> = writable({});
 
 	// constructor() {

@@ -3,7 +3,7 @@
 	import { popup, type PopupSettings } from '@skeletonlabs/skeleton';
 	import Fa, { type IconSize } from 'svelte-fa';
 	import type { ButtonExec, ButtonExecNoNeedFactory } from '.';
-	import { ErrorWNotif, getContext, _, keyboardShortcut } from '$lib/global';
+	import { ErrorWNotif, getContext, _, keyboardShortcut } from '$lib/global/index.svelte';
 	import newLocalId from 'locally-unique-id-generator';
 	import { fade, scale } from 'svelte/transition';
 

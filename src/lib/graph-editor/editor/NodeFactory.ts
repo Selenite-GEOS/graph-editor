@@ -19,7 +19,7 @@ import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine'
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
-import { ErrorWNotif, _ } from '$lib/global';
+import { ErrorWNotif, _ } from '$lib/global/index.svelte';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
 import wu from 'wu';
 import * as Nodes from '../nodes';

@@ -8,7 +8,7 @@
 	} from '@skeletonlabs/skeleton';
 	import { EditorButton, EditorButtons } from './buttons';
 	import { VariablesListOverlay } from './overlay';
-	import { _, getContext } from '$lib/global';
+	import { _, getContext } from '$lib/global/index.svelte';
 	import {
 		connectionPathTypes,
 		assignConnectionPath,

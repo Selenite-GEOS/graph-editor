@@ -1,6 +1,6 @@
 import { capitalizeWords } from '$utils/string';
 import { type Setup } from '$graph-editor/setup';
-import { _ } from '$lib/global';
+import { _ } from '$lib/global/index.svelte';
 import { NodeFactory } from '$graph-editor/editor';
 import { Node, nodeRegistry, type NodeConstructor } from '$graph-editor/nodes';
 import { get } from 'svelte/store';
@@ -343,6 +343,7 @@ function getMenuItemsFromNodeItems({ factory, pos, nodeItems }: { factory: NodeF
 			action: async () => {
 				const node = new nodeClass({ factory });
 				await editor.addNode(node);
+				console.log(area, pos, factory)
 				const localPos = clientToSurfacePos({ pos, factory });
 				await area?.translate(node.id, localPos);
 			},
@@ -352,7 +353,7 @@ function getMenuItemsFromNodeItems({ factory, pos, nodeItems }: { factory: NodeF
 }
 export type ShowContextMenu = (params: {
 	pos: Position;
-	items: MenuItem[];
+	items: Partial<MenuItem>[];
 	searchbar: boolean;
 	onHide?: () => void;
 }) => void;

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { EditorButton, type ButtonExec } from '.';
-	import { _, getContext, keyboardShortcut } from '$lib/global';
+	import { _, getContext, keyboardShortcut } from '$lib/global/index.svelte';
 	import { faGem } from '@fortawesome/free-solid-svg-icons';
 	import { AreaExtensions } from 'rete-area-plugin';
 	import wu from 'wu';

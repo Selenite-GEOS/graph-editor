@@ -25,7 +25,7 @@ import AddXmlAttributeControlCmpnt from '$graph-editor/render/svelte/presets/cla
 import { ConnectionPathPlugin } from 'rete-connection-path-plugin';
 // import { curveStep, type CurveFactory, curveBasis, curveLinear, curveMonotoneX } from 'd3-shape';
 import { get } from 'svelte/store';
-import { ErrorWNotif } from '$lib/global';
+import { ErrorWNotif } from '$lib/global/index.svelte';
 import { AddXmlAttributeControl, type Connection } from '$graph-editor';
 import { assignConnectionPath } from '$graph-editor/connection-path';
 

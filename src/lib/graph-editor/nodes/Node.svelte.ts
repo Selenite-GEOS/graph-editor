@@ -2,7 +2,7 @@ import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
 import type { AreaExtra } from '$graph-editor/area';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
-import type { NodeFactory } from '$graph-editor/editor';
+import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
 import { Stack } from '$lib/types/Stack';
 import {
@@ -29,8 +29,11 @@ import {
 	type SocketDatastructure
 } from '$graph-editor/socket';
 
-import { ErrorWNotif } from '$lib/global';
+import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { ConverterNode } from './data/common-data-nodes.svelte';
+import type { AreaPlugin } from 'rete-area-plugin';
+import type { Schemes } from '$graph-editor/schemes';
+import { tick } from 'svelte';
 
 /**
  * A map of node classes indexed by their id.
@@ -216,8 +219,45 @@ export class Node<
 	extends ClassicPreset.Node<Inputs, Outputs, Controls>
 	implements DataflowNode, ComponentSupportInterface
 {
-	width = $state();
-	height = $state();
+	#width = $state(100);
+	#height = $state(50);
+
+	get width() {
+		return this.#width
+	}
+	get height() {
+		return this.#height
+	}
+	set height(h: number) {
+		this.#height = h
+		this.emitResized()
+	}
+	set width(w: number) {
+		this.#width = w;
+		this.emitResized()
+	}
+	
+	async emitResized() {
+		this.area?.emit({
+			type: 'noderesized',
+			data: { id: this.id, size: { height: this.height, width: this.width } }
+		});
+	}
+	// updateConnections() {
+	// 	console.debug("update conns")
+	// 	for (const conn of this.getConnections()) {
+	// 		this.updateElement('connection', conn.id)
+	// 	}
+	// }
+
+	get editor(): NodeEditor | undefined {
+		return this.factory?.getEditor();
+	}
+
+	get area(): AreaPlugin<Schemes, AreaExtra> | undefined {
+		return this.factory?.getArea();
+	}
+
 	static description: string = '';
 	static visible: boolean = true;
 	static inputTypes?: string[];
@@ -414,7 +454,7 @@ export class Node<
 	}
 
 	getArea() {
-		return this.factory.getArea();
+		return this.factory?.getArea();
 	}
 
 	// Callback called at the end of execute

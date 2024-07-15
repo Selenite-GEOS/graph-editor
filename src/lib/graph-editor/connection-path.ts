@@ -1,4 +1,4 @@
-import { ErrorWNotif } from '$lib/global';
+import { ErrorWNotif } from '$lib/global/index.svelte';
 import { curveBasis, curveStep, type CurveFactory, curveLinear, curveMonotoneX } from 'd3-shape';
 
 export const connectionPathTypes = ['curve', 'monotone', 'linear', 'step'] as const;

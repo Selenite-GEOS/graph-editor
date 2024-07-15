@@ -10,6 +10,7 @@ import { get } from 'svelte/store';
 import type { Component } from 'svelte';
 import { getSvelteRenderer, type SvelteRenderer } from './renderer.svelte';
 import { ButtonControl, InputControl, Socket } from '$graph-editor/socket';
+import { getDOMSocketPosition } from '../sockets-position.ts/dom-socket-position';
 
 type ComponentProps = Record<string, any> | undefined | void | null;
 type RenderResult = { component: Component; props: ComponentProps } | undefined | void | null;
@@ -145,10 +146,11 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
 	const { AddXmlAttributeControl } = await import('$graph-editor/nodes/XML');
 	const Presets = await import('./presets');
-	sveltePlugin.addPreset(minimapPreset({ size: 200 }));
+	// sveltePlugin.addPreset(minimapPreset({ size: 200 }));
 	// sveltePlugin.addPreset(Presets.contextMenu.setup())
 	sveltePlugin.addPreset(
 		Presets.classic.setup({
+			socketPositionWatcher: getDOMSocketPosition(),
 			customize: {
 				socket(context) {
 					if (context.payload instanceof Socket) {

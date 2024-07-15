@@ -20,7 +20,7 @@
 	import { spawnMoonMenu } from '$lib/oldMenu/context-menu/moonContextMenu';
 	import type { Point } from '$lib/types/Point';
 	import { createActionMenuItem } from '$lib/oldMenu';
-	import { ErrorWNotif, _ } from '$lib/global';
+	import { ErrorWNotif, _ } from '$lib/global/index.svelte';
 	import ArrayEditor from './ArrayEditorModal.svelte';
 
 	let v: Variable;

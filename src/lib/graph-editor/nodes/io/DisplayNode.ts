@@ -19,9 +19,6 @@ export class DisplayNode extends Node<
 	{},
 	{ display: InputControl<'text'> }
 > {
-	height = 120;
-	width = 300;
-
 	constructor(
 		params: NodeParams & {
 			initial?: string;

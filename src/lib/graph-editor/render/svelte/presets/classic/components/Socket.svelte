@@ -45,7 +45,7 @@
 		border-radius: math.div($socket-size, 2);
 		width: $socket-size;
 		height: $socket-size;
-		margin: $socket-margin;
+		margin: $socket-margin 0;
 		vertical-align: middle;
 		background: var(--background);
 		z-index: 2;

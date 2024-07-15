@@ -9,7 +9,7 @@
 		_,
 		ErrorWNotif,
 		keyboardShortcut
-	} from '$lib/global';
+	} from '$lib/global/index.svelte';
 	import type { NodeEditor, NodeEditorSaveData, NodeFactory } from '$graph-editor';
 	import { isNodeEditorSaveData } from '$graph-editor/utils';
 

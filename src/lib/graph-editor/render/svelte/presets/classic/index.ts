@@ -45,7 +45,7 @@ type ClassicProps<Schemes extends ClassicScheme, K> = {
  */
 export function setup<Schemes extends ClassicScheme, K extends SvelteArea2D<Schemes>>(
 	props?: ClassicProps<Schemes, K>
-): RenderPreset<Schemes, K> {
+): RenderPreset {
 	const positionWatcher =
 		typeof props?.socketPositionWatcher === 'undefined'
 			? getDOMSocketPosition<Schemes, K>()
@@ -67,7 +67,7 @@ export function setup<Schemes extends ClassicScheme, K extends SvelteArea2D<Sche
 				return { data: payload, emit };
 			} else if (context.data.type === 'connection') {
 				const { start, end } = context.data;
-
+				// console.log("Connection")
 				return {
 					data: payload,
 					...(start ? { start } : {}),

@@ -154,6 +154,14 @@ export const showContextMenu: ShowContextMenu = ({ items, pos, searchbar, onHide
 	menu.visible = true;
 	menu.pos = pos;
 	menu.searchbar = searchbar;
-	menu.items = items;
+	menu.items = items.map((item,i) => {return {
+		label: String(i),
+		id: String(i),
+		description: '',
+		action: () => {console.warn("Missing action for menu item", item.label ?? String(i))},
+		path: [],
+		tags: [],
+		...item
+	}});
 	menu.onHide = onHide;
 };

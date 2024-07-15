@@ -10,7 +10,7 @@ import {
 	Comment
 } from 'rete-comment-plugin';
 import { get } from 'svelte/store';
-import { _ } from '$lib/global';
+import { _ } from '$lib/global/index.svelte';
 import wu from 'wu';
 
 export class CommentPlugin<

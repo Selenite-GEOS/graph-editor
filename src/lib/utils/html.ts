@@ -54,7 +54,7 @@ export function oldClientToSurfacePos({
 }): [number, number] {
 	const area = factory.getArea();
 	if (!area) throw new Error('No area');
-	const surface = area.container.children[0] as HTMLElement;
+	const surface = area.area.content.holder as HTMLElement;
 	const surfaceRect = surface.getBoundingClientRect();
 	const surfacePos = { x: surfaceRect.left, y: surfaceRect.top };
 

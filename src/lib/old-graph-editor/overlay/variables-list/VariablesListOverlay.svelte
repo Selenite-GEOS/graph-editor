@@ -3,7 +3,7 @@
 
 	import { faAngleDown, faPlus } from '@fortawesome/free-solid-svg-icons';
 	import { localStorageStore, modeCurrent } from '@skeletonlabs/skeleton';
-	import { _, getContext, keyboardShortcut } from '$lib/global';
+	import { _, getContext, keyboardShortcut } from '$lib/global/index.svelte';
 	import Fa from 'svelte-fa';
 	import { browser } from '$app/environment';
 	import { onMount, tick } from 'svelte';

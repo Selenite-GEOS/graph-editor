@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { faFileCode } from '@fortawesome/free-solid-svg-icons';
 	import EditorButton from './EditorButton.svelte';
-	import { _, getContext } from '$lib/global';
+	import { _, getContext } from '$lib/global/index.svelte';
 	import type { CodeEditorIntegration } from '$lib/editor';
 	import { onDestroy, onMount } from 'svelte';
 	import { localStorageStore } from '@skeletonlabs/skeleton';

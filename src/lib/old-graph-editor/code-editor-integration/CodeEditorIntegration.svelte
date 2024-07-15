@@ -4,7 +4,7 @@
 	import type { EditorContext } from '..';
 	import CodeEditorIntegrationButton from './CodeEditorIntegrationButton.svelte';
 	import { notifications } from '@mantine/notifications';
-	import { ErrorWNotif, getContext, _ } from '$lib/global';
+	import { ErrorWNotif, getContext, _ } from '$lib/global/index.svelte';
 	import 'regenerator-runtime/runtime';
 	import wu from 'wu';
 	import { structures } from 'rete-structures';

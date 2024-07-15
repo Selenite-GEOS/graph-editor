@@ -1,7 +1,7 @@
 import { type BaseSchemes, NodeEditor, type Root, Scope } from 'rete';
 import type { Connection } from '$graph-editor/nodes';
 import { ExecSocket, type Socket } from '$graph-editor/socket';
-import { ErrorWNotif } from '$lib/global';
+import { ErrorWNotif } from '$lib/global/index.svelte';
 
 export type XMLAttrType = `xmlAttr:${string}`;
 export type XMLElementType = `xmlElement:${string}`;

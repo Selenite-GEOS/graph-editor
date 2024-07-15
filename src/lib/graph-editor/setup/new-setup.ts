@@ -10,6 +10,7 @@ import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';
 import { contextMenuSetup, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
+import {  gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
 
 export type XmlContext = {};
 
@@ -85,6 +86,20 @@ export async function setupFullGraphEditor(
 				const typedSocketsPlugin = new TypedSocketsPlugin<Schemes>();
 				editor.use(typedSocketsPlugin);
 			},
+			// Temporary area 
+			{
+				name: 'Test area',
+				type: 'area',
+				setup: ({area}) => {
+					area.addPipe((ctx) => {
+						// if (ctx.type === 'render') {
+						// 	console.log(ctx.data)
+						// }
+						// console.log(area.elements)
+						return ctx;
+					})
+				}
+			},
 			// Arrange
 			async ({ editor, area, factory }) => {
 				if (!area) {
@@ -115,6 +130,8 @@ export async function setupFullGraphEditor(
 				factory.accumulating = accumulating;
 				factory.selector = selector;
 			},
+			// Gridlines
+			gridLinesSetup,
 			// History
 			async ({ area, factory }) => {
 				if (!area) {

@@ -5,7 +5,7 @@
 	import { _ } from 'svelte-i18n';
 	import GraphSearchPanel from './GraphSearchPanel.svelte';
 	import { fade, slide } from 'svelte/transition';
-	import { getContext, keyboardShortcut } from '$lib/global';
+	import { getContext, keyboardShortcut } from '$lib/global/index.svelte';
 
 	const session = getContext('session');
 

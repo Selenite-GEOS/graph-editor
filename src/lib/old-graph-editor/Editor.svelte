@@ -10,7 +10,7 @@
 
 	import type { EditorExample } from '$graph-editor/example/types';
 	import { capitalize, newLocalId, newUuid } from '$utils';
-	import { _, getContext, keyboardShortcut, notifications } from '$lib/global';
+	import { _, getContext, keyboardShortcut, notifications } from '$lib/global/index.svelte';
 	export let position = 'absolute';
 	export let hidden = true;
 	export let name = $_('editor.default-name');

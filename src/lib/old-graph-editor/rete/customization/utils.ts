@@ -1,6 +1,6 @@
 import type { InputControlTypes } from '../../../graph-editor/socket/control/Control.svelte';
 import type { SocketType } from '../../../graph-editor/plugins/typed-sockets';
-import type { Socket } from '$graph-editor/socket';
+import { Socket } from '$graph-editor/socket';
 import { $socketcolor } from './presets/classic/vars';
 
 export const colorMap: { [key in SocketType]?: string } = {
@@ -26,13 +26,14 @@ export const colorMap: { [key in SocketType]?: string } = {
 	groupNameRef: '#5165b2'
 };
 
-export function assignColor(s: Socket): string {
+export function assignColor(s: Socket | SocketType): string {
 	// if (s.required)
 	// 	return '#b38a8a';
-	if (s.type.startsWith('xml')) {
+	const type = s instanceof Socket ? s.type : s;
+	if (type.startsWith('xml')) {
 		// return random color generated from the name and make sure saturation doesn't go over 50%
 		// Convert the string seed into a numerical value
-		const seed = s.type;
+		const seed = type;
 		let seedValue = 0;
 		for (let i = 0; i < seed.length; i++) {
 			seedValue += seed.charCodeAt(i);
@@ -56,7 +57,7 @@ export function assignColor(s: Socket): string {
 		return color;
 	}
 
-	return colorMap[s.type] || $socketcolor;
+	return colorMap[type] || $socketcolor;
 }
 
 export function assignControl(

@@ -1,4 +1,5 @@
 import {
+	description,
 	Node,
 	registerNode,
 	tags,
@@ -9,6 +10,7 @@ import { Socket } from '../../socket/Socket.svelte';
 
 @registerNode('math.AddNode')
 @tags('+', 'sum')
+@description("Adds two numbers together.")
 export class AddNode extends Node<{ a: Socket<'number'>; b: Socket<'number'> }, { value: Socket }> {
 	constructor(params: NodeParams & { a?: number; b?: number } = {}) {
 		super({ label: 'Add', height: 190, ...params });

@@ -4,7 +4,7 @@ import { camlelcaseize, titlelize } from '$lib/utils/string';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
 import { type InputControl, type assignControl, type Socket, Control } from '$graph-editor/socket';
-import { ErrorWNotif } from '$lib/global';
+import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { GeosSchema } from '$lib/geos';
 import type { NodeFactory } from '$graph-editor/editor';
 import 'regenerator-runtime/runtime';

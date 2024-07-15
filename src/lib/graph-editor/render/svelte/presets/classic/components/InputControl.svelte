@@ -11,13 +11,14 @@
 	import { stopPropagation } from '@selenite/commons';
 	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
 	import EditArray from './EditArray.svelte';
+	import { fade } from 'svelte/transition';
 
 	type Props = {
 		data: InputControl<InputControlType>;
-		width?: string;
+		// width?: string;
 		inputTextSize?: string;
 	};
-	let { data: inputControl, width = 'w-full', inputTextSize = 'text-md' }: Props = $props();
+	let { data: inputControl, inputTextSize = 'text-md' }: Props = $props();
 	let type = $derived(inputControl.type);
 	const isCheckbox = $derived(type === 'checkbox');
 	$inspect(inputControl.value).with(console.debug);
@@ -30,7 +31,13 @@
 		integer: 'number',
 		'group-name-ref': 'text'
 	};
+	// let width: string = $derived.by(() => {
+	// 	// if (type === )
+	// 	if (type === "number" || type === "integer") return 'w-[8rem]'
+	// 	return '';
+	// })
 	let inputProps: HTMLInputAttributes = $derived({
+		placeholder: inputControl.socketType,
 		class: `${isCheckbox ? 'checkbox' : 'input input-bordered'}`,
 		readonly: inputControl.readonly,
 		type: simpleTypes.includes(type as (typeof simpleTypes)[number])

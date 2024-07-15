@@ -1,127 +1,149 @@
 <script lang="ts">
-	import type { Node } from '$graph-editor/nodes';
-	import { stopPropagation } from '@selenite/commons';
-	import OldNode from './OldNode.svelte';
+	import type { Node, NodeConstructor } from '$graph-editor/nodes';
 	import Ref from '$graph-editor/render/svelte/Ref.svelte';
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
+	import { themeControl } from '$lib/global/index.svelte';
 
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
+	const constructor = $derived(node.constructor as NodeConstructor);
+	let transitionEnabled = $state(false);
+
+	// Avoid transitions on mount
+	$effect(() => {
+		setTimeout(() => {
+			transitionEnabled = true;
+		}, 50)
+	})
 </script>
 
 <section
-	class="bg-base-300 grid select-none p-4 rounded-md cursor-pointer gap-2 grid-flow-row-dense"
-	bind:clientWidth={node.width}
-	bind:clientHeight={node.height}
+	role="cell"
+	tabindex="0"
+	class:transition-all={transitionEnabled}
+	class="border-base-content border border-opacity-0 overflow-hidden bg-base-300 bg-opacity-85 rounded-box {themeControl.isLight ? 'hover:brightness-105' :  'hover:brightness-[1.15]'}"
+	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
 >
-	<h1 class="card-title mb-3 col-span-full">{node.label}</h1>
+	<div
+		class=" grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
+		bind:clientWidth={node.width}
+		bind:clientHeight={node.height}
+	>
+		<h1 class="card-title mb-3 col-span-fuaall text-nowrap" title={constructor.description}>{node.label}</h1>
 
-	{#each node.sortedControls as [key, control] (key)}
-		<Ref
-			class="h-full !flex items-center justify-center control col-span-full"
-			data-testid="control"
-			init={(element) =>
-				emit({
-					type: 'render',
-					data: {
-						type: 'control',
-						element,
-						payload: control
-					}
-				})}
-			unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-		/>
-	{/each}
-	<div class="grid grid-flow-dense gap-2">
-	{#each node.sortedInputs as [key, input], i (key)}
-		<div class="text-md items-center flex col-start-1" data-testid={key}>
+		{#each node.sortedControls as [key, control] (key)}
 			<Ref
-				data-testid="input-socket"
+				class="h-full !flex items-center justify-center control col-span-full"
+				data-testid="control"
 				init={(element) =>
 					emit({
 						type: 'render',
 						data: {
-							type: 'socket',
-							side: 'input',
-							key,
-							nodeId: node.id,
+							type: 'control',
 							element,
-							payload: input.socket
+							payload: control
 						}
 					})}
 				unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 			/>
-			{#if !input.control || !input.showControl}
-				<div class="input-title" data-testid="input-title">
-					{input.label || ''}{#if input.socket.isRequired}<span
-							class="ps-0.5 text-lg"
-							title="required">*</span
-						>{/if}
+		{/each}
+		<form class="grid grid-flow-dense gap-2">
+			{#each node.sortedInputs as [key, input], i (key)}
+				<div
+					class="text-md justify-items-start items-center grid grid-cols-subgrid col-start-1 col-span-2"
+					data-testid={key}
+				>
+					<Ref
+						data-testid="input-socket"
+						init={(element) =>
+							emit({
+								type: 'render',
+								data: {
+									type: 'socket',
+									side: 'input',
+									key,
+									nodeId: node.id,
+									element,
+									payload: input.socket
+								}
+							})}
+						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+					/>
+					{#if !input.control || !input.showControl}
+						<div class="input-title" data-testid="input-title">
+							{input.label || ''}{#if input.socket.isRequired}<span
+									class="ps-0.5 text-lg"
+									title="required">*</span
+								>{/if}
+						</div>
+					{:else}
+						<Ref
+							class="h-full !flex items-center input-control"
+							data-testid="input-control"
+							init={(element) =>
+								emit({
+									type: 'render',
+									data: {
+										type: 'control',
+										element,
+										payload: input.control
+									}
+								})}
+							unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+						/>
+					{/if}
 				</div>
-			{:else}
-				<Ref
-					class="h-full !flex items-center input-control"
-					data-testid="input-control"
-					init={(element) =>
-						emit({
-							type: 'render',
-							data: {
-								type: 'control',
-								element,
-								payload: input.control
-							}
-						})}
-					unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-				/>
-			{/if}
-		</div>
-	{/each}
-	{#each node.sortedOutputs as [key, output] (key)}
-		<div class="text-md justify-end items-center flex col-start-2" data-testid={key}>
-			<Ref
-				data-testid="output-socket"
-				init={(element) =>
-					emit({
-						type: 'render',
-						data: {
-							type: 'socket',
-							side: 'output',
-							key,
-							nodeId: node.id,
-							element,
-							payload: output.socket
-						}
-					})}
-				unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-			/>
-			{#if !output.control || !output.showControl}
-				<div class="output-title" data-testid="output-title">
-					{output.label || ''}{#if output.socket.isRequired}<span
-							class="ps-0.5 text-lg"
-							title="required">*</span
-						>{/if}
+			{/each}
+			{#each node.sortedOutputs as [key, output] (key)}
+				<div
+					class="text-md justify-items-end items-center grid grid-cols-subgrid col-start-3 col-span-2"
+					data-testid={key}
+				>
+					{#if !output.control || !output.showControl}
+						<div class="output-title" data-testid="output-title">
+							{output.label || ''}{#if output.socket.isRequired}<span
+									class="ps-0.5 text-lg"
+									title="required">*</span
+								>{/if}
+						</div>
+					{:else}
+						<Ref
+							class="h-full !flex items-center output-control"
+							data-testid="output-control"
+							init={(element) =>
+								emit({
+									type: 'render',
+									data: {
+										type: 'control',
+										element,
+										payload: output.control
+									}
+								})}
+							unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+						/>
+					{/if}
+					<Ref
+						data-testid="output-socket"
+						class="text-end"
+						init={(element) =>
+							emit({
+								type: 'render',
+								data: {
+									type: 'socket',
+									side: 'output',
+									key,
+									nodeId: node.id,
+									element,
+									payload: output.socket
+								}
+							})}
+						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+					/>
 				</div>
-			{:else}
-				<Ref
-					class="h-full !flex items-center output-control"
-					data-testid="output-control"
-					init={(element) =>
-						emit({
-							type: 'render',
-							data: {
-								type: 'control',
-								element,
-								payload: output.control
-							}
-						})}
-					unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-				/>
-			{/if}
-		</div>
-	{/each}
+			{/each}
+		</form>
 	</div>
 </section>
-
 <!-- <div class="mt-[10rem]" onpointerdown={stopPropagation}>
 	<OldNode data={node} {emit}/>
 </div> -->
