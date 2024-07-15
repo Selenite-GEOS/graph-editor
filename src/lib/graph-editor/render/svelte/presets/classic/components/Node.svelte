@@ -20,7 +20,6 @@
 	let timeout: NodeJS.Timeout | null = null;
 	let disappearTimeout: NodeJS.Timeout | null = null;
 	$effect(() => {
-		console.log(node.needsProcessing);
 		if (node.needsProcessing) {
 			displayProcessing = true;
 			disappearProcessing = false;
@@ -35,7 +34,6 @@
 			}, 600);
 		}
 	});
-	$inspect("display", displayProcessing, "disappear", disappearProcessing)
 </script>
 
 <section

@@ -86,7 +86,7 @@
 		>
 			Grid
 		</button>
-		<select class="select select-bordered" bind:value={themeControl.theme}>
+		<select class="select select-bordered" title="Theme" bind:value={themeControl.theme}>
 			<option value="">Default</option>
 			{#each themeControl.themes as theme}
 				<option value={theme}>{capitalize(theme)}</option>
