@@ -1,9 +1,0 @@
-query RemoteFileExplorer($explorerInput: RemoteExplorerInput!) {
-	remoteExplorer {
-		files(remoteExplorerInput: $explorerInput) {
-			name
-			isDir
-			path
-		}
-	}
-}

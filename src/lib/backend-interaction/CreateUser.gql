@@ -1,8 +1,0 @@
-mutation CreateUser($user: UserCreateInput!) {
-	createUser(user: $user) {
-		id
-		name
-		email
-		# emailVerified
-	}
-}

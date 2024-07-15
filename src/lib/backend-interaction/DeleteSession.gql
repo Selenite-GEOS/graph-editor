@@ -1,3 +1,0 @@
-mutation DeleteSession($sessionToken: String!) {
-	deleteSession(sessionToken: $sessionToken)
-}

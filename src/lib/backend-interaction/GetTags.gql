@@ -1,6 +1,0 @@
-query GetTags @cache(policy: CacheAndNetwork) {
-	tags {
-		tag
-		timesAdded
-	}
-}

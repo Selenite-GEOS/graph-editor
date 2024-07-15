@@ -1,8 +1,0 @@
-query UserAuthInfo($id: UUID, $email: String, $provider: ProviderInput) {
-	user(id: $id, email: $email, provider: $provider) {
-		id
-		email
-		# emailVerified
-		name
-	}
-}
