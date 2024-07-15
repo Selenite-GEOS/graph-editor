@@ -34,6 +34,7 @@ import type { ConverterNode } from './data/common-data-nodes.svelte';
 import type { AreaPlugin } from 'rete-area-plugin';
 import type { Schemes } from '$graph-editor/schemes';
 import { tick } from 'svelte';
+import { structures } from 'rete-structures';
 
 /**
  * A map of node classes indexed by their id.
@@ -277,7 +278,7 @@ export class Node<
 	state = $state<Partial<State>>({} as State);
 	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = $state({});
 	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } = $state({});
-
+	needsProcessing = $state(false)
 	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)));
 	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)));
 	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)));
@@ -648,7 +649,12 @@ export class Node<
 	}
 
 	processDataflow = () => {
-		this.factory.resetDataflow(this);
+		if (!this.editor) return;
+		this.needsProcessing = true;
+		for (const n of structures(this.editor).successors(this.id).nodes()) {
+			n.needsProcessing = true;
+		}
+		this.factory?.resetDataflow(this);
 	};
 
 	getWaitPromises(nodes: Node[]): Promise<void>[] {

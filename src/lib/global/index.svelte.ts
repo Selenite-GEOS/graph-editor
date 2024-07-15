@@ -76,6 +76,7 @@ class ThemeControl {
 	}
 	themes = $state(themes);
 	#themeIndex = $state(0);
+	previousTheme = $derived(this.themes[(this.themes.length + this.#themeIndex - 1) % this.themes.length])
 	nextTheme = $derived(this.themes[(this.#themeIndex + 1) % this.themes.length]);
 	isLight = $derived(!darkThemes.includes(this.theme as typeof darkThemes[number]));
 }

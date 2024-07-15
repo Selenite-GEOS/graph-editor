@@ -2,7 +2,6 @@
 	import { Modal } from '$graph-editor/plugins/modal';
 	import {
 		defaultInputControlValues,
-		inputControlSocketType,
 		socketToControl,
 		type InputControl,
 		type InputControlType,
@@ -38,7 +37,7 @@
 	// })
 	let inputProps: HTMLInputAttributes = $derived({
 		placeholder: inputControl.socketType,
-		class: `${isCheckbox ? 'checkbox' : 'input input-bordered'}`,
+		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'}`,
 		readonly: inputControl.readonly,
 		type: simpleTypes.includes(type as (typeof simpleTypes)[number])
 			? inputType[type as (typeof simpleTypes)[number]]

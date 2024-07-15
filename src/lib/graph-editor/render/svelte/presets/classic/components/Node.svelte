@@ -13,23 +13,51 @@
 	$effect(() => {
 		setTimeout(() => {
 			transitionEnabled = true;
-		}, 50)
-	})
+		}, 50);
+	});
+	let displayProcessing = $state(false);
+	let disappearProcessing = $state(false);
+	let timeout: NodeJS.Timeout | null = null;
+	let disappearTimeout: NodeJS.Timeout | null = null;
+	$effect(() => {
+		console.log(node.needsProcessing);
+		if (node.needsProcessing) {
+			displayProcessing = true;
+			disappearProcessing = false;
+			if (timeout) clearTimeout(timeout);
+			if (disappearTimeout) clearTimeout(disappearTimeout);
+			disappearTimeout = setTimeout(() => {
+				disappearProcessing = true;
+			}, 200);
+			timeout = setTimeout(() => {
+				disappearProcessing = false;
+				displayProcessing = false;
+			}, 600);
+		}
+	});
+	$inspect("display", displayProcessing, "disappear", disappearProcessing)
 </script>
 
 <section
 	role="cell"
 	tabindex="0"
 	class:transition-all={transitionEnabled}
-	class="border-base-content border border-opacity-0 overflow-hidden bg-base-300 bg-opacity-85 rounded-box {themeControl.isLight ? 'hover:brightness-105' :  'hover:brightness-[1.15]'}"
+	class:text-primary={node.needsProcessing}
+	class="border-base-content border border-opacity-0 overflow-hidden bg-base-300 bg-opacity-85 rounded-box {themeControl.isLight
+		? 'hover:brightness-105'
+		: 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
 >
 	<div
-		class=" grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
+		class:disappear={disappearProcessing}
+		class:animated-diagonal={displayProcessing}
+		class="grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
 		bind:clientWidth={node.width}
 		bind:clientHeight={node.height}
 	>
-		<h1 class="card-title mb-3 col-span-fuaall text-nowrap" title={constructor.description}>{node.label}</h1>
+		<h1 class="card-title mb-3 col-span-fuaall text-nowrap" title={constructor.description}>
+			{node.label}
+		</h1>
 
 		{#each node.sortedControls as [key, control] (key)}
 			<Ref
@@ -144,6 +172,53 @@
 		</form>
 	</div>
 </section>
+
 <!-- <div class="mt-[10rem]" onpointerdown={stopPropagation}>
 	<OldNode data={node} {emit}/>
 </div> -->
+
+<style lang="scss">
+	@property --o {
+		syntax: '<number>'; /* <- defined as type number for the transition to work */
+		initial-value: 0;
+		inherits: false;
+	}
+	@keyframes slideDiagonal {
+		from {
+			background-position: 0% 0%;
+			--o: 1;
+		}
+		to {
+			background-position: 20rem 0%;
+			--o: 1;
+		}
+	}
+	@keyframes slideDiagonalDisappear {
+		from {
+			background-position: 6.67rem 0%;
+			--o: 1;
+		}
+		to {
+			background-position: 20rem 0%;
+			--o: 0;
+		}
+	}
+
+	.animated-diagonal {
+		background-image: linear-gradient(
+			-80deg,
+			transparent 0%,
+			transparent 25%,
+			oklch(var(--b2) / var(--o)) 25%,
+			oklch(var(--b2) / var(--o)) 66%,
+			transparent 66%,
+			transparent 100%
+		);
+		background-size: 5rem 100%;
+		animation: slideDiagonal 0.6s linear infinite;
+	}
+	.animated-diagonal.disappear {
+		animation-name: slideDiagonalDisappear;
+		animation-duration: 0.4s;
+	}
+</style>

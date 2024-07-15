@@ -27,8 +27,8 @@ import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';
 // import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
 import type { HistoryPlugin } from '$graph-editor/plugins/history';
-import { clone, debounce } from 'lodash-es';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
+import { tick } from 'svelte';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -585,11 +585,12 @@ export class NodeFactory {
 		if (this.area) AreaExtensions.zoomAt(this.area, [node], { scale: undefined });
 	}
 
-	runDataflowEngines() {
+	async runDataflowEngines() {
 		if (!this.#isDataflowEnabled) {
 			console.warn('Dataflow engines are disabled');
 			return;
 		}
+		await tick()
 		console.log('Running dataflow engines');
 		try {
 			this.editor
@@ -597,6 +598,7 @@ export class NodeFactory {
 				// .filter((n) => n instanceof AddNode || n instanceof DisplayNode)
 				.forEach((n) => {
 					this.dataflowEngine.fetch(n.id);
+					n.needsProcessing = false;
 				});
 		} catch (e) {
 			console.error('Dataflow engine cancelled');

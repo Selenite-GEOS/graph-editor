@@ -95,7 +95,7 @@
 	</div>
 	<div
 		use:shortcut={{
-			shortcuts: { key: 'a' },
+			key: 'a',
 			async action(e) {
 				await editor?.factory?.arrange?.layout();
 				const area = editor?.factory?.area;
@@ -104,14 +104,20 @@
 			}
 		}}
 		use:shortcut={{
-			shortcuts: { key: 'g' },
+			key: 'g',
 			action: toggleGridlinesVisibility
 		}}
 		use:shortcut={{
-			shortcuts: { key: 't' },
+			key: 't',
 			action(e) {
 				themeControl.theme = themeControl.nextTheme;
 			}
+		}}
+		use:shortcut={{
+			key: 'r',
+			action(e) {
+				themeControl.theme = themeControl.previousTheme
+			},
 		}}
 		class="m-auto"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"
