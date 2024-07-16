@@ -690,7 +690,7 @@ export class Node<
 
 	processDataflow = () => {
 		if (!this.editor) return;
-		this.needsProcessing = true;
+		// this.needsProcessing = true;
 		for (const n of structures(this.editor).successors(this.id).nodes()) {
 			n.needsProcessing = true;
 		}

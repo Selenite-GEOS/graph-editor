@@ -2,7 +2,8 @@ import { readable, writable } from 'svelte/store';
 import { get } from 'svelte/store';
 import type { GeosSchema } from '$lib/geos';
 import type { Action } from 'svelte/action';
-
+import { notifications } from '$graph-editor/plugins/notifications';
+export {notifications} from '$graph-editor/plugins/notifications';
 export { getContext } from 'svelte';
 export type NewGeosContext = { geosSchema: GeosSchema };
 
@@ -94,12 +95,6 @@ export const _ = readable<(msg: string) => string>((msg) => {
 
 	return msgs[msg] ?? msg;
 });
-
-export const notifications = {
-	show(o: unknown) {
-		console.log(o);
-	}
-};
 
 export function getModalStore() {
 	console.warn('Not implemented');
