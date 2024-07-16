@@ -69,7 +69,11 @@
 	}
 	.array {
 		border: 4px dashed var(--background);
-		background: none;
+		background-color:oklch(var(--b3)/var(--tw-bg-opacity));
 		border-radius: 0%;
+
+		&:hover {
+			background-color: oklch(var(--b1)/var(--tw-bg-opacity)) ;
+		}
 	}
 </style>
