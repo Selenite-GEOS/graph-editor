@@ -154,7 +154,7 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 			customize: {
 				socket(context) {
 					if (context.payload instanceof Socket) {
-						if (context.payload.type === 'exec') return Presets.classic.ExecSocket;
+						// if (context.payload.type === 'exec') return Presets.classic.ExecSocket;
 						return Presets.classic.Socket;
 					}
 

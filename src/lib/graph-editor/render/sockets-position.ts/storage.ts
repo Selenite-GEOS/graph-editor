@@ -1,5 +1,5 @@
-import type { Side } from "$graph-editor/socket";
-import type { Position } from "@selenite/commons";
+import type { Side } from '$graph-editor/socket';
+import type { Position } from '@selenite/commons';
 
 type SocketPayload = {
 	element: HTMLElement;

@@ -11,7 +11,7 @@ export type SocketValueWithDatastructure<T, D extends SocketDatastructure> = D e
 		: never;
 export class Socket<
 	S extends SocketType = SocketType,
-	D extends SocketDatastructure = SocketDatastructure
+	D extends SocketDatastructure = 'scalar'
 > extends ClassicPreset.Socket {
 	// public readonly isArray: boolean;
 	public readonly datastructure: D;

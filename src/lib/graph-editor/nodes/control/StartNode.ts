@@ -1,23 +1,19 @@
-import { Node } from '../Node.svelte';
-import { ButtonControl } from '$graph-editor/socket';
-import type { NodeFactory } from '$graph-editor/editor';
+import { Node, registerNode, type NodeParams } from '../Node.svelte';
+import { ButtonControl, ExecSocket } from '$graph-editor/socket';
 
-export class StartNode extends Node {
-	constructor({ factory }: { factory: NodeFactory }) {
-		super({ label: 'Start', factory, height: 130 });
+@registerNode('control.start')
+export class StartNode extends Node<{}, {exec: ExecSocket}> {
+	constructor(params: NodeParams = {}) {
+		super({ label: 'Start', ...params });
 		this.addOutExec();
 		this.addControl(
 			'playBtn',
-			new ButtonControl('Play', () => {
-				this.factory.getControlFlowEngine().execute(this.id);
-				console.log('play');
+			new ButtonControl('Play', async () => {
+				this.factory?.getControlFlowEngine().execute(this.id);
 			})
 		);
 	}
 	execute(_: never, forward: (output: 'exec') => void) {
 		forward('exec');
-	}
-	data() {
-		return {};
 	}
 }

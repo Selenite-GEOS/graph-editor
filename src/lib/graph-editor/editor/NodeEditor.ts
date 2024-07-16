@@ -93,10 +93,10 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		}
 
 		return {
-			nodes: this.getNodes().map((node) => node.toJSON()),
-			connections: this.getConnections().map((conn) => conn.toJSON()),
 			editorName: this.name,
 			variables,
+			nodes: this.getNodes().map((node) => node.toJSON()),
+			connections: this.getConnections().map((conn) => conn.toJSON()),
 			comments: this.factory?.comment
 				? wu(this.factory?.comment?.comments.values())
 						.map((t) => {

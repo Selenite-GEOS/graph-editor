@@ -6,6 +6,7 @@ import { $socketcolor } from './presets/classic/vars';
 export const colorMap: { [key in SocketType]?: string } = {
 	string: '#d88cbb',
 	path: '#8B78E6',
+	exec: '#b479b6',
 	integer: false ? 'hsl(151.07deg 48.7% 35.1%)' : 'hsl(151.07deg 48.7% 45.1%)',
 	pythonObject: '#616796',
 	pythonProperty: '#949cd3',

@@ -12,7 +12,13 @@
 		expanded?: boolean;
 		element?: HTMLElement;
 	};
-	let { tree, leaf, class: classes = '', expanded = $bindable(true), element = $bindable() }: Props = $props();
+	let {
+		tree,
+		leaf,
+		class: classes = '',
+		expanded = $bindable(true),
+		element = $bindable()
+	}: Props = $props();
 	let childExpanded: Record<number, boolean> = $state(
 		Object.fromEntries(tree.map((_, i) => [i, false]))
 	);
@@ -20,13 +26,13 @@
 	export function expandAll() {
 		for (const k in childExpanded) {
 			childExpanded[k] = true;
-			childTrees[k]?.expandAll()
+			childTrees[k]?.expandAll();
 		}
 	}
 	export function collapseAll() {
 		for (const k in childExpanded) {
 			childExpanded[k] = false;
-			childTrees[k]?.collapseAll()
+			childTrees[k]?.collapseAll();
 		}
 	}
 	export function expandPath(path: string[]) {
@@ -36,7 +42,7 @@
 			if (!isForest(node)) continue;
 			if (node.label !== t) continue;
 			childExpanded[i] = true;
-			childTrees[i].expandPath(q)
+			childTrees[i].expandPath(q);
 			break;
 		}
 	}

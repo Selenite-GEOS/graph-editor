@@ -3,9 +3,10 @@
 	import { assignColor } from '$rete/customization/utils';
 	import { capitalize } from 'lodash-es';
 	import cssVars from 'svelte-css-vars';
+	import ExecSocket from './ExecSocket.svelte';
 	let { data }: { data: Socket } = $props();
 	let socketVars = $derived({ background: assignColor(data) });
-
+	const type = $derived(data.type);
 	const datastructureClasses: Record<SocketDatastructure, string> = {
 		array: 'array',
 		scalar: ''
@@ -24,15 +25,19 @@
 	// }, 200);
 </script>
 
-<div
-	class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}"
-	role="button"
-	tabindex="0"
-	class:outline={data.selected}
-	{title}
-	use:cssVars={socketVars}
-	on:contextmenu|stopPropagation|preventDefault
-></div>
+{#if type === 'exec'}
+<ExecSocket {data} />
+{:else}
+	<div
+		class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}"
+		role="button"
+		tabindex="0"
+		class:outline={data.selected}
+		{title}
+		use:cssVars={socketVars}
+		on:contextmenu|stopPropagation|preventDefault
+	></div>
+{/if}
 
 <style lang="scss" scoped>
 	@use 'sass:math';
@@ -69,11 +74,11 @@
 	}
 	.array {
 		border: 4px dashed var(--background);
-		background-color:oklch(var(--b3)/var(--tw-bg-opacity));
+		background-color: oklch(var(--b3) / var(--tw-bg-opacity));
 		border-radius: 0%;
 
 		&:hover {
-			background-color: oklch(var(--b1)/var(--tw-bg-opacity)) ;
+			background-color: oklch(var(--b1) / var(--tw-bg-opacity));
 		}
 	}
 </style>

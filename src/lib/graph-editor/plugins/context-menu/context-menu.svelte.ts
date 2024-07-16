@@ -149,20 +149,30 @@ export class ContextMenu {
  *
  * Helper function to use the context menu singleton.
  */
-export const showContextMenu: ShowContextMenu = ({ items, pos, searchbar, onHide, expand = false }) => {
+export const showContextMenu: ShowContextMenu = ({
+	items,
+	pos,
+	searchbar,
+	onHide,
+	expand = false
+}) => {
 	const menu = ContextMenu.instance;
-	menu.expanded = expand
+	menu.expanded = expand;
 	menu.visible = true;
 	menu.pos = pos;
 	menu.searchbar = searchbar;
-	menu.items = items.map((item,i) => {return {
-		label: String(i),
-		id: String(i),
-		description: '',
-		action: () => {console.warn("Missing action for menu item", item.label ?? String(i))},
-		path: [],
-		tags: [],
-		...item
-	}});
+	menu.items = items.map((item, i) => {
+		return {
+			label: String(i),
+			id: String(i),
+			description: '',
+			action: () => {
+				console.warn('Missing action for menu item', item.label ?? String(i));
+			},
+			path: [],
+			tags: [],
+			...item
+		};
+	});
 	menu.onHide = onHide;
 };

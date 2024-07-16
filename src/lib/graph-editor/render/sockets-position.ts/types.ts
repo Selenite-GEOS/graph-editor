@@ -2,7 +2,6 @@ import type { Side } from '$graph-editor/socket';
 import type { Position } from '@selenite/commons';
 import type { BaseSchemes, NodeId } from 'rete';
 
-
 export type OnChange = (data: Position) => void;
 
 /**
@@ -26,7 +25,6 @@ export type RenderMeta = { filled?: boolean };
 export type RenderSignal<Type extends string, Data> =
 	| { type: 'render'; data: { element: HTMLElement; type: Type } & RenderMeta & Data }
 	| { type: 'rendered'; data: { element: HTMLElement; type: Type } & Data };
-
 
 export type ExpectArea2DExtra<Schemes extends BaseSchemes> =
 	| RenderSignal<

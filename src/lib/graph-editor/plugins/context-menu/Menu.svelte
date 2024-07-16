@@ -42,7 +42,7 @@
 
 	async function focusFocusedItem() {
 		if (!focusedItem) return;
-		console.debug('Focus', {...focusedItem});
+		console.debug('Focus', { ...focusedItem });
 		treeCmpnt?.expandPath(focusedItem.path);
 		await tick();
 		const elmnt = treeElement?.querySelector(`#${focusedItem.id}`) as HTMLElement & {

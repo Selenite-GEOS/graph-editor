@@ -8,10 +8,11 @@
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
-	import { capitalize, shortcut } from '@selenite/commons';
+	import { capitalize, shortcut, type KeyboardShortcut } from '@selenite/commons';
 	import { themeControl } from '$lib/global/index.svelte';
-
+	import type {HTMLButtonAttributes} from 'svelte/elements'
 	let editor = $state<NodeEditor>();
+	const factory = $derived(editor?.factory)
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
 	let editorReady = $state(false);
 	// On mount
@@ -66,6 +67,11 @@
 		editor?.factory?.getArea()?.emit({ type: 'gridline-toggle-visibility' })
 	}
 </script>
+{#snippet button({props={}, label, shortcut: kbShortcut, action, class: classes =''}: {label?: string, class?: string, shortcut?: KeyboardShortcut, action?: (e: Event) => void, props?: HTMLButtonAttributes})}
+<button type="button" class="btn {classes}" {...props} use:shortcut={{...kbShortcut, action}} onclick={(e: Event) => {if (action) action(e)}}>
+	{label}
+</button>
+{/snippet}
 
 <ContextMenuComponent />
 <div class="h-[100vh] grid relative bg-base-200">
@@ -86,6 +92,13 @@
 		>
 			Grid
 		</button>
+		{@render button({label: 'Clear', class: 'btn-warning', action: () => editor?.clear()})}
+		{@render button({label: 'Load', class:'btn-neutral', action(e) {
+			factory?.loadFromFile()
+		},})}
+		{@render button({label: 'Download', class:'btn-neutral', action(e) {
+			factory?.downloadGraph()
+		},})}
 		<select class="select select-bordered" title="Theme" bind:value={themeControl.theme}>
 			<option value="">Default</option>
 			{#each themeControl.themes as theme}

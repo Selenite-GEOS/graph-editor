@@ -12,10 +12,12 @@
 		path: (start: Position, end: Position) => Promise<string>;
 	};
 	let { component, data, start, end, path }: Props = $props();
-	const conn = $derived(data)
-	const factory = $derived(conn.factory)
-	
-	const sourceType = $derived(factory?.getNode(conn.source)?.outputs[conn.sourceOutput]?.socket.type)
+	const conn = $derived(data);
+	const factory = $derived(conn.factory);
+
+	const sourceType = $derived(
+		factory?.getNode(conn.source)?.outputs[conn.sourceOutput]?.socket.type
+	);
 	// const targetType = $derived(factory?.getNode(conn.target)?.inputs[conn.targetInput]?.socket.type)
 
 	// const connType = $derived(sourceType)
@@ -24,7 +26,6 @@
 	let observedEnd = $state({ x: 0, y: 0 });
 	let observedPath = $state('');
 
-
 	const startPosition = $derived(start && 'x' in start ? start : observedStart);
 	const endPosition = $derived(end && 'x' in end ? end : observedEnd);
 
@@ -32,8 +33,7 @@
 		startPosition;
 		endPosition;
 		fetchPath(startPosition, endPosition);
-	})	
-
+	});
 
 	async function fetchPath(start: Position, end: Position) {
 		observedPath = await path(start, end);
@@ -58,5 +58,4 @@
 	start={observedStart}
 	end={observedEnd}
 	path={observedPath}
-
 />

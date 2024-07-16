@@ -36,7 +36,7 @@ export function isInputControlType(type: unknown): type is InputControlType {
 export const defaultInputControlValues = {
 	text: '',
 	number: 0,
-	checkbox: false,
+	checkbox: true,
 	textarea: '',
 	integer: 0,
 	vector: { x: 0, y: 0, z: 0 },

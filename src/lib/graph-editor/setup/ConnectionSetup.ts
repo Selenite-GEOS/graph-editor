@@ -17,8 +17,13 @@ import type { Socket } from '$graph-editor/socket/Socket.svelte';
 import { findSocket } from '$graph-editor/socket/utils';
 import type { Node } from '$graph-editor/nodes';
 import { XmlNode } from '$graph-editor/nodes/XML';
-import { baseNodeMenuItems, ContextMenu, getMenuItemsFromNodeItems, showContextMenu, type NodeMenuItem } from '$graph-editor/plugins/context-menu';
-
+import {
+	baseNodeMenuItems,
+	ContextMenu,
+	getMenuItemsFromNodeItems,
+	showContextMenu,
+	type NodeMenuItem
+} from '$graph-editor/plugins/context-menu';
 
 export class ConnectionDropEvent extends Event {
 	public readonly pos: { x: number; y: number };
@@ -45,8 +50,8 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 
 	/**
 	 * Handles pointer down and up events to control interactive connection creation.
-	 * @param event 
-	 * @param type 
+	 * @param event
+	 * @param type
 	 */
 	override async pick(event: PointerEvent, type: EventType): Promise<void> {
 		const pointedElements = document.elementsFromPoint(event.clientX, event.clientY);
@@ -73,14 +78,18 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 				if (!socketData) {
 					const area: AreaPlugin<Schemes, AreaExtra> = this.parent;
 					const pos = { x: event.clientX, y: event.clientY };
-					const items: NodeMenuItem[] = []
-					const anyItems: NodeMenuItem[] = []
+					const items: NodeMenuItem[] = [];
+					const anyItems: NodeMenuItem[] = [];
 					const side = this.lastPickedSockedData.side;
-					const {datastructure: droppedDatastructure, type: droppedType} = this.lastPickedSockedData.payload;
+					const { datastructure: droppedDatastructure, type: droppedType } =
+						this.lastPickedSockedData.payload;
 					for (const item of baseNodeMenuItems) {
 						const types = side === 'output' ? item.inputTypes : item.outputTypes;
-						for (const [k, {type, datastructure}] of Object.entries(types)) {
-							if (type === droppedType || type === 'any' && datastructure === droppedDatastructure) {
+						for (const [k, { type, datastructure }] of Object.entries(types)) {
+							if (
+								type === droppedType ||
+								(type === 'any' && datastructure === droppedDatastructure)
+							) {
 								(type === 'any' ? anyItems : items).push(item);
 								break;
 							}
@@ -90,29 +99,42 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 						expand: true,
 						pos,
 						searchbar: true,
-						items: getMenuItemsFromNodeItems({factory: this.factory, pos, nodeItems: [...items, ...anyItems], action: (n) => {
-							const matchingSocket = Object.entries(side === 'output' ? n.inputTypes : n.outputTypes).find(([k, {type, datastructure}]) => {
-								if (type === droppedType || type === 'any' && datastructure === droppedDatastructure) {
-									return true;
+						items: getMenuItemsFromNodeItems({
+							factory: this.factory,
+							pos,
+							nodeItems: [...items, ...anyItems],
+							action: (n) => {
+								const matchingSocket = Object.entries(
+									side === 'output' ? n.inputTypes : n.outputTypes
+								).find(([k, { type, datastructure }]) => {
+									if (
+										type === droppedType ||
+										(type === 'any' && datastructure === droppedDatastructure)
+									) {
+										return true;
+									}
+									return false;
+								});
+								if (!matchingSocket) {
+									console.error("Can't find a valid key for the new node");
+									return;
 								}
-								return false;
-							})
-							if (!matchingSocket) {
-								console.error("Can't find a valid key for the new node")
-								return;
-							}
-							const newNodeKey = matchingSocket[0]
-							const source = side === 'output' ? this.lastPickedSockedData!.payload.node : n;
-							const sourceOutput = side === 'output' ? this.lastPickedSockedData!.key : newNodeKey;
-							const target = side === 'output' ? n : this.lastPickedSockedData!.payload.node;
-							const targetInput = side === 'output' ? newNodeKey : this.lastPickedSockedData!.key;
+								const newNodeKey = matchingSocket[0];
+								const source = side === 'output' ? this.lastPickedSockedData!.payload.node : n;
+								const sourceOutput =
+									side === 'output' ? this.lastPickedSockedData!.key : newNodeKey;
+								const target = side === 'output' ? n : this.lastPickedSockedData!.payload.node;
+								const targetInput = side === 'output' ? newNodeKey : this.lastPickedSockedData!.key;
 
-							this.factory.getEditor().addNewConnection(source, sourceOutput, target, targetInput);
-						} }),
+								this.factory
+									.getEditor()
+									.addNewConnection(source, sourceOutput, target, targetInput);
+							}
+						}),
 						onHide: () => {
-							this.drop()
+							this.drop();
 						}
-					})
+					});
 					return;
 				}
 			}

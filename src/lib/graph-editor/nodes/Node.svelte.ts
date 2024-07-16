@@ -201,6 +201,13 @@ export type SocketsValues<
 		Sockets[K]['datastructure']
 	>;
 };
+
+type DataSocket<T extends Exclude<SocketType, 'exec'> = Exclude<SocketType, 'exec'>> = Socket<T, 'scalar'>
+type ExecSocketsKeys<Sockets extends Record<string, DataSocket | ExecSocket>> = {[K in keyof Sockets]: Sockets[K] extends DataSocket ? never : K}[keyof Sockets];
+type DataSocketsKeys<Sockets extends Record<string, Socket>> = Exclude<keyof Sockets, ExecSocketsKeys<Sockets>>
+type Test = {a: DataSocket, b: ExecSocket, c: ExecSocket}
+const r : DataSocketsKeys<Test> = "a"
+type DataSockets<Sockets extends Record<string, Socket | ExecSocket>> = {[K in keyof Sockets]: Sockets[K]["type"] extends 'exec' ? never : K};
 export class Node<
 		Inputs extends {
 			[key in string]: Socket;
@@ -436,13 +443,16 @@ export class Node<
 		return this.naturalFlowExec;
 	}
 
-	async fetchInputs() {
+	async fetchInputs(): Promise<SocketsValues<Inputs>> {
+		if (!this.factory) {
+			throw new Error("Can't fetch inputs, node factory is undefined");
+		}
 		try {
-			return await this.factory.dataflowEngine.fetchInputs(this.id);
+			return (await this.factory.dataflowEngine.fetchInputs(this.id)) as SocketsValues<Inputs>;
 		} catch (e) {
 			if (e && (e as { message: string }).message === 'cancelled') {
 				console.log('gracefully cancelled Node.fetchInputs');
-				return {};
+				return {} as SocketsValues<Inputs>;
 			} else throw e;
 		}
 	}
@@ -501,15 +511,18 @@ export class Node<
 		return res;
 	});
 
-	execute(input: string, forward: (output: string) => unknown, forwardExec = true) {
+	execute(input: ExecSocketsKeys<Inputs>, forward: (output: ExecSocketsKeys<Outputs>) => unknown, forwardExec = true) {
 		if (forwardExec && this.outputs.exec) {
-			forward('exec');
+			forward('exec' as ExecSocketsKeys<Outputs>);
 		}
 		this.onEndExecute();
 	}
 
-	addInExec(name = 'exec', displayName = '') {
-		const input = new Input(new ExecSocket({ name: displayName, node: this }), undefined, true);
+	addInExec(name: ExecSocketsKeys<Inputs> = 'exec' as ExecSocketsKeys<Inputs>, displayName = '') {
+		const input = new Input({
+			socket: new ExecSocket({ name: displayName, node: this }),
+			isRequired: true
+		});
 		this.addInput(name, input as unknown as Input<Exclude<Inputs[keyof Inputs], undefined>>);
 	}
 
@@ -555,7 +568,7 @@ export class Node<
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}
 
-	addInData<K extends keyof Inputs>(
+	addInData<K extends DataSocketsKeys<Inputs>>(
 		key: K,
 		params?: {
 			type?: Inputs[K]['type'];
@@ -688,7 +701,16 @@ export class Node<
 		return nodes.map((node) => node.waitForEndExecutePromise());
 	}
 
-	getData<K extends keyof Inputs>(
+	async getDataWithInputs<K extends DataSocketsKeys<Inputs>>(
+		key: K
+	): Promise<
+		SocketValueWithDatastructure<SocketValueType<Inputs[K]['type']>, Inputs[K]['datastructure']>
+	> {
+		const inputs = await this.fetchInputs();
+		return this.getData(key, inputs);
+	}
+
+	getData<K extends DataSocketsKeys<Inputs>>(
 		key: K,
 		inputs?: Record<keyof Inputs, unknown>
 	): SocketValueWithDatastructure<SocketValueType<Inputs[K]['type']>, Inputs[K]['datastructure']> {
@@ -699,7 +721,6 @@ export class Node<
 		// 	return checkedInputs2[key];
 		// }
 		// if ()
-
 		const checkedInputs = inputs as Record<string, unknown[]>;
 		// const isArray = this.inputs[key]?.socket.isArray;
 

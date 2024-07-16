@@ -9,11 +9,8 @@ import {
 	Connection,
 	Node,
 	nodeRegistry,
-	type NodeConstructor,
 	type NodeSaveData
 } from '../nodes/Node.svelte';
-import { ClassicPreset } from 'rete';
-import { InputControl } from '$graph-editor/socket';
 import type { Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
@@ -29,6 +26,7 @@ import { persisted } from 'svelte-persisted-store';
 import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
+import type { NotificationsManager } from '$graph-editor/plugins/notifications';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -81,7 +79,7 @@ type WithoutFactory<T> = Omit<T, 'factory'>;
 
 // export function registerNode() {}
 export class NodeFactory {
-	public notifications = {
+	public notifications: NotificationsManager = {
 		show: (p: unknown) => {
 			console.error('notfications.show not implemented');
 		}
@@ -187,8 +185,8 @@ export class NodeFactory {
 	}
 
 	destroyArea() {
-		console.log("Destroying area.")
-		this.area?.destroy()
+		console.log('Destroying area.');
+		this.area?.destroy();
 	}
 
 	async loadGraph(editorSaveData: NodeEditorSaveData) {
@@ -552,6 +550,41 @@ export class NodeFactory {
 			.forEach((n) => this.dataflowEngine.reset(n.id));
 	}
 
+	downloadGraph() {
+		const json = JSON.stringify(this.editor, undefined, 4);
+		const blob = new Blob([json], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${this.editor.name}.json`;
+		document.body.appendChild(a);
+		a.click();
+		URL.revokeObjectURL(url);
+		document.body.removeChild(a);
+	}
+
+	loadFromFile() {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+		input.onchange = async () => {
+			if (!input.files) return;
+			const file = input.files[0];
+			const reader = new FileReader();
+			reader.onload = async () => {
+				const data = reader.result as string;
+				try {
+					const json = JSON.parse(data);
+					await this.loadGraph(json);
+				} catch (e) {
+					console.error('Failed to load graph', e);
+				}
+			};
+			reader.readAsText(file);
+		};
+		input.click();
+	}
+
 	lastSearchNodeIndex = -1;
 	/**
 	 * Finds a node whose label or name matches the query.
@@ -590,7 +623,7 @@ export class NodeFactory {
 			console.warn('Dataflow engines are disabled');
 			return;
 		}
-		await tick()
+		await tick();
 		console.log('Running dataflow engines');
 		try {
 			this.editor

@@ -1,18 +1,22 @@
 <script lang="ts">
 	import type { ExecSocket } from '$graph-editor/socket/ExecSocket';
 
-	export let data: ExecSocket;
+	let {data} : {data: ExecSocket} = $props();
+	const socket = $derived(data);
+	$inspect('exec', {...socket}, socket.type)
 </script>
 
 <div
 	id="outerTriangle"
 	class=" socket outline-4 outline outline-primary-400"
 	class:outline={data.selected}
+	title={'exec'}
 >
-	<div id="innerTriangle" class="socket" title={data.value ? String(data.value) : data.name} />
+	<div id="innerTriangle" class="socket" title={'exec'} />
 </div>
 
-<style>
+<style lang="scss">
+	@import '../vars.sass';
 	/* .required {
 		border-color: red;
 	} */
@@ -25,7 +29,7 @@
 		left: -27px;
 		border-top: 14px solid transparent;
 		border-bottom: 14px solid transparent;
-		border-left: 24px solid #b479b6;
+		border-left: 24px solid $exec-color;
 		/* display: inline-block; */
 		cursor: pointer;
 		/*width: ${$socketsize}px;
@@ -40,7 +44,7 @@
 			left: -24px;
 			border-top: 10px solid transparent;
 			border-bottom: 10px solid transparent;
-			border-left: 17px solid #b479b6;
+			border-left: 17px solid $exec-color;
 		}
 		&:multiple {
 			border-color: yellow;
@@ -63,7 +67,7 @@
 			left: -24px;
 			border-top: 10px solid transparent;
 			border-bottom: 10px solid transparent;
-			border-left: 17px solid #b479b6;
+			border-left: 17px solid $exec-color;
 		}
 	}
 </style>

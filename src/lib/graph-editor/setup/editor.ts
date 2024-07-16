@@ -5,7 +5,7 @@ import type { AreaExtra } from '$graph-editor/area';
 import type { Schemes } from '$graph-editor/schemes';
 import { TypedSocketsPlugin } from '../../graph-editor/plugins/typed-sockets';
 import { NodeEditor, type NodeEditorSaveData, NodeFactory } from '$graph-editor/editor';
-import type { EditorExample } from '$graph-editor/examples';
+import type { EditorExample } from '$graph-editor/old-examples';
 import { MegaSetup } from './MegaSetup';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import type { GeosDataContext } from '$lib/geos';

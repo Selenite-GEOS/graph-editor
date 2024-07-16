@@ -63,6 +63,11 @@
 				}
 			}}
 			use:shortcut={{
+				key: 'Enter',
+				ignoreElements: [],
+				action: () => menu.triggerFirstItem()
+			}}
+			use:shortcut={{
 				ignoreElements: [],
 				shortcuts: { key: 'Escape' },
 				action(e) {
@@ -70,14 +75,14 @@
 				}
 			}}
 			use:shortcut={{
-				shortcuts: {key: 'ArrowDown'},
+				shortcuts: { key: 'ArrowDown' },
 				action() {
 					menuCmpnt?.focusNext();
 				},
 				ignoreElements: []
 			}}
 			use:shortcut={{
-				shortcuts: {key: 'ArrowUp'},
+				shortcuts: { key: 'ArrowUp' },
 				action() {
 					menuCmpnt?.focusPrevious();
 				},
@@ -105,13 +110,6 @@
 			{#if menu.searchbar}
 				<input
 					bind:this={searchInput}
-					on:keypress={(e) => {
-						// Trigger first menu item on enter when there's a query
-						if (e.key !== 'Enter') return;
-						if (menu.query) {
-							menu.triggerFirstItem();
-						}
-					}}
 					type="text"
 					class="p-2"
 					placeholder="Search..."

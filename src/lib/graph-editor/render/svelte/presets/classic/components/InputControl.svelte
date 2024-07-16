@@ -38,6 +38,7 @@
 	let inputProps: HTMLInputAttributes = $derived({
 		placeholder: inputControl.socketType,
 		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'}`,
+		title: isCheckbox ? String(inputControl.value) : undefined,
 		readonly: inputControl.readonly,
 		type: simpleTypes.includes(type as (typeof simpleTypes)[number])
 			? inputType[type as (typeof simpleTypes)[number]]

@@ -303,10 +303,9 @@ export type NodeMenuItem = {
 	/** Description of the node. */
 	description: string;
 
-	inputTypes: Node['inputTypes']
-	outputTypes: Node['outputTypes']
+	inputTypes: Node['inputTypes'];
+	outputTypes: Node['outputTypes'];
 };
-
 
 export const baseNodeMenuItems: NodeMenuItem[] = [];
 for (const [id, nodeClass] of nodeRegistry.entries()) {
@@ -330,15 +329,25 @@ for (const [id, nodeClass] of nodeRegistry.entries()) {
 		outputTypes: node.outputTypes,
 		path: nodeClass.path,
 		tags: nodeClass.tags ?? [],
-		description: nodeClass.description ?? '',
+		description: nodeClass.description ?? ''
 	});
 }
-export function getMenuItemsFromNodeItems({ factory, pos, nodeItems, action }: { factory: NodeFactory; pos: Position, nodeItems: NodeMenuItem[], action?: (n: Node) => void }): MenuItem[] {
+export function getMenuItemsFromNodeItems({
+	factory,
+	pos,
+	nodeItems,
+	action
+}: {
+	factory: NodeFactory;
+	pos: Position;
+	nodeItems: NodeMenuItem[];
+	action?: (n: Node) => void;
+}): MenuItem[] {
 	const editor = factory.getEditor();
 	const area = factory.getArea();
 	const res: MenuItem[] = [];
 
-	for (const {description, label, path, tags, nodeClass} of nodeItems) {
+	for (const { description, label, path, tags, nodeClass } of nodeItems) {
 		res.push({
 			id: nodeClass.id.replaceAll('.', '-'),
 			description,
@@ -348,11 +357,11 @@ export function getMenuItemsFromNodeItems({ factory, pos, nodeItems, action }: {
 			action: async () => {
 				const node = new nodeClass({ factory });
 				await editor.addNode(node);
-				console.log(area, pos, factory)
+				console.log(area, pos, factory);
 				const localPos = clientToSurfacePos({ pos, factory });
 				await area?.translate(node.id, localPos);
-				if (action)	action(node);
-			},
+				if (action) action(node);
+			}
 		});
 	}
 	return res;
@@ -455,8 +464,12 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 					}
 
 					const pos: Position = { x: context.data.event.clientX, y: context.data.event.clientY };
-					const items: MenuItem[] = getMenuItemsFromNodeItems({factory, pos, nodeItems: baseNodeMenuItems});
-					
+					const items: MenuItem[] = getMenuItemsFromNodeItems({
+						factory,
+						pos,
+						nodeItems: baseNodeMenuItems
+					});
+
 					// Spawn context menu
 					showContextMenu({
 						items,

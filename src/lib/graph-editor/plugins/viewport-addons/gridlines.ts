@@ -1,8 +1,8 @@
 import type { Setup } from '$graph-editor/setup/Setup';
 import { themeControl } from '$lib/global/index.svelte';
-import {gridLines} from '@selenite/commons'
+import { gridLines } from '@selenite/commons';
 
-export type GridlineExtra = {type: 'gridline-toggle-visibility'} | {type: 'gridline-update'}
+export type GridlineExtra = { type: 'gridline-toggle-visibility' } | { type: 'gridline-update' };
 
 export const gridLinesSetup: Setup = {
 	name: 'Gridlines',
@@ -14,26 +14,34 @@ export const gridLinesSetup: Setup = {
 		canvas.style.position = 'absolute';
 		canvas.width = container.clientWidth;
 		canvas.height = container.clientHeight;
-		const gridlines = gridLines(canvas, {transform: area.area.transform, visibility });
+		const gridlines = gridLines(canvas, { transform: area.area.transform, visibility });
 
 		area.addPipe((ctx) => {
-			if (!(['translated', 'zoomed', 'resized', 'gridline-toggle-visibility', 'gridline-update'] as (typeof ctx)['type'][]).includes(ctx.type)) {
+			if (
+				!(
+					[
+						'translated',
+						'zoomed',
+						'resized',
+						'gridline-toggle-visibility',
+						'gridline-update'
+					] as (typeof ctx)['type'][]
+				).includes(ctx.type)
+			) {
 				return ctx;
 			}
-			if (ctx.type === 'gridline-toggle-visibility')
-				visibility = !visibility
-			themeControl.isLight
+			if (ctx.type === 'gridline-toggle-visibility') visibility = !visibility;
+			themeControl.isLight;
 			if (ctx.type === 'resized') {
 				canvas.width = area.container.clientWidth;
 				canvas.height = area.container.clientHeight;
 			}
 
-
 			if (gridlines && gridlines.update)
 				gridlines.update({
 					transform: area.area.transform,
 					visibility,
-					color: themeControl.isLight ? '#000' : '#ddd',
+					color: themeControl.isLight ? '#000' : '#ddd'
 					// width: themeControl.isLight ? '' :
 				});
 

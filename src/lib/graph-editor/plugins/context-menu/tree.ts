@@ -49,6 +49,6 @@ export function flattenTree<T>(tree: Tree<T>): T[] {
 			}
 		}
 	}
-	rec(tree)
+	rec(tree);
 	return res;
 }

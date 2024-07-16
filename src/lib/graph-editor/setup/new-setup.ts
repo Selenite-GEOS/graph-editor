@@ -1,5 +1,5 @@
 import { NodeEditor, NodeFactory, type NodeEditorSaveData } from '$graph-editor/editor';
-import type { EditorExample } from '$graph-editor/examples';
+import type { EditorExample } from '$graph-editor/old-examples';
 import type { Writable } from 'svelte/store';
 import { isSetup, type Setup, type SetupAreaFunction, type SetupFunction } from './Setup';
 import { setupConnections } from './ConnectionSetup';
@@ -10,7 +10,8 @@ import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';
 import { contextMenuSetup, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
-import {  gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
+import { gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
+import { notificationsSetup } from '$graph-editor/plugins/notifications';
 
 export type XmlContext = {};
 
@@ -86,18 +87,19 @@ export async function setupFullGraphEditor(
 				const typedSocketsPlugin = new TypedSocketsPlugin<Schemes>();
 				editor.use(typedSocketsPlugin);
 			},
-			// Temporary area 
+			notificationsSetup,
+			// Temporary area
 			{
 				name: 'Test area',
 				type: 'area',
-				setup: ({area}) => {
+				setup: ({ area }) => {
 					area.addPipe((ctx) => {
 						// if (ctx.type === 'render') {
 						// 	console.log(ctx.data)
 						// }
 						// console.log(area.elements)
 						return ctx;
-					})
+					});
 				}
 			},
 			// Arrange

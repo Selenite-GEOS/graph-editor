@@ -8,6 +8,6 @@ export * as Editor from './editor';
 export * from './variables';
 export * as Setup from './setup/new-setup';
 export * as Plugins from './plugins';
-
+export * as Examples from './examples';
 /** @ignore */
 export { NodeEditor, NodeFactory } from './editor';
