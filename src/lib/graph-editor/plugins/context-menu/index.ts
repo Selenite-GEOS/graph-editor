@@ -302,10 +302,13 @@ export type NodeMenuItem = {
 	tags: string[];
 	/** Description of the node. */
 	description: string;
+
+	inputTypes: Node['inputTypes']
+	outputTypes: Node['outputTypes']
 };
 
 
-const baseNodeMenuItems: NodeMenuItem[] = [];
+export const baseNodeMenuItems: NodeMenuItem[] = [];
 for (const [id, nodeClass] of nodeRegistry.entries()) {
 	if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
 	const pieces = id.split('.').map(capitalizeWords);
@@ -323,12 +326,14 @@ for (const [id, nodeClass] of nodeRegistry.entries()) {
 	baseNodeMenuItems.push({
 		label: node.label === undefined || node.label.trim() === '' ? idName : node.label,
 		nodeClass: nodeClass as typeof Node,
+		inputTypes: node.inputTypes,
+		outputTypes: node.outputTypes,
 		path: nodeClass.path,
 		tags: nodeClass.tags ?? [],
-		description: nodeClass.description ?? ''
+		description: nodeClass.description ?? '',
 	});
 }
-function getMenuItemsFromNodeItems({ factory, pos, nodeItems }: { factory: NodeFactory; pos: Position, nodeItems: NodeMenuItem[] }): MenuItem[] {
+export function getMenuItemsFromNodeItems({ factory, pos, nodeItems, action }: { factory: NodeFactory; pos: Position, nodeItems: NodeMenuItem[], action?: (n: Node) => void }): MenuItem[] {
 	const editor = factory.getEditor();
 	const area = factory.getArea();
 	const res: MenuItem[] = [];
@@ -346,12 +351,14 @@ function getMenuItemsFromNodeItems({ factory, pos, nodeItems }: { factory: NodeF
 				console.log(area, pos, factory)
 				const localPos = clientToSurfacePos({ pos, factory });
 				await area?.translate(node.id, localPos);
+				if (action)	action(node);
 			},
 		});
 	}
 	return res;
 }
 export type ShowContextMenu = (params: {
+	expand?: boolean;
 	pos: Position;
 	items: Partial<MenuItem>[];
 	searchbar: boolean;

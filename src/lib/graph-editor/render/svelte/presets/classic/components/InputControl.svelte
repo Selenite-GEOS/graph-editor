@@ -139,7 +139,7 @@
 {:else if datastructure === 'array'}
 	<button
 		type="button"
-		class="btn-edit-datastructure"
+		class="btn-edit-datastructure text-nowrap"
 		ondblclick={stopPropagation}
 		onpointerdown={stopPropagation}
 		onclick={() => {
@@ -180,7 +180,7 @@
 				}
 			});
 		}}>Edit array</button
-	><span class="text-xs ms-1">Length : {(inputControl.value as []).length}</span>
+	><span class="text-xs ms-1 text-nowrap">Length : {(inputControl.value as []).length}</span>
 {:else}
 	Unsupported datastructure
 {/if}

@@ -105,7 +105,9 @@ export interface InDataParams<N> {
 	index?: number;
 }
 
-function sortedByIndex<K extends string | number, V extends {index?:number}>(entries: [K, V][]): [K, V][] {
+function sortedByIndex<K extends string | number, V extends { index?: number }>(
+	entries: [K, V][]
+): [K, V][] {
 	return entries.toSorted((a, b) => (a[1].index ?? 0) - (b[1].index ?? 0));
 }
 
@@ -224,20 +226,20 @@ export class Node<
 	#height = $state(50);
 
 	get width() {
-		return this.#width
+		return this.#width;
 	}
 	get height() {
-		return this.#height
+		return this.#height;
 	}
 	set height(h: number) {
-		this.#height = h
-		this.emitResized()
+		this.#height = h;
+		this.emitResized();
 	}
 	set width(w: number) {
 		this.#width = w;
-		this.emitResized()
+		this.emitResized();
 	}
-	
+
 	async emitResized() {
 		this.area?.emit({
 			type: 'noderesized',
@@ -276,9 +278,12 @@ export class Node<
 	static id: string;
 	static nodeCounts = BigInt(0);
 	state = $state<Partial<State>>({} as State);
-	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = $state({});
-	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } = $state({});
-	needsProcessing = $state(false)
+	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = $state(
+		{}
+	);
+	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } =
+		$state({});
+	needsProcessing = $state(false);
 	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)));
 	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)));
 	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)));
@@ -473,6 +478,28 @@ export class Node<
 			this.resolveEndExecutes.push(resolve);
 		});
 	}
+
+	inputTypes = $derived.by(() => {
+		const res: Record<string, { type: SocketType; datastructure: SocketDatastructure }> = {};
+		for (const k of Object.keys(this.inputs)) {
+			const socket = this.inputs[k]?.socket;
+			if (socket) {
+				res[k] = { type: socket.type, datastructure: socket.datastructure };
+			}
+		}
+		return res;
+	});
+
+	outputTypes = $derived.by(() => {
+		const res: Record<string, { type: SocketType; datastructure: SocketDatastructure }> = {};
+		for (const k of Object.keys(this.outputs)) {
+			const socket = this.outputs[k]?.socket;
+			if (socket) {
+				res[k] = { type: socket.type, datastructure: socket.datastructure };
+			}
+		}
+		return res;
+	});
 
 	execute(input: string, forward: (output: string) => unknown, forwardExec = true) {
 		if (forwardExec && this.outputs.exec) {

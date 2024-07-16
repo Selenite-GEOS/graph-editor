@@ -149,8 +149,9 @@ export class ContextMenu {
  *
  * Helper function to use the context menu singleton.
  */
-export const showContextMenu: ShowContextMenu = ({ items, pos, searchbar, onHide }) => {
+export const showContextMenu: ShowContextMenu = ({ items, pos, searchbar, onHide, expand = false }) => {
 	const menu = ContextMenu.instance;
+	menu.expanded = expand
 	menu.visible = true;
 	menu.pos = pos;
 	menu.searchbar = searchbar;
