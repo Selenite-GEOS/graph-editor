@@ -1,20 +1,30 @@
-import { getMessageFormatter, t } from 'svelte-i18n';
-import { Node, type NodeParams } from '$graph-editor/nodes/Node.svelte';
+import {
+	Node,
+	path,
+	registerNode,
+	type NodeParams,
+	type SocketsValues
+} from '$graph-editor/nodes/Node.svelte';
 import { capitalize, getVarsFromFormatString } from '$lib/utils/string';
+import type { Scalar, Socket } from '$graph-editor/socket';
 
-export interface FormatNodeParams extends NodeParams {
+export type FormatNodeParams = NodeParams & {
 	format?: string;
 	vars?: Record<string, unknown>;
-}
+	params?: {
+		format: string;
+		vars: Record<string, unknown>;
+	};
+};
 
-export class FormatNode extends Node {
-	formatInputHeight = 0;
-	updateHeight = true;
-
-	constructor({ factory, format = '{name}', vars = { name: '' } }: FormatNodeParams) {
+@registerNode('string.Format')
+export class FormatNode extends Node<
+	{ format: Scalar<'string'> } & Record<string, Socket<'any'>>,
+	{ result: Scalar<'string'> }
+> {
+	constructor(params: FormatNodeParams = {}) {
 		// super('Format', { factory, height: 124.181818 + 43.818182 });
-		super({ label: 'Format', height: 124.181818 + 43.818182, factory, params: { format, vars } });
-		this.formatInputHeight = 43.818182;
+		super({ label: 'Format', ...params });
 
 		this.pythonComponent.setDataCodeGetter('result', () => {
 			const vars = this.getFormatVariablesKeys();
@@ -23,44 +33,21 @@ export class FormatNode extends Node {
 				.join(', ');
 			return `$(format).format(${var_bindings})`;
 		});
-
-		this.oldAddOutData({
-			name: 'result',
-			displayName: '',
-			type: 'groupNameRef'
+		this.addOutData('result', {
+			type: 'string'
 		});
-		this.oldAddInData({
-			name: 'format',
-			displayName: 'Format',
-			socketLabel: 'Format',
+		this.addInData('format', {
 			type: 'string',
+			initial: params.params?.format ?? '{name}',
 			control: {
 				type: 'textarea',
-				options: {
-					label: 'Format',
-					initial: format,
-					debouncedOnChange: (value) => {
-						this.updateDataInputs();
-
-						this.params.format = value;
-					},
-					onHeightChange: (height, info) => {
-						this.height -= this.formatInputHeight;
-						this.formatInputHeight = height;
-						this.height += height;
-						if (this.updateHeight) {
-							this.updateElement('node', this.id);
-
-							this.updateHeight = false;
-						} else {
-							this.updateHeight = true;
-						}
-					}
+				onChange: (value) => {
+					this.params.format = value;
+					this.updateDataInputs();
 				}
 			}
 		});
-
-		this.updateDataInputs(vars);
+		this.updateDataInputs();
 	}
 
 	getFormatVariablesKeys(): Record<string, string> {
@@ -72,7 +59,7 @@ export class FormatNode extends Node {
 		return res;
 	}
 
-	getValues(inputs: Record<string, unknown[]>) {
+	getValues(inputs?: Record<string, unknown>) {
 		const values: Record<string, unknown> = {};
 		Object.keys(this.inputs).forEach((key) => {
 			if (key.startsWith('data-')) values[key.slice('data-'.length)] = this.getData(key, inputs);
@@ -80,60 +67,61 @@ export class FormatNode extends Node {
 		return values;
 	}
 
-	override data(inputs?: Record<string, unknown[]> | undefined): { result?: string } {
-		const res = { result: '' };
-		if (inputs === undefined) return res;
+	data(
+		inputs?:
+			| SocketsValues<
+					{ format: Scalar<'string'> } & Record<string, Socket<'any', 'scalar' | 'array'>>
+			  >
+			| undefined
+	): SocketsValues<{ result: Scalar<'string'> }> {
+		let res = this.getData('format', inputs);
+		console.log(res)
 		const values = this.getValues(inputs);
-		try {
-			res.result = getMessageFormatter(this.getData<'text'>('format', inputs) as string).format(
-				values
-			) as string;
-		} catch (e) {
-			//empty
+		for (const [k, v] of Object.entries(values)) {
+			res = res.replace(`{${k}}`, v as string);
 		}
-		return res;
+
+		return { result: res };
 	}
 
 	updateDataInputs(inputs?: Record<string, unknown>) {
-		const formatString = this.getData<'text'>('format', inputs);
+		const formatString = this.getData('format', inputs);
 
 		let anyChange = false;
+		console.log(formatString);
 		if (formatString) {
 			try {
 				const vars = getVarsFromFormatString(formatString);
+				console.log('vars', vars);
 
 				vars.forEach((varName) => {
 					const key = 'data-' + varName;
 					if (!(key in this.inputs)) {
-						const varData = this.getData(varName, inputs);
+						// const varData = this.getData(varName, inputs);
 						anyChange = true;
-						this.oldAddInData({
-							name: key,
-							displayName: capitalize(varName),
-							socketLabel: capitalize(varName),
-							control: {
-								type: 'text',
-								options: {
-									label: capitalize(varName),
-									initial: varData
-								}
-							}
+						this.addInData(key, {
+							label: capitalize(varName),
+							isLabelDisplayed: true
 						});
-						this.height += 60;
+						console.log('added', key);
 					}
 				});
+
+				for (const [i, var_] of vars.entries()) {
+					const key = 'data-' + var_;
+					this.inputs[key]!.index = i;
+				}
 
 				for (const key in this.inputs) {
 					if (key.startsWith('data-') && !vars.includes(key.substr(5))) {
 						this.removeInput(key);
 						anyChange = true;
-						this.height -= 60;
 					}
 				}
 			} catch (error) {
 				return;
 			}
 		}
-		if (anyChange) this.updateElement('node', this.id);
+		if (anyChange) this.updateElement();
 	}
 }

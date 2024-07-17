@@ -4,12 +4,17 @@
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
 	import { themeControl } from '$lib/global/index.svelte';
-	import { capitalize } from '@selenite/commons';
+	import { capitalize, distance, posFromClient, shortcut } from '@selenite/commons';
+	import { XmlNode } from '$graph-editor/nodes/XML';
+	import type { Position } from '$graph-editor/common';
+	import { Control } from '$graph-editor/socket';
 
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
 	const constructor = $derived(node.constructor as NodeConstructor);
 	let transitionEnabled = $state(false);
 
+	const xmlNode = $derived(node instanceof XmlNode ? node : undefined);
+	const xmlName = $derived(xmlNode?.name);
 	// Avoid transitions on mount
 	$effect(() => {
 		setTimeout(() => {
@@ -35,14 +40,37 @@
 			}, 600);
 		}
 	});
+	let editingName = $state(false);
+	let nameInput = $state<HTMLInputElement>();
+	$effect(() => {
+		nameInput?.select();
+	});
+	let lastPointerDownPos = $state<Position>();
 </script>
+
+{#snippet controlSnippet(control: Control, {class: classes}: {class?: string})}
+	<Ref
+		class={classes}
+		data-testid="control"
+		init={(element) =>
+			emit({
+				type: 'render',
+				data: {
+					type: 'control',
+					element,
+					payload: control
+				}
+			})}
+		unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+	/>
+{/snippet}
 
 <section
 	role="cell"
 	tabindex="0"
 	class:transition-all={transitionEnabled}
 	class:text-primary={node.needsProcessing}
-	class="border-base-content border border-opacity-0 overflow-hidden bg-base-300 bg-opacity-85 rounded-box {themeControl.isLight
+	class="border-base-200 border border-opacity-0 overflow-hidden bg-base-300 bg-opacity-85 rounded-box {themeControl.isLight
 		? 'hover:brightness-105'
 		: 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
@@ -54,25 +82,77 @@
 		bind:clientWidth={node.width}
 		bind:clientHeight={node.height}
 	>
-		<h1 class="card-title mb-3 col-span-fuaall text-nowrap" title={constructor.description}>
-			{node.label}
-		</h1>
+		<header class='grid'>
+			{#if xmlNode && xmlName}
+				<h2 class="text-sm mb-1 col-start-1">
+					{xmlNode.label}
+				</h2>
+			{/if}
+			<h1
+				class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
+				title={constructor.description}
+			>
+				{#if xmlNode && xmlNode.name}
+					<button
+						type="button"
+						class="cursor-text"
+						onclick={(e) => {
+							if (lastPointerDownPos) {
+								const pos = posFromClient(e);
+								const dist = distance(lastPointerDownPos, pos);
+								console.log(dist);
+								if (dist > 2) return;
+							}
+
+							editingName = true;
+						}}
+						onpointerdown={(e) => {
+							lastPointerDownPos = posFromClient(e);
+						}}
+					>
+						{xmlName}
+					</button>
+					{#if editingName}
+						<input
+							bind:this={nameInput}
+							class="absolute input inset-0"
+							onblur={() => (editingName = false)}
+							value={xmlNode.name}
+							use:shortcut={{
+								key: 'enter',
+								ignoreElements: [],
+								action() {
+									if (!nameInput) return;
+									xmlNode.name = nameInput.value;
+									editingName = false;
+								}
+							}}
+							use:shortcut={{
+								key: 'escape',
+								ignoreElements: [],
+								action() {
+									editingName = false;
+								}
+							}}
+						/>
+					{/if}
+				{:else}
+					{node.label}
+				{/if}
+			</h1>
+			<aside class="col-start-2 row-span-full ms-4 max-h-0">
+				{#each node.sortedControls as [k, control]}
+					{#if control.placeInHeader}
+						{@render controlSnippet(control, {})}
+					{/if}
+				{/each}
+			</aside>
+		</header>
 
 		{#each node.sortedControls as [key, control] (key)}
-			<Ref
-				class="h-full !flex items-center justify-center control col-span-full"
-				data-testid="control"
-				init={(element) =>
-					emit({
-						type: 'render',
-						data: {
-							type: 'control',
-							element,
-							payload: control
-						}
-					})}
-				unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-			/>
+			{#if !control.placeInHeader}
+				{@render controlSnippet(control, {class: 'h-full !flex items-center justify-center control col-span-full'})}
+			{/if}
 		{/each}
 		<form class="grid grid-flow-dense gap-2">
 			{#each node.sortedInputs as [key, input], i (key)}
@@ -96,9 +176,12 @@
 							})}
 						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 					/>
-					<div class="">
+					<div>
 						{#if !input.control || !input.showControl || input.alwaysShowLabel === true}
-							<div class="input-title" data-testid="input-title">
+							<div
+								class="input-title {input.control && input.showControl ? 'ms-0 mb-1' : ''}"
+								data-testid="input-title"
+							>
 								{capitalize(input.label || '')}{#if input.socket.isRequired}<span
 										class="ps-0.5 text-lg"
 										title="required">*</span
@@ -107,7 +190,7 @@
 						{/if}
 						{#if input.control && input.showControl}
 							<Ref
-								class="h-full !flex items-center input-control"
+								class="h-full !flex items-center input-control mr-2"
 								data-testid="input-control"
 								init={(element) =>
 									emit({
@@ -129,31 +212,26 @@
 					class="text-md justify-items-end items-center grid grid-cols-subgrid col-start-3 col-span-2"
 					data-testid={key}
 				>
-					{#if !output.control || !output.showControl}
-						{#if output.displayLabel}
-							<div class="output-title" data-testid="output-title">
-								{capitalize(output.label || '')}{#if output.socket.isRequired}<span
-										class="ps-0.5 text-lg"
-										title="required">*</span
-									>{/if}
-							</div>
-						{/if}
-					{:else}
-						<Ref
-							class="h-full !flex items-center output-control"
-							data-testid="output-control"
-							init={(element) =>
-								emit({
-									type: 'render',
-									data: {
-										type: 'control',
-										element,
-										payload: output.control
-									}
-								})}
-							unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-						/>
-					{/if}
+					<div class="output-title" data-testid="output-title">
+						{capitalize(output.label || '')}{#if output.socket.isRequired}<span
+								class="ps-0.5 text-lg"
+								title="required">*</span
+							>{/if}
+					</div>
+					<!-- <Ref
+						class="h-full !flex items-center output-control"
+						data-testid="output-control"
+						init={(element) =>
+							emit({
+								type: 'render',
+								data: {
+									type: 'control',
+									element,
+									payload: output.control
+								}
+							})}
+						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+					/> -->
 					<Ref
 						data-testid="output-socket"
 						class="text-end col-start-2"

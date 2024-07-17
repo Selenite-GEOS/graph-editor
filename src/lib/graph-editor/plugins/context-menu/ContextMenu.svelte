@@ -69,20 +69,20 @@
 			}}
 			use:shortcut={{
 				ignoreElements: [],
-				shortcuts: { key: 'Escape' },
+				key: 'Escape',
 				action(e) {
 					menu.visible = false;
 				}
 			}}
 			use:shortcut={{
-				shortcuts: { key: 'ArrowDown' },
+				key: 'ArrowDown',
 				action() {
 					menuCmpnt?.focusNext();
 				},
 				ignoreElements: []
 			}}
 			use:shortcut={{
-				shortcuts: { key: 'ArrowUp' },
+				key: 'ArrowUp' ,
 				action() {
 					menuCmpnt?.focusPrevious();
 				},
@@ -105,13 +105,13 @@
 			on:blur={() => {
 				menu.focused = false;
 			}}
-			class="floating context-menu flex flex-col overflow-y-auto rounded-sm"
+			class="floating context-menu flex flex-col overflow-y-auto rounded-box border shadow-lg border-base-300"
 		>
 			{#if menu.searchbar}
 				<input
 					bind:this={searchInput}
 					type="text"
-					class="p-2"
+					class="p-3 rounded-t-box"
 					placeholder="Search..."
 					bind:value={menu.query}
 				/>

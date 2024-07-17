@@ -7,11 +7,11 @@
 		type InputControlType,
 		type InputControlValueType
 	} from '$graph-editor/socket';
-	import { stopPropagation } from '@selenite/commons';
-	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
+	import { autosize, stopPropagation } from '@selenite/commons';
+	import type { HTMLInputAttributes, HTMLInputTypeAttribute, HTMLTextareaAttributes } from 'svelte/elements';
 	import EditArray from './EditArray.svelte';
 	import { fade } from 'svelte/transition';
-
+	import type { DataType } from '$graph-editor/plugins/typed-sockets';
 	type Props = {
 		data: InputControl<InputControlType>;
 		// width?: string;
@@ -51,6 +51,11 @@
 				return;
 			}
 			if (type === 'number' && isNaN(parseFloat(e.currentTarget.value))) {
+				return;
+			}
+			const stringTypes = ['string', 'path', 'groupNameRef'] as DataType[];
+			if (stringTypes.includes(inputControl.socketType as DataType)) {
+				inputControl.value = e.currentTarget.value;
 				return;
 			}
 			let value: unknown;
@@ -144,6 +149,8 @@
 				})}
 			{/each}
 		</div>
+	{:else if type === 'textarea'}
+		<textarea use:autosize {...inputProps as HTMLTextareaAttributes} class="textarea text-start max-h-[20rem] min-w-[11rem]" onpointerdown={stopPropagation}>{inputControl.value}</textarea>
 	{:else}
 		{@render input(inputProps)}
 	{/if}

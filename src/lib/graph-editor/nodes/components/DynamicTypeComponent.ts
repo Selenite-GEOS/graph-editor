@@ -5,15 +5,20 @@ import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { Node } from '../Node.svelte';
 
 export class DynamicTypeComponent<
-	Inputs extends Record<string, Socket>,
-	Outputs extends Record<string, Socket>
+	Inputs extends Record<string, Socket> = Record<string, Socket>,
+	Outputs extends Record<string, Socket> = Record<string, Socket>
 > extends NodeComponent<Inputs, Outputs> {
 	numConnections = 0;
-	state: { type: SocketType } = { type: 'any' };
+
+	get state() {
+		return this.node.state.dynamicTypeCmpnt as { type: SocketType };
+	}
+
 	dynamicTypeInputs: (keyof Inputs)[];
 	dynamicTypeOutputs: (keyof Outputs)[];
 	constructor(
 		params: NodeComponentParams<Inputs, Outputs> & {
+			initial?: SocketType;
 			inputs: (keyof Inputs)[];
 			outputs: (keyof Outputs)[];
 		}
@@ -25,12 +30,11 @@ export class DynamicTypeComponent<
 			Record<string, Socket>,
 			Record<string, Socket>,
 			{},
-			{ dynamicTypeCmpnt: {type: DataType }}
+			{ dynamicTypeCmpnt: {type: SocketType }}
 		>;
 		if (!node.state.dynamicTypeCmpnt) {
-			node.state.dynamicTypeCmpnt = { type: 'any'};
+			node.state.dynamicTypeCmpnt = { type: params.initial?? 'any'};
 		}
-		this.state = node.state.dynamicTypeCmpnt;
 		this.changeType(this.state.type);
 		const factory = node.factory;
 		if (!factory) return;

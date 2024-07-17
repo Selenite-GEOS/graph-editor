@@ -58,7 +58,7 @@
 				<!-- svelte-ignore event_directive_deprecated -->
 				<button
 					type="button"
-					class="text-start grid grid-cols-subgrid grid-rows-subgrid items-center col-span-2"
+					class="ps-2 text-start gap-4 grid grid-cols-subgrid grid-rows-subgrid items-center col-span-2"
 					on:click={() => toggleExpanded(i)}
 				>
 					<Fa

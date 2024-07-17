@@ -41,13 +41,29 @@
 					nodeClass: XmlNode,
 					params: {
 						xmlConfig: {
-							xmlTag: 'ExampleXML'
+							xmlTag: 'ExampleXML',
 						},
 					},
 					path: ['XML'],
 					tags: ['xml']
 				}),
 				xmlItem({xmlConfig: {xmlTag: 'ExampleWithName', 
+				xmlProperties: [
+								{
+									name: 'name',
+									type: 'string',
+									required: true,
+								},
+								{
+									name: 'a',
+									type: 'number',
+									required: true,
+								},
+								{
+									name: 'b',
+									type: 'number',
+								}
+							]
 					
 				}})
 			 ] }).then(

@@ -1,14 +1,38 @@
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { cloneDeep } from 'lodash-es';
 import { ClassicPreset, getUID } from 'rete';
-import type { Socket, SocketDatastructure, SocketValueWithDatastructure } from '../Socket.svelte';
+import type {
+	Socket,
+	SocketDatastructure,
+	SocketValueWithDatastructure
+} from '../socket/Socket.svelte';
 import { valueConverters } from '$graph-editor/common';
 import type { HTMLAttributes, HTMLBaseAttributes, HTMLInputAttributes } from 'svelte/elements';
 
+export type ControlParams = {
+	placeInHeader: boolean;
+};
+
+
+export function applyParams<T extends object>(target: T, constructor: new () => T, params: Record<string, unknown>) {
+	if (Object.keys(params).length === 0) return;
+	const ref = new constructor();
+	Object.assign(
+		target,
+		Object.fromEntries(Object.entries(params).filter(([k]) => k in ref))
+	);
+}
+
 /**
- * A control represents objects the users can interact with.
+ * A control represents widgets the user can interact with.
  */
-export class Control extends ClassicPreset.Control {}
+export class Control extends ClassicPreset.Control {
+	placeInHeader = $state(false);
+	constructor(params: Partial<ControlParams> = {}) {
+		super();
+		applyParams(this, Control, params);
+	}
+}
 
 /**
  * Supported types of input control.
@@ -153,7 +177,7 @@ export class InputControl<
 	datastructure: D;
 	#socketType: SocketType = $state('any');
 	changeType?: (type: SocketType) => void = $state();
-	props = $state<HTMLInputAttributes>({}) ;
+	props = $state<HTMLInputAttributes>({});
 
 	constructor(params: InputControlParams<T, D>) {
 		super();

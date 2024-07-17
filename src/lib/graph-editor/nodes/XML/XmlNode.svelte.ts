@@ -10,7 +10,7 @@ import {
 } from '$graph-editor/nodes/Node.svelte';
 import type { XmlAttributeDefinition } from './types';
 import { camlelcaseize, titlelize } from '$lib/utils/string';
-import type { SocketType } from '$graph-editor/plugins/typed-sockets';
+import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
 import {
 	type InputControl,
@@ -24,6 +24,7 @@ import type { GeosSchema } from '$lib/geos';
 import type { NodeFactory } from '$graph-editor/editor';
 import 'regenerator-runtime/runtime';
 import wu from 'wu';
+import { formatXml } from '$utils';
 
 export class AddXmlAttributeControl extends Control {
 	constructor(public readonly xmlNode: XmlNode) {
@@ -61,24 +62,36 @@ export class XmlToString extends Node<
 	}
 	data(
 		inputs?: SocketsValues<{ xml: Scalar<'xmlElement:*'> }> | undefined
-	):
-		SocketsValues<{ value: Scalar<'string'> }> {
+	): SocketsValues<{ value: Scalar<'string'> }> {
 		const xml = this.getData('xml', inputs) as unknown as XMLData;
-		return { value: xml ? xml.toXml() : '' };
+		return { value: xml ? formatXml({xml: xml.toXml()}) : '' };
 	}
 }
 
 @registerNode('xml.XML', 'abstract')
-export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar }, {}, {attributeValues: Record<string, unknown>, usedOptionalAttrs: string[], name: string}> {
-	// static __isAbstract = true;
-	static hidden = true;
-	static counts: Record<string, bigint> = {};
-	name?: string;
+export class XmlNode extends Node<
+	Record<string, Socket<DataType>>,
+	{ value: Scalar },
+	{ addXmlAttr: AddXmlAttributeControl },
+	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[]; name?: string }
+> {
+	static counts: Record<string, number> = {};
+
 	xmlTag: string;
 	xmlInputs: Record<string, { tag?: string }> = {};
 	xmlProperties: Set<string> = new Set();
 	optionalXmlAttributes: Set<string> = new Set();
 	xmlVectorProperties: Set<string> = new Set();
+
+	get name(): string | undefined {
+		return this.state.name;
+	}
+	set name(n: string) {
+		this.state.name =
+			typeof n === 'string' && n.trim() !== ''
+				? n
+				: camlelcaseize(this.xmlTag) + XmlNode.counts[this.xmlTag]++;
+	}
 
 	constructor(xmlNodeParams: XmlNodeParams) {
 		let { initialValues = {} } = xmlNodeParams;
@@ -86,7 +99,7 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 		xmlNodeParams.params = {
 			...xmlNodeParams.params,
 			xmlConfig,
-			initialValues,
+			initialValues
 		};
 
 		console.debug('xmlNodeParams', xmlNodeParams);
@@ -106,6 +119,7 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 			xmlProperties.forEach(({ name, type, isArray, controlType, required, pattern }) => {
 				if (name === 'name') {
 					hasName = true;
+					return;
 				}
 				if (required || name in initialValues) {
 					this.addInAttribute({
@@ -127,12 +141,14 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 		}
 
 		if (hasName) {
-			if ('name' in initialValues) this.name = initialValues['name'] as string;
-			else {
-				let name = xmlNodeParams.label;
-				name = name !== undefined ? name : '';
-				XmlNode.counts[name] = XmlNode.counts[name] ? XmlNode.counts[name] + BigInt(1) : BigInt(1);
-				this.name = camlelcaseize(name) + XmlNode.counts[name];
+			XmlNode.counts[xmlConfig.xmlTag] = XmlNode.counts[xmlConfig.xmlTag] ? XmlNode.counts[xmlConfig.xmlTag] + 1 : 1;
+			if (!this.state.name) {
+				if ('name' in initialValues) this.name = initialValues['name'] as string;
+				else {
+					let name = xmlConfig.xmlTag;
+					
+					this.name = camlelcaseize(name) + XmlNode.counts[name];
+				}
 			}
 			this.state.name = this.name;
 		}
@@ -221,7 +237,6 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 
 	setName(name: string) {
 		this.name = name;
-		this.state.name = name;
 	}
 
 	addInAttribute({
@@ -234,8 +249,6 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 		pattern,
 		initialValues = {}
 	}: XmlAttributeDefinition & { initialValues?: Record<string, unknown> }) {
-		if (name.toLowerCase() === 'name') return;
-
 		this.xmlProperties.add(name);
 
 		const xmlTypePattern = /([^\W_]+)(?:_([^\W_]+))?/gm;
@@ -261,12 +274,12 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 
 		if (type === 'vector') this.xmlVectorProperties.add(name);
 
-		const { control: attrInputControl } = this.addInData('name', {
-			name: name,
+		const { control: attrInputControl } = this.addInData(name, {
 			displayName: titlelize(name),
 			socketLabel: titlelize(name),
 			isRequired: required,
-			type: type as SocketType,
+			isLabelDisplayed: true,
+			type: type as DataType,
 			isArray: isArray,
 			control: isArray
 				? undefined
@@ -279,7 +292,7 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 							pattern: pattern,
 							debouncedOnChange: (value) => {
 								console.log('debouncedOnChange', value);
-								this.state.attributeValues[name] = value;
+								// this.state.attributeValues[name] = value;
 								this.getDataflowEngine().reset(this.id);
 							}
 						}
@@ -289,13 +302,13 @@ export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar
 			// console.log('attrInputControl', attrInputControl);
 			const val = (attrInputControl as InputControl).value;
 			if (val !== undefined) {
-				this.state.attributeValues[name] = val;
+				// this.state.attributeValues[name] = val;
 				setTimeout(() => {
 					this.getDataflowEngine().reset(this.id);
 				});
 			}
 		} else {
-			this.state.attributeValues[name] = initialValues[name];
+			// this.state.attributeValues[name] = initialValues[name];
 		}
 
 		this.height += isArray ? 58 : 65.5;

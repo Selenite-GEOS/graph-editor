@@ -27,6 +27,7 @@ import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
+import { downloadJSON } from '@selenite/commons';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -558,16 +559,7 @@ export class NodeFactory {
 	}
 
 	downloadGraph() {
-		const json = JSON.stringify(this.editor, undefined, 4);
-		const blob = new Blob([json], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = `${this.editor.name}.json`;
-		document.body.appendChild(a);
-		a.click();
-		URL.revokeObjectURL(url);
-		document.body.removeChild(a);
+		downloadJSON(this.editor.name, this.editor)
 	}
 
 	loadFromFile() {

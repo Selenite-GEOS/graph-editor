@@ -1,45 +1,33 @@
-import { ButtonControl } from '$graph-editor/socket';
+import { ButtonControl, Socket, type Exec, type Scalar } from '$graph-editor/socket';
 import { formatXml } from '$utils';
-import { Node } from '$graph-editor/nodes/Node.svelte';
-import type { NodeFactory } from '$graph-editor/editor';
-import type { XMLData } from '../XML/XMLData';
+import { Node, path, registerNode, type NodeParams } from '$graph-editor/nodes/Node.svelte';
+import { download } from '@selenite/commons';
 
-export class DownloadNode extends Node {
-	constructor({ factory }: { factory: NodeFactory }) {
-		super({ label: 'Download', factory, height: 160 });
-		this.oldAddInData({
-			name: 'data',
-			displayName: 'Data',
-			socketLabel: 'Data',
-			type: 'xmlElement:*'
-		});
-		this.addControl(
-			'downloadBtn',
-			new ButtonControl('Download', async () => {
-				const inputs = await this.fetchInputs();
-				const data = this.getData('data', inputs) as XMLData;
-				console.log('data to convert to xml', data);
-				console.log(formatXml({ xml: data.toXml() }));
+@registerNode('io.Download')
+@path('I/O')
+export class DownloadNode extends Node<
+	{ exec: Exec; data: Socket<'any'>; name: Scalar<'string'> },
+	{ exec: Exec },
+	{ downloadBtn: ButtonControl }
+> {
+	constructor(params: NodeParams = {}) {
+		super({ label: 'Download', ...params });
+		this.addInData('name', { type: 'string', isLabelDisplayed: true, initial: 'data.txt' });
+		this.addInExec();
+		this.addOutExec();
+		this.addInData('data', { isLabelDisplayed: true });
+		this.addControl('downloadBtn', new ButtonControl({label: 'Download', onClick: () => this.download(), placeInHeader: true}));
+	}
 
-				// download to computer
-				const element = document.createElement('a');
+	async download() {
+		const inputs = await this.fetchInputs();
+		const data = this.getData('data', inputs);
+		const name = this.getData('name', inputs);
+		download(name, data);
+	}
 
-				element.setAttribute(
-					'href',
-					'data:text/plain;charset=utf-8,' + encodeURIComponent(formatXml({ xml: data.toXml() }))
-				);
-				element.setAttribute(
-					'download',
-					`${data.name ?? (data.tag === 'Problem' ? factory.getEditor().name : data.tag)}.xml`
-				);
-
-				element.style.display = 'none';
-				document.body.appendChild(element);
-
-				element.click();
-
-				document.body.removeChild(element);
-			})
-		);
+	async execute(input: 'exec', forward: (output: 'exec') => unknown, forwardExec?: boolean): Promise<void> {
+		await this.download();
+		super.execute(input, forward, true)
 	}
 }

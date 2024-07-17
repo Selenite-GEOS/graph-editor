@@ -17,7 +17,7 @@
 	// import { Popup } from '$lib/layout';
 	import { _ } from '$lib/global/index.svelte';
 	import { writable } from 'svelte/store';
-	import { XmlNode } from '$graph-editor/nodes/XML/XmlNode';
+	import { XmlNode } from '$graph-editor/nodes/XML/XmlNode.svelte';
 	import { MacroNode } from '$graph-editor/nodes/MacroNode';
 	import { VariableNode } from '$graph-editor/nodes/XML';
 

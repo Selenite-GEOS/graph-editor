@@ -1,4 +1,4 @@
-import { Node, registerNode, type NodeParams, type SocketsValues } from '../Node.svelte';
+import { Node, registerNode, tags, type NodeParams, type SocketsValues } from '../Node.svelte';
 import { getLeavesFromOutput } from '../utils';
 import type { DataType, SocketType } from '../../plugins/typed-sockets';
 import type { ExecSocket, Socket } from '$graph-editor/socket';
@@ -6,12 +6,13 @@ import { DynamicTypeComponent } from '../components/DynamicTypeComponent';
 
 // Class defining a For Each Node
 @registerNode('control.ForEach')
+@tags('loop', 'iteration')
 export class ForEachNode<T extends DataType = DataType> extends Node<
-	{ exec: ExecSocket; array: Socket<'any', 'array'> },
+	{ exec: ExecSocket; array: Socket<DataType, 'array'> },
 	{
 		loop: ExecSocket;
 		exec: ExecSocket;
-		item: Socket<'any', 'scalar'>;
+		item: Socket<DataType, 'scalar'>;
 		index: Socket<'number', 'scalar'>;
 	}
 > {
@@ -21,7 +22,7 @@ export class ForEachNode<T extends DataType = DataType> extends Node<
 
 	constructor(params: NodeParams = {}) {
 		super({ ...params, label: 'For Each' });
-
+		const initialType: DataType = 'number';
 		this.pythonComponent.addVariables('item', 'index');
 		this.pythonComponent.setCodeTemplateGetter(() => {
 			return `
@@ -34,17 +35,33 @@ for $(index), $(item) in enumerate($(array)):
 		this.addInExec();
 		this.addOutExec('loop', 'Loop');
 		this.addOutExec('exec', 'Done');
+		let dynamicTypeCmpnt: DynamicTypeComponent| undefined;
 		this.addInData('array', {
 			datastructure: 'array',
-			type: 'any'
+			type: initialType,
+			changeType: (type) => {
+				if (type ==='exec') {
+					throw new Error('Cannot use exec as type');
+				}
+				if (!dynamicTypeCmpnt) return;
+				dynamicTypeCmpnt.changeType(type);
+				if (this.inputs.array?.socket)
+				this.inputs.array.socket.type = type;
+			if (this.outputs.item?.socket)
+					this.outputs.item.socket.type = type
+			}
 		});
 		this.addOutData('item', {
-			type: 'any'
+			type: initialType
 		});
 		this.addOutData('index', {
 			type: 'number'
 		});
-		this.addComponentByClass(DynamicTypeComponent, { inputs: ['array'], outputs: ['item'] });
+		dynamicTypeCmpnt = this.addComponentByClass(DynamicTypeComponent, {
+			inputs: ['array'],
+			outputs: ['item'],
+			initial: initialType
+		});
 	}
 
 	// Executes the node
@@ -59,6 +76,7 @@ for $(index), $(item) in enumerate($(array)):
 			this.currentItemIndex = i;
 
 			this.getDataflowEngine().reset(this.id);
+			this.processDataflow();
 			const leavesFromLoopExec = getLeavesFromOutput(this, 'loop');
 			const promises = this.getWaitPromises(leavesFromLoopExec);
 			forward('loop');

@@ -48,9 +48,10 @@
 		treeCmpnt?.expandPath(focusedItem.path);
 		await tick();
 		const elmnt = treeElement?.querySelector(`#${focusedItem.id}`) as HTMLElement & {
-			focus: () => void;
-		};
-		elmnt.focus();
+			focus?: () => void;
+		} | undefined;
+		if (elmnt?.focus)
+			elmnt.focus();
 	}
 </script>
 
@@ -58,14 +59,14 @@
 	bind:this={treeCmpnt}
 	bind:element={treeElement}
 	{tree}
-	class="p-2 bg-slate-900 bg-opacity-100 text-white {classes}"
+	class="p-2 bg-neutral bg-opacity-100 text-neutral-content {classes}"
 >
 	{#snippet leaf(item: MenuItem)}
 		<!-- svelte-ignore event_directive_deprecated -->
 		<button
 			type="button"
 			id={item.id}
-			class=" p-1 rounded-sm w-full text-start"
+			class="transition-all duration-100 p-0.5 ps-4 rounded-btn w-full text-start bg-transparent hover:bg-base-300 hover:text-base-content"
 			title={item.description}
 			on:click={() => {
 				if (onclick) onclick();

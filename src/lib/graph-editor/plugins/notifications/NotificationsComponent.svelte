@@ -24,7 +24,12 @@
     <div class="border-4 h-full rounded-badge" style="border-color: {notif.color && notif.color in colors ? colors[notif.color] : 'oklch(var(--in))' };"></div>
 		<div>
 			<h1 class="font-bold">{notif.title ?? 'Notification'}</h1>
-			<p class="text-wrap">{notif.message}</p>
+			<p class="text-wrap">
+				{#each (notif.message ?? '').split('\n') as line}
+					{line}
+					<br />
+				{/each}
+			</p>
 		</div>
 		{#if notif.withCloseButton ?? true}
 			<button type="button" class="btn btn-sm btn-ghost place-self-end self-center" onclick={() => notif.remove()}>

@@ -1,3 +1,3 @@
 export * from './VariableNode';
-export * from './XmlNode';
+export * from './XmlNode.svelte';
 export * from './GetNameNode';

@@ -1,13 +1,13 @@
 import { ClassicPreset } from 'rete';
 import type { Socket } from './Socket.svelte';
-import type { Control } from './control';
+import type { Control } from '../control';
 
 export class Input<S extends Socket = Socket>
 	extends ClassicPreset.Port<S>
 	implements ClassicPreset.Input<S>
 {
 	public readonly isRequired: boolean;
-	public readonly index?: number;
+	public index = $state<number>() ;
 	// showControl: boolean = $state(true);
 	/**
 	 * Control instance

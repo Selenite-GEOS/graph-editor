@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Fa from 'svelte-fa';
 	import { faPlus } from '@fortawesome/free-solid-svg-icons';
-	import type { AddXmlAttributeControl } from '../../../../../nodes/XML/XmlNode';
+	import type { AddXmlAttributeControl } from '../../../../../nodes/XML/XmlNode.svelte';
 
 	export let data: AddXmlAttributeControl;
 	const optAttrNames = [...data.xmlNode.optionalXmlAttributes];

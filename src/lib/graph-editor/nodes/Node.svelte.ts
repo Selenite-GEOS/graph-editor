@@ -20,10 +20,7 @@ import {
 	Control,
 	InputControl,
 	type InputControlType,
-	type InputControlValueType,
 	type InputControlParams,
-	inputControlTypes,
-	isInputControlType,
 	assignControl,
 	type SocketValueType,
 	type SocketValueWithDatastructure,
@@ -34,10 +31,10 @@ import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { ConverterNode } from './data/common-data-nodes.svelte';
 import type { AreaPlugin } from 'rete-area-plugin';
 import type { Schemes } from '$graph-editor/schemes';
-import { tick } from 'svelte';
 import { structures } from 'rete-structures';
 import { getLeavesFromOutput } from './utils';
 import type { HTMLInputAttributes } from 'svelte/elements';
+import { uuidv4 } from '@selenite/commons';
 
 /**
  * A map of node classes indexed by their id.
@@ -240,8 +237,7 @@ export class Node<
 		State extends Record<string, unknown> = Record<string, unknown>,
 		Params extends Record<string, unknown> = Record<string, unknown>
 	>
-	extends ClassicPreset.Node<Inputs, Outputs, Controls>
-	implements DataflowNode, ComponentSupportInterface
+	implements ClassicPreset.Node<Inputs, Outputs, Controls>, DataflowNode, ComponentSupportInterface
 {
 	#width = $state(100);
 	#height = $state(50);
@@ -304,10 +300,11 @@ export class Node<
 	);
 	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } =
 		$state({});
+	controls = $state<Controls>({} as Controls);
 	needsProcessing = $state(false);
 	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)) as [string, Input<Socket>][]);
 	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)) as [string, Output<Socket>][]);
-	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)));
+	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)) as [string, Control][]);
 	readonly pythonComponent: PythonNodeComponent;
 	readonly socketSelectionComponent: R_SocketSelection_NC;
 	readonly ingoingDataConnections: Record<string, Connection<Node, Node>[]> = {};
@@ -329,6 +326,14 @@ export class Node<
 	getState(): Record<string, unknown> {
 		return this.state;
 	}
+	addInput<K extends keyof Inputs>(key: K, input: Input<Exclude<Inputs[K], undefined>>): void {
+		this.inputs[key] = input;
+	}
+
+	addOutput<K extends keyof Outputs>(key: K, output: Output<Exclude<Outputs[K], undefined>>): void {
+		this.outputs[key] = output;
+	
+	}
 
 	getConnections(): Connection[] {
 		return [
@@ -341,7 +346,8 @@ export class Node<
 
 	constructor(params: NodeParams = {}) {
 		const { label = '', width = 190, height = 120, factory } = params;
-		super(label);
+		this.id = uuidv4();
+		this.label = label;
 		this.initialValues = params.initialValues;
 		this.pythonComponent = this.addComponentByClass(PythonNodeComponent);
 		this.socketSelectionComponent = this.addComponentByClass(R_SocketSelection_NC);
@@ -359,6 +365,30 @@ export class Node<
 		// format.subscribe((_) => (this.label = _(label)));
 		this.width = width;
 		this.height = height;
+	}
+	label = $state("");
+	id: string;
+	selected?: boolean | undefined;
+	hasInput<K extends keyof Inputs>(key: K) {
+		return key in this.inputs;
+	}
+	removeInput(key: keyof Inputs): void {
+		delete this.inputs[key];
+	}
+	hasOutput<K extends keyof Outputs>(key: K) {
+		return key in this.outputs;
+	}
+	removeOutput(key: keyof Outputs): void {
+		delete this.outputs[key];
+	}
+	hasControl<K extends keyof Controls>(key: K) {
+		return key in this.controls;
+	}
+	addControl<K extends keyof Controls>(key: K, control: Controls[K]): void {
+		this.controls[key] = control;
+	}
+	removeControl(key: keyof Controls): void {
+		throw new Error('Method not implemented.');
 	}
 	setState(state: Record<string, unknown>) {
 		this.state = state;
@@ -543,7 +573,7 @@ export class Node<
 		input: ExecSocketsKeys<Inputs>,
 		forward: (output: ExecSocketsKeys<Outputs>) => unknown,
 		forwardExec = true
-	) {
+	): void | Promise<void> {
 		this.needsProcessing = true;
 		if (forwardExec && this.outputs.exec) {
 			forward('exec' as ExecSocketsKeys<Outputs>);
@@ -556,6 +586,7 @@ export class Node<
 
 	addInExec(name: ExecSocketsKeys<Inputs> = 'exec' as ExecSocketsKeys<Inputs>, displayName = '') {
 		const input = new Input({
+			index: -1,
 			socket: new ExecSocket({ name: displayName, node: this }),
 			isRequired: true
 		});
@@ -611,6 +642,7 @@ export class Node<
 			datastructure?: Inputs[K]['datastructure'] extends 'scalar'
 				? 'scalar' | undefined
 				: Inputs[K]['datastructure'];
+			control?: Partial<InputControlParams<InputControlType>>;
 			label?: string;
 			isRequired?: boolean;
 			isLabelDisplayed?: boolean;
@@ -641,11 +673,12 @@ export class Node<
 		if (controlType) {
 			const inputControl = this.makeInputControl({
 				type: controlType,
+				...params?.control,
 				props: params?.props,
 				socketType: params?.type ?? 'any',
 				datastructure: params?.datastructure ?? 'scalar',
 				initial: this.initialValues?.inputs[key] ?? params?.initial,
-				changeType: params?.changeType
+				changeType: params?.changeType,
 			});
 			input.addControl(inputControl);
 		}
@@ -729,6 +762,7 @@ export class Node<
 	) {
 		if (isNaturalFlow) this.naturalFlowExec = name;
 		const output = new Output(new ExecSocket({ name: displayName, node: this }), displayName);
+		output.index = -1
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}
 
