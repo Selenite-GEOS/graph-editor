@@ -4,7 +4,7 @@
 	import { showContextMenu } from '$graph-editor/plugins/context-menu';
 	import { stopPropagation } from '@selenite/commons';
 	import type { SocketType } from '$graph-editor/plugins/typed-sockets';
-	import { assignColor } from '$rete/customization/utils';
+	import { assignColor } from '$graph-editor/render/utils';
 	// svelte-ignore unused-export-let
 	type Props = {
 		//  data: Schemes['Connection'] & { isLoop?: boolean };

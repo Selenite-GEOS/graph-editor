@@ -1,7 +1,6 @@
-import type { InputControlTypes } from '../../../graph-editor/socket/control/Control.svelte';
-import type { SocketType } from '../../../graph-editor/plugins/typed-sockets';
-import { Socket } from '$graph-editor/socket';
-import { $socketcolor } from './presets/classic/vars';
+import type { SocketType } from '../plugins/typed-sockets';
+import { Socket, type InputControlType } from '$graph-editor/socket';
+import { $socketcolor } from './vars';
 
 export const colorMap: { [key in SocketType]?: string } = {
 	string: '#d88cbb',
@@ -63,9 +62,9 @@ export function assignColor(s: Socket | SocketType): string {
 
 export function assignControl(
 	socketType: SocketType,
-	default_?: InputControlTypes
-): InputControlTypes | undefined {
-	const controlMap: { [key in SocketType]?: InputControlTypes } = {
+	default_?: InputControlType
+): InputControlType | undefined {
+	const controlMap: { [key in SocketType]?: InputControlType } = {
 		path: 'remote-file',
 		string: 'text',
 		integer: 'integer',

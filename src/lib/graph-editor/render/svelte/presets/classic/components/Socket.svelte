@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Socket, SocketDatastructure } from '$graph-editor/socket/Socket.svelte';
-	import { assignColor } from '$rete/customization/utils';
+	import { assignColor } from '$graph-editor/render/utils';
 	import { capitalize } from 'lodash-es';
 	import cssVars from 'svelte-css-vars';
 	import ExecSocket from './ExecSocket.svelte';
