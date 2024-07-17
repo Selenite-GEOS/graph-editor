@@ -1,0 +1,360 @@
+{
+    "editorName": "XML Generation",
+    "variables": {},
+    "nodes": [
+        {
+            "id": "5cc45132bdd9fd89",
+            "type": "xml.ToString",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": 386.86183338079024,
+                "y": 375.11051802180924
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "bdc926222f57fa83",
+            "type": "io.Log",
+            "params": {},
+            "state": {
+                "name": "Print XML"
+            },
+            "position": {
+                "x": 953.2877001238928,
+                "y": 10.249904057594827
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "message": "",
+                    "time": 3
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "0247b5e0e9f046c0",
+            "type": "control.start",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": 28.597432532420786,
+                "y": 17.38841870352472
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "fb5d5bc80b7f841f",
+            "type": "control.ForEach",
+            "params": {},
+            "state": {
+                "dynamicTypeCmpnt": {
+                    "type": "number"
+                },
+                "name": "Cfl factors"
+            },
+            "position": {
+                "x": 187.71426789627438,
+                "y": 14.216973660812387
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "array": [
+                        0,
+                        0.25,
+                        0.5,
+                        0.75,
+                        1
+                    ]
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "52f1ed1beb0c4a17",
+            "type": "io.Download",
+            "params": {},
+            "state": {
+                "name": "Download XML"
+            },
+            "position": {
+                "x": 1374.187422520094,
+                "y": 10.500564071691723
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "name": "data.txt",
+                    "data": ""
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "94ad4afd5237318f",
+            "type": "io.Log",
+            "params": {},
+            "state": {
+                "name": "Print download name"
+            },
+            "position": {
+                "x": 1766.006596346749,
+                "y": 9.753628781500424
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "message": "Downloaded",
+                    "time": 3
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "4a65116bb345cc03",
+            "type": "string.Format",
+            "params": {},
+            "state": {
+                "name": "Download message"
+            },
+            "position": {
+                "x": 1431.9904748275412,
+                "y": 342.70212253941503
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "format": "Downloaded {name} !",
+                    "data-name": ""
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "82e18dafae0c4e67",
+            "type": "string.Format",
+            "params": {},
+            "state": {
+                "name": "File name"
+            },
+            "position": {
+                "x": 1043.274123728626,
+                "y": 340.67449330212037
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "format": "{name}-cfl-{cfl}.xml",
+                    "data-name": "Example",
+                    "data-cfl": ""
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "312589539bf39e55",
+            "type": "string.Format",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": 621.1311897216268,
+                "y": 339.56122898746867
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "format": "Download xml :\n\n{xml}",
+                    "data-xml": ""
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "c48c255178119c73",
+            "type": "string.StringNode",
+            "params": {},
+            "state": {
+                "name": "Config name"
+            },
+            "position": {
+                "x": 377.38382418086235,
+                "y": 593.823124003576
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": "example"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "86b91b48-5dab-40b5-a00d-bbb789cea9d6",
+            "type": "xml.XML",
+            "params": {
+                "xmlConfig": {
+                    "xmlTag": "ExampleWithName",
+                    "xmlProperties": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "required": true
+                        },
+                        {
+                            "name": "cfl",
+                            "type": "number",
+                            "required": true
+                        },
+                        {
+                            "name": "b",
+                            "type": "number"
+                        }
+                    ]
+                },
+                "initialValues": {
+                    "inputs": {
+                        "cfl": 0
+                    },
+                    "controls": {}
+                }
+            },
+            "state": {
+                "usedOptionalAttrs": [],
+                "name": "Example XML"
+            },
+            "position": {
+                "x": 131.97750416285822,
+                "y": 350.2889575009789
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "cfl": 0
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        }
+    ],
+    "connections": [
+        {
+            "id": "731c2242233cda3c",
+            "source": "0247b5e0e9f046c0",
+            "target": "fb5d5bc80b7f841f",
+            "sourceOutput": "exec",
+            "targetInput": "exec"
+        },
+        {
+            "id": "27efd9f7f115ebf7",
+            "source": "52f1ed1beb0c4a17",
+            "target": "94ad4afd5237318f",
+            "sourceOutput": "exec",
+            "targetInput": "exec"
+        },
+        {
+            "id": "74c340fa595f275e",
+            "source": "5cc45132bdd9fd89",
+            "target": "52f1ed1beb0c4a17",
+            "sourceOutput": "value",
+            "targetInput": "data"
+        },
+        {
+            "id": "74559a7509320907",
+            "source": "82e18dafae0c4e67",
+            "target": "52f1ed1beb0c4a17",
+            "sourceOutput": "result",
+            "targetInput": "name"
+        },
+        {
+            "id": "69f5717eec242a10",
+            "source": "4a65116bb345cc03",
+            "target": "94ad4afd5237318f",
+            "sourceOutput": "result",
+            "targetInput": "message"
+        },
+        {
+            "id": "1234a928dd37aeb5",
+            "source": "82e18dafae0c4e67",
+            "target": "4a65116bb345cc03",
+            "sourceOutput": "result",
+            "targetInput": "data-name"
+        },
+        {
+            "id": "73d042b035d39f43",
+            "source": "fb5d5bc80b7f841f",
+            "target": "82e18dafae0c4e67",
+            "sourceOutput": "item",
+            "targetInput": "data-cfl"
+        },
+        {
+            "id": "debdf1edf2936cad",
+            "source": "fb5d5bc80b7f841f",
+            "target": "bdc926222f57fa83",
+            "sourceOutput": "loop",
+            "targetInput": "exec"
+        },
+        {
+            "id": "ad74be11a09a73bb",
+            "source": "bdc926222f57fa83",
+            "target": "52f1ed1beb0c4a17",
+            "sourceOutput": "exec",
+            "targetInput": "exec"
+        },
+        {
+            "id": "f57d2972006821eb",
+            "source": "312589539bf39e55",
+            "target": "bdc926222f57fa83",
+            "sourceOutput": "result",
+            "targetInput": "message"
+        },
+        {
+            "id": "508caaa0027b4a34",
+            "source": "c48c255178119c73",
+            "target": "82e18dafae0c4e67",
+            "sourceOutput": "value",
+            "targetInput": "data-name"
+        },
+        {
+            "id": "821d97ac2fbaa471",
+            "source": "5cc45132bdd9fd89",
+            "target": "312589539bf39e55",
+            "sourceOutput": "value",
+            "targetInput": "data-xml"
+        },
+        {
+            "id": "37f183b0e83017d1",
+            "source": "fb5d5bc80b7f841f",
+            "target": "86b91b48-5dab-40b5-a00d-bbb789cea9d6",
+            "sourceOutput": "item",
+            "targetInput": "cfl"
+        },
+        {
+            "id": "7429b3ad4b3b62f9",
+            "source": "86b91b48-5dab-40b5-a00d-bbb789cea9d6",
+            "target": "5cc45132bdd9fd89",
+            "sourceOutput": "value",
+            "targetInput": "xml"
+        }
+    ],
+    "comments": []
+}
