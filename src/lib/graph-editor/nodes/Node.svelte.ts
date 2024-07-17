@@ -47,13 +47,16 @@ export const nodeRegistry = new Map<string, NodeConstructor>();
 export function registerNode<
 	Inputs extends { [x: string]: Socket<SocketType> },
 	Outputs extends { [x: string]: Socket<SocketType> },
-	Controls extends { [x: string]: Control }, T extends 'abstract' | 'real' = 'real'
+	Controls extends { [x: string]: Control },
+	T extends 'abstract' | 'real' = 'real'
 >(id: string, type?: T) {
 	// this is the decorator factory, it sets up
 	// the returned decorator function
-	return function (target: T extends 'abstract' ? unknown : NodeConstructor<Node<Inputs, Outputs, Controls>>) {
+	return function (
+		target: T extends 'abstract' ? unknown : NodeConstructor<Node<Inputs, Outputs, Controls>>
+	) {
 		target.id = id;
-		if (type ==='abstract') target.visible = false;
+		if (type === 'abstract') target.visible = false;
 		if (nodeRegistry.has(id)) {
 			console.warn('Node already registered', id);
 		}
@@ -294,7 +297,17 @@ export class Node<
 	protected params: Params = {} as Params;
 	static id: string;
 	static nodeCounts = BigInt(0);
-	state = $state<Partial<State>>({} as State);
+	state = $state<{ name?: string } & Partial<State>>({} as State);
+	get name(): string | undefined {
+		return this.state.name;
+	}
+	set name(n :string) {
+		if (n.trim() === '') {
+			this.state.name = undefined;
+			return;
+		}
+		this.state.name = n;
+	}
 	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = $state(
 		{}
 	);
@@ -303,7 +316,9 @@ export class Node<
 	controls = $state<Controls>({} as Controls);
 	needsProcessing = $state(false);
 	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)) as [string, Input<Socket>][]);
-	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)) as [string, Output<Socket>][]);
+	sortedOutputs = $derived(
+		sortedByIndex(Object.entries(this.outputs)) as [string, Output<Socket>][]
+	);
 	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)) as [string, Control][]);
 	readonly pythonComponent: PythonNodeComponent;
 	readonly socketSelectionComponent: R_SocketSelection_NC;
@@ -332,7 +347,6 @@ export class Node<
 
 	addOutput<K extends keyof Outputs>(key: K, output: Output<Exclude<Outputs[K], undefined>>): void {
 		this.outputs[key] = output;
-	
 	}
 
 	getConnections(): Connection[] {
@@ -366,7 +380,7 @@ export class Node<
 		this.width = width;
 		this.height = height;
 	}
-	label = $state("");
+	label = $state('');
 	id: string;
 	selected?: boolean | undefined;
 	hasInput<K extends keyof Inputs>(key: K) {
@@ -678,7 +692,7 @@ export class Node<
 				socketType: params?.type ?? 'any',
 				datastructure: params?.datastructure ?? 'scalar',
 				initial: this.initialValues?.inputs[key] ?? params?.initial,
-				changeType: params?.changeType,
+				changeType: params?.changeType
 			});
 			input.addControl(inputControl);
 		}
@@ -762,7 +776,7 @@ export class Node<
 	) {
 		if (isNaturalFlow) this.naturalFlowExec = name;
 		const output = new Output(new ExecSocket({ name: displayName, node: this }), displayName);
-		output.index = -1
+		output.index = -1;
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}
 

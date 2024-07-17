@@ -73,7 +73,7 @@ export class XmlNode extends Node<
 	Record<string, Socket<DataType>>,
 	{ value: Scalar },
 	{ addXmlAttr: AddXmlAttributeControl },
-	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[]; name?: string }
+	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[] }
 > {
 	static counts: Record<string, number> = {};
 
@@ -83,14 +83,15 @@ export class XmlNode extends Node<
 	optionalXmlAttributes: Set<string> = new Set();
 	xmlVectorProperties: Set<string> = new Set();
 
-	get name(): string | undefined {
-		return this.state.name;
-	}
-	set name(n: string) {
-		this.state.name =
+	set name(n: string) {	
+		super.name =
 			typeof n === 'string' && n.trim() !== ''
 				? n
 				: camlelcaseize(this.xmlTag) + XmlNode.counts[this.xmlTag]++;
+	}
+
+	get name(): string | undefined {
+		return super.name;
 	}
 
 	constructor(xmlNodeParams: XmlNodeParams) {
@@ -146,11 +147,9 @@ export class XmlNode extends Node<
 				if ('name' in initialValues) this.name = initialValues['name'] as string;
 				else {
 					let name = xmlConfig.xmlTag;
-					
 					this.name = camlelcaseize(name) + XmlNode.counts[name];
 				}
 			}
-			this.state.name = this.name;
 		}
 
 		// Add XML element inputs

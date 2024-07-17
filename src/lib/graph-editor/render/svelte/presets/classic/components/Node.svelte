@@ -4,7 +4,13 @@
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
 	import { themeControl } from '$lib/global/index.svelte';
-	import { capitalize, distance, posFromClient, shortcut } from '@selenite/commons';
+	import {
+		capitalize,
+		distance,
+		posFromClient,
+		shortcut,
+		stopPropagation
+	} from '@selenite/commons';
 	import { XmlNode } from '$graph-editor/nodes/XML';
 	import type { Position } from '$graph-editor/common';
 	import { Control } from '$graph-editor/socket';
@@ -14,7 +20,6 @@
 	let transitionEnabled = $state(false);
 
 	const xmlNode = $derived(node instanceof XmlNode ? node : undefined);
-	const xmlName = $derived(xmlNode?.name);
 	// Avoid transitions on mount
 	$effect(() => {
 		setTimeout(() => {
@@ -48,7 +53,7 @@
 	let lastPointerDownPos = $state<Position>();
 </script>
 
-{#snippet controlSnippet(control: Control, {class: classes}: {class?: string})}
+{#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
 	<Ref
 		class={classes}
 		data-testid="control"
@@ -82,48 +87,53 @@
 		bind:clientWidth={node.width}
 		bind:clientHeight={node.height}
 	>
-		<header class='grid'>
-			{#if xmlNode && xmlName}
+		<header class="grid">
+			{#if node.name}
 				<h2 class="text-sm mb-1 col-start-1">
-					{xmlNode.label}
+					{node.label}
 				</h2>
 			{/if}
 			<h1
 				class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
 				title={constructor.description}
 			>
-				{#if xmlNode && xmlNode.name}
+					<!-- svelte-ignore event_directive_deprecated -->
 					<button
 						type="button"
-						class="cursor-text"
-						onclick={(e) => {
+						class="cursor-text pe-2"
+						on:click={(e) => {
 							if (lastPointerDownPos) {
 								const pos = posFromClient(e);
 								const dist = distance(lastPointerDownPos, pos);
-								console.log(dist);
+								console.debug('Dragged distance', dist);
 								if (dist > 2) return;
 							}
-
 							editingName = true;
 						}}
-						onpointerdown={(e) => {
+						on:pointerdown={(e) => {
 							lastPointerDownPos = posFromClient(e);
 						}}
 					>
-						{xmlName}
+						{node.name ?? node.label}
 					</button>
 					{#if editingName}
+						<!-- svelte-ignore event_directive_deprecated -->
 						<input
 							bind:this={nameInput}
 							class="absolute input inset-0"
-							onblur={() => (editingName = false)}
-							value={xmlNode.name}
+							on:blur={() => {
+								if (!nameInput || !editingName) return;
+								node.name = nameInput.value;
+								editingName = false;
+							}}
+							on:pointerdown={stopPropagation}
+							value={node.name}
 							use:shortcut={{
 								key: 'enter',
 								ignoreElements: [],
 								action() {
-									if (!nameInput) return;
-									xmlNode.name = nameInput.value;
+									node.name = nameInput!.value;
+									editingName = false;
 									editingName = false;
 								}
 							}}
@@ -136,9 +146,7 @@
 							}}
 						/>
 					{/if}
-				{:else}
-					{node.label}
-				{/if}
+
 			</h1>
 			<aside class="col-start-2 row-span-full ms-4 max-h-0">
 				{#each node.sortedControls as [k, control]}
@@ -151,7 +159,9 @@
 
 		{#each node.sortedControls as [key, control] (key)}
 			{#if !control.placeInHeader}
-				{@render controlSnippet(control, {class: 'h-full !flex items-center justify-center control col-span-full'})}
+				{@render controlSnippet(control, {
+					class: 'h-full !flex items-center justify-center control col-span-full'
+				})}
 			{/if}
 		{/each}
 		<form class="grid grid-flow-dense gap-2">
@@ -198,7 +208,7 @@
 										data: {
 											type: 'control',
 											element,
-											payload: input.control
+											payload: input.control!
 										}
 									})}
 								unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
