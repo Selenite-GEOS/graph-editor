@@ -1,5 +1,5 @@
 import type { NodeFactory } from './NodeFactory';
-import type { NodeEditor, NodeEditorSaveData } from './NodeEditor';
+import type { NodeEditor, NodeEditorSaveData } from './NodeEditor.svelte';
 import type { EditorExample } from '$graph-editor/old-examples';
 import type { Writable } from 'svelte/store';
 

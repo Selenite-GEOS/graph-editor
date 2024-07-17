@@ -6,7 +6,7 @@ import type { Variable } from '../variables';
 import { get, writable, type Readable, type Writable } from 'svelte/store';
 import { NodeFactory } from './NodeFactory';
 import wu from 'wu';
-import { _ } from '$lib/global/index.svelte';
+import { _, ErrorWNotif } from '$lib/global/index.svelte';
 
 export type CommentSaveData = {
 	id: string;
@@ -36,15 +36,22 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 
 	// constructor() {
 	// }
-	setName(name: string, triggerListeners = true) {
-		this.name = name.trim() !== '' ? name : get(_)('editor.default-name');
-		if (triggerListeners) this.onChangeNameListeners.forEach((listener) => listener(this.name));
+	setName(name: string) {
+		this.graphName = name;
 	}
-	name = 'New Editor';
+	protected readonly name = 'Node Editor';
+	#graphName = $state('New Graph')
+	get graphName() {
+		return this.#graphName;
+	}
+	set graphName(n) {
+		this.#graphName = n.trim() !== '' ? n : get(_)('editor.default-name');
+		this.onChangeNameListeners.forEach((listener) => listener(n));
+	}
 	nameStore: Readable<string> = {
 		subscribe: (run, invalidate) => {
 			this.addOnChangeNameListener(run);
-			run(this.name);
+			run(this.graphName);
 
 			return () => {
 				this.onChangeNameListeners.splice(
@@ -57,6 +64,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	onChangeNameListeners: ((name: string) => void)[] = [];
 	id = newLocalId('node-editor');
 
+	// @ts-expect-error
 	getNode(id: string): Node | undefined {
 		return super.getNode(id);
 	}
@@ -71,9 +79,14 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		target: Node | string,
 		targetInput: string
 	): Promise<boolean> {
-		source = typeof source === 'string' ? this.getNode(source) : source;
-		target = typeof target === 'string' ? this.getNode(target) : target;
-		return await this.addConnection(new Connection(source, sourceOutput, target, targetInput));
+		
+		const source_ = typeof source === 'string' ? this.getNode(source) : source;
+		const target_ = typeof target === 'string' ? this.getNode(target) : target;
+		if (!source_ || !target_) {
+			console.error('Node not found');
+			return false;
+		}
+		return await this.addConnection(new Connection(source_, sourceOutput, target_, targetInput));
 	}
 
 	async addConnection(data: Connection): Promise<boolean> {
@@ -93,7 +106,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		}
 
 		return {
-			editorName: this.name,
+			editorName: this.graphName,
 			variables,
 			nodes: this.getNodes().map((node) => node.toJSON()),
 			connections: this.getConnections().map((conn) => conn.toJSON()),

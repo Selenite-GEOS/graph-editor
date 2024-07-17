@@ -1,5 +1,5 @@
 import { AreaExtensions, AreaPlugin } from 'rete-area-plugin';
-import type { NodeEditor, NodeEditorSaveData } from './NodeEditor';
+import type { NodeEditor, NodeEditorSaveData } from './NodeEditor.svelte';
 import type { AreaExtra } from '../area/AreaExtra';
 import type { Schemes } from '../schemes';
 import { ControlFlowEngine, DataflowEngine } from 'rete-engine';
@@ -11,7 +11,7 @@ import {
 	nodeRegistry,
 	type NodeSaveData
 } from '../nodes/Node.svelte';
-import type { Writable } from 'svelte/store';
+import { readable, type Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
@@ -28,6 +28,7 @@ import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/co
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
 import { downloadJSON } from '@selenite/commons';
+import { Modal } from '$graph-editor/plugins/modal';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -81,8 +82,30 @@ type WithoutFactory<T> = Omit<T, 'factory'>;
 // export function registerNode() {}
 export class NodeFactory {
 	public notifications: NotificationsManager = {
-		show: (p: unknown) => {
-			console.error('notfications.show not implemented');
+		show: (notif) => {
+			let res = ''
+			if (notif.title) res += notif.title + ':';
+			console.log(res, notif.message);
+		},
+		error(notif) {
+			let res = ''
+			if (notif.title) res += notif.title + ':';
+			console.error(res, notif.message);
+		},
+		info(notif) {
+			let res = ''
+			if (notif.title) res += notif.title + ':';
+			console.info(res, notif.message);
+		},
+		success(notif) {
+			let res = ''
+			if (notif.title) res += notif.title + ':';
+			console.log('Succes', res, notif.message);
+		},
+		warn(notif) {
+			let res = ''
+			if (notif.title) res += notif.title + ':';
+			console.warn(res, notif.message);
 		}
 	};
 	public readonly connectionPathType: Writable<ConnectionPathType> = persisted(
@@ -90,7 +113,8 @@ export class NodeFactory {
 		defaultConnectionPath
 	);
 
-	public readonly modalStore?: ReturnType<typeof getModalStore>;
+	modalStore = readable(Modal.instance)
+	
 	private state: Map<string, unknown> = new Map();
 
 	public id = newLocalId('node-factory');
@@ -283,12 +307,10 @@ export class NodeFactory {
 		selector?: AreaExtensions.Selector<SelectorEntity>;
 		arrange?: AutoArrangePlugin<Schemes>;
 		history?: HistoryPlugin<Schemes>;
-		modalStore?: ReturnType<typeof getModalStore>;
 		comment?: CommentPlugin<Schemes, AreaExtra>;
 		accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
 	}) {
 		const { editor, area, makutuClasses, selector, arrange } = params;
-		this.modalStore = params.modalStore;
 		this.comment = params.comment;
 		this.accumulating = params.accumulating;
 		this.history = params.history;
@@ -559,7 +581,7 @@ export class NodeFactory {
 	}
 
 	downloadGraph() {
-		downloadJSON(this.editor.name, this.editor)
+		downloadJSON(this.editor.graphName, this.editor)
 	}
 
 	loadFromFile() {
@@ -602,7 +624,7 @@ export class NodeFactory {
 		const resIndex = nodes.findIndex((n) => {
 			return (
 				n.label.toLowerCase().includes(query) ||
-				(n instanceof Nodes.XmlNode && n.name && n.name.toLowerCase().includes(query))
+				(n.name && n.name.toLowerCase().includes(query))
 			);
 		});
 		this.lastSearchNodeIndex = resIndex === -1 ? -1 : (resIndex + m) % nodes.length;

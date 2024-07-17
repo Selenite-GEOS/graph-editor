@@ -9,6 +9,6 @@
  * @module Editor
  */
 
-export * from './NodeEditor';
+export * from './NodeEditor.svelte';
 export * from './types';
 export * from './NodeFactory';

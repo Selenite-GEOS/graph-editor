@@ -73,18 +73,7 @@
 				console.log('Editor setup complete');
 				if ($saveData) {
 					await factory.loadGraph($saveData);
-					editorReady = true;
-					return;
 				}
-				const a = await factory.addNode(NumberNode);
-				const b = await factory.addNode(NumberNode, { initial: 2 });
-				const sum = await factory.addNode(AddNode, {});
-				await editor.addNewConnection(a, 'value', sum, 'a');
-				await editor.addNewConnection(b, 'value', sum, 'b');
-				const display = await factory.addNode(DisplayNode, {});
-				await editor.addNewConnection(sum, 'value', display, 'input');
-				await factory.arrange?.layout();
-				if (factory.area) await AreaExtensions.zoomAt(factory.area, editor.getNodes());
 				editorReady = true;
 			}
 		);
@@ -159,6 +148,9 @@
 				<option value={theme}>{capitalize(theme)}</option>
 			{/each}
 		</select>
+		{#if editor}
+		<input class="input input-bordered" bind:value={editor.graphName}/>
+		{/if}
 	</div>
 	<div
 		use:shortcut={{
