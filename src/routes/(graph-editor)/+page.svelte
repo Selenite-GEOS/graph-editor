@@ -9,7 +9,7 @@
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
 	import { capitalize, shortcut, type KeyboardShortcut } from '@selenite/commons';
-	import { themeControl } from '$lib/global/index.svelte';
+	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type {HTMLButtonAttributes} from 'svelte/elements'
 	import { XmlNode } from '$graph-editor/nodes/XML';
 	import type { GraphNode, NodeParams } from '$graph-editor/nodes';
@@ -55,7 +55,7 @@
 									required: true,
 								},
 								{
-									name: 'a',
+									name: 'cfl',
 									type: 'number',
 									required: true,
 								},
@@ -102,6 +102,11 @@
 		const saveData = editor.toJSON();
 		console.debug('Save');
 		$saveData = saveData;
+		notifications.success({
+			autoClose: 3000,
+			title: 'Save',
+			message: 'Saved!'
+		})
 	}
 	let container = $state<HTMLDivElement>();
 	let screenProportion = $state(100);
@@ -129,6 +134,7 @@
 			disabled={!editorReady}
 			class=" hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all"
 			onclick={() => save()}
+			use:shortcut={{key: 's', ctrl: true, action: save}}
 		>
 			Save
 		</button>
