@@ -88,7 +88,7 @@
 		bind:clientHeight={node.height}
 	>
 		<header class="grid">
-			{#if node.name}
+			{#if node.name || editingName}
 				<h2 class="text-sm mb-1 col-start-1">
 					{node.label}
 				</h2>
