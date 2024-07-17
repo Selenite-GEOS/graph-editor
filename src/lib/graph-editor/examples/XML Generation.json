@@ -8,8 +8,8 @@
             "params": {},
             "state": {},
             "position": {
-                "x": 386.86183338079024,
-                "y": 375.11051802180924
+                "x": 722.5443763952765,
+                "y": 228.5165649048033
             },
             "inputControlValues": {
                 "inputs": {},
@@ -26,7 +26,7 @@
                 "name": "Print XML"
             },
             "position": {
-                "x": 953.2877001238928,
+                "x": 948.5404256498306,
                 "y": 10.249904057594827
             },
             "inputControlValues": {
@@ -45,7 +45,7 @@
             "params": {},
             "state": {},
             "position": {
-                "x": 28.597432532420786,
+                "x": 11.63109025135737,
                 "y": 17.38841870352472
             },
             "inputControlValues": {
@@ -66,7 +66,7 @@
                 "name": "Cfl factors"
             },
             "position": {
-                "x": 187.71426789627438,
+                "x": 167.112262771521,
                 "y": 14.216973660812387
             },
             "inputControlValues": {
@@ -134,8 +134,8 @@
                 "name": "Download message"
             },
             "position": {
-                "x": 1431.9904748275412,
-                "y": 342.70212253941503
+                "x": 1363.0156243144613,
+                "y": 327.86112848213014
             },
             "inputControlValues": {
                 "inputs": {
@@ -155,33 +155,14 @@
                 "name": "File name"
             },
             "position": {
-                "x": 1043.274123728626,
-                "y": 340.67449330212037
+                "x": 947.4771319221553,
+                "y": 335.8689022711828
             },
             "inputControlValues": {
                 "inputs": {
                     "format": "{name}-cfl-{cfl}.xml",
                     "data-name": "Example",
                     "data-cfl": ""
-                },
-                "controls": {}
-            },
-            "selectedInputs": [],
-            "selectedOutputs": []
-        },
-        {
-            "id": "312589539bf39e55",
-            "type": "string.Format",
-            "params": {},
-            "state": {},
-            "position": {
-                "x": 621.1311897216268,
-                "y": 339.56122898746867
-            },
-            "inputControlValues": {
-                "inputs": {
-                    "format": "Download xml :\n\n{xml}",
-                    "data-xml": ""
                 },
                 "controls": {}
             },
@@ -196,8 +177,8 @@
                 "name": "Config name"
             },
             "position": {
-                "x": 377.38382418086235,
-                "y": 593.823124003576
+                "x": 657.836009993806,
+                "y": 493.9049037205557
             },
             "inputControlValues": {
                 "inputs": {},
@@ -243,8 +224,8 @@
                 "name": "Example XML"
             },
             "position": {
-                "x": 131.97750416285822,
-                "y": 350.2889575009789
+                "x": 515.6235039490608,
+                "y": 228.12740490362899
             },
             "inputControlValues": {
                 "inputs": {
@@ -307,39 +288,11 @@
             "targetInput": "data-cfl"
         },
         {
-            "id": "debdf1edf2936cad",
-            "source": "fb5d5bc80b7f841f",
-            "target": "bdc926222f57fa83",
-            "sourceOutput": "loop",
-            "targetInput": "exec"
-        },
-        {
-            "id": "ad74be11a09a73bb",
-            "source": "bdc926222f57fa83",
-            "target": "52f1ed1beb0c4a17",
-            "sourceOutput": "exec",
-            "targetInput": "exec"
-        },
-        {
-            "id": "f57d2972006821eb",
-            "source": "312589539bf39e55",
-            "target": "bdc926222f57fa83",
-            "sourceOutput": "result",
-            "targetInput": "message"
-        },
-        {
             "id": "508caaa0027b4a34",
             "source": "c48c255178119c73",
             "target": "82e18dafae0c4e67",
             "sourceOutput": "value",
             "targetInput": "data-name"
-        },
-        {
-            "id": "821d97ac2fbaa471",
-            "source": "5cc45132bdd9fd89",
-            "target": "312589539bf39e55",
-            "sourceOutput": "value",
-            "targetInput": "data-xml"
         },
         {
             "id": "37f183b0e83017d1",
@@ -354,6 +307,27 @@
             "target": "5cc45132bdd9fd89",
             "sourceOutput": "value",
             "targetInput": "xml"
+        },
+        {
+            "id": "b404651e625bd9d8",
+            "source": "5cc45132bdd9fd89",
+            "target": "bdc926222f57fa83",
+            "sourceOutput": "value",
+            "targetInput": "message"
+        },
+        {
+            "id": "a62a1854739df999",
+            "source": "fb5d5bc80b7f841f",
+            "target": "bdc926222f57fa83",
+            "sourceOutput": "loop",
+            "targetInput": "exec"
+        },
+        {
+            "id": "4de047fe0792971e",
+            "source": "bdc926222f57fa83",
+            "target": "52f1ed1beb0c4a17",
+            "sourceOutput": "exec",
+            "targetInput": "exec"
         }
     ],
     "comments": []

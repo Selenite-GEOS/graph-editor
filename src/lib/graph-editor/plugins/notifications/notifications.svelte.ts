@@ -30,7 +30,7 @@ class Notifications implements NotificationsManager {
 	}
 
 	queue: NotificationParams[] = $state([]);
-	maxNotifs = $state(3);
+	maxNotifs = $state(4);
 	autoHideTime = $state(3000);
 	hideAnimTime = $state(300);
 	displayed: DisplayedNotification[] = $state([]);
