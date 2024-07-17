@@ -1,1 +1,1 @@
-export * from './gridlines';
+export * as GridLine from './gridlines';
