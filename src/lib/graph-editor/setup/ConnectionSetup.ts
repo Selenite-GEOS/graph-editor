@@ -56,7 +56,7 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 	override async pick(event: PointerEvent, type: EventType): Promise<void> {
 		const pointedElements = document.elementsFromPoint(event.clientX, event.clientY);
 
-		// @ts-expect-error
+		// @ts-expect-error: Access private field
 		const socketData = findSocket(this.socketsCache, pointedElements) as
 			| (SocketData & { payload: Socket })
 			| undefined;
@@ -143,7 +143,7 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 			if (type === 'up') return;
 
 			// pickedSocket.selected = !pickedSocket.selected;
-			// @ts-expect-error
+			// @ts-expect-error: Access private field
 			const node: Node = this.editor.getNode(socketData.nodeId);
 			const socket = (
 				socketData.side === 'input' ? node.inputs[socketData.key] : node.outputs[socketData.key]
@@ -187,7 +187,7 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 
 	const connectionPlugin = new MyConnectionPlugin(factory);
 	Presets.classic.setup();
-	// @ts-expect-error
+	// @ts-expect-error: Ignore type error
 	connectionPlugin.addPreset((socketData: SocketData & { payload: Socket }) => {
 		// console.log("connectionPlugin", socketData)
 		const params: ClassicParams<Schemes> = {
@@ -205,7 +205,7 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 				editor.addNewConnection(sourceNode, source.key, targetNode, target.key);
 				return true;
 			},
-			// @ts-expect-error
+			// @ts-expect-error: Ignore payload missing in parent method types
 			canMakeConnection(
 				from: SocketData & { payload: Socket },
 				to: SocketData & { payload: Socket }

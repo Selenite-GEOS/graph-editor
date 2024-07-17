@@ -141,7 +141,7 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 			area.update('connection', conn.id);
 		}
 	});
-	// @ts-expect-error
+	// @ts-expect-error: Ignore type error
 	sveltePlugin.use(pathPlugin);
 	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
 	const { AddXmlAttributeControl } = await import('$graph-editor/nodes/XML');

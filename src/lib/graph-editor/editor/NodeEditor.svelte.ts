@@ -64,7 +64,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	onChangeNameListeners: ((name: string) => void)[] = [];
 	id = newLocalId('node-editor');
 
-	// @ts-expect-error
+	// @ts-expect-error: Fix parent method types
 	getNode(id: string): Node | undefined {
 		return super.getNode(id);
 	}
