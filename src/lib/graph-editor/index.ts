@@ -5,7 +5,7 @@
 
 export * as Nodes from './nodes';
 export * as Editor from './editor';
-export * from './variables';
+export * as Variable from './variables';
 export * as Setup from './setup';
 export * as Plugins from './plugins';
 export * as Examples from './examples';
