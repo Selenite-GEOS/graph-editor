@@ -11,6 +11,10 @@ export type NotificationParams = {
 export type DisplayedNotification = NotificationParams & { visible: boolean; remove: () => void };
 export type NotificationsManager = {
 	show: (params: NotificationParams) => void;
+	success: (params: Omit<NotificationParams, 'color'>) => void;
+	warn: (params: Omit<NotificationParams, 'color'>) => void;
+	error: (params: Omit<NotificationParams, 'color'>) => void;
+	info: (params: Omit<NotificationParams, 'color'>) => void;
 };
 
 /**
@@ -38,6 +42,23 @@ class Notifications implements NotificationsManager {
 		this.queue.push(notif);
 		this.updateDisplayed();
 	}
+
+	success(notif: Omit<NotificationParams, 'color'>) {
+		this.show({ ...notif, color: 'success' });
+	}
+
+	warn(notif: Omit<NotificationParams, 'color'>) {
+		this.show({ ...notif, color: 'warning' });
+	}
+
+	error(notif: Omit<NotificationParams, 'color'>) {
+		this.show({ ...notif, color: 'error' });
+	}
+
+	info(notif: Omit<NotificationParams, 'color'>) {
+		this.show({ ...notif, color: 'info' });
+	}
+	
 
 	removeDisplayed(notif: DisplayedNotification) {
 		const i = this.displayed.findIndex((n) => n === notif);

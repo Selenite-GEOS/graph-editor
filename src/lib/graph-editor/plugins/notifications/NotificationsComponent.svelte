@@ -9,8 +9,13 @@
 
     const colors : Record<string, string> = {
         'red': 'oklch(var(--er))',
-        'green': 'oklch(var(--ok))',
+		'error': 'oklch(var(--er))',
+        'green': 'oklch(var(--su))',
+		'success': 'oklch(var(--su))',
         'blue': 'oklch(var(--in))',
+		'info': 'oklch(var(--in))',
+		'warn': 'oklch(var(--wa))',
+		'warning': 'oklch(var(--wa))',
         'yellow': 'oklch(var(--wa))',
     }
 </script>
@@ -40,7 +45,7 @@
 {/snippet}
 
 <Portal>
-	<aside class="toast toast-top toast-end z-30">
+	<aside class="toast toast-top toast-end z-30 max-h-screen overflow-y-auto overflow-x-clip">
 		{#each notifications.displayed as notif (notif)}
 			{#if notif.visible}
 				{@render notification(notif)}
