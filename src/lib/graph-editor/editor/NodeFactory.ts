@@ -98,12 +98,19 @@ export class NodeFactory {
 		id: string,
 		key: string,
 		value?: T
-	): { get: () => T; set: (value: T) => void } {
+	): { value: T, get: () => T; set: (value: T) => void } {
 		const stateKey = id + '_' + key;
 		if (!this.state.has(stateKey)) this.state.set(stateKey, value);
+		const state = this.state
 		return {
 			get: () => this.state.get(stateKey) as T,
-			set: (value: T) => this.state.set(stateKey, value)
+			set: (value: T) => this.state.set(stateKey, value),
+			get value() {
+				return state.get(stateKey) as T
+			},
+			set value(v: T) {
+				state.set(stateKey, v)
+			}
 		};
 	}
 
@@ -237,7 +244,7 @@ export class NodeFactory {
 		});
 	}
 	area?: AreaPlugin<Schemes, AreaExtra>;
-	private editor: NodeEditor;
+	editor: NodeEditor;
 	public readonly makutuClasses?: MakutuClassRepository;
 
 	public readonly dataflowEngine = createDataflowEngine();

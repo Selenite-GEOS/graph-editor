@@ -15,9 +15,10 @@
 	type Props = {
 		data: InputControl<InputControlType>;
 		// width?: string;
+		focus?: boolean;
 		inputTextSize?: string;
 	};
-	let { data: inputControl, inputTextSize = 'text-md' }: Props = $props();
+	let { data: inputControl, inputTextSize = 'text-md', focus = false }: Props = $props();
 	let type = $derived(inputControl.type);
 	const isCheckbox = $derived(type === 'checkbox');
 	$inspect(inputControl.value).with(console.debug);
@@ -37,7 +38,6 @@
 	// })
 	let inputProps: HTMLInputAttributes = $derived({
 		placeholder: inputControl.socketType,
-		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'}`,
 		title: isCheckbox ? String(inputControl.value) : undefined,
 		readonly: inputControl.readonly,
 		type: simpleTypes.includes(type as (typeof simpleTypes)[number])
@@ -60,7 +60,9 @@
 				value = e.currentTarget.value;
 			}
 			inputControl.value = value as InputControlValueType<InputControlType>;
-		}
+		},
+		...inputControl.props,
+		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'} ${inputControl.props.class}`,
 	});
 
 	let vector = $derived(
@@ -78,11 +80,19 @@
 		console.debug('control type', inputControl.type);
 	}
 	$inspect('InputControl:Type', inputControl.type).with(console.debug);
+	let focusableInput = $state<HTMLInputElement>()
+	$effect(() => {
+		if (focus) {
+			console.log("Focus", focusableInput)
+			focusableInput?.focus();
+		}
+	})
 </script>
 
 <!-- TODO maybe move pointerdown and dblclick stop propagation to framework agnostic logic -->
 {#snippet input(props: HTMLInputAttributes = {})}
 	<input
+		bind:this={focusableInput}
 		value={inputControl.value}
 		ondblclick={stopPropagation}
 		onpointerdown={stopPropagation}
@@ -146,7 +156,9 @@
 		onclick={() => {
 			modal.show({
 				component: EditArray,
-				title: `Edit ${inputControl.socketType} array`,
+				 get title() {
+					return `Edit ${inputControl.socketType} array`
+				 },
 				buttons: [
 					{
 						label: 'Change type',
@@ -169,6 +181,9 @@
 					}
 				],
 				props: {
+					addRow() {
+						(inputControl.value as []).push(defaultInputControlValues[type]);
+					},
 					get array() {
 						return inputControl.value as unknown[];
 					},

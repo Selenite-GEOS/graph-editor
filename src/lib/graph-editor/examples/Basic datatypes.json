@@ -1,486 +1,499 @@
 {
-	"editorName": "Basic datatypes",
-	"variables": {},
-	"nodes": [
-		{
-			"params": {},
-			"id": "584029f94042bd9b",
-			"type": "number.NumberNode",
-			"state": {},
-			"position": {
-				"x": 686.4,
-				"y": 707
-			},
-			"inputControlValues": {
-				"inputs": {},
-				"controls": {
-					"value": 1.43
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "970858f48aad3c32",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 1120.6,
-				"y": 612
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "1.43"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "b2e11a2f5624dd43",
-			"type": "math.AddNode",
-			"state": {},
-			"position": {
-				"x": 1162.9333333333332,
-				"y": 1342
-			},
-			"inputControlValues": {
-				"inputs": {
-					"a": 124.3456,
-					"b": 0
-				},
-				"controls": {}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "0287b1a8fb0f7256",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 1401.6,
-				"y": 1247
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "1.43"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "a2829c86ba35bf93",
-			"type": "boolean.BooleanNode",
-			"state": {},
-			"position": {
-				"x": 152,
-				"y": 1245.5
-			},
-			"inputControlValues": {
-				"inputs": {},
-				"controls": {
-					"value": true
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "083819bc7601f849",
-			"type": "boolean.ToNumber",
-			"state": {},
-			"position": {
-				"x": 750.4,
-				"y": 1433
-			},
-			"inputControlValues": {
-				"inputs": {
-					"value": false
-				},
-				"controls": {}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "2928b118dd685edf",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 350.5,
-				"y": 1078.5
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "true"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "0d6f622bd659b4cd",
-			"type": "boolean.NotNode",
-			"state": {},
-			"position": {
-				"x": 415.5,
-				"y": 1419
-			},
-			"inputControlValues": {
-				"inputs": {
-					"value": false
-				},
-				"controls": {}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "1af94e0a22ff5710",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 698.4,
-				"y": 1233
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "false"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "2dfc4207fc19ac9b",
-			"type": "string.StringNode",
-			"state": {},
-			"position": {
-				"x": 12,
-				"y": 558
-			},
-			"inputControlValues": {
-				"inputs": {},
-				"controls": {
-					"value": "bonjour je suis un chien de la casse"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "bf32f29ece923454",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 350.5,
-				"y": 463
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "bonjour je suis un chien de la casse"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "fbae597fe81cb6cc",
-			"type": "array.Array",
-			"state": {},
-			"position": {
-				"x": 96,
-				"y": 856
-			},
-			"inputControlValues": {
-				"inputs": {},
-				"controls": {
-					"value": ["a"]
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "bc1325aa751190a7",
-			"type": "array.MergeArrays",
-			"state": {},
-			"position": {
-				"x": 350.5,
-				"y": 682.5
-			},
-			"inputControlValues": {
-				"inputs": {
-					"a": [""],
-					"b": ["b"]
-				},
-				"controls": {}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "941b70f4fd020974",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 698.4,
-				"y": 907
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "[\"a\",\"b\"]"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "98207c8112f043dc",
-			"type": "array.MergeArrays",
-			"state": {},
-			"position": {
-				"x": 698.4,
-				"y": 351
-			},
-			"inputControlValues": {
-				"inputs": {
-					"a": [""],
-					"b": ["c"]
-				},
-				"controls": {}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "e6643caf509d592f",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 1120.6,
-				"y": 12
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "[\"a\",\"b\",\"c\"]"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "dd7aed20a3b98a54",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 1120.6,
-				"y": 212
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "[\"a\",\"b\",\"c\"]"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "559184aabee81592",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 1120.6,
-				"y": 412
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "[\"a\",\"b\",\"c\"]"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		},
-		{
-			"params": {},
-			"id": "64b1da2233b6cc05",
-			"type": "io.DisplayNode",
-			"state": {},
-			"position": {
-				"x": 350.5,
-				"y": 878.5
-			},
-			"inputControlValues": {
-				"inputs": {
-					"input": ""
-				},
-				"controls": {
-					"display": "[\"a\"]"
-				}
-			},
-			"selectedInputs": [],
-			"selectedOutputs": []
-		}
-	],
-	"connections": [
-		{
-			"id": "521e3f0ad1c71c5b",
-			"source": "b2e11a2f5624dd43",
-			"target": "0287b1a8fb0f7256",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "975b2f483f179d55",
-			"source": "0d6f622bd659b4cd",
-			"target": "1af94e0a22ff5710",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "75880981bb12cbfc",
-			"source": "584029f94042bd9b",
-			"target": "b2e11a2f5624dd43",
-			"sourceOutput": "value",
-			"targetInput": "a"
-		},
-		{
-			"id": "917064c811572168",
-			"source": "584029f94042bd9b",
-			"target": "970858f48aad3c32",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "f82a986668a5a126",
-			"source": "a2829c86ba35bf93",
-			"target": "2928b118dd685edf",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "a233d3ce8e074c4f",
-			"source": "a2829c86ba35bf93",
-			"target": "0d6f622bd659b4cd",
-			"sourceOutput": "value",
-			"targetInput": "value"
-		},
-		{
-			"id": "efddd946208390d9",
-			"source": "0d6f622bd659b4cd",
-			"target": "083819bc7601f849",
-			"sourceOutput": "value",
-			"targetInput": "value"
-		},
-		{
-			"id": "beaa7f3987dbb5e1",
-			"source": "fbae597fe81cb6cc",
-			"target": "bc1325aa751190a7",
-			"sourceOutput": "value",
-			"targetInput": "a"
-		},
-		{
-			"id": "ade3e1b033944e2c",
-			"source": "bc1325aa751190a7",
-			"target": "941b70f4fd020974",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "236aa774d33948b6",
-			"source": "bc1325aa751190a7",
-			"target": "98207c8112f043dc",
-			"sourceOutput": "value",
-			"targetInput": "a"
-		},
-		{
-			"id": "5418069fa8b0c0c3",
-			"source": "98207c8112f043dc",
-			"target": "e6643caf509d592f",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "9d2244762bf3e262",
-			"source": "083819bc7601f849",
-			"target": "b2e11a2f5624dd43",
-			"sourceOutput": "value",
-			"targetInput": "b"
-		},
-		{
-			"id": "72cfe5601d35d574",
-			"source": "98207c8112f043dc",
-			"target": "dd7aed20a3b98a54",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "2eb51376bef6341d",
-			"source": "98207c8112f043dc",
-			"target": "559184aabee81592",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "7b78d853875c4271",
-			"source": "2dfc4207fc19ac9b",
-			"target": "bf32f29ece923454",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		},
-		{
-			"id": "d3cf1dbc7b33de70",
-			"source": "fbae597fe81cb6cc",
-			"target": "64b1da2233b6cc05",
-			"sourceOutput": "value",
-			"targetInput": "input"
-		}
-	],
-	"comments": []
+    "editorName": "Basic datatypes",
+    "variables": {},
+    "nodes": [
+        {
+            "params": {},
+            "id": "584029f94042bd9b",
+            "type": "number.NumberNode",
+            "state": {},
+            "position": {
+                "x": 686.4,
+                "y": 707
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": 1.45
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "970858f48aad3c32",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 1120.6,
+                "y": 612
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "1.45"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "b2e11a2f5624dd43",
+            "type": "math.AddNode",
+            "state": {},
+            "position": {
+                "x": 1162.9333333333332,
+                "y": 1342
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "a": 124.3456,
+                    "b": 0
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "0287b1a8fb0f7256",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 1401.6,
+                "y": 1247
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "1.45"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "a2829c86ba35bf93",
+            "type": "boolean.BooleanNode",
+            "state": {},
+            "position": {
+                "x": 152,
+                "y": 1245.5
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": true
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "083819bc7601f849",
+            "type": "boolean.ToNumber",
+            "state": {},
+            "position": {
+                "x": 750.4,
+                "y": 1433
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "value": false
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "2928b118dd685edf",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 350.5,
+                "y": 1078.5
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "true"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "0d6f622bd659b4cd",
+            "type": "boolean.NotNode",
+            "state": {},
+            "position": {
+                "x": 415.5,
+                "y": 1419
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "value": false
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "1af94e0a22ff5710",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 698.4,
+                "y": 1233
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "false"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "2dfc4207fc19ac9b",
+            "type": "string.StringNode",
+            "state": {},
+            "position": {
+                "x": 12,
+                "y": 558
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": "bonjour je suis un chien de la casse"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "bf32f29ece923454",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 350.5,
+                "y": 463
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "bonjour je suis un chien de la casse"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "fbae597fe81cb6cc",
+            "type": "array.Array",
+            "state": {
+                "controlType": "number",
+                "type": "number"
+            },
+            "position": {
+                "x": 96,
+                "y": 856
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": [
+                        89
+                    ]
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "bc1325aa751190a7",
+            "type": "array.MergeArrays",
+            "state": {},
+            "position": {
+                "x": 350.5,
+                "y": 682.5
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "a": [
+                        ""
+                    ],
+                    "b": [
+                        "b"
+                    ]
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "941b70f4fd020974",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 698.4,
+                "y": 907
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "[89,\"b\"]"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "98207c8112f043dc",
+            "type": "array.MergeArrays",
+            "state": {},
+            "position": {
+                "x": 698.4,
+                "y": 351
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "a": [
+                        ""
+                    ],
+                    "b": [
+                        "c"
+                    ]
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "e6643caf509d592f",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 1120.6,
+                "y": 12
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "[89,\"b\",\"c\"]"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "dd7aed20a3b98a54",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 1120.6,
+                "y": 212
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "[89,\"b\",\"c\"]"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "559184aabee81592",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 1120.6,
+                "y": 412
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "[89,\"b\",\"c\"]"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "64b1da2233b6cc05",
+            "type": "io.DisplayNode",
+            "state": {},
+            "position": {
+                "x": 350.5,
+                "y": 878.5
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "[89]"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        }
+    ],
+    "connections": [
+        {
+            "id": "521e3f0ad1c71c5b",
+            "source": "b2e11a2f5624dd43",
+            "target": "0287b1a8fb0f7256",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "975b2f483f179d55",
+            "source": "0d6f622bd659b4cd",
+            "target": "1af94e0a22ff5710",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "75880981bb12cbfc",
+            "source": "584029f94042bd9b",
+            "target": "b2e11a2f5624dd43",
+            "sourceOutput": "value",
+            "targetInput": "a"
+        },
+        {
+            "id": "917064c811572168",
+            "source": "584029f94042bd9b",
+            "target": "970858f48aad3c32",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "f82a986668a5a126",
+            "source": "a2829c86ba35bf93",
+            "target": "2928b118dd685edf",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "a233d3ce8e074c4f",
+            "source": "a2829c86ba35bf93",
+            "target": "0d6f622bd659b4cd",
+            "sourceOutput": "value",
+            "targetInput": "value"
+        },
+        {
+            "id": "efddd946208390d9",
+            "source": "0d6f622bd659b4cd",
+            "target": "083819bc7601f849",
+            "sourceOutput": "value",
+            "targetInput": "value"
+        },
+        {
+            "id": "beaa7f3987dbb5e1",
+            "source": "fbae597fe81cb6cc",
+            "target": "bc1325aa751190a7",
+            "sourceOutput": "value",
+            "targetInput": "a"
+        },
+        {
+            "id": "ade3e1b033944e2c",
+            "source": "bc1325aa751190a7",
+            "target": "941b70f4fd020974",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "236aa774d33948b6",
+            "source": "bc1325aa751190a7",
+            "target": "98207c8112f043dc",
+            "sourceOutput": "value",
+            "targetInput": "a"
+        },
+        {
+            "id": "5418069fa8b0c0c3",
+            "source": "98207c8112f043dc",
+            "target": "e6643caf509d592f",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "9d2244762bf3e262",
+            "source": "083819bc7601f849",
+            "target": "b2e11a2f5624dd43",
+            "sourceOutput": "value",
+            "targetInput": "b"
+        },
+        {
+            "id": "72cfe5601d35d574",
+            "source": "98207c8112f043dc",
+            "target": "dd7aed20a3b98a54",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "2eb51376bef6341d",
+            "source": "98207c8112f043dc",
+            "target": "559184aabee81592",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "7b78d853875c4271",
+            "source": "2dfc4207fc19ac9b",
+            "target": "bf32f29ece923454",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        },
+        {
+            "id": "d3cf1dbc7b33de70",
+            "source": "fbae597fe81cb6cc",
+            "target": "64b1da2233b6cc05",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        }
+    ],
+    "comments": []
 }

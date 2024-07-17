@@ -1,0 +1,183 @@
+{
+    "editorName": "Basic control flow",
+    "variables": {},
+    "nodes": [
+        {
+            "params": {},
+            "id": "f5cad6d08af0d6d2",
+            "type": "control.start",
+            "state": {},
+            "position": {
+                "x": 82,
+                "y": 135.25
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "0d0129473ed6d254",
+            "type": "io.Log",
+            "state": {},
+            "position": {
+                "x": 863.70107421875,
+                "y": 71.3070068359375
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "message": "",
+                    "time": 3
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "a0a320ce0cb777f0",
+            "type": "control.ForEach",
+            "state": {
+                "dynamicTypeCmpnt": {
+                    "type": "string"
+                }
+            },
+            "position": {
+                "x": 282.55,
+                "y": 73.5
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "array": [
+                        "Yo",
+                        "Hey"
+                    ]
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "af1c535707316ea1",
+            "type": "array.Array",
+            "state": {
+                "controlType": "text",
+                "type": "string"
+            },
+            "position": {
+                "x": 12,
+                "y": 323.25
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": [
+                        0,
+                        0.01,
+                        "yes",
+                        "no",
+                        "yo",
+                        "my",
+                        "bro"
+                    ]
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "95d0da3f84f025f5",
+            "type": "control.time.Sleep",
+            "state": {},
+            "position": {
+                "x": 727.8270751953125,
+                "y": 71.649169921875
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "time": 1
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "params": {},
+            "id": "4a3cfa944364ea13",
+            "type": "number.NumberNode",
+            "state": {},
+            "position": {
+                "x": 591.4702415981973,
+                "y": 241.731962872113
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": 1
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        }
+    ],
+    "connections": [
+        {
+            "id": "c8b68b3be6882188",
+            "source": "f5cad6d08af0d6d2",
+            "target": "a0a320ce0cb777f0",
+            "sourceOutput": "exec",
+            "targetInput": "exec"
+        },
+        {
+            "id": "3bab47a8d7fd8ea2",
+            "source": "af1c535707316ea1",
+            "target": "a0a320ce0cb777f0",
+            "sourceOutput": "value",
+            "targetInput": "array"
+        },
+        {
+            "id": "2f962645c083aa43",
+            "source": "a0a320ce0cb777f0",
+            "target": "0d0129473ed6d254",
+            "sourceOutput": "item",
+            "targetInput": "message"
+        },
+        {
+            "id": "0c85652164856a60",
+            "source": "a0a320ce0cb777f0",
+            "target": "95d0da3f84f025f5",
+            "sourceOutput": "loop",
+            "targetInput": "exec"
+        },
+        {
+            "id": "bd06cdd751fd9ea3",
+            "source": "95d0da3f84f025f5",
+            "target": "0d0129473ed6d254",
+            "sourceOutput": "exec",
+            "targetInput": "exec"
+        },
+        {
+            "id": "e616149ed798fe4b",
+            "source": "4a3cfa944364ea13",
+            "target": "0d0129473ed6d254",
+            "sourceOutput": "value",
+            "targetInput": "time"
+        },
+        {
+            "id": "2592979a5cfad547",
+            "source": "4a3cfa944364ea13",
+            "target": "95d0da3f84f025f5",
+            "sourceOutput": "value",
+            "targetInput": "time"
+        }
+    ],
+    "comments": []
+}

@@ -9,7 +9,7 @@ import { TypedSocketsPlugin } from '$graph-editor/plugins/typed-sockets';
 import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';
-import { contextMenuSetup, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
+import { contextMenuSetup, type NodeMenuItem, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
 import { gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
 import { notificationsSetup } from '$graph-editor/plugins/notifications';
 
@@ -74,7 +74,7 @@ export async function setupGraphEditor(
 }
 
 export async function setupFullGraphEditor(
-	params: SetupGraphEditorParams & { showContextMenu?: ShowContextMenu } = {}
+	params: SetupGraphEditorParams & { showContextMenu?: ShowContextMenu, additionalNodeItems?: NodeMenuItem[] } = {}
 ): Promise<SetupGraphEditorResult> {
 	return setupGraphEditor({
 		...params,
@@ -165,6 +165,7 @@ export async function setupFullGraphEditor(
 				}
 			},
 			contextMenuSetup({
+				additionalNodeItems: params.additionalNodeItems,
 				showContextMenu: (params_) => {
 					console.debug('showContextMenu', params_);
 					if (!params.showContextMenu) {
@@ -172,7 +173,8 @@ export async function setupFullGraphEditor(
 						return;
 					}
 					params.showContextMenu(params_);
-				}
+				},
+
 			})
 
 			// new RenderSetup(),

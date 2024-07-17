@@ -9,10 +9,12 @@ export { default as TreeComponent } from './Tree.svelte';
 type TreeCollector<T> = { leaves: T[]; forest: Map<string, TreeCollector<T>> };
 export function makeTree<T, K extends string>({
 	items,
-	pathKey
+	pathKey,
+	sort
 }: {
 	items: (T & { [k in K]: string[] })[];
 	pathKey: K;
+	sort?: (a: T, b: T) => number;
 }): Tree<T> {
 	const collector: TreeCollector<T> = { leaves: [], forest: new Map() };
 	for (const item of items) {
@@ -25,10 +27,11 @@ export function makeTree<T, K extends string>({
 		}
 		current.leaves.push(item);
 	}
+
 	const res: Tree<T> = [];
 	function rec(current: Tree<T>, currentCollector: TreeCollector<T>) {
-		current.push(...currentCollector.leaves);
-		for (const [k, v] of currentCollector.forest.entries()) {
+		current.push(...currentCollector.leaves.toSorted(sort));
+		for (const [k, v] of [...currentCollector.forest.entries()].toSorted(([a], [b]) => a.localeCompare(b))) {
 			const forest: Tree<T> = [];
 			current.push({ label: k, forest });
 			rec(forest, v);

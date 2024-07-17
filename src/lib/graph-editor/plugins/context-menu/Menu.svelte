@@ -14,7 +14,9 @@
 		untrack(() => {
 			focusedIndex = -1;
 		});
-		return makeTree({ items, pathKey: 'path' });
+		return makeTree({ items, pathKey: 'path', sort(a, b) {
+			return a.label.localeCompare(b.label);
+		}, });
 	});
 	const itemsInTree = $derived(flattenTree(tree));
 	let focusedIndex = $state(-1);

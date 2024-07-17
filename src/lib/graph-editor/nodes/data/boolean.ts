@@ -15,14 +15,6 @@ import {
 } from '$graph-editor/nodes/Node.svelte';
 import { ConverterNode, InputControlNode } from './common-data-nodes.svelte';
 
-@registerNode('boolean.BooleanNode')
-@description('Produces a boolean.')
-export class BooleanNode extends InputControlNode {
-	constructor(params?: NodeParams) {
-		super({ label: 'Boolean', ...params, controlType: 'checkbox' });
-	}
-}
-
 @registerNode('boolean.NotNode')
 @description('Negates a boolean value.')
 @tags('!', 'negate', 'invert')
@@ -40,6 +32,14 @@ export class NotNode extends Node<{ value: Socket<'boolean'> }, { value: Socket<
 		return {
 			value: !this.getData('value', inputs)
 		};
+	}
+}
+
+@registerNode('boolean.BooleanNode')
+@description('Produces a boolean.')
+export class BooleanNode extends InputControlNode {
+	constructor(params?: NodeParams) {
+		super({ label: 'Boolean', ...params, controlType: 'checkbox' });
 	}
 }
 

@@ -1,16 +1,26 @@
-import { Connection, Node } from '../Node.svelte';
+import { Node, registerNode, type NodeParams, type SocketsValues } from '../Node.svelte';
 import { getLeavesFromOutput } from '../utils';
-import type { NodeFactory } from '$graph-editor/editor';
-import type { SocketType } from '../../plugins/typed-sockets';
+import type { DataType, SocketType } from '../../plugins/typed-sockets';
+import type { ExecSocket, Socket } from '$graph-editor/socket';
+import { DynamicTypeComponent } from '../components/DynamicTypeComponent';
 
 // Class defining a For Each Node
-export class ForEachNode extends Node {
-	currentItemIndex?: number = undefined;
-	state = { ...this.state, type: 'any' };
+@registerNode('control.ForEach')
+export class ForEachNode<T extends DataType = DataType> extends Node<
+	{ exec: ExecSocket; array: Socket<'any', 'array'> },
+	{
+		loop: ExecSocket;
+		exec: ExecSocket;
+		item: Socket<'any', 'scalar'>;
+		index: Socket<'number', 'scalar'>;
+	}
+> {
+	currentItemIndex?: number = -1;
+	// state = { ...this.state, type: 'any' };
 	numConnections = 0;
 
-	constructor({ factory }: { factory: NodeFactory }) {
-		super({ label: 'For Each', factory, height: 275 });
+	constructor(params: NodeParams = {}) {
+		super({ ...params, label: 'For Each' });
 
 		this.pythonComponent.addVariables('item', 'index');
 		this.pythonComponent.setCodeTemplateGetter(() => {
@@ -23,76 +33,29 @@ for $(index), $(item) in enumerate($(array)):
 
 		this.addInExec();
 		this.addOutExec('loop', 'Loop');
-		this.oldAddInData({ name: 'array', displayName: 'Array', isArray: true });
-		this.oldAddOutData({ name: 'item', displayName: 'Item' });
-		this.oldAddOutData({ name: 'index', displayName: 'Index', type: 'number' });
 		this.addOutExec('exec', 'Done');
-
-		this.getEditor().addPipe((context) => {
-			if (!['connectionremoved', 'connectioncreated'].includes(context.type)) return context;
-
-			if (!('data' in context)) return context;
-
-			if (!(context.data instanceof Connection)) return context;
-
-			const conn = context.data;
-
-			if (
-				(conn.target !== this.id || conn.targetInput !== 'array') &&
-				(conn.source !== this.id || conn.sourceOutput !== 'item')
-			)
-				return context;
-
-			if (context.type === 'connectionremoved') {
-				this.numConnections--;
-				console.log('numConnections', this.numConnections);
-
-				if (this.numConnections === 0) this.changeType('any');
-			} else if (context.type === 'connectioncreated') {
-				// }
-				this.numConnections++;
-
-				if (this.state.type !== 'any') return context;
-
-				if (conn.target === this.id) {
-					const sourceNode = this.getEditor().getNode(conn.source);
-					const sourceOutput = sourceNode.outputs[conn.sourceOutput];
-					if (sourceOutput) this.changeType(sourceOutput.socket.type);
-				} else if (conn.source === this.id) {
-					const targetNode = this.getEditor().getNode(conn.target);
-					const targetInput = targetNode.inputs[conn.targetInput];
-					if (targetInput) this.changeType(targetInput.socket.type);
-				}
-			}
-
-			return context;
+		this.addInData('array', {
+			datastructure: 'array',
+			type: 'any'
 		});
+		this.addOutData('item', {
+			type: 'any'
+		});
+		this.addOutData('index', {
+			type: 'number'
+		});
+		this.addComponentByClass(DynamicTypeComponent, { inputs: ['array'], outputs: ['item'] });
 	}
-	changeType(type: SocketType) {
-		// console.log('changeType', type);
-		// console.log('this.state.type', this.state.type);
 
-		if (type === this.state.type) return;
-		// console.log('changeType', type);
-
-		this.state.type = type;
-		const input = this.inputs.array;
-
-		if (input) {
-			input.socket.type = type;
-		}
-		const output = this.outputs.item;
-		if (output) {
-			output.socket.type = type;
-		}
-		this.updateElement('node', this.id);
-	}
 	// Executes the node
-	override async execute(input: string, forward: (output: string) => unknown): Promise<void> {
-		const inputs = await this.fetchInputs();
-		const array = inputs.array[0];
-
+	async execute(
+		input: 'exec',
+		forward: (output: 'exec' | 'loop') => unknown,
+		forwardExec?: boolean
+	): Promise<void> {
+		const array = await this.getDataWithInputs('array');
 		for (let i = 0; i < array.length; i++) {
+			this.needsProcessing = true;
 			this.currentItemIndex = i;
 
 			this.getDataflowEngine().reset(this.id);
@@ -101,19 +64,19 @@ for $(index), $(item) in enumerate($(array)):
 			forward('loop');
 
 			await Promise.all(promises);
+			this.needsProcessing = false;
 		}
 
 		super.execute(input, forward);
 	}
 
-	// Gets the data
-	data(inputs: { array?: unknown[][] }): { item: unknown; index?: number } {
+	data(
+		inputs?: SocketsValues<{ exec: ExecSocket; array: Socket<'any', 'array'> }> | undefined
+	): SocketsValues<{ item: Socket<'any', 'scalar'>; index: Socket<'number', 'scalar'> }> {
 		if (this.currentItemIndex === undefined) {
-			return { item: undefined, index: undefined };
+			return { item: undefined, index: -1 };
 		}
-
-		const array = inputs.array ? inputs.array[0] : [];
-
+		const array = this.getData('array', inputs);
 		const item = array[this.currentItemIndex];
 		return { item, index: this.currentItemIndex };
 	}

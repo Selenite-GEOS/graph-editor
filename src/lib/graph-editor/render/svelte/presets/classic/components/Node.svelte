@@ -4,6 +4,7 @@
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
 	import { themeControl } from '$lib/global/index.svelte';
+	import { capitalize } from '@selenite/commons';
 
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
 	const constructor = $derived(node.constructor as NodeConstructor);
@@ -95,29 +96,32 @@
 							})}
 						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 					/>
-					{#if !input.control || !input.showControl}
-						<div class="input-title" data-testid="input-title">
-							{input.label || ''}{#if input.socket.isRequired}<span
-									class="ps-0.5 text-lg"
-									title="required">*</span
-								>{/if}
-						</div>
-					{:else}
-						<Ref
-							class="h-full !flex items-center input-control"
-							data-testid="input-control"
-							init={(element) =>
-								emit({
-									type: 'render',
-									data: {
-										type: 'control',
-										element,
-										payload: input.control
-									}
-								})}
-							unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-						/>
-					{/if}
+					<div class="">
+						{#if !input.control || !input.showControl || input.alwaysShowLabel === true}
+							<div class="input-title" data-testid="input-title">
+								{capitalize(input.label || '')}{#if input.socket.isRequired}<span
+										class="ps-0.5 text-lg"
+										title="required">*</span
+									>{/if}
+							</div>
+						{/if}
+						{#if input.control && input.showControl}
+							<Ref
+								class="h-full !flex items-center input-control"
+								data-testid="input-control"
+								init={(element) =>
+									emit({
+										type: 'render',
+										data: {
+											type: 'control',
+											element,
+											payload: input.control
+										}
+									})}
+								unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+							/>
+						{/if}
+					</div>
 				</div>
 			{/each}
 			{#each node.sortedOutputs as [key, output] (key)}
@@ -126,12 +130,14 @@
 					data-testid={key}
 				>
 					{#if !output.control || !output.showControl}
-						<div class="output-title" data-testid="output-title">
-							{output.label || ''}{#if output.socket.isRequired}<span
-									class="ps-0.5 text-lg"
-									title="required">*</span
-								>{/if}
-						</div>
+						{#if output.displayLabel}
+							<div class="output-title" data-testid="output-title">
+								{capitalize(output.label || '')}{#if output.socket.isRequired}<span
+										class="ps-0.5 text-lg"
+										title="required">*</span
+									>{/if}
+							</div>
+						{/if}
 					{:else}
 						<Ref
 							class="h-full !flex items-center output-control"
@@ -150,7 +156,7 @@
 					{/if}
 					<Ref
 						data-testid="output-socket"
-						class="text-end"
+						class="text-end col-start-2"
 						init={(element) =>
 							emit({
 								type: 'render',

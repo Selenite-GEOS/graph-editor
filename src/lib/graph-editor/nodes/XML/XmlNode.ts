@@ -1,9 +1,24 @@
-import { Node, type NodeParams, type OutDataParams } from '$graph-editor/nodes/Node.svelte';
+import {
+	hidden,
+	Node,
+	path,
+	registerConverter,
+	registerNode,
+	type NodeParams,
+	type OutDataParams,
+	type SocketsValues
+} from '$graph-editor/nodes/Node.svelte';
 import type { XmlAttributeDefinition } from './types';
 import { camlelcaseize, titlelize } from '$lib/utils/string';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
-import { type InputControl, type assignControl, type Socket, Control } from '$graph-editor/socket';
+import {
+	type InputControl,
+	type Scalar,
+	type Socket,
+	assignControl,
+	Control
+} from '$graph-editor/socket';
 import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { GeosSchema } from '$lib/geos';
 import type { NodeFactory } from '$graph-editor/editor';
@@ -17,9 +32,8 @@ export class AddXmlAttributeControl extends Control {
 }
 
 export type XmlConfig = {
-	noName?: boolean;
 	xmlTag: string;
-	outData?: OutDataParams;
+	// outData?: OutDataParams;
 	xmlProperties?: XmlAttributeDefinition[];
 	childTypes?: string[];
 };
@@ -29,7 +43,33 @@ export type XmlNodeParams = NodeParams & {
 	initialValues?: Record<string, unknown>;
 };
 
-export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
+@registerNode('xml.ToString')
+@registerConverter('xmlElement:*', 'string')
+@path('XML')
+export class XmlToString extends Node<
+	{ xml: Scalar<'xmlElement:*'> },
+	{ value: Scalar<'string'> }
+> {
+	constructor(params: NodeParams = {}) {
+		super({ label: 'To String', ...params });
+		this.addInData('xml', {
+			type: 'xmlElement:*'
+		});
+		this.addOutData('value', {
+			type: 'string'
+		});
+	}
+	data(
+		inputs?: SocketsValues<{ xml: Scalar<'xmlElement:*'> }> | undefined
+	):
+		SocketsValues<{ value: Scalar<'string'> }> {
+		const xml = this.getData('xml', inputs) as unknown as XMLData;
+		return { value: xml ? xml.toXml() : '' };
+	}
+}
+
+@registerNode('xml.XML', 'abstract')
+export class XmlNode extends Node<Record<string, Socket<'any'>>, { value: Scalar }, {}, {attributeValues: Record<string, unknown>, usedOptionalAttrs: string[], name: string}> {
 	// static __isAbstract = true;
 	static hidden = true;
 	static counts: Record<string, bigint> = {};
@@ -39,13 +79,6 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 	xmlProperties: Set<string> = new Set();
 	optionalXmlAttributes: Set<string> = new Set();
 	xmlVectorProperties: Set<string> = new Set();
-	params: { xmlConfig: XmlConfig } = { ...this.params };
-	state: { attributeValues: Record<string, unknown>; usedOptionalAttrs: string[]; name?: string } =
-		{
-			...this.state,
-			attributeValues: {},
-			usedOptionalAttrs: []
-		};
 
 	constructor(xmlNodeParams: XmlNodeParams) {
 		let { initialValues = {} } = xmlNodeParams;
@@ -54,55 +87,26 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 			...xmlNodeParams.params,
 			xmlConfig,
 			initialValues,
-			label: xmlNodeParams.label,
-			noName: xmlConfig.noName
 		};
 
-		console.log('xmlNodeParams', xmlNodeParams);
-		const { outData, xmlProperties, childTypes = [] } = xmlConfig;
-		const { noName = false } = xmlConfig;
-		super({ ...xmlNodeParams, width: 220, height: 40 });
+		console.debug('xmlNodeParams', xmlNodeParams);
+		const { xmlProperties, childTypes = [] } = xmlConfig;
 
-		const { get, set } = this.factory.useState('XmlNode', 'pipeSetup', false);
-		if (!get()) {
-			set(true);
-			this.factory.getArea()?.addPipe((ctx) => {
-				if (ctx.type === 'contextmenu') {
-					const { context, event } = ctx.data;
-					if (!(context instanceof XmlNode)) return ctx;
-					const node = context;
-					if (!(event.target instanceof HTMLSpanElement)) return ctx;
-					const input = event.target.closest('.rete-input');
-					if (!(input instanceof HTMLElement)) return ctx;
-					const testid = input.dataset.testid;
-					if (!testid) return ctx;
-					const key = testid.split('-')[1];
-					node.removeOptionalAttribute(key);
-					return ctx;
-				}
-				return ctx;
-			});
-		}
-
-		if (!noName) {
-			this.height += 15;
-			if ('name' in initialValues) this.name = initialValues['name'] as string;
-			else {
-				let name = xmlNodeParams.label;
-				name = name !== undefined ? name : '';
-				XmlNode.counts[name] = XmlNode.counts[name] ? XmlNode.counts[name] + BigInt(1) : BigInt(1);
-				this.name = camlelcaseize(name) + XmlNode.counts[name];
-			}
-			this.state.name = this.name;
+		super({ label: xmlConfig.xmlTag, ...xmlNodeParams });
+		if (!this.state.usedOptionalAttrs) {
+			this.state.usedOptionalAttrs = [];
 		}
 		this.xmlTag = xmlConfig.xmlTag;
 		// console.log(this.name);
 
 		// this.name = name + XmlNode.count;
 		initialValues = initialValues !== undefined ? initialValues : {};
-
+		let hasName = false;
 		if (xmlProperties)
 			xmlProperties.forEach(({ name, type, isArray, controlType, required, pattern }) => {
+				if (name === 'name') {
+					hasName = true;
+				}
 				if (required || name in initialValues) {
 					this.addInAttribute({
 						name,
@@ -120,7 +124,17 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 
 		if (this.optionalXmlAttributes.size > 0) {
 			this.addControl('addXmlAttr', new AddXmlAttributeControl(this));
-			this.height += 53;
+		}
+
+		if (hasName) {
+			if ('name' in initialValues) this.name = initialValues['name'] as string;
+			else {
+				let name = xmlNodeParams.label;
+				name = name !== undefined ? name : '';
+				XmlNode.counts[name] = XmlNode.counts[name] ? XmlNode.counts[name] + BigInt(1) : BigInt(1);
+				this.name = camlelcaseize(name) + XmlNode.counts[name];
+			}
+			this.state.name = this.name;
 		}
 
 		// Add XML element inputs
@@ -133,15 +147,31 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 			});
 
 		// Add XML output
-		if (outData) {
-			this.oldAddOutData({
-				name: 'value',
-				displayName: noName ? undefined : this.name,
-				displayLabel: false,
-				socketLabel: outData.socketLabel,
-				type: outData.type
+		this.addOutData('value', {
+			showLabel: false,
+			type: `xmlElement:${xmlConfig.xmlTag}`
+		});
+
+		if (!this.factory) return;
+		const pipeSetup = this.factory.useState('XmlNode', 'pipeSetup', false);
+		if (!pipeSetup.value) {
+			pipeSetup.value = true;
+			this.factory.getArea()?.addPipe((ctx) => {
+				if (ctx.type === 'contextmenu') {
+					const { context, event } = ctx.data;
+					if (!(context instanceof XmlNode)) return ctx;
+					const node = context;
+					if (!(event.target instanceof HTMLSpanElement)) return ctx;
+					const input = event.target.closest('.rete-input');
+					if (!(input instanceof HTMLElement)) return ctx;
+					const testid = input.dataset.testid;
+					if (!testid) return ctx;
+					const key = testid.split('-')[1];
+					node.removeOptionalAttribute(key);
+					return ctx;
+				}
+				return ctx;
 			});
-			this.height += 45;
 		}
 	}
 
@@ -180,11 +210,11 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 	override applyState(): void {
 		if (this.state.name) this.name = this.state.name;
 		// console.log(this.state);
-		for (const name of this.state.usedOptionalAttrs) {
+		for (const name of this.state.usedOptionalAttrs ?? []) {
 			this.addOptionalAttribute(name);
 		}
 		const { attributeValues } = this.state;
-		for (const [key, value] of Object.entries(attributeValues)) {
+		for (const [key, value] of Object.entries(attributeValues ?? {})) {
 			(this.inputs[key]?.control as InputControl)?.setValue(value);
 		}
 	}
@@ -231,7 +261,7 @@ export class XmlNode extends Node<Record<string, Socket>, { value: Socket }> {
 
 		if (type === 'vector') this.xmlVectorProperties.add(name);
 
-		const { control: attrInputControl } = this.oldAddInData({
+		const { control: attrInputControl } = this.addInData('name', {
 			name: name,
 			displayName: titlelize(name),
 			socketLabel: titlelize(name),

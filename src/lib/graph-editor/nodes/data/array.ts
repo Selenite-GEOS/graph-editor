@@ -11,7 +11,7 @@ export class ArrayNode extends InputControlNode<SocketType, 'array'> {
 			...params,
 			controlType: 'text',
 			datastructure: 'array',
-			socketType: 'string'
+			socketType: 'number'
 		});
 	}
 }

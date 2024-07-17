@@ -9,7 +9,8 @@ import {
 	type ComponentSupportInterface,
 	type BaseComponent,
 	PythonNodeComponent,
-	R_SocketSelection_NC
+	R_SocketSelection_NC,
+	type NodeComponentParams
 } from '$graph-editor/components';
 import {
 	Socket,
@@ -35,6 +36,8 @@ import type { AreaPlugin } from 'rete-area-plugin';
 import type { Schemes } from '$graph-editor/schemes';
 import { tick } from 'svelte';
 import { structures } from 'rete-structures';
+import { getLeavesFromOutput } from './utils';
+import type { HTMLInputAttributes } from 'svelte/elements';
 
 /**
  * A map of node classes indexed by their id.
@@ -47,12 +50,13 @@ export const nodeRegistry = new Map<string, NodeConstructor>();
 export function registerNode<
 	Inputs extends { [x: string]: Socket<SocketType> },
 	Outputs extends { [x: string]: Socket<SocketType> },
-	Controls extends { [x: string]: Control }
->(id: string) {
+	Controls extends { [x: string]: Control }, T extends 'abstract' | 'real' = 'real'
+>(id: string, type?: T) {
 	// this is the decorator factory, it sets up
 	// the returned decorator function
-	return function (target: NodeConstructor<Node<Inputs, Outputs, Controls>>) {
+	return function (target: T extends 'abstract' ? unknown : NodeConstructor<Node<Inputs, Outputs, Controls>>) {
 		target.id = id;
+		if (type ==='abstract') target.visible = false;
 		if (nodeRegistry.has(id)) {
 			console.warn('Node already registered', id);
 		}
@@ -202,18 +206,27 @@ export type SocketsValues<
 	>;
 };
 
-type DataSocket<T extends Exclude<SocketType, 'exec'> = Exclude<SocketType, 'exec'>> = Socket<T, 'scalar'>
-type ExecSocketsKeys<Sockets extends Record<string, DataSocket | ExecSocket>> = {[K in keyof Sockets]: Sockets[K] extends DataSocket ? never : K}[keyof Sockets];
-type DataSocketsKeys<Sockets extends Record<string, Socket>> = Exclude<keyof Sockets, ExecSocketsKeys<Sockets>>
-type Test = {a: DataSocket, b: ExecSocket, c: ExecSocket}
-const r : DataSocketsKeys<Test> = "a"
-type DataSockets<Sockets extends Record<string, Socket | ExecSocket>> = {[K in keyof Sockets]: Sockets[K]["type"] extends 'exec' ? never : K};
+type DataSocket<T extends Exclude<SocketType, 'exec'> = Exclude<SocketType, 'exec'>> = Socket<
+	T,
+	SocketDatastructure
+>;
+type ExecSocketsKeys<Sockets extends Record<string, DataSocket | ExecSocket>> = {
+	[K in keyof Sockets]: Sockets[K] extends DataSocket ? never : K extends string ? K : never;
+}[keyof Sockets];
+type DataSocketsKeys<Sockets extends Record<string, DataSocket | ExecSocket>> = Exclude<
+	keyof Sockets,
+	ExecSocketsKeys<Sockets>
+>;
+type Test = { a: DataSocket; b: ExecSocket; c: ExecSocket };
+const r: DataSocketsKeys<Test> = 'a';
+type ExecSockets<Sockets extends Record<string, Socket | ExecSocket>> = {
+	[K in ExecSocketsKeys<Sockets>]: Sockets[K];
+};
+type DataSockets<Sockets extends Record<string, Socket | ExecSocket>> = {
+	[K in DataSocketsKeys<Sockets>]: Sockets[K];
+};
 export class Node<
-		Inputs extends {
-			[key in string]: Socket;
-		} = {
-			[key in string]: Socket;
-		},
+		Inputs extends Record<string, Socket> = Record<string, Socket>,
 		Outputs extends {
 			[key in string]: Socket;
 		} = {
@@ -224,7 +237,8 @@ export class Node<
 		} = {
 			[key in string]: Control;
 		},
-		State extends Record<string, unknown> = {}
+		State extends Record<string, unknown> = Record<string, unknown>,
+		Params extends Record<string, unknown> = Record<string, unknown>
 	>
 	extends ClassicPreset.Node<Inputs, Outputs, Controls>
 	implements DataflowNode, ComponentSupportInterface
@@ -280,8 +294,8 @@ export class Node<
 	private outData: Record<string, unknown> = {};
 	private resolveEndExecutes = new Stack<() => void>();
 	private naturalFlowExec: string | undefined = 'exec';
-	protected factory?: NodeFactory;
-	protected params: Record<string, unknown>;
+	factory?: NodeFactory;
+	protected params: Params = {} as Params;
 	static id: string;
 	static nodeCounts = BigInt(0);
 	state = $state<Partial<State>>({} as State);
@@ -291,8 +305,8 @@ export class Node<
 	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } =
 		$state({});
 	needsProcessing = $state(false);
-	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)));
-	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)));
+	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)) as [string, Input<Socket>][]);
+	sortedOutputs = $derived(sortedByIndex(Object.entries(this.outputs)) as [string, Output<Socket>][]);
 	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)));
 	readonly pythonComponent: PythonNodeComponent;
 	readonly socketSelectionComponent: R_SocketSelection_NC;
@@ -363,10 +377,17 @@ export class Node<
 		return null;
 	}
 
-	addComponentByClass<T extends BaseComponent>(
-		componentClass: new (options: { owner: Node }) => T
-	): T {
-		const component = new componentClass({ owner: this });
+	addComponentByClass<
+		T extends BaseComponent,
+		N extends NodeComponentParams<Inputs, Outputs>,
+		P,
+		Inputs extends Record<string, Socket>,
+		Outputs extends Record<string, Socket>
+	>(componentClass: new (options: N & P) => T, params: P): T {
+		const component = new componentClass({
+			owner: this as unknown as Node<Inputs, Outputs>,
+			...params
+		} as N & P);
 		this.components.push(component);
 		return component;
 	}
@@ -408,10 +429,10 @@ export class Node<
 		}
 
 		return {
-			params: this.params,
 			id: this.id,
 			type: (this.constructor as typeof Node).id,
-			state: $state.snapshot(this.state),
+			params: this.params,
+			state: $state.snapshot(this.state) as State,
 			position: this.getArea()?.nodeViews.get(this.id)?.position,
 			inputControlValues: inputControlValues,
 			selectedInputs,
@@ -475,7 +496,8 @@ export class Node<
 
 	// Callback called at the end of execute
 	onEndExecute() {
-		if (!this.resolveEndExecutes.isEmpty()) {
+		// if (!this.resolveEndExecutes.isEmpty()) {
+		while (!this.resolveEndExecutes.isEmpty()) {
 			const resolve = this.resolveEndExecutes.pop();
 			if (resolve) {
 				resolve();
@@ -511,11 +533,25 @@ export class Node<
 		return res;
 	});
 
-	execute(input: ExecSocketsKeys<Inputs>, forward: (output: ExecSocketsKeys<Outputs>) => unknown, forwardExec = true) {
+	async getWaitForChildrenPromises(output: ExecSocketsKeys<Outputs>): Promise<void> {
+		const leavesFromLoopExec = getLeavesFromOutput(this as Node, output);
+		const promises = this.getWaitPromises(leavesFromLoopExec);
+		await Promise.all(promises);
+	}
+
+	execute(
+		input: ExecSocketsKeys<Inputs>,
+		forward: (output: ExecSocketsKeys<Outputs>) => unknown,
+		forwardExec = true
+	) {
+		this.needsProcessing = true;
 		if (forwardExec && this.outputs.exec) {
 			forward('exec' as ExecSocketsKeys<Outputs>);
 		}
 		this.onEndExecute();
+		setTimeout(() => {
+			this.needsProcessing = false;
+		});
 	}
 
 	addInExec(name: ExecSocketsKeys<Inputs> = 'exec' as ExecSocketsKeys<Inputs>, displayName = '') {
@@ -526,7 +562,7 @@ export class Node<
 		this.addInput(name, input as unknown as Input<Exclude<Inputs[keyof Inputs], undefined>>);
 	}
 
-	addOutData<K extends keyof Outputs>(
+	addOutData<K extends DataSocketsKeys<Outputs> & string>(
 		key: K,
 		params: {
 			datastructure?: Outputs[K]['datastructure'];
@@ -541,13 +577,13 @@ export class Node<
 		}
 		const output = new Output(
 			new Socket({
-				name: params.label,
+				name: params.label ?? key,
 				datastructure: params.datastructure ?? 'scalar',
 				type: params.type,
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			params.label
+			params.label ?? key
 		);
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 		return output.socket;
@@ -580,29 +616,32 @@ export class Node<
 			isLabelDisplayed?: boolean;
 			initial?: SocketValueType<Inputs[K]['type']>;
 			index?: number;
+			props?: HTMLInputAttributes;
 			changeType?: (type: SocketType) => void;
 		}
-	) {
+	): Input<Inputs[K]> {
 		if (key in this.inputs) {
 			throw new Error(`Input ${String(key)} already exists`);
 		}
 		const input = new Input({
 			socket: new Socket({
 				node: this,
-				displayLabel: params?.isLabelDisplayed ?? true,
+				displayLabel: params?.isLabelDisplayed,
 				datastructure: params?.datastructure,
 				type: params?.type ?? 'any'
 			}),
+			alwaysShowLabel: params?.isLabelDisplayed,
 			index: params?.index,
 			multipleConnections: params?.isArray,
 			isRequired: params?.isRequired,
-			label: params?.label
+			label: params?.label ?? (key as string)
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
 		const controlType = assignControl(params?.type ?? 'any');
 		if (controlType) {
 			const inputControl = this.makeInputControl({
 				type: controlType,
+				props: params?.props,
 				socketType: params?.type ?? 'any',
 				datastructure: params?.datastructure ?? 'scalar',
 				initial: this.initialValues?.inputs[key] ?? params?.initial,
@@ -610,6 +649,7 @@ export class Node<
 			});
 			input.addControl(inputControl);
 		}
+		return input;
 	}
 
 	oldAddInData<N>({
@@ -682,7 +722,11 @@ export class Node<
 		return inputControl;
 	}
 
-	addOutExec(name = 'exec', displayName = '', isNaturalFlow = false) {
+	addOutExec(
+		name: ExecSocketsKeys<Outputs> = 'exec' as ExecSocketsKeys<Outputs>,
+		displayName = '',
+		isNaturalFlow = false
+	) {
 		if (isNaturalFlow) this.naturalFlowExec = name;
 		const output = new Output(new ExecSocket({ name: displayName, node: this }), displayName);
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
@@ -744,7 +788,7 @@ export class Node<
 	// @ts-expect-error
 	data(
 		inputs?: SocketsValues<Inputs> | undefined
-	): SocketsValues<Outputs> | Promise<SocketsValues<Outputs>> {
+	): SocketsValues<DataSockets<Outputs>> | Promise<SocketsValues<DataSockets<Outputs>>> {
 		const res: Record<string, unknown> = {};
 		for (const key in this.outputs) {
 			if (!(this.outputs[key]?.socket instanceof ExecSocket)) res[key] = undefined;

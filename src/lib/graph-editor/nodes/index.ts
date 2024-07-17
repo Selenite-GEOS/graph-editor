@@ -17,4 +17,4 @@ export * as Macro from './MacroNode';
 export * as Math from './math';
 export * from './Node.svelte';
 
-// export { Node as GraphNode } from './Node';
+export { Node as GraphNode } from './Node.svelte';

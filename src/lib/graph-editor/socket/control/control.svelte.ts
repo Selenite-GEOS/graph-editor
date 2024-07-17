@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash-es';
 import { ClassicPreset, getUID } from 'rete';
 import type { Socket, SocketDatastructure, SocketValueWithDatastructure } from '../Socket.svelte';
 import { valueConverters } from '$graph-editor/common';
+import type { HTMLAttributes, HTMLBaseAttributes, HTMLInputAttributes } from 'svelte/elements';
 
 /**
  * A control represents objects the users can interact with.
@@ -96,6 +97,7 @@ export type InputControlParams<
 	datastructure: D;
 	initial?: SocketValueWithDatastructure<InputControlValueType<T>, D>;
 	readonly?: boolean;
+	props?: HTMLInputAttributes;
 	onChange?: (value: InputControlValueType<T>) => void;
 	label?: string;
 	changeType?: (type: SocketType) => void;
@@ -151,9 +153,11 @@ export class InputControl<
 	datastructure: D;
 	#socketType: SocketType = $state('any');
 	changeType?: (type: SocketType) => void = $state();
+	props = $state<HTMLInputAttributes>({}) ;
 
 	constructor(params: InputControlParams<T, D>) {
 		super();
+		this.props = params.props ?? {};
 		this.id = getUID();
 		this.datastructure = params.datastructure;
 		this.readonly = params.readonly ?? false;

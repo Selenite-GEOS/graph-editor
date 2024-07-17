@@ -3,7 +3,7 @@
 
 	let {data} : {data: ExecSocket} = $props();
 	const socket = $derived(data);
-	$inspect('exec', {...socket}, socket.type)
+	// $inspect('exec', {...socket}, socket.type)
 </script>
 
 <div

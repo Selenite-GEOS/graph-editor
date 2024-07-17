@@ -1,8 +1,10 @@
 import { structures } from 'rete-structures';
 import { Connection, Node } from './Node.svelte';
+import type { Socket } from '$graph-editor/socket';
 
 // TODO : make the leave every or every leave based on every node current
-export function getLeavesFromOutput(node: Node, key: string): Node[] {
+type NodeTypes = { inputs: Record<string, Socket>, outputs: Record<string, Socket> };
+export function getLeavesFromOutput<T extends NodeTypes>(node: Node<T['inputs'], T['outputs']>, key: string): Node[] {
 	const connections = node.getEditor().getConnections();
 
 	const loopNode = connections

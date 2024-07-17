@@ -18,20 +18,25 @@ export class Input<S extends Socket = Socket>
 	 */
 	showControl = $state(true);
 
+	alwaysShowLabel = $state(false);
+
 	constructor({
 		socket,
 		multipleConnections,
+		alwaysShowLabel = false,
 		label,
 		isRequired = false,
 		index
 	}: {
 		socket: S;
 		label?: string;
+		alwaysShowLabel?: boolean;
 		multipleConnections?: boolean;
 		isRequired?: boolean;
 		index?: number;
 	}) {
 		super(socket, label, multipleConnections);
+		this.alwaysShowLabel = alwaysShowLabel
 		// $effect.root(() => {
 		// 	console.log('showcontrol', this.showControl);
 		// });

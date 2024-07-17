@@ -11,6 +11,7 @@ import {
 	type SocketValueType,
 	type SocketValueWithDatastructure as WithDatastructure
 } from '$graph-editor/socket';
+import type { HTMLInputAttributes } from 'svelte/elements';
 import { Node, type NodeParams, type SocketsValues } from '../Node.svelte';
 
 export type InputControlNodeParams<
@@ -22,6 +23,7 @@ export type InputControlNodeParams<
 	datastructure?: D;
 	initial?: InputControlValueType<T>;
 	socketType?: S;
+	props?: HTMLInputAttributes
 };
 
 export class InputControlNode<
@@ -50,6 +52,7 @@ export class InputControlNode<
 			socketType,
 			datastructure,
 			initial: params.initial,
+			props: params.props,
 			changeType: (type) => this.changeType(type as S)
 		});
 

@@ -1,5 +1,5 @@
-import type { BaseComponent } from './BaseComponent';
+import type { BaseComponent, ComponentParams } from './BaseComponent';
 
 export interface ComponentSupportInterface {
-	addComponentByClass(componentClass: typeof BaseComponent): void;
+	addComponentByClass<P>(componentClass: typeof BaseComponent, params: Omit<P, keyof ComponentParams>): void;
 }

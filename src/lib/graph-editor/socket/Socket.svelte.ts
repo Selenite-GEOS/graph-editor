@@ -1,5 +1,5 @@
 import { ClassicPreset } from 'rete';
-import type { SocketType } from '../plugins/typed-sockets';
+import type { DataType, SocketType } from '../plugins/typed-sockets';
 import type { Node } from '$graph-editor/nodes/Node.svelte';
 
 const socketDatastructures = ['scalar', 'array'] as const;
@@ -9,9 +9,10 @@ export type SocketValueWithDatastructure<T, D extends SocketDatastructure> = D e
 	: D extends 'array'
 		? T[]
 		: never;
+export type Scalar<S extends DataType = DataType> = Socket<S, 'scalar'>
 export class Socket<
 	S extends SocketType = SocketType,
-	D extends SocketDatastructure = 'scalar'
+	D extends SocketDatastructure = SocketDatastructure
 > extends ClassicPreset.Socket {
 	// public readonly isArray: boolean;
 	public readonly datastructure: D;
@@ -20,14 +21,14 @@ export class Socket<
 	public value: unknown;
 	public selected: boolean;
 	public readonly node: Node;
-	public displayLabel: boolean;
+	public displayLabel: boolean | undefined;
 
 	constructor({
 		name = '',
 		datastructure = 'scalar' as D,
 		isRequired = false,
 		type = 'any' as S,
-		displayLabel = true,
+		displayLabel,
 		node
 	}: {
 		name?: string;

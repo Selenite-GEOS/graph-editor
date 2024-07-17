@@ -2,7 +2,7 @@ import { capitalizeWords } from '$utils/string';
 import { type Setup } from '$graph-editor/setup';
 import { _ } from '$lib/global/index.svelte';
 import { NodeFactory } from '$graph-editor/editor';
-import { Node, nodeRegistry, type NodeConstructor } from '$graph-editor/nodes';
+import { Node, nodeRegistry, type NodeConstructor, type NodeParams } from '$graph-editor/nodes';
 import { get } from 'svelte/store';
 import wu from 'wu';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
@@ -11,6 +11,8 @@ import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
 // Ensure all nodes are registered
 import '$graph-editor/nodes';
+import type { Control, Socket } from '$graph-editor/socket';
+import { XmlNode, type XmlConfig, type XmlNodeParams } from '$graph-editor/nodes/XML';
 export * from './context-menu.svelte';
 export { default as ContextMenuComponent } from './ContextMenu.svelte';
 // export class ContextMenuSetup extends SetupClass {
@@ -291,11 +293,12 @@ export { default as ContextMenuComponent } from './ContextMenu.svelte';
 // 	}
 // }
 
-export type NodeMenuItem = {
+export type NodeMenuItem<N extends typeof Node> = {
 	/** Label of the node. */
 	label: string;
 	/** Function that creates the node. */
-	nodeClass: typeof Node;
+	nodeClass: N;
+	params: ConstructorParameters<N>[0];
 	/** Menu path of the node. */
 	path: string[];
 	/** Search tags of the node. */
@@ -306,8 +309,35 @@ export type NodeMenuItem = {
 	inputTypes: Node['inputTypes'];
 	outputTypes: Node['outputTypes'];
 };
+type Ins = Record<string, Socket>;
+type Outs = Record<string, Socket>;
+type Controls = Record<string, Control>;
+type State = Record<string, unknown>;
+type Params = Record<string, unknown>;
+export function nodeItem<
+	I extends Ins,
+	O extends Outs,
+	C extends Controls,
+	S extends State,
+	P extends Params,
+	N extends typeof Node<I, O, C, S, P>
+>(item: NodeMenuItem<N>): NodeMenuItem<typeof Node> {
+	return item as NodeMenuItem<typeof Node>;
+}
+export function xmlItem({label, xmlConfig}: {label?: string, xmlConfig: XmlConfig}): NodeMenuItem<typeof Node> {
+	return nodeItem({
+		label:label ?? xmlConfig.xmlTag,
+		nodeClass: XmlNode,
+		params: {xmlConfig},
+		path: ['XML'],
+		tags: ['xml'],
+		description: '',
+		inputTypes: {},
+		outputTypes: {}
+	})
+}
 
-export const baseNodeMenuItems: NodeMenuItem[] = [];
+export const baseNodeMenuItems: NodeMenuItem<typeof Node>[] = [];
 for (const [id, nodeClass] of nodeRegistry.entries()) {
 	if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
 	const pieces = id.split('.').map(capitalizeWords);
@@ -340,14 +370,14 @@ export function getMenuItemsFromNodeItems({
 }: {
 	factory: NodeFactory;
 	pos: Position;
-	nodeItems: NodeMenuItem[];
+	nodeItems: NodeMenuItem<typeof Node>[];
 	action?: (n: Node) => void;
 }): MenuItem[] {
 	const editor = factory.getEditor();
 	const area = factory.getArea();
 	const res: MenuItem[] = [];
 
-	for (const { description, label, path, tags, nodeClass } of nodeItems) {
+	for (const { description, label, path, tags, nodeClass, params } of nodeItems) {
 		res.push({
 			id: nodeClass.id.replaceAll('.', '-'),
 			description,
@@ -355,9 +385,8 @@ export function getMenuItemsFromNodeItems({
 			path,
 			tags,
 			action: async () => {
-				const node = new nodeClass({ factory });
+				const node = new nodeClass({ factory, ...params });
 				await editor.addNode(node);
-				console.log(area, pos, factory);
 				const localPos = clientToSurfacePos({ pos, factory });
 				await area?.translate(node.id, localPos);
 				if (action) action(node);
@@ -373,7 +402,13 @@ export type ShowContextMenu = (params: {
 	searchbar: boolean;
 	onHide?: () => void;
 }) => void;
-export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowContextMenu }): Setup {
+export function contextMenuSetup({
+	showContextMenu,
+	additionalNodeItems
+}: {
+	showContextMenu: ShowContextMenu;
+	additionalNodeItems?: NodeMenuItem[];
+}): Setup {
 	return {
 		name: 'Context Menu',
 		type: 'area',
@@ -467,7 +502,7 @@ export function contextMenuSetup({ showContextMenu }: { showContextMenu: ShowCon
 					const items: MenuItem[] = getMenuItemsFromNodeItems({
 						factory,
 						pos,
-						nodeItems: baseNodeMenuItems
+						nodeItems: [...baseNodeMenuItems, ...(additionalNodeItems || [])]
 					});
 
 					// Spawn context menu

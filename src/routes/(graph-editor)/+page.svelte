@@ -4,21 +4,53 @@
 	import { AddNode } from '$graph-editor/nodes/math';
 	import { setupSvelteRender } from '$graph-editor/render';
 	import { Setup } from '$lib/graph-editor';
-	import { showContextMenu, ContextMenuComponent } from '$graph-editor/plugins/context-menu';
+	import { showContextMenu, ContextMenuComponent, type NodeMenuItem, nodeItem, xmlItem } from '$graph-editor/plugins/context-menu';
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
 	import { capitalize, shortcut, type KeyboardShortcut } from '@selenite/commons';
 	import { themeControl } from '$lib/global/index.svelte';
 	import type {HTMLButtonAttributes} from 'svelte/elements'
+	import { XmlNode } from '$graph-editor/nodes/XML';
+	import type { GraphNode, NodeParams } from '$graph-editor/nodes';
 	let editor = $state<NodeEditor>();
 	const factory = $derived(editor?.factory)
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
 	let editorReady = $state(false);
+
 	// On mount
 	$effect(() => {
 		if (!container) return;
-		Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu }).then(
+		function fXmlNode(params: NodeParams = {}) {
+			return new XmlNode({
+				...params,
+				xmlConfig: {
+					xmlTag: 'ExampleXML'
+				}
+			});
+		};
+		fXmlNode.id = XmlNode.id;
+		
+		Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu,
+			 additionalNodeItems: [
+				nodeItem({
+					label: 'Example XML',
+					description: 'This an example XML node.',
+					inputTypes: {},
+					outputTypes: {},
+					nodeClass: XmlNode,
+					params: {
+						xmlConfig: {
+							xmlTag: 'ExampleXML'
+						},
+					},
+					path: ['XML'],
+					tags: ['xml']
+				}),
+				xmlItem({xmlConfig: {xmlTag: 'ExampleWithName', 
+					
+				}})
+			 ] }).then(
 			async (res) => {
 				editor = res.editor;
 				const factory = res.factory;

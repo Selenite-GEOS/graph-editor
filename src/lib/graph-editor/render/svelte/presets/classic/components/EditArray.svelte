@@ -9,13 +9,15 @@
 	import Fa from 'svelte-fa';
 	import { InputControl as InputControlComponent } from '..';
 	import { faTimes } from '@fortawesome/free-solid-svg-icons';
+	import { shortcut } from '@selenite/commons';
 
 	type Props = {
 		array: unknown[];
 		type: InputControlType;
 		onchange?: (array: unknown[]) => void;
+		addRow?: () => void;
 	};
-	let { array, type, onchange }: Props = $props();
+	let { array, type, onchange, addRow }: Props = $props();
 	$inspect('editarray', array).with(console.debug);
 
 	const controls = $derived(
@@ -37,12 +39,12 @@
 	);
 </script>
 
-<div class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center">
+<div class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center" use:shortcut={{key: 'Enter', action: addRow, ignoreElements: []}}>
 	{#each controls as control, i (i)}
 		<span class="text-end">{i}</span>
 		<span>—</span>
-		<span class="text-center">
-			<InputControlComponent data={control} />
+		<span class="text-center text-base-content">
+			<InputControlComponent data={control} focus={true} />
 		</span>
 		<!-- Delete row button -->
 		<button
