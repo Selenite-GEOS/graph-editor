@@ -25,11 +25,11 @@
 		position: relative;
 		height: 0;
 		width: 0;
-		top: -14px;
-		left: -27px;
+		top: -13px;
+		left: -24px;
 		border-top: 14px solid transparent;
 		border-bottom: 14px solid transparent;
-		border-left: 24px solid $exec-color;
+		border-left: $socket-size solid $exec-color;
 		/* display: inline-block; */
 		cursor: pointer;
 		/*width: ${$socketsize}px;
@@ -41,7 +41,7 @@
 		box-sizing: border-box;
 		&:hover {
 			top: -10px;
-			left: -24px;
+			left: -22px;
 			border-top: 10px solid transparent;
 			border-bottom: 10px solid transparent;
 			border-left: 17px solid $exec-color;
@@ -56,15 +56,15 @@
 		width: 0;
 		/* margin-left: 10px; */
 		display: inline-block;
-		border-top: 16px solid transparent;
-		border-bottom: 16px solid transparent;
+		border-top: 14px solid transparent;
+		border-bottom: 14px solid transparent;
 		padding-left: -10px;
-		border-left: 28px solid white;
+		border-left: $socket-size solid white;
 		box-sizing: border-box;
 		/* z-index: 1; */
 		&:hover #innerTriangle {
 			top: -10px;
-			left: -24px;
+			left: -22px;
 			border-top: 10px solid transparent;
 			border-bottom: 10px solid transparent;
 			border-left: 17px solid $exec-color;
