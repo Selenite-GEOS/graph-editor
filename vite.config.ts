@@ -3,8 +3,8 @@ import { defineConfig } from 'vitest/config';
 import wasmPack from 'vite-plugin-wasm-pack'
 export default defineConfig({
 	plugins: [
-		wasmPack([], ['selenite-commons-rs']),
 		sveltekit(),
+		wasmPack([], ['selenite-commons-rs']),
 	],
 	build: {
 		target: 'es2022'

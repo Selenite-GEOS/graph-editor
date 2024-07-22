@@ -11,7 +11,7 @@ import {
 	nodeRegistry,
 	type NodeSaveData
 } from '../nodes/Node.svelte';
-import { readable, type Writable } from 'svelte/store';
+import { readable, type Readable, type Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
@@ -19,7 +19,6 @@ import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectab
 import { ErrorWNotif, _ } from '$lib/global/index.svelte';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
 import wu from 'wu';
-import * as Nodes from '../nodes';
 import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';
 // import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
@@ -80,6 +79,8 @@ type WithFactory<T extends Record<string, unknown>> = T & { factory: NodeFactory
 type WithoutFactory<T> = Omit<T, 'factory'>;
 
 // export function registerNode() {}
+
+
 export class NodeFactory {
 	public notifications: NotificationsManager = {
 		show: (notif) => {
@@ -113,7 +114,7 @@ export class NodeFactory {
 		defaultConnectionPath
 	);
 
-	modalStore = readable(Modal.instance)
+	modalStore: Readable<Modal> = readable(Modal.instance)
 	
 	private state: Map<string, unknown> = new Map();
 
