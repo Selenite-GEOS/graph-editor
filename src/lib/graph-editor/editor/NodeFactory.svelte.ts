@@ -275,11 +275,11 @@ export class NodeFactory {
 
 	public readonly dataflowEngine = createDataflowEngine();
 	private readonly controlflowEngine = createControlflowEngine();
-	public readonly selector?: AreaExtensions.Selector<SelectorEntity>;
-	public readonly accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
+	public  selector?: AreaExtensions.Selector<SelectorEntity>;
+	public  accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
 	public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
-	public readonly arrange?: AutoArrangePlugin<Schemes>;
-	public readonly history: HistoryPlugin<Schemes> | undefined;
+	public arrange?: AutoArrangePlugin<Schemes>;
+	public  history: HistoryPlugin<Schemes> | undefined;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
 	#isDataflowEnabled = true;
 

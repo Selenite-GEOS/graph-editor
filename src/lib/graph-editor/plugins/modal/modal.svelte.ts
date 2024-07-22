@@ -1,7 +1,9 @@
 import type { Component, Snippet } from 'svelte';
 
 type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
-export type ModalSettings<Props extends Record<string, any> = {}, Params extends unknown[] = []> = {
+
+
+export type BaseModalSettings = {
 	title?: string;
 	buttons?: (
 		| {
@@ -11,7 +13,27 @@ export type ModalSettings<Props extends Record<string, any> = {}, Params extends
 		  }
 		| 'cancel'
 	)[];
-} & ({ component: Component<Props>; props: Props } | { snippet: Snippet<Params>; params: Params });
+};
+
+
+export type ComponentModalSettings<Props extends Record<string, any> = {}> = {
+	component: Component<Props>;
+	props: Props;
+} & BaseModalSettings;
+
+export type SnippetModalSettings<Props extends Record<string, any> = {}> = {
+	snippet: Snippet<[Props]>;
+	props: Props;
+} & BaseModalSettings;
+
+export type ModalSettings<Props extends Record<string, any> = {}> = ComponentModalSettings<Props> | SnippetModalSettings<Props>;
+
+export function isComponentModalSettings<Props extends Record<string, any>>(modal: ModalSettings<Props>): modal is ComponentModalSettings<Props> {
+	return 'component' in modal;
+}
+export function isSnippetModalSettings<Props extends Record<string, any>>(modal: ModalSettings<Props>): modal is SnippetModalSettings<Props> {
+	return 'snippet' in modal;
+}
 export class Modal {
 	static #instance: Modal | undefined;
 	static get instance(): Modal {
@@ -26,7 +48,7 @@ export class Modal {
 	private constructor() {}
 
 	show<Props extends Record<string, any>>(params: ModalSettings<Props>) {
-		console.debug('Show modal');
+		console.debug('Show modal', params);
 		this.queue.push(params as unknown as ModalSettings);
 	}
 

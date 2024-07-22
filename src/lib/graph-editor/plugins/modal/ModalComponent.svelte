@@ -1,13 +1,9 @@
 <script lang="ts">
-	import { Modal } from './modal.svelte';
+	import { isComponentModalSettings, isSnippetModalSettings, Modal } from './modal.svelte';
 
 	const modal = Modal.instance;
 	let dialog = $state<HTMLDialogElement>();
 	let lastModal = $derived(modal.queue.at(-1));
-	let component = $derived(lastModal?.component);
-	let props = $derived(lastModal?.props);
-	let snippet = $derived(lastModal?.snippet);
-	let params = $derived(lastModal?.params);
 	let title = $derived(lastModal?.title);
 	let buttons = $derived(lastModal?.buttons);
 	let resolvedButtons = $derived(
@@ -39,11 +35,13 @@
 			{#if title}
 				<h1>{title}</h1>
 			{/if}
-			{#if component}
-				<svelte:component this={component} {...props} />
-			{:else if snippet}
-				{@render snippet(params)}
+			<div class="text-base-content">
+			{#if isComponentModalSettings(lastModal)}
+				<svelte:component this={lastModal.component} {...lastModal.props} />
+			{:else if isSnippetModalSettings(lastModal)}
+				{@render lastModal.snippet(lastModal.props)}
 			{/if}
+			</div>
 			{#if resolvedButtons}
 				<div class="divider"></div>
 				<div class="modal-buttons">

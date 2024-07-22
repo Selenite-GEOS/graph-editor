@@ -1,5 +1,4 @@
 import { NodeEditor, NodeFactory, type NodeEditorSaveData } from '$graph-editor/editor';
-import type { EditorExample } from '$graph-editor/old-examples';
 import type { Writable } from 'svelte/store';
 import { isSetup, type Setup, type SetupAreaFunction, type SetupFunction } from './Setup';
 import { setupConnections } from './ConnectionSetup';
@@ -12,6 +11,8 @@ import { tick } from 'svelte';
 import { contextMenuSetup, showContextMenu, type NodeMenuItem, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
 import { gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
 import { notificationsSetup } from '$graph-editor/plugins/notifications';
+import type { GraphNode } from '$graph-editor/nodes';
+import { HistoryPlugin } from '$graph-editor/plugins/history';
 
 export type XmlContext = {};
 
@@ -19,7 +20,6 @@ export type ModalStore = {};
 
 export type SetupGraphEditorParams = {
 	container?: HTMLElement;
-	loadExample?: EditorExample;
 	saveData?: NodeEditorSaveData;
 	xmlContext?: Writable<XmlContext>;
 	modalStore?: ModalStore;
@@ -76,7 +76,7 @@ export async function setupGraphEditor(
 }
 
 export async function setupFullGraphEditor(
-	params: SetupGraphEditorParams & { showContextMenu?: ShowContextMenu, additionalNodeItems?: NodeMenuItem[] } = {}
+	params: SetupGraphEditorParams & { showContextMenu?: ShowContextMenu, additionalNodeItems?: NodeMenuItem<typeof GraphNode>[] } = {}
 ): Promise<SetupGraphEditorResult> {
 	params.showContextMenu = showContextMenu;
 	return setupGraphEditor({
@@ -144,7 +144,7 @@ export async function setupFullGraphEditor(
 					return;
 				}
 				console.log('Setting up history');
-				const { HistoryPlugin, Presets: HistoryPresets } = await import('rete-history-plugin');
+				const {  Presets: HistoryPresets } = await import('rete-history-plugin');
 				const history = new HistoryPlugin<Schemes>();
 				history.addPreset(HistoryPresets.classic.setup());
 				area.use(history);
@@ -158,6 +158,14 @@ export async function setupFullGraphEditor(
 						'$graph-editor/plugins/CommentPlugin'
 					);
 					const comment = new CommentPlugin<Schemes, AreaExtra>({ factory });
+					if (!factory.selector) {
+						console.warn("Missing selector")
+						return;
+					}
+					if (!factory.accumulating) {
+						console.warn("Missing accumulating")
+						return;
+					}
 					CommentExtensions.selectable<Schemes, AreaExtra>(
 						comment,
 						factory.selector,
