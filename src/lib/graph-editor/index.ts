@@ -5,7 +5,9 @@
 
 export * as Nodes from './nodes';
 export * as Editor from './editor';
+export * from './editor';
 export * as Variable from './variables';
+export * from './variables'
 export * as Setup from './setup';
 export * from './setup'
 export * as Plugins from './plugins';
@@ -15,6 +17,4 @@ export * as Component from './components'
 export * as Area from './area'
 export * as Common from './common'
 export type {Schemes} from './schemes'
-/** @ignore */
-export { NodeEditor, NodeFactory } from './editor';
 export * from './plugins/notifications'
