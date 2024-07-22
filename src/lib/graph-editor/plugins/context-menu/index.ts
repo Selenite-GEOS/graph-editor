@@ -10,7 +10,7 @@ import type { Position } from '$graph-editor/common';
 import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
 // Ensure all nodes are registered
-import '$graph-editor/nodes';
+import {} from '$graph-editor/nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { XmlNode, type XmlConfig, type XmlNodeParams } from '$graph-editor/nodes/XML';
 export * from './context-menu.svelte';
