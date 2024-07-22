@@ -1,5 +1,5 @@
 import { Node } from '../Node.svelte';
-// import { notifications } from '@mantine/notifications';
+// import { notifications } from '@selenite/graph-editor';
 import { getLeavesFromOutput } from '../utils';
 import type { NodeFactory } from '$graph-editor/editor';
 

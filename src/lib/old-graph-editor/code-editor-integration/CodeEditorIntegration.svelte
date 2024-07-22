@@ -3,7 +3,7 @@
 	import { faArrowDown, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 	import type { EditorContext } from '..';
 	import CodeEditorIntegrationButton from './CodeEditorIntegrationButton.svelte';
-	import { notifications } from '@mantine/notifications';
+	import { notifications } from '@selenite/graph-editor';
 	import { ErrorWNotif, getContext, _ } from '$lib/global/index.svelte';
 	import 'regenerator-runtime/runtime';
 	import wu from 'wu';

@@ -2,7 +2,7 @@
 	import type { NodeFactory } from '$graph-editor/node/NodeFactory';
 	import { faPython } from '@fortawesome/free-brands-svg-icons';
 	import EditorButton from './EditorButton.svelte';
-	import { notifications } from '@mantine/notifications';
+	import { notifications } from '@selenite/graph-editor';
 	import { ErrorWNotif, _, getContext } from '$lib/global/index.svelte';
 	import type { Root } from 'rete';
 	import type { Area2D } from 'rete-area-plugin';

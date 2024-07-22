@@ -2,7 +2,7 @@
 	import { faEarth } from '@fortawesome/free-solid-svg-icons';
 	import EditorButton from './EditorButton.svelte';
 	import { getContext } from 'svelte';
-	import { notifications } from '@mantine/notifications';
+	import { notifications } from '@selenite/graph-editor';
 	import { _ } from '$lib/global/index.svelte';
 
 	const toggleGeos = getContext('toggleGeos');

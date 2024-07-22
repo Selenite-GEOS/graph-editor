@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
-	import { notifications } from '@mantine/notifications';
+	import { notifications } from '@selenite/graph-editor';
 	import { _, getContext } from '$lib/global/index.svelte';
 	import EditorButton from './EditorButton.svelte';
 	import { getLocalStorageUsagePercent as getLocalStorageUsage } from '$utils/localStorage';

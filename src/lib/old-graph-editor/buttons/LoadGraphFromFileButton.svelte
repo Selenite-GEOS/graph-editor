@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { faCalendarTimes, faUpload } from '@fortawesome/free-solid-svg-icons';
-	import { notifications } from '@mantine/notifications';
+	import { notifications } from '@selenite/graph-editor';
 	import EditorButton from './EditorButton.svelte';
 	import { _, getContext } from '$lib/global/index.svelte';
 	import type { NodeFactory } from '$graph-editor/node/NodeFactory';
