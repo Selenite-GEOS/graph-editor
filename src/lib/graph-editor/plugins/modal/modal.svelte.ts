@@ -34,6 +34,12 @@ export function isComponentModalSettings<Props extends Record<string, any>>(moda
 export function isSnippetModalSettings<Props extends Record<string, any>>(modal: ModalSettings<Props>): modal is SnippetModalSettings<Props> {
 	return 'snippet' in modal;
 }
+
+/**
+ * Singleton that manages modals.
+ * 
+ * The singleton can be accessed with `Modal.instance`.
+ */
 export class Modal {
 	static #instance: Modal | undefined;
 	static get instance(): Modal {
