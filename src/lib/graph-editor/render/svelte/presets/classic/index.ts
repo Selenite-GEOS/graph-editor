@@ -18,7 +18,6 @@ import type { ClassicScheme, ExtractPayload, SvelteArea2D } from './types';
 
 export { default as Connection } from './components/Connection.svelte';
 export { default as Control } from './components/Control.svelte';
-export { default as Node } from './components/OldNode.svelte';
 export { default as Socket } from './components/Socket.svelte';
 export { default as Button } from './components/Button.svelte';
 // export {default as InputControl} from './components/InputControl.svelte'
