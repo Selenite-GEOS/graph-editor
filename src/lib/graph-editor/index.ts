@@ -10,6 +10,7 @@ export * as Variable from './variables';
 export * from './variables'
 export * as Setup from './setup';
 export * from './setup'
+export * from './render'
 export * as Plugins from './plugins';
 export * as Examples from './examples';
 export * as Socket from './socket';
