@@ -11,4 +11,4 @@
 
 export * from './NodeEditor.svelte';
 export * from './types';
-export * from './NodeFactory';
+export * from './NodeFactory.svelte';

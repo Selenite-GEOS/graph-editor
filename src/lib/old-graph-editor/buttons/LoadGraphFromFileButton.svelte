@@ -3,7 +3,7 @@
 	import { notifications } from '@selenite/graph-editor';
 	import EditorButton from './EditorButton.svelte';
 	import { _, getContext } from '$lib/global/index.svelte';
-	import type { NodeFactory } from '$graph-editor/node/NodeFactory';
+	import type { NodeFactory } from '$graph-editor/node/NodeFactory.svelte';
 
 	let factory: NodeFactory;
 	let fileInput: HTMLInputElement;

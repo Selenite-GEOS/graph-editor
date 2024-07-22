@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { NodeFactory } from '$graph-editor/node/NodeFactory';
+	import type { NodeFactory } from '$graph-editor/node/NodeFactory.svelte';
 	import { faPython } from '@fortawesome/free-brands-svg-icons';
 	import EditorButton from './EditorButton.svelte';
 	import { notifications } from '@selenite/graph-editor';

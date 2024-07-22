@@ -4,7 +4,7 @@ import { Connection, Node, type ConnectionSaveData, type NodeSaveData } from '..
 import { newLocalId } from '$utils';
 import type { Variable } from '../variables';
 import { get, writable, type Readable, type Writable } from 'svelte/store';
-import { NodeFactory } from './NodeFactory';
+import { NodeFactory } from './NodeFactory.svelte';
 import wu from 'wu';
 import { _, ErrorWNotif } from '$lib/global/index.svelte';
 

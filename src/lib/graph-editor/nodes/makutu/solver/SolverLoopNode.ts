@@ -1,4 +1,4 @@
-import type { NodeFactory } from '$graph-editor/node/NodeFactory';
+import type { NodeFactory } from '$graph-editor/node/NodeFactory.svelte';
 import { SolverAPINode } from './SolverAPINode';
 
 export class SolverLoopNode extends SolverAPINode {
