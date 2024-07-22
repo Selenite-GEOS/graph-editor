@@ -8,7 +8,7 @@
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
-	import { capitalize, shortcut, type KeyboardShortcut } from '@selenite/commons';
+	import { capitalize, parseXsdFromUrl, shortcut, type KeyboardShortcut } from '@selenite/commons';
 	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type {HTMLButtonAttributes} from 'svelte/elements'
 	import { XmlNode } from '$graph-editor/nodes/XML';
@@ -19,6 +19,7 @@
 	let editorReady = $state(false);
 
 	// On mount
+
 	$effect(() => {
 		if (!container) return;
 		function fXmlNode(params: NodeParams = {}) {
@@ -68,6 +69,8 @@
 				}})
 			 ] }).then(
 			async (res) => {
+				const schema = await parseXsdFromUrl('/geos_schema.xsd');
+				console.log(schema);
 				editor = res.editor;
 				const factory = res.factory;
 				console.log('Editor setup complete');

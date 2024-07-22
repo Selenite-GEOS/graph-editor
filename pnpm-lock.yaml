@@ -103,8 +103,8 @@ importers:
         version: 2.1.0
     devDependencies:
       '@selenite/commons':
-        specifier: ^0.7.0
-        version: 0.7.0(svelte@5.0.0-next.188)
+        specifier: ^0.8.2
+        version: 0.8.2(svelte@5.0.0-next.188)
       '@skeletonlabs/skeleton':
         specifier: 3.0.0-next.1
         version: 3.0.0-next.1(postcss@8.4.39)(tailwindcss@3.4.6)
@@ -192,6 +192,9 @@ importers:
       vite:
         specifier: ^5.3.4
         version: 5.3.4(@types/node@20.14.11)(sass@1.77.8)
+      vite-plugin-wasm-pack:
+        specifier: ^0.1.12
+        version: 0.1.12
       vitest:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@20.14.11)(sass@1.77.8)
@@ -685,8 +688,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@selenite/commons@0.7.0':
-    resolution: {integrity: sha512-YSqiiNtpgmabmq1aQsYJz2WORrqsKvNZ+b1aw6fAQHUnxHc2TE73i95XMoFO8CFbhg/5Ftw0WL6kUFvd+24rew==}
+  '@selenite/commons@0.8.2':
+    resolution: {integrity: sha512-F2+RwQHCQoDHfT3jaKib7jdxGyWMqOJMT4gc7jVfWv5fFquyVmi8LwOeBfdvwBtq2hJjQ505JqALt+9jzOHg/g==}
     peerDependencies:
       svelte: ^5.0.0-next.1
 
@@ -1313,6 +1316,10 @@ packages:
   fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
 
+  fs-extra@10.1.0:
+    resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
+    engines: {node: '>=12'}
+
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
@@ -1492,6 +1499,9 @@ packages:
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
+  jsonfile@6.1.0:
+    resolution: {integrity: sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==}
+
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
@@ -1628,6 +1638,9 @@ packages:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  narrowing@1.5.0:
+    resolution: {integrity: sha512-DUu4XdKgkfAPTAL28k79pdnshDE2W5T24QAnidSPo2F/W1TX6CjNzmEeXQfE5O1lxQvC0GYI6ZRDsLcyzugEYA==}
 
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
@@ -2003,6 +2016,9 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
+  selenite-commons-rs@0.1.0:
+    resolution: {integrity: sha512-E3pEGpIm2+99ZdgmjI9+Qrr4/pqtWNztLcpNZIWrZJAKJ9BzX01CfstWFvcDnMAlEgoo9ZqbCqjORerj3Szw7Q==}
+
   semver@7.6.3:
     resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
     engines: {node: '>=10'}
@@ -2287,6 +2303,10 @@ packages:
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
+  universalify@2.0.1:
+    resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
+    engines: {node: '>= 10.0.0'}
+
   unload@2.4.1:
     resolution: {integrity: sha512-IViSAm8Z3sRBYA+9wc0fLQmU9Nrxb16rcDmIiR6Y9LJSZzI7QY5QsDhqPpKOjAn0O9/kfK1TfNEMMAGPTIraPw==}
 
@@ -2310,6 +2330,9 @@ packages:
     resolution: {integrity: sha512-de6HJgzC+TFzOu0NTC4RAIsyf/DY/ibWDYQUcuEA84EMHhcefTUGkjFHKKEJhQN4A+6I0u++kr3l36ZF2d7XRw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
+
+  vite-plugin-wasm-pack@0.1.12:
+    resolution: {integrity: sha512-WliYvQp9HXluir4OKGbngkcKxtYtifU11cqLurRRJGsl770Sjr1iIkp5RuvU3IC1poT4A57Z2/YgAKI2Skm7ZA==}
 
   vite@5.3.4:
     resolution: {integrity: sha512-Cw+7zL3ZG9/NZBB8C+8QbQZmR54GwqIz+WMI4b3JgdYJvX+ny9AjJXqkGQlDXSXRP9rP0B4tbciRMOVEKulVOA==}
@@ -2755,10 +2778,11 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.18.1':
     optional: true
 
-  '@selenite/commons@0.7.0(svelte@5.0.0-next.188)':
+  '@selenite/commons@0.8.2(svelte@5.0.0-next.188)':
     dependencies:
       '@types/uuid': 10.0.0
       autosize: 6.0.1
+      selenite-commons-rs: 0.1.0
       svelte: 5.0.0-next.188
       uuid: 10.0.0
 
@@ -3525,6 +3549,12 @@ snapshots:
 
   fraction.js@4.3.7: {}
 
+  fs-extra@10.1.0:
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.1.0
+      universalify: 2.0.1
+
   fs.realpath@1.0.0: {}
 
   fsevents@2.3.3:
@@ -3684,6 +3714,12 @@ snapshots:
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
+  jsonfile@6.1.0:
+    dependencies:
+      universalify: 2.0.1
+    optionalDependencies:
+      graceful-fs: 4.2.11
+
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
@@ -3817,6 +3853,8 @@ snapshots:
       thenify-all: 1.6.0
 
   nanoid@3.3.7: {}
+
+  narrowing@1.5.0: {}
 
   natural-compare@1.4.0: {}
 
@@ -4169,6 +4207,8 @@ snapshots:
       immutable: 4.3.6
       source-map-js: 1.2.0
 
+  selenite-commons-rs@0.1.0: {}
+
   semver@7.6.3: {}
 
   set-cookie-parser@2.6.0: {}
@@ -4460,6 +4500,8 @@ snapshots:
 
   undici-types@5.26.5: {}
 
+  universalify@2.0.1: {}
+
   unload@2.4.1: {}
 
   update-browserslist-db@1.1.0(browserslist@4.23.2):
@@ -4492,6 +4534,12 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+
+  vite-plugin-wasm-pack@0.1.12:
+    dependencies:
+      chalk: 4.1.2
+      fs-extra: 10.1.0
+      narrowing: 1.5.0
 
   vite@5.3.4(@types/node@20.14.11)(sass@1.77.8):
     dependencies:

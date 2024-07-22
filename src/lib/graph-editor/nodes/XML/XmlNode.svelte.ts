@@ -71,7 +71,7 @@ export class XmlToString extends Node<
 @registerNode('xml.XML', 'abstract')
 export class XmlNode extends Node<
 	Record<string, Socket<DataType>>,
-	{ value: Scalar },
+	{ value: Scalar, name: Scalar<'groupNameRef'> },
 	{ addXmlAttr: AddXmlAttributeControl },
 	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[] }
 > {
@@ -141,8 +141,19 @@ export class XmlNode extends Node<
 			this.addControl('addXmlAttr', new AddXmlAttributeControl(this));
 		}
 
+		// Add XML output
+		this.addOutData('value', {
+			showLabel: false,
+			type: `xmlElement:${xmlConfig.xmlTag}`
+		});
+
 		if (hasName) {
-			XmlNode.counts[xmlConfig.xmlTag] = XmlNode.counts[xmlConfig.xmlTag] ? XmlNode.counts[xmlConfig.xmlTag] + 1 : 1;
+			this.addOutData('name', {
+				type: 'groupNameRef'
+			});
+			XmlNode.counts[xmlConfig.xmlTag] = XmlNode.counts[xmlConfig.xmlTag]
+				? XmlNode.counts[xmlConfig.xmlTag] + 1
+				: 1;
 			if (!this.state.name) {
 				if ('name' in initialValues) this.name = initialValues['name'] as string;
 				else {
@@ -160,12 +171,6 @@ export class XmlNode extends Node<
 				isArray: true,
 				type: `xmlElement:${childTypes.join('|')}`
 			});
-
-		// Add XML output
-		this.addOutData('value', {
-			showLabel: false,
-			type: `xmlElement:${xmlConfig.xmlTag}`
-		});
 
 		if (!this.factory) return;
 		const pipeSetup = this.factory.useState('XmlNode', 'pipeSetup', false);

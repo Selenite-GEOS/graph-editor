@@ -16,3 +16,4 @@ export * as Common from './common'
 export type {Schemes} from './schemes'
 /** @ignore */
 export { NodeEditor, NodeFactory } from './editor';
+export * from './plugins/notifications'

@@ -628,7 +628,7 @@ export class Node<
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			params.label ?? key
+			params.showLabel ?? true ? params.label ?? key : undefined
 		);
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 		return output.socket;
