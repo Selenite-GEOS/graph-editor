@@ -13,6 +13,7 @@ import { clientToSurfacePos } from '$utils/html';
 import {} from '$graph-editor/nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { XmlNode, type XmlConfig, type XmlNodeParams } from '$graph-editor/nodes/XML';
+import { newLocalId } from '@selenite/commons';
 export * from './context-menu.svelte';
 export { default as ContextMenuComponent } from './ContextMenu.svelte';
 // export class ContextMenuSetup extends SetupClass {
@@ -379,7 +380,7 @@ export function getMenuItemsFromNodeItems({
 
 	for (const { description, label, path, tags, nodeClass, params } of nodeItems) {
 		res.push({
-			id: nodeClass.id.replaceAll('.', '-'),
+			id: newLocalId(nodeClass.id.replaceAll('.', '-')),
 			description,
 			label,
 			path,

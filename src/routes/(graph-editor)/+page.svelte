@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { NumberNode } from '$graph-editor/nodes/data/number';
-	import { DisplayNode } from '$graph-editor/nodes/io/DisplayNode';
-	import { AddNode } from '$graph-editor/nodes/math';
 	import { setupSvelteRender } from '$graph-editor/render';
 	import { Setup } from '$lib/graph-editor';
-	import { showContextMenu, ContextMenuComponent, type NodeMenuItem, nodeItem, xmlItem } from '$graph-editor/plugins/context-menu';
+	import { showContextMenu, ContextMenuComponent, nodeItem, xmlItem } from '$graph-editor/plugins/context-menu';
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
@@ -12,7 +9,7 @@
 	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type {HTMLButtonAttributes} from 'svelte/elements'
 	import { XmlNode } from '$graph-editor/nodes/XML';
-	import type { GraphNode, NodeParams } from '$graph-editor/nodes';
+	import type { NodeParams } from '$graph-editor/nodes';
 	let editor = $state<NodeEditor>();
 	const factory = $derived(editor?.factory)
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
@@ -22,15 +19,6 @@
 
 	$effect(() => {
 		if (!container) return;
-		function fXmlNode(params: NodeParams = {}) {
-			return new XmlNode({
-				...params,
-				xmlConfig: {
-					xmlTag: 'ExampleXML'
-				}
-			});
-		};
-		fXmlNode.id = XmlNode.id;
 		
 		Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu,
 			 additionalNodeItems: [

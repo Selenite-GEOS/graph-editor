@@ -103,8 +103,8 @@ importers:
         version: 2.1.0
     devDependencies:
       '@selenite/commons':
-        specifier: ^0.8.2
-        version: 0.8.2(svelte@5.0.0-next.195)
+        specifier: ^0.10.1
+        version: 0.10.1(svelte@5.0.0-next.195)
       '@skeletonlabs/skeleton':
         specifier: 3.0.0-next.1
         version: 3.0.0-next.1(postcss@8.4.39)(tailwindcss@3.4.6)
@@ -688,8 +688,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@selenite/commons@0.8.2':
-    resolution: {integrity: sha512-F2+RwQHCQoDHfT3jaKib7jdxGyWMqOJMT4gc7jVfWv5fFquyVmi8LwOeBfdvwBtq2hJjQ505JqALt+9jzOHg/g==}
+  '@selenite/commons@0.10.1':
+    resolution: {integrity: sha512-DdbfZJ/VgiH4DvD1ukAOMubekxyz2V3HevBT+dgSJCfp6uAudBx0nt9VnYeF09pXVjTIYb8w9R4AXoLOH/2dhA==}
     peerDependencies:
       svelte: ^5.0.0-next.1
 
@@ -2778,7 +2778,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.18.1':
     optional: true
 
-  '@selenite/commons@0.8.2(svelte@5.0.0-next.195)':
+  '@selenite/commons@0.10.1(svelte@5.0.0-next.195)':
     dependencies:
       '@types/uuid': 10.0.0
       autosize: 6.0.1
