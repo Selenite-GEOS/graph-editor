@@ -65,7 +65,14 @@
 			use:shortcut={{
 				key: 'Enter',
 				ignoreElements: [],
-				action: () => menu.triggerFirstItem()
+				action: () => {
+					if (menuCmpnt?.getFocusedItem()) {
+						menuCmpnt?.getFocusedItem()?.action();
+						menu.visible = false;
+						return;
+					}
+					menu.triggerFirstItem()
+				}
 			}}
 			use:shortcut={{
 				ignoreElements: [],
@@ -119,6 +126,7 @@
 			<Menu
 				bind:this={menuCmpnt}
 				items={menu.filteredItems}
+				sort={menu.query.trim().length === 0}
 				onclick={() => {
 					menu.visible = false;
 				}}

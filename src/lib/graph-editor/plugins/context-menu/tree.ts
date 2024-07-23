@@ -30,8 +30,12 @@ export function makeTree<T, K extends string>({
 
 	const res: Tree<T> = [];
 	function rec(current: Tree<T>, currentCollector: TreeCollector<T>) {
-		current.push(...currentCollector.leaves.toSorted(sort));
-		for (const [k, v] of [...currentCollector.forest.entries()].toSorted(([a], [b]) => a.localeCompare(b))) {
+		current.push(...sort ? currentCollector.leaves.toSorted(sort) : currentCollector.leaves);
+		const forestEntries = [...currentCollector.forest.entries()];
+		if (sort) {
+			forestEntries.sort(([a], [b]) => a.localeCompare(b));
+		}
+		for (const [k, v] of forestEntries) {
 			const forest: Tree<T> = [];
 			current.push({ label: k, forest });
 			rec(forest, v);

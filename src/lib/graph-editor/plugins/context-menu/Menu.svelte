@@ -7,20 +7,26 @@
 		items: MenuItem[];
 		onclick?: () => void;
 		class?: string;
+		sort?: boolean
 	};
-	let { items, onclick, class: classes = '' }: Props = $props();
+	let { items, onclick, class: classes = '', sort = true }: Props = $props();
 
 	const tree = $derived.by(() => {
 		untrack(() => {
 			focusedIndex = -1;
 		});
-		return makeTree({ items, pathKey: 'path', sort(a, b) {
+		return makeTree({ items, pathKey: 'path', sort: sort ? (a, b) => {
 			return a.label.localeCompare(b.label);
-		}, });
+		} : undefined });
 	});
 	const itemsInTree = $derived(flattenTree(tree));
 	let focusedIndex = $state(-1);
 	let focusedItem: MenuItem | undefined = $derived(itemsInTree[focusedIndex]);
+
+	export function getFocusedItem(): MenuItem | undefined {
+		return focusedItem;
+	
+	}
 	let treeCmpnt = $state<TreeComponent<MenuItem>>();
 	let treeElement = $state<HTMLElement>();
 	export function expandAll() {
