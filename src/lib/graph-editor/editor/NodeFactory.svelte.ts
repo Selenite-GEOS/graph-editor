@@ -222,6 +222,19 @@ export class NodeFactory {
 		this.area?.destroy();
 	}
 
+	/**
+	 * Moves the view to the center of the nodes, with a zoom such that all nodes are visible.
+	 * @param nodes - Nodes to center the view on. If not provided, all nodes are used.
+	 */
+	centerView(nodes?: Node[]) {
+		if (!this.area) return;
+		return AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes())
+	}
+
+	/**
+	 * Loads a graph from a save.
+	 * @param editorSaveData - Save data to load.
+	 */
 	async loadGraph(editorSaveData: NodeEditorSaveData) {
 		await this.bulkOperation(async () => {
 			console.log('Load graph :', editorSaveData.editorName);
