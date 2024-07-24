@@ -301,7 +301,7 @@ export class Node<
 	get name(): string | undefined {
 		return this.state.name;
 	}
-	set name(n :string) {
+	set name(n: string) {
 		if (n.trim() === '') {
 			this.state.name = undefined;
 			return;
@@ -628,7 +628,7 @@ export class Node<
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			params.showLabel ?? true ? params.label ?? key : undefined
+			(params.showLabel ?? true) ? (params.label ?? key) : undefined
 		);
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 		return output.socket;
@@ -783,10 +783,14 @@ export class Node<
 	processDataflow = () => {
 		if (!this.editor) return;
 		// this.needsProcessing = true;
-		for (const n of structures(this.editor).successors(this.id).nodes()) {
-			n.needsProcessing = true;
+		try {
+			for (const n of structures(this.editor).successors(this.id).nodes()) {
+				n.needsProcessing = true;
+			}
+			this.factory?.resetDataflow(this);
+		} catch (e) {
+			console.error(e);
 		}
-		this.factory?.resetDataflow(this);
 	};
 
 	getWaitPromises(nodes: Node[]): Promise<void>[] {
