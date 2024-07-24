@@ -5,12 +5,7 @@ import type { Schemes } from '../schemes';
 import { ControlFlowEngine, DataflowEngine } from 'rete-engine';
 import { ExecSocket } from '../socket/ExecSocket';
 import { structures } from 'rete-structures';
-import {
-	Connection,
-	Node,
-	nodeRegistry,
-	type NodeSaveData
-} from '../nodes/Node.svelte';
+import { Connection, Node, nodeRegistry, type NodeSaveData } from '../nodes/Node.svelte';
 import { readable, type Readable, type Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
@@ -80,31 +75,30 @@ type WithoutFactory<T> = Omit<T, 'factory'>;
 
 // export function registerNode() {}
 
-
 export class NodeFactory {
 	public notifications: NotificationsManager = {
 		show: (notif) => {
-			let res = ''
+			let res = '';
 			if (notif.title) res += notif.title + ':';
 			console.log(res, notif.message);
 		},
 		error(notif) {
-			let res = ''
+			let res = '';
 			if (notif.title) res += notif.title + ':';
 			console.error(res, notif.message);
 		},
 		info(notif) {
-			let res = ''
+			let res = '';
 			if (notif.title) res += notif.title + ':';
 			console.info(res, notif.message);
 		},
 		success(notif) {
-			let res = ''
+			let res = '';
 			if (notif.title) res += notif.title + ':';
 			console.log('Succes', res, notif.message);
 		},
 		warn(notif) {
-			let res = ''
+			let res = '';
 			if (notif.title) res += notif.title + ':';
 			console.warn(res, notif.message);
 		}
@@ -114,8 +108,8 @@ export class NodeFactory {
 		defaultConnectionPath
 	);
 
-	modalStore: Readable<Modal> = readable(Modal.instance)
-	
+	modalStore: Readable<Modal> = readable(Modal.instance);
+
 	private state: Map<string, unknown> = new Map();
 
 	public id = newLocalId('node-factory');
@@ -124,18 +118,18 @@ export class NodeFactory {
 		id: string,
 		key: string,
 		value?: T
-	): { value: T, get: () => T; set: (value: T) => void } {
+	): { value: T; get: () => T; set: (value: T) => void } {
 		const stateKey = id + '_' + key;
 		if (!this.state.has(stateKey)) this.state.set(stateKey, value);
-		const state = this.state
+		const state = this.state;
 		return {
 			get: () => this.state.get(stateKey) as T,
 			set: (value: T) => this.state.set(stateKey, value),
 			get value() {
-				return state.get(stateKey) as T
+				return state.get(stateKey) as T;
 			},
 			set value(v: T) {
-				state.set(stateKey, v)
+				state.set(stateKey, v);
 			}
 		};
 	}
@@ -228,7 +222,7 @@ export class NodeFactory {
 	 */
 	centerView(nodes?: Node[]) {
 		if (!this.area) return;
-		return AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes())
+		return AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes());
 	}
 
 	/**
@@ -288,15 +282,22 @@ export class NodeFactory {
 
 	public readonly dataflowEngine = createDataflowEngine();
 	private readonly controlflowEngine = createControlflowEngine();
-	public  selector?: AreaExtensions.Selector<SelectorEntity>;
-	public  accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
+	public selector?: AreaExtensions.Selector<SelectorEntity>;
+	public accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
 	public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
 	public arrange?: AutoArrangePlugin<Schemes>;
-	public  history: HistoryPlugin<Schemes> | undefined;
+	public history: HistoryPlugin<Schemes> | undefined;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
 	#isDataflowEnabled = true;
 
 	reactivateDataflowTimeout: NodeJS.Timeout | null = null;
+
+	/**
+	 * Returns all nodes in the editor.
+	 */
+	get nodes() {
+		return this.editor.getNodes();
+	}
 	/**
 	 * Executes callback without running dataflow engines.
 	 *
@@ -312,6 +313,17 @@ export class NodeFactory {
 			this.#isDataflowEnabled = true;
 			this.runDataflowEngines();
 		}, 100);
+	}
+
+	/**
+	 * Removes all nodes and connections from the editor.
+	 */
+	async clear() {
+		this.bulkOperation(async () => {
+			for (const node of this.nodes) {
+				await this.removeNode(node);
+			}
+		});
 	}
 
 	constructor(params: {
@@ -356,13 +368,13 @@ export class NodeFactory {
 			const socket = sourceNode?.outputs[conn.sourceOutput]?.socket;
 			const outgoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
-					? sourceNode?.outgoingExecConnections ?? {}
-					: sourceNode?.outgoingDataConnections ?? {};
+					? (sourceNode?.outgoingExecConnections ?? {})
+					: (sourceNode?.outgoingDataConnections ?? {});
 
 			const ingoingConnections =
 				socket instanceof ExecSocket || socket?.type == 'exec'
-					? targetNode?.ingoingExecConnections ?? {}
-					: targetNode?.ingoingDataConnections ?? {};
+					? (targetNode?.ingoingExecConnections ?? {})
+					: (targetNode?.ingoingDataConnections ?? {});
 
 			if (context.type === 'connectioncreated') {
 				if (!sourceNode || !targetNode) {
@@ -595,7 +607,7 @@ export class NodeFactory {
 	}
 
 	downloadGraph() {
-		downloadJSON(this.editor.graphName, this.editor)
+		downloadJSON(this.editor.graphName, this.editor);
 	}
 
 	loadFromFile() {
@@ -637,8 +649,7 @@ export class NodeFactory {
 		console.log('mozza nodes', nodes);
 		const resIndex = nodes.findIndex((n) => {
 			return (
-				n.label.toLowerCase().includes(query) ||
-				(n.name && n.name.toLowerCase().includes(query))
+				n.label.toLowerCase().includes(query) || (n.name && n.name.toLowerCase().includes(query))
 			);
 		});
 		this.lastSearchNodeIndex = resIndex === -1 ? -1 : (resIndex + m) % nodes.length;

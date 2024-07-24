@@ -1,6 +1,6 @@
 {
 	"name": "@selenite/graph-editor",
-	"version": "0.0.56",
+	"version": "0.0.57",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",

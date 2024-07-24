@@ -1,6 +1,6 @@
 import type { BaseSchemes } from 'rete';
 import { HistoryPlugin as BaseHistoryPlugin, type HistoryAction } from 'rete-history-plugin';
-import { get, writable } from 'svelte/store';
+import { get, writable, type Writable } from 'svelte/store';
 
 export class HistoryPlugin<Schemes extends BaseSchemes> extends BaseHistoryPlugin<Schemes> {
 	canRedo = writable(false);
