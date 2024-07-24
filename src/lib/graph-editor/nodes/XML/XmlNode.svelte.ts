@@ -71,7 +71,7 @@ export class XmlToString extends Node<
 @registerNode('xml.XML', 'abstract')
 export class XmlNode extends Node<
 	Record<string, Socket<DataType>>,
-	{ value: Scalar, name: Scalar<'groupNameRef'> },
+	{ value: Scalar, name?: Scalar<'groupNameRef'> },
 	{ addXmlAttr: AddXmlAttributeControl },
 	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[] }
 > {
@@ -318,7 +318,7 @@ export class XmlNode extends Node<
 		this.height += isArray ? 58 : 65.5;
 	}
 
-	override data(inputs?: Record<string, unknown>): { value: XMLData } {
+	override data(inputs?: Record<string, unknown>): { value: XMLData, name?: string } {
 		let children: XMLData[] = [];
 		for (const [key, { tag }] of Object.entries(this.xmlInputs)) {
 			const data = this.getData(key, inputs) as XMLData;
@@ -347,7 +347,7 @@ export class XmlNode extends Node<
 		});
 		// console.log(xmlData);
 
-		return { value: xmlData };
+		return { value: xmlData, name: this.name };
 	}
 
 	getProperties(inputs?: Record<string, unknown>): Record<string, unknown> {
