@@ -789,7 +789,7 @@ export class Node<
 			}
 			this.factory?.resetDataflow(this);
 		} catch (e) {
-			console.warn("Processing dataflow cancelled");
+			console.warn("Dataflow processing cancelled");
 		}
 	};
 

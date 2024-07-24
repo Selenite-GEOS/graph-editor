@@ -89,9 +89,7 @@ export class XmlNode extends Node<
 				? n
 				: camlelcaseize(this.xmlTag) + XmlNode.counts[this.xmlTag]++;
 		// Run dataflow in timeout to avoid running at setup
-		setTimeout(() => {
 			this.processDataflow()
-		})
 	}
 
 	get name(): string | undefined {
