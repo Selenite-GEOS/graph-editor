@@ -83,11 +83,12 @@ export class XmlNode extends Node<
 	optionalXmlAttributes: Set<string> = new Set();
 	xmlVectorProperties: Set<string> = new Set();
 
-	set name(n: string) {	
+	set name(n: string) {
 		super.name =
 			typeof n === 'string' && n.trim() !== ''
 				? n
 				: camlelcaseize(this.xmlTag) + XmlNode.counts[this.xmlTag]++;
+		this.processDataflow()
 	}
 
 	get name(): string | undefined {
