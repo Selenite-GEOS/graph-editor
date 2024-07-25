@@ -102,6 +102,7 @@
 		ondblclick={stopPropagation}
 		onpointerdown={stopPropagation}
 		{...props}
+		class="{props.class} text-base-content"
 	/>
 {/snippet}
 

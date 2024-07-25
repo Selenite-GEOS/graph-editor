@@ -67,7 +67,7 @@
 <svg
 	data-testid="connection"
 	class="group hover:cursor-pointer -z-10"
-	on:pointerdown={stopPropagation}
+	on:dblclick={stopPropagation}
 	on:click|stopPropagation={() => onClick()}
 	on:keypress={(e) => {
 		if (e.key === 'Enter') {

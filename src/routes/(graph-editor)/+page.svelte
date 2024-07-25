@@ -165,7 +165,8 @@
 		}}
 		use:shortcut={{
 			key: 'r',
-			action(e) {
+			action(n, e) {
+				
 				themeControl.theme = themeControl.previousTheme
 			},
 		}}

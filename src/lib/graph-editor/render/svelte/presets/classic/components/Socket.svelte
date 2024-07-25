@@ -3,9 +3,14 @@
 	import { assignColor } from '$graph-editor/render/utils';
 	import { capitalize } from 'lodash-es';
 	import cssVars from 'svelte-css-vars';
-	import ExecSocket from './ExecSocket.svelte';
+	import ExecSocketCmpnt from './ExecSocket.svelte';
+	import { variant } from '$utils';
+	import { ExecSocket } from '$graph-editor/socket/ExecSocket';
 	let { data }: { data: Socket } = $props();
-	let socketVars = $derived({ background: assignColor(data) });
+	const socket = $derived(data);
+	const node = $derived(data.node);
+	const arrayBackgroundColor = $derived(node.isLastSelected ? "var(--p)" : node.selected ? "var(--s)": "var(--b3)");
+	let socketVars = $derived({ background: assignColor(data), arrayBackgroundColor });
 	const type = $derived(data.type);
 	const datastructureClasses: Record<SocketDatastructure, string> = {
 		array: 'array',
@@ -26,10 +31,12 @@
 </script>
 
 {#if type === 'exec'}
-<ExecSocket {data} />
+<ExecSocketCmpnt data={data as ExecSocket} />
 {:else}
+	<!-- svelte-ignore event_directive_deprecated -->
 	<div
-		class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}"
+		class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}
+		"
 		role="button"
 		tabindex="0"
 		class:outline={data.selected}
@@ -74,7 +81,7 @@
 	}
 	.array {
 		border: 4px dashed var(--background);
-		background-color: oklch(var(--b3) / var(--tw-bg-opacity));
+		background-color: oklch(var(--arrayBackgroundColor) / var(--tw-bg-opacity));
 		border-radius: 0%;
 
 		&:hover {

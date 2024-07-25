@@ -40,3 +40,6 @@ To publish your library to [npm](https://www.npmjs.com):
 ```bash
 pnpm publish
 ```
+
+## TODO
+- make node selection framework agnostic

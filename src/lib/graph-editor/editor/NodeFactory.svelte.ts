@@ -108,6 +108,8 @@ export class NodeFactory {
 		defaultConnectionPath
 	);
 
+	lastSelectedNode = $state<Node>();
+
 	modalStore: Readable<Modal> = readable(Modal.instance);
 
 	private state: Map<string, unknown> = new Map();
@@ -428,6 +430,46 @@ export class NodeFactory {
 		);
 	}
 
+	unselect(element: Node) {
+		if (element.selected)
+			element.selected = false;
+		if (this.selector?.isSelected({ id: element.id, label: 'node' })) {
+			this.selector?.remove({ id: element.id, label: 'node' });
+			this?.getArea()?.update('node', element.id);
+		}
+	}
+
+	selectNode(node: Node) {
+		if (!this.area) return;
+		if (this.selector?.isSelected({ id: node.id, label: 'node' })) {
+			this.selector.pick({ id: node.id, label: 'node' });
+			this.lastSelectedNode = node;
+			return;
+		}
+		this.selector?.add(
+			{
+				id: node.id,
+				label: 'node',
+				translate: (dx, dy) => {
+					if (!this.area) return;
+					const view = this.area.nodeViews.get(node.id);
+					const current = view?.position;
+
+					if (current) {
+						view.translate(current.x + dx, current.y + dy);
+					}
+				},
+				unselect: () => {
+					node.selected = false;
+					this?.getArea()?.update('node', node.id);
+				}
+			},
+			this.accumulating?.active() ?? false
+		);
+		this.selector?.pick({ id: node.id, label: 'node' });
+		node.selected = true;
+	}
+
 	selectConnection(id: string) {
 		// const factory = this;
 		const selector = this.selector;
@@ -469,6 +511,14 @@ export class NodeFactory {
 		});
 	}
 
+	/**
+	 * Unselects all elements.
+	 */
+	unselectAll() {
+		const selector = this.selector;
+		if (!selector) throw new ErrorWNotif('Missing selector');
+		selector.unselectAll();
+	}
 	/** Delete all selected elements */
 	async deleteSelectedElements(): Promise<void> {
 		const selector = this.selector;

@@ -8,7 +8,12 @@ import { TypedSocketsPlugin } from '$graph-editor/plugins/typed-sockets';
 import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';
-import { contextMenuSetup, showContextMenu, type NodeMenuItem, type ShowContextMenu } from '$graph-editor/plugins/context-menu';
+import {
+	contextMenuSetup,
+	showContextMenu,
+	type NodeMenuItem,
+	type ShowContextMenu
+} from '$graph-editor/plugins/context-menu';
 import { gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
 import { notificationsSetup } from '$graph-editor/plugins/notifications';
 import type { GraphNode } from '$graph-editor/nodes';
@@ -63,8 +68,7 @@ export async function setupGraphEditor(
 		await areaSetup({ editor, factory, area: factory.getArea()! });
 	}
 	const { AreaExtensions } = await import('rete-area-plugin');
-	if (params.saveData)
-		factory.loadGraph(params.saveData);
+	if (params.saveData) factory.loadGraph(params.saveData);
 	await tick();
 	setTimeout(async () => {
 		if (factory.getArea()) await AreaExtensions.zoomAt(factory.getArea()!, editor.getNodes());
@@ -76,7 +80,10 @@ export async function setupGraphEditor(
 }
 
 export async function setupFullGraphEditor(
-	params: SetupGraphEditorParams & { showContextMenu?: ShowContextMenu, additionalNodeItems?: NodeMenuItem<typeof GraphNode>[] } = {}
+	params: SetupGraphEditorParams & {
+		showContextMenu?: ShowContextMenu;
+		additionalNodeItems?: NodeMenuItem<typeof GraphNode>[];
+	} = {}
 ): Promise<SetupGraphEditorResult> {
 	params.showContextMenu = showContextMenu;
 	return setupGraphEditor({
@@ -97,6 +104,11 @@ export async function setupFullGraphEditor(
 				type: 'area',
 				setup: ({ area }) => {
 					area.addPipe((ctx) => {
+						if (ctx.type === "pointerdown") {
+							document.body.style.userSelect = "none";
+						} else if (ctx.type ==="pointerup") {
+							document.body.style.userSelect = "";
+						}
 						// if (ctx.type === 'render') {
 						// 	console.log(ctx.data)
 						// }
@@ -131,7 +143,28 @@ export async function setupFullGraphEditor(
 				const selector = AreaExtensions.selector();
 				const accumulating = AreaExtensions.accumulateOnCtrl();
 				AreaExtensions.showInputControl(area);
-				AreaExtensions.selectableNodes(area, selector, { accumulating });
+				let twitch: number | null = null;
+				area.addPipe((ctx) => {
+					if (ctx.type === 'nodetranslated') {
+						const { id, position, previous } = ctx.data;
+						const dx = position.x - previous.x;
+						const dy = position.y - previous.y;
+						if (selector.isPicked({ id, label: 'node' })) {
+							selector.translate(dx, dy);
+						}
+					}
+					if (twitch === null) {
+						if (ctx.type === 'pointerdown') twitch = 0;
+					} else {
+						if (ctx.type === 'pointermove') twitch++;
+						else if (ctx.type === 'pointerup') {
+							if (twitch < 4) factory.unselectAll();
+							twitch = null;
+						}
+					}
+					return ctx;
+				});
+				// AreaExtensions.selectableNodes(area, selector, { accumulating });
 				factory.accumulating = accumulating;
 				factory.selector = selector;
 			},
@@ -144,7 +177,7 @@ export async function setupFullGraphEditor(
 					return;
 				}
 				console.log('Setting up history');
-				const {  Presets: HistoryPresets } = await import('rete-history-plugin');
+				const { Presets: HistoryPresets } = await import('rete-history-plugin');
 				const history = new HistoryPlugin<Schemes>();
 				history.addPreset(HistoryPresets.classic.setup());
 				area.use(history);
@@ -159,11 +192,11 @@ export async function setupFullGraphEditor(
 					);
 					const comment = new CommentPlugin<Schemes, AreaExtra>({ factory });
 					if (!factory.selector) {
-						console.warn("Missing selector")
+						console.warn('Missing selector');
 						return;
 					}
 					if (!factory.accumulating) {
-						console.warn("Missing accumulating")
+						console.warn('Missing accumulating');
 						return;
 					}
 					CommentExtensions.selectable<Schemes, AreaExtra>(
@@ -184,8 +217,7 @@ export async function setupFullGraphEditor(
 						return;
 					}
 					params.showContextMenu(params_);
-				},
-
+				}
 			})
 
 			// new RenderSetup(),

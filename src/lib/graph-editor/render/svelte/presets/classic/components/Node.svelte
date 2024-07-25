@@ -6,6 +6,8 @@
 	import { themeControl } from '$lib/global/index.svelte';
 	import {
 		capitalize,
+		clickIfDrag,
+		clickIfNoDrag,
 		distance,
 		posFromClient,
 		shortcut,
@@ -14,6 +16,19 @@
 	import { XmlNode } from '$graph-editor/nodes/XML';
 	import type { Position } from '$graph-editor/common';
 	import { Control } from '$graph-editor/socket';
+	import { variant } from '$utils';
+	import type { ActionReturn } from 'svelte/action';
+	import {
+		flip,
+		offset,
+		useDismiss,
+		useFloating,
+		useInteractions,
+		useRole
+	} from '@skeletonlabs/floating-ui-svelte';
+	import { fade } from 'svelte/transition';
+	import { faAlignCenter, faAlignLeft, faAlignRight } from '@fortawesome/free-solid-svg-icons';
+	import Fa from 'svelte-fa';
 
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
 	const constructor = $derived(node.constructor as NodeConstructor);
@@ -51,6 +66,21 @@
 		nameInput?.select();
 	});
 	let lastPointerDownPos = $state<Position>();
+
+	const floating = useFloating({
+		open: node.isLastSelected,
+		middleware: [flip(), offset({ mainAxis: 10 })],
+		placement: 'top'
+	});
+	const role = useRole(floating.context);
+	const interactions = useInteractions([role]);
+
+	node.area?.addPipe((ctx) => {
+		if (ctx.type === 'translated') {
+			floating.update();
+		}
+		return ctx;
+	});
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
@@ -70,15 +100,55 @@
 	/>
 {/snippet}
 
+
+
+{#if node.isLastSelected}
+	<div
+		class="w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-50 p-2 rounded-sm select-none pointer-events-none"
+		on:pointerdown={stopPropagation}
+		style={floating.floatingStyles}
+		{...interactions.getFloatingProps()}
+		transition:fade={{ duration: 175 }}
+		bind:this={floating.elements.floating}
+	>
+		<button type="button" class="btn btn-ghost btn-sm pointer-events-auto">
+			<Fa icon={faAlignLeft} />
+		</button>
+		<button type="button"  class="btn btn-ghost btn-sm pointer-events-auto">
+			<Fa icon={faAlignCenter} />
+		</button>
+		<button type="button"  class="btn btn-ghost btn-sm pointer-events-auto">
+			<Fa icon={faAlignRight} />
+		</button>
+	</div>
+{/if}
+
+<!-- svelte-ignore event_directive_deprecated -->
 <section
 	role="cell"
 	tabindex="0"
+	{...interactions.getReferenceProps()}
+	bind:this={floating.elements.reference}
 	class:transition-all={transitionEnabled}
 	class:text-primary={node.needsProcessing}
-	class="border-base-200 border border-opacity-0 overflow-hidden bg-base-300 bg-opacity-85 rounded-box {themeControl.isLight
-		? 'hover:brightness-105'
-		: 'hover:brightness-[1.15]'}"
+	class="relative border-base-200 border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
+	{node.isLastSelected
+		? variant('primary')
+		: node.selected
+			? variant('secondary')
+			: variant('base-300')}
+	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
+	use:clickIfNoDrag={{
+		onclick(e) {
+			node.factory?.selectNode(node);
+		}
+	}}
+	on:keydown={(e) => {
+		if (e.key === 'Enter') {
+			node.factory?.selectNode(node);
+		}
+	}}
 >
 	<div
 		class:disappear={disappearProcessing}
@@ -97,56 +167,68 @@
 				class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
 				title={constructor.description}
 			>
+				<!-- svelte-ignore event_directive_deprecated -->
+				<button
+					type="button"
+					class="cursor-text pe-2"
+					use:shortcut={{
+						ctrl: true,
+						repeats: false,
+						action(btn) {
+							btn.classList.remove('cursor-text');
+						},
+						endAction(btn) {
+							btn.classList.add('cursor-text');
+						}
+					}}
+					on:click={(e) => {
+						if (e.ctrlKey || e.altKey || e.shiftKey) return;
+						if (lastPointerDownPos) {
+							const pos = posFromClient(e);
+							const dist = distance(lastPointerDownPos, pos);
+							console.debug('Dragged distance', dist);
+							if (dist > 2) return;
+						}
+						editingName = true;
+						node.selected = false;
+					}}
+					on:pointerdown={(e) => {
+						lastPointerDownPos = posFromClient(e);
+					}}
+				>
+					{node.name ?? node.label}
+				</button>
+				{#if editingName}
 					<!-- svelte-ignore event_directive_deprecated -->
-					<button
-						type="button"
-						class="cursor-text pe-2"
-						on:click={(e) => {
-							if (lastPointerDownPos) {
-								const pos = posFromClient(e);
-								const dist = distance(lastPointerDownPos, pos);
-								console.debug('Dragged distance', dist);
-								if (dist > 2) return;
-							}
-							editingName = true;
+					<input
+						bind:this={nameInput}
+						class="absolute input inset-0"
+						on:blur={() => {
+							if (!nameInput || !editingName) return;
+							node.name = nameInput.value;
+							editingName = false;
+							lastPointerDownPos = undefined;
 						}}
-						on:pointerdown={(e) => {
-							lastPointerDownPos = posFromClient(e);
-						}}
-					>
-						{node.name ?? node.label}
-					</button>
-					{#if editingName}
-						<!-- svelte-ignore event_directive_deprecated -->
-						<input
-							bind:this={nameInput}
-							class="absolute input inset-0"
-							on:blur={() => {
-								if (!nameInput || !editingName) return;
-								node.name = nameInput.value;
+						on:pointerdown={stopPropagation}
+						value={node.name}
+						use:shortcut={{
+							key: 'enter',
+							ignoreElements: [],
+							action() {
+								node.name = nameInput!.value;
 								editingName = false;
-							}}
-							on:pointerdown={stopPropagation}
-							value={node.name}
-							use:shortcut={{
-								key: 'enter',
-								ignoreElements: [],
-								action() {
-									node.name = nameInput!.value;
-									editingName = false;
-									editingName = false;
-								}
-							}}
-							use:shortcut={{
-								key: 'escape',
-								ignoreElements: [],
-								action() {
-									editingName = false;
-								}
-							}}
-						/>
-					{/if}
-
+								editingName = false;
+							}
+						}}
+						use:shortcut={{
+							key: 'escape',
+							ignoreElements: [],
+							action() {
+								editingName = false;
+							}
+						}}
+					/>
+				{/if}
 			</h1>
 			<aside class="col-start-2 row-span-full ms-4 max-h-0">
 				{#each node.sortedControls as [k, control]}

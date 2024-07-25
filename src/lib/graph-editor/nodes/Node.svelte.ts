@@ -2,7 +2,7 @@ import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
 import type { AreaExtra } from '$graph-editor/area';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
-import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
+import { NodeFactory, type NodeEditor } from '$graph-editor/editor';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
 import { Stack } from '$lib/types/Stack';
 import {
@@ -293,7 +293,7 @@ export class Node<
 	private outData: Record<string, unknown> = {};
 	private resolveEndExecutes = new Stack<() => void>();
 	private naturalFlowExec: string | undefined = 'exec';
-	factory?: NodeFactory;
+	factory = $state<NodeFactory>();
 	protected params: Params = {} as Params;
 	static id: string;
 	static nodeCounts = BigInt(0);
@@ -382,7 +382,24 @@ export class Node<
 	}
 	label = $state('');
 	id: string;
-	selected?: boolean | undefined;
+	#selected = $state(false);
+	get selected() {
+		return this.#selected
+	}
+	set selected(s) {
+		this.#selected = s;
+		if (this.factory) {
+			if (s) {
+				this.factory.selectNode(this);
+			} else if (!s && this.factory.lastSelectedNode === this) 
+				this.factory.lastSelectedNode = undefined;
+		}
+	}
+
+	get isLastSelected() {
+		return this.factory?.lastSelectedNode === this;
+	}
+
 	hasInput<K extends keyof Inputs>(key: K) {
 		return key in this.inputs;
 	}
