@@ -1,5 +1,5 @@
 onmessage = () => {
-	console.log('Hello world from worker!');
+	console.debug('Hello world from worker!');
 };
 
 export {};

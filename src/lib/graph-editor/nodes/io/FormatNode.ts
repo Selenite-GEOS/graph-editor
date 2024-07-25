@@ -75,7 +75,7 @@ export class FormatNode extends Node<
 			| undefined
 	): SocketsValues<{ result: Scalar<'string'> }> {
 		let res = this.getData('format', inputs);
-		console.log(res)
+		// console.debug(res)
 		const values = this.getValues(inputs);
 		for (const [k, v] of Object.entries(values)) {
 			res = res.replace(`{${k}}`, v as string);
@@ -88,11 +88,11 @@ export class FormatNode extends Node<
 		const formatString = this.getData('format', inputs);
 
 		let anyChange = false;
-		console.log(formatString);
+		// console.debug(formatString);
 		if (formatString) {
 			try {
 				const vars = getVarsFromFormatString(formatString);
-				console.log('vars', vars);
+				// console.debug('vars', vars);
 
 				vars.forEach((varName) => {
 					const key = 'data-' + varName;
@@ -103,7 +103,7 @@ export class FormatNode extends Node<
 							label: capitalize(varName),
 							isLabelDisplayed: true
 						});
-						console.log('added', key);
+						// console.debug('added', key);
 					}
 				});
 
