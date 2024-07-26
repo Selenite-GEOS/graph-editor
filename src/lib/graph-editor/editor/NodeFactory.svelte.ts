@@ -471,6 +471,7 @@ export class NodeFactory {
 			this.accumulating?.active() ?? false
 		);
 		this.selector?.pick({ id: node.id, label: 'node' });
+		this.lastSelectedNode = node;
 		if (!node.selected)
 			node.selected = true;
 	}
