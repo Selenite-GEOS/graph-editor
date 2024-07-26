@@ -103,12 +103,21 @@ export async function setupFullGraphEditor(
 				name: 'Test area',
 				type: 'area',
 				setup: ({ area }) => {
+					let resizeObserver = new ResizeObserver((e) => {
+						console.debug('The element was resized');
+						area.emit({type: 'resized', data: {event: new Event("resize")}});
+					});
+
+					resizeObserver.observe(area.container);
 					area.addPipe((ctx) => {
-						if (ctx.type === "pointerdown") {
-							document.body.style.userSelect = "none";
-						} else if (ctx.type ==="pointerup") {
-							document.body.style.userSelect = "";
+						if (ctx.type === 'pointerdown') {
+							document.body.style.userSelect = 'none';
+						} else if (ctx.type === 'pointerup') {
+							document.body.style.userSelect = '';
 						}
+
+						
+						
 						// if (ctx.type === 'render') {
 						// 	console.log(ctx.data)
 						// }
