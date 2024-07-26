@@ -13,11 +13,13 @@ export * as Setup from './setup';
 export * from './setup'
 export * from './render'
 export * as Plugins from './plugins';
+export * from './plugins/notifications';
+export * from './plugins';
 export * as Examples from './examples';
+export * from './examples'
 export * as Socket from './socket';
 export * as Component from './components'
 export * as Area from './area'
+export * from './area'
 export * as Common from './common'
 export type {Schemes} from './schemes'
-export * from './plugins/notifications'
-export * from './plugins'
