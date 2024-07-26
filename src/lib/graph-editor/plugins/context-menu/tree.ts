@@ -20,13 +20,15 @@ export function makeTree<T, K extends string>({
 	for (const item of items) {
 		let current = collector;
 		for (const parent of item[pathKey]) {
-			if (!collector.forest.has(parent)) {
-				collector.forest.set(parent, { leaves: [], forest: new Map() });
+			if (!current.forest.has(parent)) {
+				current.forest.set(parent, { leaves: [], forest: new Map() });
 			}
-			current = collector.forest.get(parent)!;
+			current = current.forest.get(parent)!;
 		}
 		current.leaves.push(item);
 	}
+
+	console.log("collector", collector)
 
 	const res: Tree<T> = [];
 	function rec(current: Tree<T>, currentCollector: TreeCollector<T>) {

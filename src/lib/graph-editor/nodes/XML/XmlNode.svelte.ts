@@ -35,6 +35,7 @@ export class AddXmlAttributeControl extends Control {
 export type XmlConfig = {
 	xmlTag: string;
 	// outData?: OutDataParams;
+	outLabel?: string;
 	xmlProperties?: XmlAttributeDefinition[];
 	childTypes?: string[];
 };
@@ -83,9 +84,11 @@ export class XmlNode extends Node<
 	optionalXmlAttributes: Set<string> = new Set();
 	xmlVectorProperties: Set<string> = new Set();
 
+	hasName = $state(false)
+
 	set name(n: string) {
 		super.name =
-			typeof n === 'string' && n.trim() !== ''
+			!this.hasName || typeof n === 'string' && n.trim() !== ''
 				? n
 				: camlelcaseize(this.xmlTag) + XmlNode.counts[this.xmlTag]++;
 		// Run dataflow in timeout to avoid running at setup
@@ -117,11 +120,10 @@ export class XmlNode extends Node<
 
 		// this.name = name + XmlNode.count;
 		initialValues = initialValues !== undefined ? initialValues : {};
-		let hasName = false;
 		if (xmlProperties)
 			xmlProperties.forEach(({ name, type, isArray, controlType, required, pattern }) => {
 				if (name === 'name') {
-					hasName = true;
+					this.hasName = true;
 					return;
 				}
 				if (required || name in initialValues) {
@@ -145,11 +147,12 @@ export class XmlNode extends Node<
 
 		// Add XML output
 		this.addOutData('value', {
-			showLabel: false,
+			showLabel: true,
+			label: xmlConfig.outLabel ,
 			type: `xmlElement:${xmlConfig.xmlTag}`
 		});
-
-		if (hasName) {
+		console.log("outTag", xmlConfig.outLabel)
+		if (this.hasName) {
 			this.addOutData('name', {
 				type: 'groupNameRef'
 			});
@@ -344,7 +347,7 @@ export class XmlNode extends Node<
 		const xmlData = new XMLData({
 			tag: this.xmlTag,
 			children: children,
-			name: this.name,
+			name: this.hasName ? this.name : undefined,
 			properties: this.getProperties(inputs)
 		});
 		// console.log(xmlData);
@@ -389,17 +392,15 @@ export class XmlNode extends Node<
 	}: {
 		name: string;
 		tag?: string;
-		type?: SocketType;
+		type?: DataType;
 		isArray?: boolean;
 		index?: number;
 	}) {
 		this.xmlInputs[name] = { tag: tag };
-		this.oldAddInData({
-			name: name,
-			displayName: titlelize(name),
-			socketLabel: titlelize(name),
+		this.addInData(name, {
+			label: titlelize(name),
 			type: type,
-			isArray: isArray,
+			datastructure: isArray ? 'array' : 'scalar',
 			index
 		});
 		this.height += 37;

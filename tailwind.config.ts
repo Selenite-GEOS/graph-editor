@@ -1,6 +1,6 @@
 import { join } from 'path';
 import daisyui from 'daisyui';
-
+import scrollbar from 'tailwind-scrollbar'
 /** @type {import('tailwindcss').Config} */
 export default {
 	darkMode: 'class',
@@ -15,7 +15,7 @@ export default {
 			// }
 		}
 	},
-	plugins: [daisyui],
+	plugins: [daisyui, scrollbar({ nocompatible: true })],
 	daisyui: {
 		themes: [
 			'light',

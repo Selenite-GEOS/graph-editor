@@ -6,6 +6,6 @@
 
 <ModalComponent />
 <NotificationsComponent/>
-<div class="h-screen w-screen">
+<div class="h-screen w-screen overflow-clip">
 	<slot />
 </div>

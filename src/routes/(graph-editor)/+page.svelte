@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
 	import { Setup } from '$lib/graph-editor';
-	import { showContextMenu, ContextMenuComponent, nodeItem, xmlItem } from '$graph-editor/plugins/context-menu';
+	import { showContextMenu, ContextMenuComponent, nodeItem, xmlItem, xmlNodeItems } from '$graph-editor/plugins/context-menu';
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
@@ -19,9 +19,12 @@
 
 	$effect(() => {
 		if (!container) return;
-		
-		Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu,
+		(async () => {
+			const schema = await parseXsdFromUrl('/geos_schema.xsd');
+			console.log(schema);
+			const res = await Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu,
 			 additionalNodeItems: [
+				...(schema ? xmlNodeItems({schema, basePath: ['GEOS']}) : []),
 				nodeItem({
 					label: 'Example XML',
 					description: 'This an example XML node.',
@@ -55,10 +58,9 @@
 							]
 					
 				}})
-			 ] }).then(
-			async (res) => {
-				const schema = await parseXsdFromUrl('/geos_schema.xsd');
-				console.log(schema);
+			 ] })
+	
+				
 				editor = res.editor;
 				const factory = res.factory;
 				console.log('Editor setup complete');
@@ -66,8 +68,10 @@
 					await factory.loadGraph($saveData);
 				}
 				editorReady = true;
-			}
-		);
+			
+		
+		})();
+		
 
 		return () => {
 			editor?.factory?.destroyArea();

@@ -1,4 +1,4 @@
-import { readable, writable } from 'svelte/store';
+import { readable, type Readable } from 'svelte/store';
 import { get } from 'svelte/store';
 import type { GeosSchema } from '$lib/geos';
 import type { Action } from 'svelte/action';

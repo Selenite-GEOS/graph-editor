@@ -29,6 +29,8 @@
 	let searchInput = $state<HTMLInputElement>();
 	let menuCmpnt = $state<Menu>();
 	$effect(() => {
+		menu.filteredItems
+		console.log("yo")
 		if (menu.expanded) {
 			untrack(() => {
 				menuCmpnt?.expandAll();
@@ -56,7 +58,7 @@
 					const key = e.key.toLowerCase();
 					return key.length === 1 && key.match(/^[-\w+?!+*/=%~&]$/) !== null;
 				},
-				action(e) {
+				action(node, e) {
 					if (!searchInput) return;
 					menu.query += e.key;
 					searchInput.focus();
@@ -112,8 +114,9 @@
 			on:blur={() => {
 				menu.focused = false;
 			}}
-			class="floating context-menu flex flex-col overflow-y-auto rounded-box border shadow-lg border-base-300"
+			class="floating context-menu flex flex-col overflow-x-clip scrollbar-corner-rounded-full scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 scrollbar-track-slate-900 overflow-y-auto rounded-box border shadow-lg border-base-300"
 		>
+
 			{#if menu.searchbar}
 				<input
 					bind:this={searchInput}
@@ -145,7 +148,7 @@
 
 	.context-menu {
 		min-width: 10rem;
-		max-width: 20rem;
+		max-width: 35rem;
 		min-height: 1rem;
 		max-height: 30rem;
 	}

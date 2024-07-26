@@ -104,7 +104,6 @@ export async function setupFullGraphEditor(
 				type: 'area',
 				setup: ({ area }) => {
 					let resizeObserver = new ResizeObserver((e) => {
-						console.debug('The element was resized');
 						area.emit({type: 'resized', data: {event: new Event("resize")}});
 					});
 

@@ -1,6 +1,6 @@
 {
   "name": "@selenite/graph-editor",
-  "version": "0.0.70",
+  "version": "0.0.71",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run package",
@@ -70,7 +70,7 @@
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
-    "@selenite/commons": "^0.14.1",
+    "@selenite/commons": "^0.15.2",
     "autoprefixer": "^10.4.19",
     "broadcast-channel": "^7.0.0",
     "color": "^4.2.3",
@@ -97,6 +97,7 @@
     "svelte-i18n": "^4.0.0",
     "svelte-persisted-store": "^0.11.0",
     "svelte-portal": "^2.2.1",
+    "tailwind-scrollbar": "^3.1.0",
     "uuid": "^10.0.0",
     "wu": "^2.1.0"
   },
