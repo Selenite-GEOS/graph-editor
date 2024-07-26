@@ -439,6 +439,10 @@ export class NodeFactory {
 		}
 	}
 
+	isSelected(node:Node) {
+		return this.selector?.isSelected({ id: node.id, label: 'node' });
+	}
+
 	selectNode(node: Node) {
 		if (!this.area) return;
 		if (this.selector?.isSelected({ id: node.id, label: 'node' })) {
@@ -467,7 +471,8 @@ export class NodeFactory {
 			this.accumulating?.active() ?? false
 		);
 		this.selector?.pick({ id: node.id, label: 'node' });
-		node.selected = true;
+		if (!node.selected)
+			node.selected = true;
 	}
 
 	selectConnection(id: string) {
