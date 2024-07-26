@@ -4,6 +4,7 @@
  */
 
 export * as Nodes from './nodes';
+export * from './nodes'
 export * as Editor from './editor';
 export * from './editor';
 export * as Variable from './variables';
