@@ -389,9 +389,10 @@ export class Node<
 	set selected(s) {
 		this.#selected = s;
 		if (this.factory) {
-			if (s && !this.factory.isSelected(this)) {
-				this.factory.selectNode(this);
-			} else if (!s && this.factory.lastSelectedNode === this) 
+			// if (s && !this.factory.isSelected(this)) {
+			// 	this.factory.selectNode(this);
+			// } else 
+			if (!s && this.factory.lastSelectedNode === this) 
 				this.factory.lastSelectedNode = undefined;
 		}
 	}

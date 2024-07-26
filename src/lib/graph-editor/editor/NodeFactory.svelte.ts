@@ -431,16 +431,15 @@ export class NodeFactory {
 	}
 
 	unselect(element: Node) {
-		if (element.selected)
-			element.selected = false;
+		if (element.selected) element.selected = false;
 		if (this.selector?.isSelected({ id: element.id, label: 'node' })) {
 			this.selector?.remove({ id: element.id, label: 'node' });
 			this?.getArea()?.update('node', element.id);
 		}
 	}
 
-	isSelected(node:Node) {
-		return this.selector?.isSelected({ id: node.id, label: 'node' });
+	isSelected(node: Node) {
+		return this.selector?.isSelected({ id: node.id, label: 'node' }) ?? node.selected;
 	}
 
 	selectNode(node: Node) {
@@ -450,30 +449,31 @@ export class NodeFactory {
 			this.lastSelectedNode = node;
 			return;
 		}
-		this.selector?.add(
-			{
-				id: node.id,
-				label: 'node',
-				translate: (dx, dy) => {
-					if (!this.area) return;
-					const view = this.area.nodeViews.get(node.id);
-					const current = view?.position;
+		if (this.selector) {
+			this.selector.add(
+				{
+					id: node.id,
+					label: 'node',
+					translate: (dx, dy) => {
+						if (!this.area) return;
+						const view = this.area.nodeViews.get(node.id);
+						const current = view?.position;
 
-					if (current) {
-						view.translate(current.x + dx, current.y + dy);
+						if (current) {
+							view.translate(current.x + dx, current.y + dy);
+						}
+					},
+					unselect: () => {
+						node.selected = false;
+						this?.getArea()?.update('node', node.id);
 					}
 				},
-				unselect: () => {
-					node.selected = false;
-					this?.getArea()?.update('node', node.id);
-				}
-			},
-			this.accumulating?.active() ?? false
-		);
-		this.selector?.pick({ id: node.id, label: 'node' });
+				this.accumulating?.active() ?? false
+			);
+			this.selector.pick({ id: node.id, label: 'node' });
+		}
 		this.lastSelectedNode = node;
-		if (!node.selected)
-			node.selected = true;
+		if (!node.selected) node.selected = true;
 	}
 
 	selectConnection(id: string) {
