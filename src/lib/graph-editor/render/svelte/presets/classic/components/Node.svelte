@@ -139,6 +139,11 @@
 			: variant('base-300')}
 	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
+	on:pointerdown={() => {
+		if (node.selected) {
+			node.factory?.selectNode(node)
+		}
+	}}
 	use:clickIfNoDrag={{
 		onclick(e) {
 			node.factory?.selectNode(node);
