@@ -5,11 +5,14 @@
  * @module
  */
 export * as Data from './data';
+export {MakeArray} from './data'
 export * from './data';
 export * as IO from './io';
 export * as Control from './control';
 export * as XML from './XML';
+export * from './XML'
 export * as Macro from './MacroNode';
+export * from './MacroNode'
 
 // import * as API from './ObjectAPINode';
 // import * as API from './APINode';
