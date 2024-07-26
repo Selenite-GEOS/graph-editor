@@ -2,7 +2,7 @@ import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
 import type { AreaExtra } from '$graph-editor/area';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
-import { NodeFactory, type NodeEditor } from '$graph-editor/editor';
+import type { NodeFactory, NodeEditor } from '$graph-editor/editor';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
 import { Stack } from '$lib/types/Stack';
 import {
