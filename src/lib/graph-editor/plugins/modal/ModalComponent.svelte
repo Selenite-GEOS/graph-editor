@@ -33,14 +33,18 @@
 	<dialog bind:this={dialog} class="modal" onclose={() => modal.close()}>
 		<div class="modal-box">
 			{#if title}
-				<h1>{title}</h1>
+				{#if typeof title === 'string'}
+					<h1>{title}</h1>
+				{:else}
+					{@render title()}
+				{/if}
 			{/if}
 			<div class="text-base-content">
-			{#if isComponentModalSettings(lastModal)}
-				<svelte:component this={lastModal.component} {...lastModal.props} />
-			{:else if isSnippetModalSettings(lastModal)}
-				{@render lastModal.snippet(lastModal.props)}
-			{/if}
+				{#if isComponentModalSettings(lastModal)}
+					<svelte:component this={lastModal.component} {...lastModal.props} modal={lastModal} />
+				{:else if isSnippetModalSettings(lastModal)}
+					{@render lastModal.snippet(lastModal.props)}
+				{/if}
 			</div>
 			{#if resolvedButtons}
 				<div class="divider"></div>

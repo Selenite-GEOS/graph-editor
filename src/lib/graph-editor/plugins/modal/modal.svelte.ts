@@ -4,7 +4,7 @@ type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
 
 
 export type BaseModalSettings = {
-	title?: string;
+	title?: string | Snippet;
 	buttons?: (
 		| {
 				level?: ButtonLevel;
@@ -17,7 +17,7 @@ export type BaseModalSettings = {
 
 
 export type ComponentModalSettings<Props extends Record<string, any> = {}> = {
-	component: Component<Props>;
+	component: Component<Props & {modal: ComponentModalSettings}>;
 	props: Props;
 } & BaseModalSettings;
 
