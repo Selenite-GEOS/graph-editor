@@ -9,6 +9,7 @@
 		clickIfDrag,
 		clickIfNoDrag,
 		distance,
+		getJustifyBetweenOffsets,
 		posFromClient,
 		shortcut,
 		stopPropagation
@@ -27,7 +28,13 @@
 		useRole
 	} from '@skeletonlabs/floating-ui-svelte';
 	import { fade } from 'svelte/transition';
-	import { faAlignCenter, faAlignLeft, faAlignRight } from '@fortawesome/free-solid-svg-icons';
+	import {
+		faAlignCenter,
+		faAlignLeft,
+		faAlignRight,
+		faArrowsLeftRight,
+		faArrowsUpToLine
+	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
@@ -68,7 +75,7 @@
 	let lastPointerDownPos = $state<Position>();
 
 	const floating = useFloating({
-		open: node.isLastSelected,
+		open: node.picked,
 		middleware: [flip(), offset({ mainAxis: 10 })],
 		placement: 'top'
 	});
@@ -100,25 +107,80 @@
 	/>
 {/snippet}
 
-
-
-{#if node.isLastSelected}
+{#if node.picked}
+	<!-- svelte-ignore event_directive_deprecated -->
 	<div
-		class="w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-50 p-2 rounded-sm select-none pointer-events-none"
+		class="grid w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-50 p-2 rounded-sm select-none pointer-events-none"
 		on:pointerdown={stopPropagation}
 		style={floating.floatingStyles}
 		{...interactions.getFloatingProps()}
 		transition:fade={{ duration: 175 }}
 		bind:this={floating.elements.floating}
 	>
-		<button type="button" class="btn btn-ghost btn-sm pointer-events-auto">
+		<button
+			title="Align top"
+			type="button"
+			class="btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.alignTop()}
+		>
+			<Fa icon={faArrowsUpToLine} rotate="0" />
+		</button>
+		<button
+			title="Align middle"
+			type="button"
+			class="btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.alignMiddle()}
+		>
+			<Fa icon={faAlignCenter} rotate={90} />
+		</button>
+		<button
+			title="Align bottom"
+			type="button"
+			class="btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.alignBottom()}
+		>
+			<Fa icon={faArrowsUpToLine} rotate={180} />
+		</button>
+		<button
+			title="Space even vertical"
+			type="button"
+			class=" btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.spaceVertical()}
+		>
+			<Fa icon={faArrowsLeftRight} rotate={90} />
+		</button>
+		<!-- svelte-ignore event_directive_deprecated -->
+		<button
+			title="Align left"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyLeft()}
+		>
 			<Fa icon={faAlignLeft} />
 		</button>
-		<button type="button"  class="btn btn-ghost btn-sm pointer-events-auto">
+		<button
+			title="Center"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyCenter()}
+		>
 			<Fa icon={faAlignCenter} />
 		</button>
-		<button type="button"  class="btn btn-ghost btn-sm pointer-events-auto">
+		<button
+			title="Align right"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyRight()}
+		>
 			<Fa icon={faAlignRight} />
+		</button>
+		<button
+			title="Space even horizontal"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyBetween()}
+		>
+			<Fa icon={faArrowsLeftRight} />
 		</button>
 	</div>
 {/if}
@@ -132,26 +194,27 @@
 	class:transition-all={transitionEnabled}
 	class:text-primary={node.needsProcessing}
 	class="relative border-base-200 border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
-	{node.isLastSelected
+	{node.picked
 		? variant('primary')
 		: node.selected
 			? variant('secondary')
 			: variant('base-300')}
 	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
-	on:pointerdown={() => {
-		if (node.selected) {
-			node.factory?.selectNode(node)
+	on:pointerdown={(e) => {
+		if (node.selected && e.button === 0) {
+			node.factory?.select(node);
 		}
 	}}
 	use:clickIfNoDrag={{
 		onclick(e) {
-			node.factory?.selectNode(node);
+			if (e.button !== 0) return;
+			node.factory?.select(node);
 		}
 	}}
 	on:keydown={(e) => {
 		if (e.key === 'Enter') {
-			node.factory?.selectNode(node);
+			node.factory?.select(node);
 		}
 	}}
 >

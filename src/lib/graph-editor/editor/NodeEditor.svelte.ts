@@ -69,6 +69,14 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return super.getNode(id);
 	}
 
+	get nodes() {
+		return this.getNodes()
+	}
+
+	get connections() {
+		return this.getConnections()
+	}
+
 	async addExecConnection(source: Node, target: Node): Promise<boolean> {
 		return await this.addConnection(new Connection(source, 'exec', target, 'exec'));
 	}

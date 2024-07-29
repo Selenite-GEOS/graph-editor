@@ -522,14 +522,26 @@ export function contextMenuSetup({
 					if (context.data.context !== 'root') {
 						if (!(context.data.context instanceof Node)) return context;
 						console.debug('Context menu on node');
+						// (factory as NodeFactory).select(context.data.context, {
+						// 	accumulate: (factory as NodeFactory).selector.entities.size > 1
+						// });
 						showContextMenu({
 							items: [
 								{
 									id: 'delete',
 									label: 'Delete',
 									description: 'Delete a node from the editor, removing its connections.',
-									action() {
-										factory.removeNode(context.data.context as Node);
+									async action() {
+										const node = context.data.context as Node;
+
+										if (node.selected) {
+
+											await (factory as NodeFactory)
+											.deleteSelectedElements();
+										} else {
+											await (factory as NodeFactory)
+												.removeNode(context.data.context);
+										}
 									},
 									path: [],
 									tags: ['delete', 'deletion']

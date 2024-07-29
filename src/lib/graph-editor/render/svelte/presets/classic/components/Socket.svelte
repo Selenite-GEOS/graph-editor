@@ -9,7 +9,7 @@
 	let { data }: { data: Socket } = $props();
 	const socket = $derived(data);
 	const node = $derived(data.node);
-	const arrayBackgroundColor = $derived(node.isLastSelected ? "var(--p)" : node.selected ? "var(--s)": "var(--b3)");
+	const arrayBackgroundColor = $derived(node.picked ? "var(--p)" : node.selected ? "var(--s)": "var(--b3)");
 	let socketVars = $derived({ background: assignColor(data), arrayBackgroundColor });
 	const type = $derived(data.type);
 	const datastructureClasses: Record<SocketDatastructure, string> = {

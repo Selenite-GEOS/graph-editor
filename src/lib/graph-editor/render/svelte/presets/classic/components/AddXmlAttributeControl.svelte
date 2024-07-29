@@ -19,7 +19,7 @@
 </script>
 
 <div class="flex">
-	<select class="select" on:pointerdown|stopPropagation bind:value={selectedPropName}>
+	<select class="select text-base-content" on:pointerdown|stopPropagation bind:value={selectedPropName}>
 		{#each remainingAttrNames as optAttrName (optAttrName)}
 			<option value={optAttrName}>{optAttrName}</option>
 		{/each}

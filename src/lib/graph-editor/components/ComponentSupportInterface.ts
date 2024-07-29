@@ -1,5 +1,5 @@
 import type { BaseComponent, ComponentParams } from './BaseComponent';
 
 export interface ComponentSupportInterface {
-	addComponentByClass<P>(componentClass: typeof BaseComponent, params: Omit<P, keyof ComponentParams>): void;
+	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(componentClass: new (params: P) => C, params: Omit<P, keyof ComponentParams>): C;
 }

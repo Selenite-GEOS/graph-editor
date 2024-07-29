@@ -35,6 +35,7 @@ import { structures } from 'rete-structures';
 import { getLeavesFromOutput } from './utils';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import { uuidv4 } from '@selenite/commons';
+import type { SelectorEntity } from '$graph-editor/editor/NodeSelection.svelte';
 
 /**
  * A map of node classes indexed by their id.
@@ -382,22 +383,12 @@ export class Node<
 	}
 	label = $state('');
 	id: string;
-	#selected = $state(false);
 	get selected() {
-		return this.#selected
-	}
-	set selected(s) {
-		this.#selected = s;
-		if (this.factory) {
-			if (s && !this.factory.isSelected(this)) {
-				this.factory.selectNode(this);
-			} else if (!s && this.factory.lastSelectedNode === this) 
-				this.factory.lastSelectedNode = undefined;
-		}
+		return this.factory?.selector.isSelected(this) ?? false;
 	}
 
-	get isLastSelected() {
-		return this.factory?.lastSelectedNode === this;
+	get picked() {
+		return this.factory ? this.factory.selector.picked === this : false;
 	}
 
 	hasInput<K extends keyof Inputs>(key: K) {
@@ -903,7 +894,13 @@ export class Connection<
 	// 	super(source, sourceOutput, target, targetInput);
 
 	// }
-	selected?: boolean;
+	get selected(): boolean {
+		return this.factory ? this.factory.selector.isSelected(this as SelectorEntity) : false
+	}
+
+	get picked(): boolean {
+		return this.factory ? this.factory.selector.isPicked(this as SelectorEntity) : false;
+	}
 	factory?: NodeFactory;
 
 	toJSON(): ConnectionSaveData {

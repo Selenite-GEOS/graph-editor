@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ErrorWNotif, _ } from '$lib/global/index.svelte';
-	import type { NodeFactory } from '$graph-editor';
+	import type { Connection, NodeFactory } from '$graph-editor';
 	import { showContextMenu } from '$graph-editor/plugins/context-menu';
 	import { stopPropagation } from '@selenite/commons';
 	import type { SocketType } from '$graph-editor/plugins/typed-sockets';
@@ -9,12 +9,13 @@
 	type Props = {
 		//  data: Schemes['Connection'] & { isLoop?: boolean };
 		id: string;
-		selected: boolean | undefined;
+		selected: boolean;
 		factory: NodeFactory | undefined;
 		path: string;
 		type?: SocketType;
+		picked: boolean;
 	};
-	let { id, selected, factory, path, type }: Props = $props();
+	let { id, selected, factory, path, type, picked }: Props = $props();
 
 	const color = $derived(type ? assignColor(type) : '');
 	// // svelte-ignore unused-export-let
@@ -53,8 +54,11 @@
 						if (!factory) {
 							throw new Error("Can't delete connection, no factory");
 						}
-						factory.selectConnection(id);
-						factory.deleteSelectedElements();
+						if (selected) {
+							factory.deleteSelectedElements();
+						} else {
+							factory.editor.removeConnection(id);
+						}
 					}
 				}
 			]
@@ -77,13 +81,14 @@
 	}}
 	on:contextmenu|preventDefault|stopPropagation={openContextMenu}
 >
-	<path class="stroke-transparent pointer-events-auto" d={path} fill="none" stroke-width={'20px'} />
+	<path class="stroke-transparent pointer-events-auto " d={path} fill="none" stroke-width={'20px'} />
 	<path
 		class="visible-path pointers-events-none"
 		style="stroke: {color};"
 		class:group-hover:brightness-125={!selected}
 		d={path}
-		class:!stroke-primary-400={selected}
+		class:!stroke-primary={picked}
+		class:!stroke-secondary={selected && !picked}
 	/>
 </svg>
 

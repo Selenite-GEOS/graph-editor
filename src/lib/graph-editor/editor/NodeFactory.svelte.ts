@@ -10,19 +10,20 @@ import { readable, type Readable, type Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
-import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
 import { ErrorWNotif, _ } from '$lib/global/index.svelte';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
 import wu from 'wu';
 import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';
-// import { defaultConnectionPath, type ConnectionPathType } from '$lib/editor';
 import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
 import { downloadJSON } from '@selenite/commons';
 import { Modal } from '$graph-editor/plugins/modal';
+import type { BaseComponent, ComponentParams, ComponentSupportInterface } from '$graph-editor/components';
+import { NodeLayout } from './NodeFactoryLayout';
+import { NodeSelection as NodeSelector, type SelectOptions, type SelectorEntity } from './NodeSelection.svelte';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -75,7 +76,7 @@ type WithoutFactory<T> = Omit<T, 'factory'>;
 
 // export function registerNode() {}
 
-export class NodeFactory {
+export class NodeFactory implements ComponentSupportInterface {
 	public notifications: NotificationsManager = {
 		show: (notif) => {
 			let res = '';
@@ -214,8 +215,15 @@ export class NodeFactory {
 	}
 
 	destroyArea() {
+		this.destroy()
+	}
+
+	destroy() {
 		console.log('Destroying area.');
 		this.area?.destroy();
+		for (const c of this.components) {
+			c.cleanup?.()
+		}
 	}
 
 	/**
@@ -278,15 +286,16 @@ export class NodeFactory {
 			});
 		});
 	}
-	area?: AreaPlugin<Schemes, AreaExtra>;
+	area = $state<AreaPlugin<Schemes, AreaExtra>>();
 	editor: NodeEditor;
 	public readonly makutuClasses?: MakutuClassRepository;
 
 	public readonly dataflowEngine = createDataflowEngine();
 	private readonly controlflowEngine = createControlflowEngine();
-	public selector?: AreaExtensions.Selector<SelectorEntity>;
-	public accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
-	public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
+	// public selector?: AreaExtensions.Selector<SelectorEntity>;
+	selector: NodeSelector;
+	// public accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
+	// public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
 	public arrange?: AutoArrangePlugin<Schemes>;
 	public history: HistoryPlugin<Schemes> | undefined;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
@@ -295,7 +304,7 @@ export class NodeFactory {
 	reactivateDataflowTimeout: NodeJS.Timeout | null = null;
 
 	/**
-	 * Returns all nodes in the editor.
+	 * Nodes in the editor.
 	 */
 	get nodes() {
 		return this.editor.getNodes();
@@ -328,21 +337,25 @@ export class NodeFactory {
 		});
 	}
 
+	layout: NodeLayout
+
 	constructor(params: {
 		editor: NodeEditor;
 		area?: AreaPlugin<Schemes, AreaExtra>;
 		makutuClasses?: MakutuClassRepository;
-		selector?: AreaExtensions.Selector<SelectorEntity>;
 		arrange?: AutoArrangePlugin<Schemes>;
 		history?: HistoryPlugin<Schemes>;
 		comment?: CommentPlugin<Schemes, AreaExtra>;
 		accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
 	}) {
-		const { editor, area, makutuClasses, selector, arrange } = params;
+		const { editor, area, makutuClasses, arrange } = params;
+
 		this.comment = params.comment;
-		this.accumulating = params.accumulating;
+		// this.accumulating = params.accumulating;
 		this.history = params.history;
-		this.selector = selector;
+		this.layout = this.addComponentByClass(NodeLayout, {});
+		// this.selector = selector;
+		this.selector = this.addComponentByClass(NodeSelector, {});
 		this.area = area;
 		this.arrange = arrange;
 		this.makutuClasses = makutuClasses;
@@ -415,13 +428,20 @@ export class NodeFactory {
 		});
 	}
 
+	components: BaseComponent[] = []
+	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(componentClass: new (params: P) => C, params: Omit<P, keyof ComponentParams>): C {
+		const component = new componentClass({...params as P, owner: this});
+		this.components.push(component);
+		return component;
+	}
+
 	commentSelectedNodes(params: { text?: string } = {}): void {
 		console.log('factory:commentSelectedNodes');
 		if (!this.comment) {
 			console.warn('No comment plugin');
 			return;
 		}
-		const nodes = this.getSelectedNodes();
+		const nodes = this.selector.nodes;
 		if (!nodes) return;
 		this.comment.addFrame(
 			params.text,
@@ -430,139 +450,42 @@ export class NodeFactory {
 		);
 	}
 
-	unselect(element: Node) {
-		if (element.selected) element.selected = false;
-		if (this.selector?.isSelected({ id: element.id, label: 'node' })) {
-			this.selector?.remove({ id: element.id, label: 'node' });
-			this?.getArea()?.update('node', element.id);
-		}
-	}
 
-	isSelected(node: Node) {
-		return this.selector?.isSelected({ id: node.id, label: 'node' }) ?? node.selected;
-	}
-
-	selectNode(node: Node) {
-		if (!this.area) return;
-		if (this.selector?.isSelected({ id: node.id, label: 'node' })) {
-			this.selector.pick({ id: node.id, label: 'node' });
-			this.lastSelectedNode = node;
-			return;
-		}
-		if (this.selector) {
-			this.selector.add(
-				{
-					id: node.id,
-					label: 'node',
-					translate: (dx, dy) => {
-						if (!this.area) return;
-						const view = this.area.nodeViews.get(node.id);
-						const current = view?.position;
-
-						if (current) {
-							view.translate(current.x + dx, current.y + dy);
-						}
-					},
-					unselect: () => {
-						node.selected = false;
-						this?.getArea()?.update('node', node.id);
-					}
-				},
-				this.accumulating?.active() ?? false
-			);
-			this.selector.pick({ id: node.id, label: 'node' });
-		}
-		this.lastSelectedNode = node;
-		if (!node.selected) node.selected = true;
-	}
-
-	selectConnection(id: string) {
-		// const factory = this;
-		const selector = this.selector;
-		if (!selector) throw new ErrorWNotif('No selector');
-		const connection = this.getEditor().getConnection(id);
-		console.log('selecting', connection);
-		selector.add(
-			{
-				id,
-				label: 'connection',
-				translate() {},
-				unselect: () => {
-					connection.selected = false;
-					this?.getArea()?.update('connection', connection.id);
-				}
-			},
-			this.accumulating?.active() ?? false
-		);
-
-		connection.selected = true;
-		this?.getArea()?.update('connection', connection.id);
-	}
-
-	selectAll() {
-		const selector = this.selector;
-		if (!selector) throw new ErrorWNotif('Missing selector');
-		if (!this.selectableNodes) {
-			console.warn('No selector');
-			return;
-		}
-		this.editor.getNodes().forEach((node) => {
-			this.selectableNodes?.select(node.id, true);
-		});
-		this.editor.getConnections().forEach((conn) => {
-			this.selectConnection(conn.id);
-		});
-		this.comment?.comments.forEach((comment) => {
-			this.comment?.select(comment.id);
-		});
-	}
-
-	/**
-	 * Unselects all elements.
-	 */
-	unselectAll() {
-		const selector = this.selector;
-		if (!selector) throw new ErrorWNotif('Missing selector');
-		selector.unselectAll();
-	}
 	/** Delete all selected elements */
 	async deleteSelectedElements(): Promise<void> {
+		console.debug("Delete selected elements.")
 		const selector = this.selector;
 		const editor = this.getEditor();
-		const selectedNodes = this.getSelectedNodes() || [];
-		if (!selectedNodes) {
-			console.warn('No selected nodes to delete');
-			return;
-		}
-		if (!selector) throw new ErrorWNotif('Missing selector');
-		const allComments = wu(selector.entities.values()).every(({ label }) => label === 'comment');
-		for (const { id, label } of selector.entities.values()) {
-			switch (label) {
-				case 'comment':
-					const comment = this.comment?.comments.get(id);
-					if (!comment) throw new ErrorWNotif('Comment not found');
-					const commentText = comment.text;
-					const links = comment.links;
-					const commentId = comment.id;
-					const redo = () => {
-						this.comment?.delete(id);
-					};
-					if (allComments)
-						this.history?.add({
-							redo,
-							undo: () => {
-								this.comment?.addFrame(commentText, links, { id: commentId });
-							}
-						});
-					redo();
-					// this.comment?.delete(id);
-					break;
-			}
-		}
+
+		// const allComments = wu(selector.entities.values()).every(({ label }) => label === 'comment');
+		// for (const { id, label } of selector.entities.values()) {
+		// 	switch (label) {
+		// 		case 'comment':
+		// 			const comment = this.comment?.comments.get(id);
+		// 			if (!comment) throw new ErrorWNotif('Comment not found');
+		// 			const commentText = comment.text;
+		// 			const links = comment.links;
+		// 			const commentId = comment.id;
+		// 			const redo = () => {
+		// 				this.comment?.delete(id);
+		// 			};
+		// 			if (allComments)
+		// 				this.history?.add({
+		// 					redo,
+		// 					undo: () => {
+		// 						this.comment?.addFrame(commentText, links, { id: commentId });
+		// 					}
+		// 				});
+		// 			redo();
+		// 			// this.comment?.delete(id);
+		// 			break;
+		// 	}
+		// }
 		// this.history?.separate();
 
-		for (const { id, label } of selector.entities.values()) {
-			switch (label) {
+		console.debug("removing", selector.typedEntities)
+		for (const { entity: {id}, type } of selector.typedEntities) {
+			switch (type) {
 				case 'connection':
 					if (editor.getConnection(id)) await editor.removeConnection(id);
 					break;
@@ -574,11 +497,11 @@ export class NodeFactory {
 					}
 					await editor.removeNode(id);
 					break;
-				// case 'comment':
-				// 	this.comment?.delete(id);
-				// 	break;
+				case 'comment':
+					this.comment?.delete(id);
+					break;
 				default:
-					console.warn(`Delete: Unknown label ${label}`);
+					console.warn(`Delete: Unknown label ${type}`);
 			}
 		}
 		this.selector.unselectAll();
@@ -615,29 +538,12 @@ export class NodeFactory {
 		Node.activeFactory = undefined;
 	}
 
-	getSelectedNodes(): Node[] | undefined {
-		if (!this.selector) return undefined;
-		const nodes = wu(this.selector.entities.values())
-			.filter(({ label }) => label === 'node')
-			.map(({ id }) => this.editor.getNode(id))
-			.filter((node) => node !== undefined)
-			.toArray() as Node[];
-		return nodes.length ? nodes : undefined;
-	}
+
 
 	getNode(id: string): Node | undefined {
 		return this.editor.getNode(id);
 	}
 
-	getSelectedNodesIds(): Set<Node['id']> | undefined {
-		if (!this.selector) return undefined;
-		const ids = new Set<Node['id']>();
-		wu(this.selector.entities.values())
-			.filter(({ label }) => label === 'node')
-			.map(({ id }) => id)
-			.forEach((id) => ids.add(id));
-		return ids.size ? ids : undefined;
-	}
 
 	create<T extends Node>(type: new () => T): T {
 		return new type();
@@ -718,6 +624,23 @@ export class NodeFactory {
 			return;
 		}
 		if (this.area) AreaExtensions.zoomAt(this.area, [node], { scale: undefined });
+	}
+
+	select(entity: SelectorEntity, options: SelectOptions= {}) {
+		this.selector.select(entity, options)
+	}
+
+	selectConnection(id: string) {
+		const conn = this.editor.getConnection(id)
+		this.selector.select(conn)
+	}
+
+	selectAll() {
+		this.selector.selectAll()
+	}
+
+	unselectAll() {
+		this.selector.unselectAll()
 	}
 
 	async runDataflowEngines() {

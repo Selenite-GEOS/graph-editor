@@ -148,33 +148,8 @@ export async function setupFullGraphEditor(
 				}
 				console.log('Setting up area extensions');
 				const { AreaExtensions } = await import('rete-area-plugin');
-				const selector = AreaExtensions.selector();
-				const accumulating = AreaExtensions.accumulateOnCtrl();
 				AreaExtensions.showInputControl(area);
-				let twitch: number | null = null;
-				area.addPipe((ctx) => {
-					if (ctx.type === 'nodetranslated') {
-						const { id, position, previous } = ctx.data;
-						const dx = position.x - previous.x;
-						const dy = position.y - previous.y;
-						if (selector.isPicked({ id, label: 'node' })) {
-							selector.translate(dx, dy);
-						}
-					}
-					if (twitch === null) {
-						if (ctx.type === 'pointerdown') twitch = 0;
-					} else {
-						if (ctx.type === 'pointermove') twitch++;
-						else if (ctx.type === 'pointerup') {
-							if (twitch < 4) factory.unselectAll();
-							twitch = null;
-						}
-					}
-					return ctx;
-				});
-				// AreaExtensions.selectableNodes(area, selector, { accumulating });
-				factory.accumulating = accumulating;
-				factory.selector = selector;
+
 			},
 			// Gridlines
 			gridLinesSetup,
