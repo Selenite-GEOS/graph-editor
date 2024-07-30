@@ -83,7 +83,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 							selector.translate(dx, dy);
 						}
 					}
-					if (this.accumulating) return ctx;
+					if (this.accumulating || this.ranging) return ctx;
 
 					if (
 						ctx.type === 'pointerdown' ||
@@ -181,7 +181,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 			const intersection = Rect.intersection(boudingRect, rect);
 			const proportion = Rect.area(intersection) / rectArea;
 			if (proportion >= 0.5) {
-				this.select(e, { range: false})
+				this.entities.add(e);
 			}
 		}
 	}
@@ -191,8 +191,9 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 			if (this.picked) {
 				this.selectRange(this.picked, entity)					
 			}
-		}
+		} else 
 		if (!this.ranging  && (options.accumulate === undefined ? !this.accumulating : !options.accumulate)) {
+			console.debug("uh")
 			this.unselectAll();
 		}
 		if ((options.accumulate === undefined ? this.accumulating : options.accumulate) && this.isSelected(entity)) {
