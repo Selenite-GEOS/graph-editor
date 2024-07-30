@@ -42,6 +42,9 @@ pnpm publish
 ```
 
 ## TODO
+- Add input values to history
+- Add array description on hover
+- Add tootip popup
 - Support scientific writing of numbers (e.g. 1e-3)
 ### Not important
 - make node selection framework agnostic

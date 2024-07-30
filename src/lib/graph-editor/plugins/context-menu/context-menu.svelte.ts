@@ -145,6 +145,8 @@ export class ContextMenu {
 	private constructor() {}
 }
 
+export const contextMenu = ContextMenu.instance;
+
 /**
  * Shows the context menu with the given items at the given position.
  *

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { flip, offset, shift, useFloating } from '@skeletonlabs/floating-ui-svelte';
 	import { ContextMenu } from './context-menu.svelte';
-	import { preventDefault, shortcut } from '@selenite/commons';
+	import { preventDefault, shortcut, stopPropagation } from '@selenite/commons';
 	const menu = $derived(ContextMenu.instance);
 	const x = $derived(menu.pos.x);
 	const y = $derived(menu.pos.y);
@@ -78,7 +78,7 @@
 			use:shortcut={{
 				ignoreElements: [],
 				key: 'Escape',
-				action(e) {
+				action(n, e) {
 					menu.visible = false;
 				}
 			}}

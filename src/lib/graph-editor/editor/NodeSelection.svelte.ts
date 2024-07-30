@@ -140,7 +140,9 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 		}
 
 		if (entity instanceof Connection) {
-			return area?.connectionViews.get(entity.id)?.element.querySelector('.visible-path') ?? undefined;
+			return (
+				area?.connectionViews.get(entity.id)?.element.querySelector('.visible-path') ?? undefined
+			);
 		}
 
 		if (entity instanceof Comment) return entity.element;
@@ -155,7 +157,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 
 	/**
 	 * Selects all entities between two entities.
-	 * 
+	 *
 	 * Selects only entities with 50% of their bounding box inside
 	 * the bouding box formed by the two entities.
 	 */
@@ -173,7 +175,6 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 		const boudingRect = new Rect(minX, minY, maxX - minX, maxY - minY);
 
 		for (const e of wu.chain<SelectorEntity>(this.owner.nodes, this.owner.connections)) {
-			
 			const rect = this.entityElement(e)?.getBoundingClientRect();
 			if (!rect) continue;
 			const rectArea = Rect.area(rect);
@@ -186,18 +187,25 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 		}
 	}
 
-	select(entity: SelectorEntity, options: { accumulate?: boolean; pick?: boolean, range?: boolean } = {}): void {
-		if (options.range === undefined && this.ranging || options.range) {
+	select(
+		entity: SelectorEntity,
+		options: { accumulate?: boolean; pick?: boolean; range?: boolean } = {}
+	): void {
+		if ((options.range === undefined && this.ranging) || options.range) {
 			if (this.picked) {
-				this.selectRange(this.picked, entity)					
+				this.selectRange(this.picked, entity);
 			}
-		} else 
-		if (!this.ranging  && (options.accumulate === undefined ? !this.accumulating : !options.accumulate)) {
-			console.debug("uh")
+		} else if (
+			!this.ranging &&
+			(options.accumulate === undefined ? !this.accumulating : !options.accumulate)
+		) {
 			this.unselectAll();
 		}
-		if ((options.accumulate === undefined ? this.accumulating : options.accumulate) && this.isSelected(entity)) {
-			this.unselect(entity)
+		if (
+			(options.accumulate === undefined ? this.accumulating : options.accumulate) &&
+			this.isSelected(entity)
+		) {
+			this.unselect(entity);
 			return;
 		}
 		this.entities.add(entity);

@@ -138,7 +138,7 @@
 			{#each ['x', 'y', 'z'] as k, i (k)}
 				{@render input({
 					type: 'number',
-					class: `input input-bordered w-[5rem] rounded-none focus:z-10 no-spinner  ${i === 0 ? 'rounded-l-btn' : i === 2 ? 'rounded-r-btn' : ''}`,
+					class: `input input-bordered w-[6rem] rounded-none focus:z-10 no-spinner  ${i === 0 ? 'rounded-l-btn' : i === 2 ? 'rounded-r-btn' : ''}`,
 					step: 0.01,
 					value: vector[k as 'x' | 'y' | 'z'],
 					oninput: (e) => {
@@ -158,7 +158,7 @@
 		<textarea
 			use:autosize
 			{...inputProps as HTMLTextareaAttributes}
-			class="textarea text-start max-h-[20rem] min-w-[11rem]"
+			class="textarea text-start max-h-[20rem] min-w-[11rem] text-base-content"
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea
 		>
 	{:else}
