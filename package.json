@@ -1,6 +1,6 @@
 {
   "name": "@selenite/graph-editor",
-  "version": "0.0.75",
+  "version": "0.0.76",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run package",
@@ -68,7 +68,7 @@
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
-    "@selenite/commons": "^0.15.4",
+    "@selenite/commons": "^0.16.1",
     "@skeletonlabs/floating-ui-svelte": "^0.3.1",
     "autoprefixer": "^10.4.19",
     "broadcast-channel": "^7.0.0",

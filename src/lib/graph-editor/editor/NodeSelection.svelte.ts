@@ -4,6 +4,7 @@ import { Connection, Node } from '$graph-editor/nodes';
 import { SvelteSet } from 'svelte/reactivity';
 import wu from 'wu';
 import { Comment } from 'rete-comment-plugin';
+import { Rect, type Position } from '@selenite/commons';
 
 const entityTypesMap = {
 	node: Node,
@@ -20,6 +21,7 @@ type EntityWithType<K extends EntityType = EntityType> = {
 export class NodeSelection extends BaseComponent<NodeFactory> {
 	entities = new SvelteSet<SelectorEntity>();
 	accumulating = $state(false);
+	ranging = $state(false);
 	typedEntities: EntityWithType[] = $derived(
 		wu(this.entities)
 			.map((e) => {
@@ -46,9 +48,11 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 				console.debug('Adding selection accumulation.');
 				const onkeydown = (e: KeyboardEvent) => {
 					this.accumulating = e.ctrlKey;
+					this.ranging = e.shiftKey;
 				};
 				const onkeyup = (e: KeyboardEvent) => {
 					this.accumulating = e.ctrlKey;
+					this.ranging = e.shiftKey;
 				};
 				window.addEventListener('keydown', onkeydown);
 				window.addEventListener('keyup', onkeyup);
@@ -86,12 +90,12 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 						ctx.type === 'pointermove' ||
 						ctx.type === 'pointerup'
 					) {
-                        if (ctx.data.event.button !== 0) return ctx;
+						if (ctx.data.event.button !== 0) return ctx;
 						const target = ctx.data.event.target;
 						if (target instanceof Element && !this.owner.area?.container.contains(target)) {
-                            console.debug("Not contained")
-                            return ctx;
-                        }
+							console.debug('Not contained');
+							return ctx;
+						}
 					}
 					if (twitch === null) {
 						if (ctx.type === 'pointerdown') twitch = 0;
@@ -128,13 +132,72 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	pickedNode = $derived(this.picked instanceof Node ? Node : undefined);
 	pickedConnection = $derived(this.picked instanceof Connection ? Connection : undefined);
 
+	entityElement(entity: SelectorEntity): HTMLElement | undefined {
+		const area = this.owner.area;
+
+		if (entity instanceof Node) {
+			return area?.nodeViews.get(entity.id)?.element;
+		}
+
+		if (entity instanceof Connection) {
+			return area?.connectionViews.get(entity.id)?.element.querySelector('.visible-path') ?? undefined;
+		}
+
+		if (entity instanceof Comment) return entity.element;
+
+		console.error("Can't get element, unknown entity");
+		return;
+	}
+
 	isSelected(entity: SelectorEntity): boolean {
 		return this.entities.has(entity);
 	}
-	select(entity: SelectorEntity, options: { accumulate?: boolean; pick?: boolean } = {}): void {
-		console.debug('select');
-		if (options.accumulate === undefined ? !this.accumulating : !options.accumulate) {
+
+	/**
+	 * Selects all entities between two entities.
+	 * 
+	 * Selects only entities with 50% of their bounding box inside
+	 * the bouding box formed by the two entities.
+	 */
+	selectRange(a: SelectorEntity, b: SelectorEntity) {
+		const rectA = this.entityElement(a)?.getBoundingClientRect();
+		const rectB = this.entityElement(b)?.getBoundingClientRect();
+
+		if (!rectA || !rectB) return;
+
+		const minX = Math.min(rectA.left, rectB.left);
+		const minY = Math.min(rectA.top, rectB.top);
+		const maxX = Math.max(rectA.right, rectB.right);
+		const maxY = Math.max(rectA.bottom, rectB.bottom);
+
+		const boudingRect = new Rect(minX, minY, maxX - minX, maxY - minY);
+
+		for (const e of wu.chain<SelectorEntity>(this.owner.nodes, this.owner.connections)) {
+			
+			const rect = this.entityElement(e)?.getBoundingClientRect();
+			if (!rect) continue;
+			const rectArea = Rect.area(rect);
+			if (rectArea === 0) continue;
+			const intersection = Rect.intersection(boudingRect, rect);
+			const proportion = Rect.area(intersection) / rectArea;
+			if (proportion >= 0.5) {
+				this.select(e, { range: false})
+			}
+		}
+	}
+
+	select(entity: SelectorEntity, options: { accumulate?: boolean; pick?: boolean, range?: boolean } = {}): void {
+		if (options.range === undefined && this.ranging || options.range) {
+			if (this.picked) {
+				this.selectRange(this.picked, entity)					
+			}
+		}
+		if (!this.ranging  && (options.accumulate === undefined ? !this.accumulating : !options.accumulate)) {
 			this.unselectAll();
+		}
+		if ((options.accumulate === undefined ? this.accumulating : options.accumulate) && this.isSelected(entity)) {
+			this.unselect(entity)
+			return;
 		}
 		this.entities.add(entity);
 		if (options.pick ?? true) {
@@ -143,6 +206,12 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	}
 	remove(entity: SelectorEntity): void {
 		this.entities.delete(entity);
+	}
+	unselect(entity: SelectorEntity) {
+		this.entities.delete(entity);
+		if (this.picked === entity) {
+			this.releasePicked();
+		}
 	}
 	unselectAll(): void {
 		console.debug('Unselect all');

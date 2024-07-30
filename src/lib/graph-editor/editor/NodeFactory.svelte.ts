@@ -22,7 +22,7 @@ import type { NotificationsManager } from '$graph-editor/plugins/notifications';
 import { downloadJSON } from '@selenite/commons';
 import { Modal } from '$graph-editor/plugins/modal';
 import type { BaseComponent, ComponentParams, ComponentSupportInterface } from '$graph-editor/components';
-import { NodeLayout } from './NodeFactoryLayout';
+import { NodeLayout } from './NodeLayout';
 import { NodeSelection as NodeSelector, type SelectOptions, type SelectorEntity } from './NodeSelection.svelte';
 
 function createDataflowEngine() {
@@ -308,6 +308,12 @@ export class NodeFactory implements ComponentSupportInterface {
 	 */
 	get nodes() {
 		return this.editor.getNodes();
+	}
+	/**
+	 * Connections in the editor.
+	 */
+	get connections() {
+		return this.editor.getConnections();
 	}
 	/**
 	 * Executes callback without running dataflow engines.

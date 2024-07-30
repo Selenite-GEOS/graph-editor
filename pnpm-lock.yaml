@@ -15,8 +15,8 @@ importers:
         specifier: ^6.6.0
         version: 6.6.0
       '@selenite/commons':
-        specifier: ^0.15.4
-        version: 0.15.4(svelte@5.0.0-next.201)
+        specifier: ^0.16.1
+        version: 0.16.1(svelte@5.0.0-next.201)
       '@skeletonlabs/floating-ui-svelte':
         specifier: ^0.3.1
         version: 0.3.1(svelte@5.0.0-next.201)
@@ -695,8 +695,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@selenite/commons@0.15.4':
-    resolution: {integrity: sha512-Xk87QmraHQIb3+mILt1HHlBUkja/cDHeJaDhbHV77qFVhzuVQ5kuqfcZxs8iyIJ7LgZT+m2mSOiRzqms5J2cMQ==}
+  '@selenite/commons@0.16.1':
+    resolution: {integrity: sha512-umNynDesceIKBECeZHMctLJSOg4ppMJJVrxp4N2/v98ICgUcHfyFgOWP+k4BfqmH4MtKwymRy/z59dWa+7Tk6w==}
     peerDependencies:
       svelte: ^5.0.0-next.197
 
@@ -2803,7 +2803,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.18.1':
     optional: true
 
-  '@selenite/commons@0.15.4(svelte@5.0.0-next.201)':
+  '@selenite/commons@0.16.1(svelte@5.0.0-next.201)':
     dependencies:
       '@neodrag/svelte': 2.0.6
       '@types/uuid': 10.0.0

@@ -30,7 +30,6 @@
 	let menuCmpnt = $state<Menu>();
 	$effect(() => {
 		menu.filteredItems
-		console.log("yo")
 		if (menu.expanded) {
 			untrack(() => {
 				menuCmpnt?.expandAll();

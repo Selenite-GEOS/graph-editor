@@ -42,4 +42,6 @@ pnpm publish
 ```
 
 ## TODO
+- Support scientific writing of numbers (e.g. 1e-3)
+### Not important
 - make node selection framework agnostic

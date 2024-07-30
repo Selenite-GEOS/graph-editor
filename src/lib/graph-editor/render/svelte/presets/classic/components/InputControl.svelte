@@ -8,7 +8,11 @@
 		type InputControlValueType
 	} from '$graph-editor/socket';
 	import { autosize, stopPropagation } from '@selenite/commons';
-	import type { HTMLInputAttributes, HTMLInputTypeAttribute, HTMLTextareaAttributes } from 'svelte/elements';
+	import type {
+		HTMLInputAttributes,
+		HTMLInputTypeAttribute,
+		HTMLTextareaAttributes
+	} from 'svelte/elements';
 	import EditArray from './EditArray.svelte';
 	import { fade } from 'svelte/transition';
 	import type { DataType } from '$graph-editor/plugins/typed-sockets';
@@ -67,7 +71,7 @@
 			inputControl.value = value as InputControlValueType<InputControlType>;
 		},
 		...inputControl.props,
-		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'} ${inputControl.props.class}`,
+		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'} ${inputControl.props.class}`
 	});
 
 	let vector = $derived(
@@ -85,13 +89,13 @@
 		console.debug('control type', inputControl.type);
 	}
 	$inspect('InputControl:Type', inputControl.type).with(console.debug);
-	let focusableInput = $state<HTMLInputElement>()
+	let focusableInput = $state<HTMLInputElement>();
 	$effect(() => {
 		if (focus) {
-			console.log("Focus", focusableInput)
+			console.log('Focus', focusableInput);
 			focusableInput?.focus();
 		}
-	})
+	});
 </script>
 
 <!-- TODO maybe move pointerdown and dblclick stop propagation to framework agnostic logic -->
@@ -134,9 +138,9 @@
 			{#each ['x', 'y', 'z'] as k, i (k)}
 				{@render input({
 					type: 'number',
+					class: `input input-bordered w-[5rem] rounded-none focus:z-10 no-spinner  ${i === 0 ? 'rounded-l-btn' : i === 2 ? 'rounded-r-btn' : ''}`,
 					step: 0.01,
 					value: vector[k as 'x' | 'y' | 'z'],
-					style: 'border-radius: 0;',
 					oninput: (e) => {
 						const res = parseFloat(e.currentTarget.value);
 						if (isNaN(res)) {
@@ -151,7 +155,12 @@
 			{/each}
 		</div>
 	{:else if type === 'textarea'}
-		<textarea use:autosize {...inputProps as HTMLTextareaAttributes} class="textarea text-start max-h-[20rem] min-w-[11rem]" onpointerdown={stopPropagation}>{inputControl.value}</textarea>
+		<textarea
+			use:autosize
+			{...inputProps as HTMLTextareaAttributes}
+			class="textarea text-start max-h-[20rem] min-w-[11rem]"
+			onpointerdown={stopPropagation}>{inputControl.value}</textarea
+		>
 	{:else}
 		{@render input(inputProps)}
 	{/if}
@@ -164,9 +173,9 @@
 		onclick={() => {
 			modal.show({
 				component: EditArray,
-				 get title() {
-					return `Edit ${inputControl.socketType} array`
-				 },
+				get title() {
+					return `Edit ${inputControl.socketType} array`;
+				},
 				buttons: [
 					{
 						label: 'Change type',
@@ -247,5 +256,16 @@
 			background: darken($btn-base-color, 10%);
 			// color: white;
 		}
+	}
+
+	.no-spinner {
+		appearance: textfield;
+		-moz-appearance: textfield;
+	}
+
+	.no-spinner::-webkit-outer-spin-button,
+	.no-spinner::-webkit-inner-spin-button {
+		margin: 0;
+		-webkit-appearance: none;
 	}
 </style>

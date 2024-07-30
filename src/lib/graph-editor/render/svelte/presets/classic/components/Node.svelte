@@ -201,11 +201,14 @@
 			: variant('base-300')}
 	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
-	on:pointerdown={(e) => {
-		if (node.selected && e.button === 0) {
-			node.factory?.select(node);
+
+
+	on:dblclick={(e) => {
+		if (node.factory?.selector.accumulating) {
+			stopPropagation(e)
 		}
 	}}
+
 	use:clickIfNoDrag={{
 		onclick(e) {
 			if (e.button !== 0) return;
@@ -249,6 +252,7 @@
 							btn.classList.add('cursor-text');
 						}
 					}}
+					
 					on:click={(e) => {
 						if (e.ctrlKey || e.altKey || e.shiftKey) return;
 						if (lastPointerDownPos) {
@@ -258,7 +262,7 @@
 							if (dist > 2) return;
 						}
 						editingName = true;
-						node.selected = false;
+						node.factory?.unselectAll()
 					}}
 					on:pointerdown={(e) => {
 						lastPointerDownPos = posFromClient(e);
@@ -270,7 +274,7 @@
 					<!-- svelte-ignore event_directive_deprecated -->
 					<input
 						bind:this={nameInput}
-						class="absolute input inset-0"
+						class="absolute input inset-0 text-base-content"
 						on:blur={() => {
 							if (!nameInput || !editingName) return;
 							node.name = nameInput.value;
