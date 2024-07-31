@@ -23,7 +23,7 @@ export type InputControlNodeParams<
 	datastructure?: D;
 	initial?: InputControlValueType<T>;
 	socketType?: S;
-	props?: HTMLInputAttributes
+	props?: HTMLInputAttributes;
 };
 
 export class InputControlNode<

@@ -10,7 +10,7 @@ export type SocketValueWithDatastructure<T, D extends SocketDatastructure> = D e
 	: D extends 'array'
 		? T[]
 		: never;
-export type Scalar<S extends DataType = DataType> = Socket<S, 'scalar'>
+export type Scalar<S extends DataType = DataType> = Socket<S, 'scalar'>;
 export class Socket<
 	S extends SocketType = SocketType,
 	D extends SocketDatastructure = SocketDatastructure
@@ -23,7 +23,7 @@ export class Socket<
 	selected: boolean;
 	readonly node: Node;
 	displayLabel: boolean | undefined;
-	port = $state<Port<Socket>>(); 
+	port = $state<Port<Socket>>();
 
 	constructor({
 		name = '',

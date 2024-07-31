@@ -83,7 +83,7 @@
 	}}
 	on:contextmenu|preventDefault|stopPropagation={openContextMenu}
 >
-	<path class="stroke-transparent pointer-events-auto " d={path} fill="none" stroke-width={'20px'} />
+	<path class="stroke-transparent pointer-events-auto" d={path} fill="none" stroke-width={'20px'} />
 	<path
 		class="visible-path pointers-events-none"
 		style="stroke: {color};"

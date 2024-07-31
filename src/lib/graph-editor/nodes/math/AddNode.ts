@@ -13,7 +13,10 @@ import { Socket, type Scalar } from '../../socket/Socket.svelte';
 @tags('+', 'sum')
 @path('Number')
 @description('Adds two numbers together.')
-export class AddNode extends Node<{ a: Scalar<'number'>; b: Scalar<'number'>}, { value: Scalar<'number'> }> {
+export class AddNode extends Node<
+	{ a: Scalar<'number'>; b: Scalar<'number'> },
+	{ value: Scalar<'number'> }
+> {
 	constructor(params: NodeParams & { a?: number; b?: number } = {}) {
 		super({ label: 'Add', height: 190, ...params });
 		const { a = 0, b = 0 } = params;

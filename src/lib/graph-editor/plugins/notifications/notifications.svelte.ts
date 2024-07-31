@@ -58,7 +58,6 @@ class Notifications implements NotificationsManager {
 	info(notif: Omit<NotificationParams, 'color'>) {
 		this.show({ ...notif, color: 'info' });
 	}
-	
 
 	removeDisplayed(notif: DisplayedNotification) {
 		const i = this.displayed.findIndex((n) => n === notif);

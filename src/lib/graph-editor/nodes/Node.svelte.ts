@@ -628,18 +628,16 @@ export class Node<
 		if (key in this.outputs) {
 			throw new Error(`Output ${String(key)} already exists`);
 		}
-		const output = new Output(
-			{
-				socket: new Socket({
-					name: params.label ?? key,
-					datastructure: params.datastructure ?? 'scalar',
-					type: params.type,
-					node: this,
-					displayLabel: params.showLabel
-				}),
-				label: (params.showLabel ?? true) ? (params.label ?? key) : undefined
-			},
-		);
+		const output = new Output({
+			socket: new Socket({
+				name: params.label ?? key,
+				datastructure: params.datastructure ?? 'scalar',
+				type: params.type,
+				node: this,
+				displayLabel: params.showLabel
+			}),
+			label: (params.showLabel ?? true) ? (params.label ?? key) : undefined
+		});
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 		return output.socket;
 	}
@@ -785,7 +783,10 @@ export class Node<
 		isNaturalFlow = false
 	) {
 		if (isNaturalFlow) this.naturalFlowExec = name;
-		const output = new Output({socket: new ExecSocket({ name: displayName, node: this }), label: displayName});
+		const output = new Output({
+			socket: new ExecSocket({ name: displayName, node: this }),
+			label: displayName
+		});
 		output.index = -1;
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}
@@ -799,7 +800,7 @@ export class Node<
 			}
 			this.factory?.resetDataflow(this);
 		} catch (e) {
-			console.warn("Dataflow processing cancelled");
+			console.warn('Dataflow processing cancelled');
 		}
 	};
 
@@ -897,7 +898,7 @@ export class Connection<
 
 	// }
 	get selected(): boolean {
-		return this.factory ? this.factory.selector.isSelected(this as SelectorEntity) : false
+		return this.factory ? this.factory.selector.isSelected(this as SelectorEntity) : false;
 	}
 
 	get picked(): boolean {

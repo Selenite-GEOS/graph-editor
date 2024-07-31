@@ -10,4 +10,4 @@ export * from './ForEachNode';
 export * from './SequenceNode';
 export * from './StartNode';
 export * from './TimeLoopNode';
-export * from './time'
+export * from './time';

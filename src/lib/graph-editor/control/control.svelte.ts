@@ -13,14 +13,14 @@ export type ControlParams = {
 	placeInHeader: boolean;
 };
 
-
-export function applyParams<T extends object>(target: T, constructor: new () => T, params: Record<string, unknown>) {
+export function applyParams<T extends object>(
+	target: T,
+	constructor: new () => T,
+	params: Record<string, unknown>
+) {
 	if (Object.keys(params).length === 0) return;
 	const ref = new constructor();
-	Object.assign(
-		target,
-		Object.fromEntries(Object.entries(params).filter(([k]) => k in ref))
-	);
+	Object.assign(target, Object.fromEntries(Object.entries(params).filter(([k]) => k in ref)));
 }
 
 /**

@@ -2,7 +2,6 @@ import type { Component, Snippet } from 'svelte';
 
 type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
 
-
 export type BaseModalSettings = {
 	title?: string | Snippet;
 	buttons?: (
@@ -15,9 +14,8 @@ export type BaseModalSettings = {
 	)[];
 };
 
-
 export type ComponentModalSettings<Props extends Record<string, any> = {}> = {
-	component: Component<Props & {modal: ComponentModalSettings}>;
+	component: Component<Props & { modal: ComponentModalSettings }>;
 	props: Props;
 } & BaseModalSettings;
 
@@ -26,18 +24,24 @@ export type SnippetModalSettings<Props extends Record<string, any> = {}> = {
 	props: Props;
 } & BaseModalSettings;
 
-export type ModalSettings<Props extends Record<string, any> = {}> = ComponentModalSettings<Props> | SnippetModalSettings<Props>;
+export type ModalSettings<Props extends Record<string, any> = {}> =
+	| ComponentModalSettings<Props>
+	| SnippetModalSettings<Props>;
 
-export function isComponentModalSettings<Props extends Record<string, any>>(modal: ModalSettings<Props>): modal is ComponentModalSettings<Props> {
+export function isComponentModalSettings<Props extends Record<string, any>>(
+	modal: ModalSettings<Props>
+): modal is ComponentModalSettings<Props> {
 	return 'component' in modal;
 }
-export function isSnippetModalSettings<Props extends Record<string, any>>(modal: ModalSettings<Props>): modal is SnippetModalSettings<Props> {
+export function isSnippetModalSettings<Props extends Record<string, any>>(
+	modal: ModalSettings<Props>
+): modal is SnippetModalSettings<Props> {
 	return 'snippet' in modal;
 }
 
 /**
  * Singleton that manages modals.
- * 
+ *
  * The singleton can be accessed with `Modal.instance`.
  */
 export class Modal {

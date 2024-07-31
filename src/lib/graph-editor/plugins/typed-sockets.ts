@@ -35,7 +35,7 @@ export type SocketType =
 	| 'groupNameRef'
 	| XMLAttrType
 	| XMLElementType;
-export type DataType = Exclude<SocketType, 'exec'>
+export type DataType = Exclude<SocketType, 'exec'>;
 export type ExportedSocketType = BaseSocketType | 'xmlAttr' | 'xmlElement';
 export function socketTypeExport(t: SocketType): ExportedSocketType {
 	if ((baseSocketTypes as readonly string[]).includes(t)) return t as BaseSocketType;

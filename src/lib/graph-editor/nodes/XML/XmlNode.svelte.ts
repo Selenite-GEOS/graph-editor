@@ -25,7 +25,14 @@ import type { NodeFactory } from '$graph-editor/editor';
 import 'regenerator-runtime/runtime';
 import wu from 'wu';
 import { formatXml } from '$utils';
-import { ComplexType, getSharedString, singular, splitCamelCase, type ChildProps, type SaveData } from '@selenite/commons';
+import {
+	ComplexType,
+	getSharedString,
+	singular,
+	splitCamelCase,
+	type ChildProps,
+	type SaveData
+} from '@selenite/commons';
 
 export class AddXmlAttributeControl extends Control {
 	constructor(public readonly xmlNode: XmlNode) {
@@ -69,14 +76,14 @@ export class XmlToString extends Node<
 		inputs?: SocketsValues<{ xml: Scalar<'xmlElement:*'> }> | undefined
 	): SocketsValues<{ value: Scalar<'string'> }> {
 		const xml = this.getData('xml', inputs) as unknown as XMLData;
-		return { value: xml ? formatXml({xml: xml.toXml()}) : '' };
+		return { value: xml ? formatXml({ xml: xml.toXml() }) : '' };
 	}
 }
 
 @registerNode('xml.XML', 'abstract')
 export class XmlNode extends Node<
 	Record<string, Socket<DataType>>,
-	{ value: Scalar, name?: Scalar<'groupNameRef'> },
+	{ value: Scalar; name?: Scalar<'groupNameRef'> },
 	{ addXmlAttr: AddXmlAttributeControl },
 	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[] }
 > {
@@ -88,15 +95,15 @@ export class XmlNode extends Node<
 	optionalXmlAttributes: Set<string> = new Set();
 	xmlVectorProperties: Set<string> = new Set();
 
-	hasName = $state(false)
+	hasName = $state(false);
 
 	set name(n: string) {
 		super.name =
-			!this.hasName || typeof n === 'string' && n.trim() !== ''
+			!this.hasName || (typeof n === 'string' && n.trim() !== '')
 				? n
 				: camlelcaseize(this.xmlTag) + XmlNode.counts[this.xmlTag]++;
 		// Run dataflow in timeout to avoid running at setup
-			this.processDataflow()
+		this.processDataflow();
 	}
 
 	get name(): string | undefined {
@@ -191,7 +198,7 @@ export class XmlNode extends Node<
 			label: xmlConfig.outLabel,
 			type: `xmlElement:${xmlConfig.xmlTag}`
 		});
-		
+
 		if (this.hasName) {
 			this.addOutData('name', {
 				type: 'groupNameRef'
@@ -353,7 +360,7 @@ export class XmlNode extends Node<
 		this.height += isArray ? 58 : 65.5;
 	}
 
-	override data(inputs?: Record<string, unknown>): { value: XMLData, name?: string } {
+	override data(inputs?: Record<string, unknown>): { value: XMLData; name?: string } {
 		let children: XMLData[] = [];
 		for (const [key, { tag }] of Object.entries(this.xmlInputs)) {
 			const data = this.getData(key, inputs) as XMLData;
@@ -426,7 +433,7 @@ export class XmlNode extends Node<
 		type?: DataType;
 		isArray?: boolean;
 		index?: number;
-		required?: boolean
+		required?: boolean;
 	}) {
 		this.xmlInputs[name] = { tag: tag };
 		this.addInData(name, {

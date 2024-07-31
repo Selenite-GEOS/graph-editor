@@ -4,7 +4,7 @@ import type { ExecSocket, Socket } from '$graph-editor/socket';
 @registerNode('io.Log')
 @path('I/O')
 export class LogNode extends Node<
-	{ message: Socket<'string', 'scalar'>; time:Socket<'number', 'scalar'>, exec: Socket<'exec'> },
+	{ message: Socket<'string', 'scalar'>; time: Socket<'number', 'scalar'>; exec: Socket<'exec'> },
 	{ exec: ExecSocket }
 > {
 	constructor(params: NodeParams = {}) {
@@ -22,7 +22,7 @@ if (rank == 0):
 		this.addOutExec();
 		this.addInData('message', {
 			label: 'Message',
-			type: 'string',
+			type: 'string'
 		});
 		this.addInData('time', {
 			label: 'Time',
@@ -38,7 +38,7 @@ if (rank == 0):
 		forwardExec?: boolean
 	): Promise<void> {
 		const msg = await this.getDataWithInputs('message');
-		const time = await this.getDataWithInputs('time')
+		const time = await this.getDataWithInputs('time');
 		console.log(`Log: ${msg}`);
 		this.factory?.notifications.show({
 			title: 'Log',

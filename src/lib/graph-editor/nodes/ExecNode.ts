@@ -1,3 +1,1 @@
-export class ExecNode extends Node {
-    
-}
+export class ExecNode extends Node {}

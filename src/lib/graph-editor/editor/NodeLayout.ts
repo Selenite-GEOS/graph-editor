@@ -1,9 +1,8 @@
-import { BaseComponent } from "$graph-editor/components";
-import { zip } from "wu";
-import type { NodeFactory } from "./NodeFactory.svelte";
-import { Layout, Vector2D } from "@selenite/commons";
-import type { GraphNode } from "$graph-editor/nodes";
-
+import { BaseComponent } from '$graph-editor/components';
+import { zip } from 'wu';
+import type { NodeFactory } from './NodeFactory.svelte';
+import { Layout, Vector2D } from '@selenite/commons';
+import type { GraphNode } from '$graph-editor/nodes';
 
 export class NodeLayout extends BaseComponent<NodeFactory> {
 	async applyOffsets(nodes: GraphNode[], offsets: Vector2D[]) {
@@ -57,45 +56,43 @@ export class NodeLayout extends BaseComponent<NodeFactory> {
 		const { rects, refPos } = this.getLayoutRectsAndRefPos();
 		return offsetFunction(rects, { refPos });
 	}
-	
+
 	applyLayout(
 		offsetFunction: (rects: Layout.LayoutRect[], options: Layout.LayoutOptions) => Vector2D[]
 	) {
-        const offsets = this.getOffsets(offsetFunction)
-        return this.applyOffsets(this.owner.selector.nodes, offsets)
-    }
+		const offsets = this.getOffsets(offsetFunction);
+		return this.applyOffsets(this.owner.selector.nodes, offsets);
+	}
 
 	justifyLeft() {
 		return this.applyLayout(Layout.getJustifyLeftOffsets);
 	}
 
-    justifyRight() {
-        return this.applyLayout(Layout.getJustifyRightOffsets);
-    }
+	justifyRight() {
+		return this.applyLayout(Layout.getJustifyRightOffsets);
+	}
 
-    justifyCenter() {
-        return this.applyLayout(Layout.getJustifyCenterOffsets);
-    }
+	justifyCenter() {
+		return this.applyLayout(Layout.getJustifyCenterOffsets);
+	}
 
-    justifyBetween() {
-        return this.applyLayout((rects: Layout.LayoutRect[]) => Layout.getJustifyBetweenOffsets(rects));
-    }
+	justifyBetween() {
+		return this.applyLayout((rects: Layout.LayoutRect[]) => Layout.getJustifyBetweenOffsets(rects));
+	}
 
-    alignTop() {
-        return this.applyLayout(Layout.getAlignTopOffsets);
-    }
+	alignTop() {
+		return this.applyLayout(Layout.getAlignTopOffsets);
+	}
 
-    alignMiddle() {
-        return this.applyLayout(Layout.getAlignMiddleOffsets);
-    }
+	alignMiddle() {
+		return this.applyLayout(Layout.getAlignMiddleOffsets);
+	}
 
-    alignBottom() {
-        return this.applyLayout(Layout.getAlignBottomOffsets);
-    }
+	alignBottom() {
+		return this.applyLayout(Layout.getAlignBottomOffsets);
+	}
 
-    spaceVertical() {
-        return this.applyLayout((rects: Layout.LayoutRect[]) => Layout.getAlignBetweenOffsets(rects));
-    }
-
-
+	spaceVertical() {
+		return this.applyLayout((rects: Layout.LayoutRect[]) => Layout.getAlignBetweenOffsets(rects));
+	}
 }

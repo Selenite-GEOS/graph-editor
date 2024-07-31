@@ -24,16 +24,16 @@ export class DynamicTypeComponent<
 		}
 	) {
 		super(params);
-		this.dynamicTypeInputs = params.inputs
-		this.dynamicTypeOutputs = params.outputs
+		this.dynamicTypeInputs = params.inputs;
+		this.dynamicTypeOutputs = params.outputs;
 		const node = this.node as Node<
 			Record<string, Socket>,
 			Record<string, Socket>,
 			{},
-			{ dynamicTypeCmpnt: {type: SocketType }}
+			{ dynamicTypeCmpnt: { type: SocketType } }
 		>;
 		if (!node.state.dynamicTypeCmpnt) {
-			node.state.dynamicTypeCmpnt = { type: params.initial?? 'any'};
+			node.state.dynamicTypeCmpnt = { type: params.initial ?? 'any' };
 		}
 		this.changeType(this.state.type);
 		const factory = node.factory;

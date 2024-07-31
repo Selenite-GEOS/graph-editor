@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ExecSocket } from '$graph-editor/socket/ExecSocket';
 
-	let {data} : {data: ExecSocket} = $props();
+	let { data }: { data: ExecSocket } = $props();
 	const socket = $derived(data);
 	// $inspect('exec', {...socket}, socket.type)
 </script>
@@ -12,7 +12,7 @@
 	class:outline={data.selected}
 	title={'exec'}
 >
-	<div id="innerTriangle" class="socket" title={'exec'} />
+	<div id="innerTriangle" class="socket" title={'exec'} ></div>
 </div>
 
 <style lang="scss">

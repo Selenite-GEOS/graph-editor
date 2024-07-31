@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import type { GeosSchema } from '$lib/geos';
 import type { Action } from 'svelte/action';
 import { notifications } from '$graph-editor/plugins/notifications';
-export {notifications} from '$graph-editor/plugins/notifications';
+export { notifications } from '$graph-editor/plugins/notifications';
 export { getContext } from 'svelte';
 export type NewGeosContext = { geosSchema: GeosSchema };
 

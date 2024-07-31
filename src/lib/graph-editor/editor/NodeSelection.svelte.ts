@@ -23,7 +23,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	accumulating = $state(false);
 	ranging = $state(false);
 
-	modifierActive = $derived(this.accumulating || this.ranging)
+	modifierActive = $derived(this.accumulating || this.ranging);
 	typedEntities: EntityWithType[] = $derived(
 		wu(this.entities)
 			.map((e) => {
@@ -73,10 +73,9 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 				this.owner.area.addPipe((ctx) => {
 					const selector = factory.selector;
 					if (ctx.type === 'nodepicked' && this.modifierActive) {
-						const node = factory.getNode(ctx.data.id)
+						const node = factory.getNode(ctx.data.id);
 						if (node && this.isSelected(node) && !this.isPicked(node)) {
-							this.pick(node)
-							
+							this.pick(node);
 						}
 					}
 					if (ctx.type === 'nodetranslated') {
@@ -94,10 +93,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 					}
 					if (this.accumulating || this.ranging) return ctx;
 
-					if (
-						ctx.type === 'pointerdown' ||
-						ctx.type === 'pointerup'
-					) {
+					if (ctx.type === 'pointerdown' || ctx.type === 'pointerup') {
 						if (ctx.data.event.button !== 0) return ctx;
 						const target = ctx.data.event.target;
 						if (target instanceof Element && !this.owner.area?.container.contains(target)) {

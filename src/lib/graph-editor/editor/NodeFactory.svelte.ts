@@ -21,9 +21,17 @@ import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
 import { downloadJSON } from '@selenite/commons';
 import { Modal } from '$graph-editor/plugins/modal';
-import type { BaseComponent, ComponentParams, ComponentSupportInterface } from '$graph-editor/components';
+import type {
+	BaseComponent,
+	ComponentParams,
+	ComponentSupportInterface
+} from '$graph-editor/components';
 import { NodeLayout } from './NodeLayout';
-import { NodeSelection as NodeSelector, type SelectOptions, type SelectorEntity } from './NodeSelection.svelte';
+import {
+	NodeSelection as NodeSelector,
+	type SelectOptions,
+	type SelectorEntity
+} from './NodeSelection.svelte';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -215,14 +223,14 @@ export class NodeFactory implements ComponentSupportInterface {
 	}
 
 	destroyArea() {
-		this.destroy()
+		this.destroy();
 	}
 
 	destroy() {
 		console.log('Destroying area.');
 		this.area?.destroy();
 		for (const c of this.components) {
-			c.cleanup?.()
+			c.cleanup?.();
 		}
 	}
 
@@ -343,7 +351,7 @@ export class NodeFactory implements ComponentSupportInterface {
 		});
 	}
 
-	layout: NodeLayout
+	layout: NodeLayout;
 
 	constructor(params: {
 		editor: NodeEditor;
@@ -434,9 +442,12 @@ export class NodeFactory implements ComponentSupportInterface {
 		});
 	}
 
-	components: BaseComponent[] = []
-	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(componentClass: new (params: P) => C, params: Omit<P, keyof ComponentParams>): C {
-		const component = new componentClass({...params as P, owner: this});
+	components: BaseComponent[] = [];
+	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(
+		componentClass: new (params: P) => C,
+		params: Omit<P, keyof ComponentParams>
+	): C {
+		const component = new componentClass({ ...(params as P), owner: this });
 		this.components.push(component);
 		return component;
 	}
@@ -456,10 +467,9 @@ export class NodeFactory implements ComponentSupportInterface {
 		);
 	}
 
-
 	/** Delete all selected elements */
 	async deleteSelectedElements(): Promise<void> {
-		console.debug("Delete selected elements.")
+		console.debug('Delete selected elements.');
 		const selector = this.selector;
 		const editor = this.getEditor();
 
@@ -489,8 +499,11 @@ export class NodeFactory implements ComponentSupportInterface {
 		// }
 		// this.history?.separate();
 
-		console.debug("removing", selector.typedEntities)
-		for (const { entity: {id}, type } of selector.typedEntities) {
+		console.debug('removing', selector.typedEntities);
+		for (const {
+			entity: { id },
+			type
+		} of selector.typedEntities) {
 			switch (type) {
 				case 'connection':
 					if (editor.getConnection(id)) await editor.removeConnection(id);
@@ -544,12 +557,9 @@ export class NodeFactory implements ComponentSupportInterface {
 		Node.activeFactory = undefined;
 	}
 
-
-
 	getNode(id: string): Node | undefined {
 		return this.editor.getNode(id);
 	}
-
 
 	create<T extends Node>(type: new () => T): T {
 		return new type();
@@ -632,21 +642,21 @@ export class NodeFactory implements ComponentSupportInterface {
 		if (this.area) AreaExtensions.zoomAt(this.area, [node], { scale: undefined });
 	}
 
-	select(entity: SelectorEntity, options: SelectOptions= {}) {
-		this.selector.select(entity, options)
+	select(entity: SelectorEntity, options: SelectOptions = {}) {
+		this.selector.select(entity, options);
 	}
 
 	selectConnection(id: string) {
-		const conn = this.editor.getConnection(id)
-		this.selector.select(conn)
+		const conn = this.editor.getConnection(id);
+		this.selector.select(conn);
 	}
 
 	selectAll() {
-		this.selector.selectAll()
+		this.selector.selectAll();
 	}
 
 	unselectAll() {
-		this.selector.unselectAll()
+		this.selector.unselectAll();
 	}
 
 	async runDataflowEngines() {

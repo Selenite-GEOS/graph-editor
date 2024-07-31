@@ -104,7 +104,7 @@ export async function setupFullGraphEditor(
 				type: 'area',
 				setup: ({ area }) => {
 					let resizeObserver = new ResizeObserver((e) => {
-						area.emit({type: 'resized', data: {event: new Event("resize")}});
+						area.emit({ type: 'resized', data: { event: new Event('resize') } });
 					});
 
 					resizeObserver.observe(area.container);
@@ -115,8 +115,6 @@ export async function setupFullGraphEditor(
 							document.body.style.userSelect = '';
 						}
 
-						
-						
 						// if (ctx.type === 'render') {
 						// 	console.log(ctx.data)
 						// }
@@ -149,7 +147,6 @@ export async function setupFullGraphEditor(
 				console.log('Setting up area extensions');
 				const { AreaExtensions } = await import('rete-area-plugin');
 				AreaExtensions.showInputControl(area);
-
 			},
 			// Gridlines
 			gridLinesSetup,

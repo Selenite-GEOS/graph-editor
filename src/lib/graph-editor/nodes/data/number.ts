@@ -14,6 +14,6 @@ import { InputControlNode } from './common-data-nodes.svelte';
 @tags('float', 'real', 'x', 'y', 'z', 't')
 export class NumberNode extends InputControlNode<'number'> {
 	constructor(params?: NodeParams) {
-		super({ label: 'Number', ...params, controlType: 'number', props: {class:"w-3"} });
+		super({ label: 'Number', ...params, controlType: 'number', props: { class: 'w-3' } });
 	}
 }

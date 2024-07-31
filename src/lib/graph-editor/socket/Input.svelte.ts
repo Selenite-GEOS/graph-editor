@@ -7,7 +7,7 @@ export class Input<S extends Socket = Socket>
 	implements ClassicPreset.Input<S>
 {
 	public readonly isRequired: boolean;
-	public index = $state<number>() ;
+	public index = $state<number>();
 	// showControl: boolean = $state(true);
 	/**
 	 * Control instance
@@ -36,7 +36,7 @@ export class Input<S extends Socket = Socket>
 		index?: number;
 	}) {
 		super(socket, label, multipleConnections);
-		this.alwaysShowLabel = alwaysShowLabel
+		this.alwaysShowLabel = alwaysShowLabel;
 		// $effect.root(() => {
 		// 	console.log('showcontrol', this.showControl);
 		// });

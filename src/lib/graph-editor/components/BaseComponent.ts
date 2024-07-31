@@ -1,6 +1,6 @@
 import type { ComponentSupportInterface } from './ComponentSupportInterface';
 
-export type ComponentParams = ConstructorParameters<typeof BaseComponent>[0]
+export type ComponentParams = ConstructorParameters<typeof BaseComponent>[0];
 export class BaseComponent<T extends ComponentSupportInterface = ComponentSupportInterface> {
 	// static id: string;
 	protected owner: T;
@@ -10,5 +10,5 @@ export class BaseComponent<T extends ComponentSupportInterface = ComponentSuppor
 		this.owner = owner;
 	}
 
-	cleanup?: () => void
+	cleanup?: () => void;
 }

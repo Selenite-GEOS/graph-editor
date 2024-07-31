@@ -8,7 +8,7 @@
 		"svelte",
 		"svelte5",
 		"visual-programming",
-    "node-editor"
+		"node-editor"
 	],
 	"scripts": {
 		"dev": "vite dev",
@@ -60,7 +60,7 @@
 		"prettier": "^3.3.3",
 		"prettier-plugin-svelte": "^3.2.6",
 		"publint": "^0.1.16",
-		"svelte": "^5.0.0-next.204",
+		"svelte": "^5.0.0-next.205",
 		"svelte-check": "^3.8.4",
 		"tailwindcss": "^3.4.6",
 		"tslib": "^2.6.3",

@@ -35,20 +35,18 @@ for $(index), $(item) in enumerate($(array)):
 		this.addInExec();
 		this.addOutExec('loop', 'Loop');
 		this.addOutExec('exec', 'Done');
-		let dynamicTypeCmpnt: DynamicTypeComponent| undefined;
+		let dynamicTypeCmpnt: DynamicTypeComponent | undefined;
 		this.addInData('array', {
 			datastructure: 'array',
 			type: initialType,
 			changeType: (type) => {
-				if (type ==='exec') {
+				if (type === 'exec') {
 					throw new Error('Cannot use exec as type');
 				}
 				if (!dynamicTypeCmpnt) return;
 				dynamicTypeCmpnt.changeType(type);
-				if (this.inputs.array?.socket)
-				this.inputs.array.socket.type = type;
-			if (this.outputs.item?.socket)
-					this.outputs.item.socket.type = type
+				if (this.inputs.array?.socket) this.inputs.array.socket.type = type;
+				if (this.outputs.item?.socket) this.outputs.item.socket.type = type;
 			}
 		});
 		this.addOutData('item', {

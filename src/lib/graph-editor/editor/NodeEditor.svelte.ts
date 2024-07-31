@@ -40,7 +40,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		this.graphName = name;
 	}
 	protected readonly name = 'Node Editor';
-	#graphName = $state('New Graph')
+	#graphName = $state('New Graph');
 	get graphName() {
 		return this.#graphName;
 	}
@@ -70,11 +70,11 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	}
 
 	get nodes() {
-		return this.getNodes()
+		return this.getNodes();
 	}
 
 	get connections() {
-		return this.getConnections()
+		return this.getConnections();
 	}
 
 	async addExecConnection(source: Node, target: Node): Promise<boolean> {
@@ -87,7 +87,6 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		target: Node | string,
 		targetInput: string
 	): Promise<boolean> {
-		
 		const source_ = typeof source === 'string' ? this.getNode(source) : source;
 		const target_ = typeof target === 'string' ? this.getNode(target) : target;
 		if (!source_ || !target_) {

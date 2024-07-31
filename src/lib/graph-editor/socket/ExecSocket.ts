@@ -6,4 +6,4 @@ export class ExecSocket extends Socket<'exec'> {
 		super({ name: name, type: 'exec', node });
 	}
 }
-export type Exec =ExecSocket
+export type Exec = ExecSocket;

@@ -28,11 +28,11 @@ export function makeTree<T, K extends string>({
 		current.leaves.push(item);
 	}
 
-	console.log("collector", collector)
+	console.log('collector', collector);
 
 	const res: Tree<T> = [];
 	function rec(current: Tree<T>, currentCollector: TreeCollector<T>) {
-		current.push(...sort ? currentCollector.leaves.toSorted(sort) : currentCollector.leaves);
+		current.push(...(sort ? currentCollector.leaves.toSorted(sort) : currentCollector.leaves));
 		const forestEntries = [...currentCollector.forest.entries()];
 		if (sort) {
 			forestEntries.sort(([a], [b]) => a.localeCompare(b));

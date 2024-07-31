@@ -29,7 +29,7 @@
 	let searchInput = $state<HTMLInputElement>();
 	let menuCmpnt = $state<Menu>();
 	$effect(() => {
-		menu.filteredItems
+		menu.filteredItems;
 		if (menu.expanded) {
 			untrack(() => {
 				menuCmpnt?.expandAll();
@@ -72,7 +72,7 @@
 						menu.visible = false;
 						return;
 					}
-					menu.triggerFirstItem()
+					menu.triggerFirstItem();
 				}
 			}}
 			use:shortcut={{
@@ -90,7 +90,7 @@
 				ignoreElements: []
 			}}
 			use:shortcut={{
-				key: 'ArrowUp' ,
+				key: 'ArrowUp',
 				action() {
 					menuCmpnt?.focusPrevious();
 				},
@@ -115,7 +115,6 @@
 			}}
 			class="floating context-menu flex flex-col overflow-x-clip scrollbar-corner-rounded-full scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 scrollbar-track-slate-900 overflow-y-auto rounded-box border shadow-lg border-base-300"
 		>
-
 			{#if menu.searchbar}
 				<input
 					bind:this={searchInput}

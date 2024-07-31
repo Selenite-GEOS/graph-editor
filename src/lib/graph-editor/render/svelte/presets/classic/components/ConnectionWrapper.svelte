@@ -15,7 +15,7 @@
 	const conn = $derived(data);
 	const factory = $derived(conn.factory);
 
-	const source = $derived(factory?.getNode(conn.source)?.outputs[conn.sourceOutput])
+	const source = $derived(factory?.getNode(conn.source)?.outputs[conn.sourceOutput]);
 	// const targetType = $derived(factory?.getNode(conn.target)?.inputs[conn.targetInput]?.socket.type)
 
 	// const connType = $derived(sourceType)

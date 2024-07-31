@@ -5,7 +5,7 @@
 </script>
 
 <ModalComponent />
-<NotificationsComponent/>
+<NotificationsComponent />
 <div class="h-screen w-screen overflow-clip">
 	<slot />
 </div>

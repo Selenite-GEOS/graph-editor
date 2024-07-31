@@ -39,7 +39,10 @@
 	);
 </script>
 
-<div class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center" use:shortcut={{key: 'Enter', action: addRow, ignoreElements: []}}>
+<div
+	class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center"
+	use:shortcut={{ key: 'Enter', action: addRow, ignoreElements: [] }}
+>
 	{#each controls as control, i (i)}
 		<span class="text-end">{i}</span>
 		<span>—</span>

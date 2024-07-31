@@ -3,8 +3,8 @@
 export { formatXml } from './xml';
 export * from './url';
 export * from './string';
-export * as DaisyUI from './daisyui'
-export * from './daisyui'
+export * as DaisyUI from './daisyui';
+export * from './daisyui';
 
 import { v4 as uuidv4 } from 'uuid';
 

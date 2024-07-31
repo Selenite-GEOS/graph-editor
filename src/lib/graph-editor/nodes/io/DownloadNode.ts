@@ -16,7 +16,10 @@ export class DownloadNode extends Node<
 		this.addInExec();
 		this.addOutExec();
 		this.addInData('data', { isLabelDisplayed: true });
-		this.addControl('downloadBtn', new ButtonControl({label: 'Download', onClick: () => this.download(), placeInHeader: true}));
+		this.addControl(
+			'downloadBtn',
+			new ButtonControl({ label: 'Download', onClick: () => this.download(), placeInHeader: true })
+		);
 	}
 
 	async download() {
@@ -26,8 +29,12 @@ export class DownloadNode extends Node<
 		download(name, data);
 	}
 
-	async execute(input: 'exec', forward: (output: 'exec') => unknown, forwardExec?: boolean): Promise<void> {
+	async execute(
+		input: 'exec',
+		forward: (output: 'exec') => unknown,
+		forwardExec?: boolean
+	): Promise<void> {
 		await this.download();
-		super.execute(input, forward, true)
+		super.execute(input, forward, true);
 	}
 }

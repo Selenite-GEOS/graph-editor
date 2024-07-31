@@ -388,22 +388,21 @@ export function xmlNodeItems({
 					const parent = parents[0];
 					const parentComplex = schema.complexTypes.get(parent);
 					if (parentComplex && parentComplex.requiredChildren.length === 0) {
-						outLabel = singular(parent)
+						outLabel = singular(parent);
 					}
-
 				} else {
 					const parentsChildren = wu(parents)
 						.map((p) => schema.complexTypes.get(p)?.childTypes)
 						.filter((s) => s !== undefined)
 						.map(getSharedString)
-						.filter(s => s.length > 0)
-					.toArray()
+						.filter((s) => s.length > 0)
+						.toArray();
 
 					const sharedParentChildren = getSharedString(parentsChildren);
 					// .flatten()
 
 					if (sharedParentChildren.length > 0) {
-						outLabel = sharedParentChildren
+						outLabel = sharedParentChildren;
 					}
 				}
 			}

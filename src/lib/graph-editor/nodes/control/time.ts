@@ -21,15 +21,15 @@ export class SleepNode extends Node<
 		forward: (output: 'exec') => unknown,
 		forwardExec?: boolean
 	): Promise<void> {
-        const time = await this.getDataWithInputs('time');
+		const time = await this.getDataWithInputs('time');
 		this.needsProcessing = true;
-        await tick()
-        this.needsProcessing = false;
+		await tick();
+		this.needsProcessing = false;
 		await new Promise((resolve) => setTimeout(resolve, time * 1000));
 		const leavesFromLoopExec = getLeavesFromOutput(this, 'exec');
 		const promises = this.getWaitPromises(leavesFromLoopExec);
 		forward('exec');
 		await Promise.all(promises);
-        super.execute(input, forward, false);
+		super.execute(input, forward, false);
 	}
 }

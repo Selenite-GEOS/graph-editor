@@ -45,7 +45,7 @@ export function assignColor(s: Socket): string {
 		// Use the seed to generate hue and saturation values
 		const baseHue = seedValue % 360;
 		const baseSaturation = 40; // Adjust this value as needed for desired saturation
-		
+
 		// Generate a random variation in hue and saturation
 		// const hueVariation = Math.random() * 30 - 15;
 		// const saturationVariation = Math.random() * 20 - 10;

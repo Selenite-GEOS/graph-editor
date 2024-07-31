@@ -7,7 +7,7 @@
 		items: MenuItem[];
 		onclick?: () => void;
 		class?: string;
-		sort?: boolean
+		sort?: boolean;
 	};
 	let { items, onclick, class: classes = '', sort = true }: Props = $props();
 
@@ -16,18 +16,23 @@
 		untrack(() => {
 			focusedIndex = -1;
 		});
-		return makeTree({ items, pathKey: 'path', sort: sort ? (a, b) => {
-			return a.label.localeCompare(b.label);
-		} : undefined });
+		return makeTree({
+			items,
+			pathKey: 'path',
+			sort: sort
+				? (a, b) => {
+						return a.label.localeCompare(b.label);
+					}
+				: undefined
+		});
 	});
-	
+
 	const itemsInTree = $derived(flattenTree(tree));
 	let focusedItem: MenuItem | undefined = $derived(itemsInTree[focusedIndex]);
-	$inspect("items", items)
-	$inspect("tree", tree)
+	$inspect('items', items);
+	$inspect('tree', tree);
 	export function getFocusedItem(): MenuItem | undefined {
 		return focusedItem;
-	
 	}
 	let treeCmpnt = $state<TreeComponent<MenuItem>>();
 	let treeElement = $state<HTMLElement>();
@@ -55,11 +60,12 @@
 		console.debug('Focus', { ...focusedItem });
 		treeCmpnt?.expandPath(focusedItem.path);
 		await tick();
-		const elmnt = treeElement?.querySelector(`#${focusedItem.id}`) as HTMLElement & {
-			focus?: () => void;
-		} | undefined;
-		if (elmnt?.focus)
-			elmnt.focus();
+		const elmnt = treeElement?.querySelector(`#${focusedItem.id}`) as
+			| (HTMLElement & {
+					focus?: () => void;
+			  })
+			| undefined;
+		if (elmnt?.focus) elmnt.focus();
 	}
 </script>
 

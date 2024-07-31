@@ -4,4 +4,4 @@
 // export * from './MinimapSetup';
 // export * from './Setup';
 // export * from './editor';
-export * from './new-setup'
+export * from './new-setup';
