@@ -45,7 +45,7 @@
 {#if menu.visible}
 	<Portal>
 		<div
-			class="floating"
+			class="floating z-20"
 			bind:this={floating.elements.reference}
 			style="left: {x}px; top: {y}px"
 		></div>
