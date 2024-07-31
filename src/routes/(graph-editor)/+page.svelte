@@ -1,17 +1,23 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
 	import { Setup } from '$lib/graph-editor';
-	import { showContextMenu, ContextMenuComponent, nodeItem, xmlItem, xmlNodeItems } from '$graph-editor/plugins/context-menu';
+	import {
+		showContextMenu,
+		ContextMenuComponent,
+		nodeItem,
+		xmlItem,
+		xmlNodeItems
+	} from '$graph-editor/plugins/context-menu';
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
 	import { capitalize, parseXsdFromUrl, shortcut, type KeyboardShortcut } from '@selenite/commons';
 	import { notifications, themeControl } from '$lib/global/index.svelte';
-	import type {HTMLButtonAttributes} from 'svelte/elements'
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';
 	import type { NodeParams } from '$graph-editor/nodes';
 	let editor = $state<NodeEditor>();
-	const factory = $derived(editor?.factory)
+	const factory = $derived(editor?.factory);
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
 	let editorReady = $state(false);
 
@@ -22,72 +28,77 @@
 		(async () => {
 			const schema = await parseXsdFromUrl('/geos_schema.xsd');
 			console.log(schema);
-			const res = await Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu,
-			 additionalNodeItems: [
-				...(schema ? xmlNodeItems({
-					schema, 
-					basePath: ['GEOS'],
-					priorities: {
-						'Problem': {
-							'Solvers': 10,
-							'Mesh': 9,
-							'Geometry': 8,
-							'Events': 7,
-							'ElementRegions': 6,
-							'NumericalMethods': 5,
-							'Constitutive': 4,
-							'FieldSpecifications':3,
-							'Functions': 2,
-							'Outputs':1
-						}
-					}}) : []),
-				nodeItem({
-					label: 'Example XML',
-					description: 'This an example XML node.',
-					inputTypes: {},
-					outputTypes: {},
-					nodeClass: XmlNode,
-					params: {
-						xmlConfig: {
-							xmlTag: 'ExampleXML',
+			const res = await Setup.setupFullGraphEditor({
+				container,
+				setups: [setupSvelteRender],
+				showContextMenu,
+				additionalNodeItems: [
+					...(schema
+						? xmlNodeItems({
+								schema,
+								basePath: ['GEOS'],
+								priorities: {
+									Problem: {
+										Solvers: 10,
+										Mesh: 9,
+										Geometry: 8,
+										Events: 7,
+										ElementRegions: 6,
+										NumericalMethods: 5,
+										Constitutive: 4,
+										FieldSpecifications: 3,
+										Functions: 2,
+										Outputs: 1
+									}
+								}
+							})
+						: []),
+					nodeItem({
+						label: 'Example XML',
+						description: 'This an example XML node.',
+						inputTypes: {},
+						outputTypes: {},
+						nodeClass: XmlNode,
+						params: {
+							xmlConfig: {
+								xmlTag: 'ExampleXML'
+							}
 						},
-					},
-					path: ['XML'],
-					tags: ['xml']
-				}),
-				xmlItem({xmlConfig: {xmlTag: 'ExampleWithName', 
-				xmlProperties: [
+						path: ['XML'],
+						tags: ['xml']
+					}),
+					xmlItem({
+						xmlConfig: {
+							xmlTag: 'ExampleWithName',
+							xmlProperties: [
 								{
 									name: 'name',
 									type: 'string',
-									required: true,
+									required: true
 								},
 								{
 									name: 'cfl',
 									type: 'number',
-									required: true,
+									required: true
 								},
 								{
 									name: 'b',
-									type: 'number',
+									type: 'number'
 								}
 							]
-					
-				}})
-			 ] })
-	
-				
-				editor = res.editor;
-				const factory = res.factory;
-				console.log('Editor setup complete');
-				if ($saveData) {
-					await factory.loadGraph($saveData);
-				}
-				editorReady = true;
-			
-		
+						}
+					})
+				]
+			});
+
+			editor = res.editor;
+			const factory = res.factory;
+			console.log('Editor setup complete');
+			if ($saveData) {
+				await factory.loadGraph($saveData);
+			}
+			editorReady = true;
 		})();
-		
 
 		return () => {
 			editor?.factory?.destroyArea();
@@ -106,7 +117,7 @@
 			autoClose: 3000,
 			title: 'Save',
 			message: 'Saved!'
-		})
+		});
 	}
 	let container = $state<HTMLDivElement>();
 	let screenProportion = $state(100);
@@ -114,16 +125,38 @@
 		themeControl.isLight;
 		editor?.area?.emit({ type: 'gridline-update' });
 	});
-	let isGridlinesVisible = $state(true)
+	let isGridlinesVisible = $state(true);
 	function toggleGridlinesVisibility() {
-		isGridlinesVisible = !isGridlinesVisible
-		editor?.factory?.getArea()?.emit({ type: 'gridline-toggle-visibility' })
+		isGridlinesVisible = !isGridlinesVisible;
+		editor?.factory?.getArea()?.emit({ type: 'gridline-toggle-visibility' });
 	}
+	type ButtonProps = {
+		label?: string;
+		class?: string;
+		shortcut?: KeyboardShortcut;
+		action?: (e: Event) => void;
+		props?: HTMLButtonAttributes;
+	};
 </script>
-{#snippet button({props={}, label, shortcut: kbShortcut, action, class: classes =''}: {label?: string, class?: string, shortcut?: KeyboardShortcut, action?: (e: Event) => void, props?: HTMLButtonAttributes})}
-<button type="button" class="btn {classes}" {...props} use:shortcut={{...kbShortcut, action}} onclick={(e: Event) => {if (action) action(e)}}>
-	{label}
-</button>
+
+{#snippet button({
+	props = {},
+	label,
+	shortcut: kbShortcut,
+	action,
+	class: classes = ''
+}: ButtonProps)}
+	<button
+		type="button"
+		class="btn {classes}"
+		{...props}
+		use:shortcut={{ ...kbShortcut, action }}
+		onclick={(e: Event) => {
+			if (action) action(e);
+		}}
+	>
+		{label}
+	</button>
 {/snippet}
 
 <ContextMenuComponent />
@@ -134,7 +167,7 @@
 			disabled={!editorReady}
 			class=" hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all"
 			onclick={() => save()}
-			use:shortcut={{key: 's', ctrl: true, action: save}}
+			use:shortcut={{ key: 's', ctrl: true, action: save }}
 		>
 			Save
 		</button>
@@ -146,13 +179,21 @@
 		>
 			Grid
 		</button>
-		{@render button({label: 'Clear', class: 'btn-warning', action: () => editor?.clear()})}
-		{@render button({label: 'Load', class:'btn-neutral', action(e) {
-			factory?.loadFromFile()
-		},})}
-		{@render button({label: 'Download', class:'btn-neutral', action(e) {
-			factory?.downloadGraph()
-		},})}
+		{@render button({ label: 'Clear', class: 'btn-warning', action: () => editor?.clear() })}
+		{@render button({
+			label: 'Load',
+			class: 'btn-neutral',
+			action(e) {
+				factory?.loadFromFile();
+			}
+		})}
+		{@render button({
+			label: 'Download',
+			class: 'btn-neutral',
+			action(e) {
+				factory?.downloadGraph();
+			}
+		})}
 		<select class="select select-bordered" title="Theme" bind:value={themeControl.theme}>
 			<option value="">Default</option>
 			{#each themeControl.themes as theme}
@@ -160,7 +201,7 @@
 			{/each}
 		</select>
 		{#if editor}
-		<input class="input input-bordered" bind:value={editor.graphName}/>
+			<input class="input input-bordered" bind:value={editor.graphName} />
 		{/if}
 	</div>
 	<div
@@ -186,9 +227,8 @@
 		use:shortcut={{
 			key: 'r',
 			action(n, e) {
-				
-				themeControl.theme = themeControl.previousTheme
-			},
+				themeControl.theme = themeControl.previousTheme;
+			}
 		}}
 		class="m-auto"
 		style="width: {screenProportion}vw; height: {screenProportion}vh;"

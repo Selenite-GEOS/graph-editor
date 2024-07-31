@@ -12,7 +12,7 @@
 	class:outline={data.selected}
 	title={'exec'}
 >
-	<div id="innerTriangle" class="socket" title={'exec'} ></div>
+	<div id="innerTriangle" class="socket" title={'exec'}></div>
 </div>
 
 <style lang="scss">
