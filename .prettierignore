@@ -3,6 +3,7 @@ node_modules
 $houdini
 temp
 dist
+docs
 .vscode
 /build
 /.svelte-kit

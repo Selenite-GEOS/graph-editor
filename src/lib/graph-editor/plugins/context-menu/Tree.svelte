@@ -70,6 +70,7 @@
 					{elmnt.label}
 				</button>
 			</div>
+			{#if childExpanded[i] !== undefined}
 			<svelte:self
 				bind:this={childTrees[i] as TreeComponent<T>}
 				class="col-start-2"
@@ -78,6 +79,7 @@
 				{leaf}
 				isRoot={false}
 			/>
+			{/if}
 		{:else}
 			<div class="col-span-2">
 				{@render leaf(elmnt)}

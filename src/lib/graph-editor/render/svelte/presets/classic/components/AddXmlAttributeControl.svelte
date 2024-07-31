@@ -6,7 +6,7 @@
 	export let data: AddXmlAttributeControl;
 	const optAttrNames = [...data.xmlNode.optionalXmlAttributes];
 	let remainingAttrNames = optAttrNames.filter(
-		(attrName) => !data.xmlNode.state.usedOptionalAttrs.includes(attrName)
+		(attrName) => !data.xmlNode.state.usedOptionalAttrs?.includes(attrName)
 	);
 	console.log('Creat', remainingAttrNames);
 	let selectedPropName = remainingAttrNames[0];
