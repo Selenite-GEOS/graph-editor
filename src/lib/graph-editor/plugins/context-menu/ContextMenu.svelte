@@ -45,7 +45,7 @@
 {#if menu.visible}
 	<Portal>
 		<div
-			class="floating z-20"
+			class="floating"
 			bind:this={floating.elements.reference}
 			style="left: {x}px; top: {y}px"
 		></div>
@@ -113,7 +113,7 @@
 			on:blur={() => {
 				menu.focused = false;
 			}}
-			class="floating context-menu flex flex-col overflow-x-clip scrollbar-corner-rounded-full scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 scrollbar-track-slate-900 overflow-y-auto rounded-box border shadow-lg border-base-300"
+			class="floating z-20 context-menu flex flex-col overflow-x-clip scrollbar-corner-rounded-full scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 scrollbar-track-slate-900 overflow-y-auto rounded-box border shadow-lg border-base-300"
 		>
 			{#if menu.searchbar}
 				<input
