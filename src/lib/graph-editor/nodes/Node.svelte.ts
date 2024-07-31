@@ -629,14 +629,16 @@ export class Node<
 			throw new Error(`Output ${String(key)} already exists`);
 		}
 		const output = new Output(
-			new Socket({
-				name: params.label ?? key,
-				datastructure: params.datastructure ?? 'scalar',
-				type: params.type,
-				node: this,
-				displayLabel: params.showLabel
-			}),
-			(params.showLabel ?? true) ? (params.label ?? key) : undefined
+			{
+				socket: new Socket({
+					name: params.label ?? key,
+					datastructure: params.datastructure ?? 'scalar',
+					type: params.type,
+					node: this,
+					displayLabel: params.showLabel
+				}),
+				label: (params.showLabel ?? true) ? (params.label ?? key) : undefined
+			},
 		);
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 		return output.socket;
@@ -783,7 +785,7 @@ export class Node<
 		isNaturalFlow = false
 	) {
 		if (isNaturalFlow) this.naturalFlowExec = name;
-		const output = new Output(new ExecSocket({ name: displayName, node: this }), displayName);
+		const output = new Output({socket: new ExecSocket({ name: displayName, node: this }), label: displayName});
 		output.index = -1;
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}

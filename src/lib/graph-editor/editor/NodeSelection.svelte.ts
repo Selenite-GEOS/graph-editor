@@ -22,6 +22,8 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	entities = new SvelteSet<SelectorEntity>();
 	accumulating = $state(false);
 	ranging = $state(false);
+
+	modifierActive = $derived(this.accumulating || this.ranging)
 	typedEntities: EntityWithType[] = $derived(
 		wu(this.entities)
 			.map((e) => {
@@ -70,6 +72,13 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 				let twitch: number | null = null;
 				this.owner.area.addPipe((ctx) => {
 					const selector = factory.selector;
+					if (ctx.type === 'nodepicked' && this.modifierActive) {
+						const node = factory.getNode(ctx.data.id)
+						if (node && this.isSelected(node) && !this.isPicked(node)) {
+							this.pick(node)
+							
+						}
+					}
 					if (ctx.type === 'nodetranslated') {
 						const { id, position, previous } = ctx.data;
 						const node = factory.getNode(id);
@@ -87,7 +96,6 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 
 					if (
 						ctx.type === 'pointerdown' ||
-						ctx.type === 'pointermove' ||
 						ctx.type === 'pointerup'
 					) {
 						if (ctx.data.event.button !== 0) return ctx;

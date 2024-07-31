@@ -15,9 +15,7 @@
 	const conn = $derived(data);
 	const factory = $derived(conn.factory);
 
-	const sourceType = $derived(
-		factory?.getNode(conn.source)?.outputs[conn.sourceOutput]?.socket.type
-	);
+	const source = $derived(factory?.getNode(conn.source)?.outputs[conn.sourceOutput])
 	// const targetType = $derived(factory?.getNode(conn.target)?.inputs[conn.targetInput]?.socket.type)
 
 	// const connType = $derived(sourceType)
@@ -54,7 +52,7 @@
 <svelte:component
 	this={component}
 	{...data}
-	type={sourceType}
+	{source}
 	start={observedStart}
 	end={observedEnd}
 	path={observedPath}

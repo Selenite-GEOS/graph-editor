@@ -25,6 +25,7 @@ import type { NodeFactory } from '$graph-editor/editor';
 import 'regenerator-runtime/runtime';
 import wu from 'wu';
 import { formatXml } from '$utils';
+import { ComplexType, getSharedString, singular, splitCamelCase, type ChildProps, type SaveData } from '@selenite/commons';
 
 export class AddXmlAttributeControl extends Control {
 	constructor(public readonly xmlNode: XmlNode) {
@@ -33,11 +34,14 @@ export class AddXmlAttributeControl extends Control {
 }
 
 export type XmlConfig = {
+	complex?: ComplexType | SaveData<ComplexType>;
+	priorities?: Record<string, Record<string, number>>;
 	xmlTag: string;
 	// outData?: OutDataParams;
 	outLabel?: string;
 	xmlProperties?: XmlAttributeDefinition[];
 	childTypes?: string[];
+	childProps?: ChildProps[];
 };
 
 export type XmlNodeParams = NodeParams & {
@@ -109,9 +113,17 @@ export class XmlNode extends Node<
 		};
 
 		console.debug('xmlNodeParams', xmlNodeParams);
-		const { xmlProperties, childTypes = [] } = xmlConfig;
-
+		const { xmlProperties, priorities: indices = {} } = xmlConfig;
+		let complex = xmlConfig.complex;
 		super({ label: xmlConfig.xmlTag, ...xmlNodeParams });
+		if (!complex) {
+			throw new Error('Complex type is missing.');
+		}
+
+		if (!(complex instanceof ComplexType)) {
+			complex = ComplexType.fromObject(complex);
+		}
+
 		if (!this.state.usedOptionalAttrs) {
 			this.state.usedOptionalAttrs = [];
 		}
@@ -142,16 +154,44 @@ export class XmlNode extends Node<
 			});
 
 		if (this.optionalXmlAttributes.size > 0) {
-			this.addControl('addXmlAttr', new AddXmlAttributeControl(this));
+			// this.addControl('addXmlAttr', new AddXmlAttributeControl(this));
+		}
+
+		// Add XML element inputs
+		const requiredChildren = complex.requiredChildren;
+		const isOnlyOptChildren = requiredChildren.length === 0;
+		for (const child of requiredChildren) {
+			const isArray = child.maxOccurs === undefined || child.maxOccurs > 1;
+			this.addXmlInData({
+				index: -2 - (xmlConfig.priorities?.[xmlConfig.xmlTag]?.[child.type] ?? 0),
+				name: child.type,
+				type: `xmlElement:${child.type}`,
+				isArray
+			});
+		}
+		const optChildTypes = complex.optionalChildTypes;
+		if (optChildTypes.length > 0) {
+			const sharedChildType = getSharedString(optChildTypes, { pluralize: true });
+			this.addXmlInData({
+				index: -1,
+				name:
+					sharedChildType.length > 0
+						? sharedChildType
+						: isOnlyOptChildren
+							? this.xmlTag
+							: 'optional',
+				isArray: true,
+				type: `xmlElement:${optChildTypes.join('|')}`
+			});
 		}
 
 		// Add XML output
 		this.addOutData('value', {
 			showLabel: true,
-			label: xmlConfig.outLabel ,
+			label: xmlConfig.outLabel,
 			type: `xmlElement:${xmlConfig.xmlTag}`
 		});
-		console.log("outTag", xmlConfig.outLabel)
+		
 		if (this.hasName) {
 			this.addOutData('name', {
 				type: 'groupNameRef'
@@ -167,15 +207,6 @@ export class XmlNode extends Node<
 				}
 			}
 		}
-
-		// Add XML element inputs
-		if (childTypes.length > 0)
-			this.addXmlInData({
-				index: -1,
-				name: 'children',
-				isArray: true,
-				type: `xmlElement:${childTypes.join('|')}`
-			});
 
 		if (!this.factory) return;
 		const pipeSetup = this.factory.useState('XmlNode', 'pipeSetup', false);
@@ -284,8 +315,7 @@ export class XmlNode extends Node<
 		if (type === 'vector') this.xmlVectorProperties.add(name);
 
 		const { control: attrInputControl } = this.addInData(name, {
-			displayName: titlelize(name),
-			socketLabel: titlelize(name),
+			label: splitCamelCase(name).join(' '),
 			isRequired: required,
 			isLabelDisplayed: true,
 			type: type as DataType,
@@ -388,69 +418,72 @@ export class XmlNode extends Node<
 		tag,
 		type = 'any',
 		isArray = false,
-		index
+		index,
+		required
 	}: {
 		name: string;
 		tag?: string;
 		type?: DataType;
 		isArray?: boolean;
 		index?: number;
+		required?: boolean
 	}) {
 		this.xmlInputs[name] = { tag: tag };
 		this.addInData(name, {
-			label: titlelize(name),
+			label: name,
 			type: type,
 			datastructure: isArray ? 'array' : 'scalar',
-			index
+			index,
+			isRequired: required
 		});
 		this.height += 37;
 	}
 }
 
-export function makeXmlNodeAction({
-	complexType
-}: {
-	complexType: ReturnType<GeosSchema['complexTypes']['get']>;
-}) {
-	if (!complexType) throw new ErrorWNotif('Complex type is not valid');
-	const name = complexType.name.match(/^(.*)Type$/)?.at(1);
-	if (!name) throw new Error(`Invalid complex type name: ${complexType.name}`);
+// export function makeXmlNodeAction({
+// 	complexType
+// }: {
+// 	complexType: ReturnType<GeosSchema['complexTypes']['get']>;
+// }) {
+// 	if (!complexType) throw new ErrorWNotif('Complex type is not valid');
+// 	const name = complexType.name.match(/^(.*)Type$/)?.at(1);
+// 	if (!name) throw new Error(`Invalid complex type name: ${complexType.name}`);
 
-	const hasNameAttribute = complexType.attributes.has('name');
-	// if (hasNameAttribute) complexTypesWithName.push(name);
-	// complexTypes.push(name);
+// 	const hasNameAttribute = complexType.attributes.has('name');
+// 	// if (hasNameAttribute) complexTypesWithName.push(name);
+// 	// complexTypes.push(name);
 
-	const xmlNodeAction: (factory: NodeFactory) => Node = (factory) =>
-		new XmlNode({
-			label: name,
-			factory: factory,
+// 	const xmlNodeAction: (factory: NodeFactory) => Node = (factory) =>
+// 		new XmlNode({
+// 			label: name,
+// 			factory: factory,
 
-			xmlConfig: {
-				noName: !hasNameAttribute,
-				childTypes: complexType.childTypes.map((childType) => {
-					const childName = childType.match(/^(.*)Type$/)?.at(1);
-					if (!childName) return childType;
-					return childName;
-				}),
-				xmlTag: name,
-				outData: {
-					name: name,
-					type: `xmlElement:${name}`,
-					socketLabel: name
-				},
+// 			xmlConfig: {
+// 				noName: !hasNameAttribute,
+// 				childTypes: complexType.childTypes.map((childType) => {
+// 					const childName = childType.match(/^(.*)Type$/)?.at(1);
+// 					if (!childName) return childType;
+// 					return childName;
+// 				}),
+// 				xmlTag: name,
+// 				outData: {
+// 					name: name,
+// 					type: `xmlElement:${name}`,
+// 					socketLabel: name
+// 				},
 
-				xmlProperties: wu(complexType.attributes.values())
-					.map((attr) => {
-						return {
-							name: attr.name,
-							required: attr.required,
-							// pattern: attr.pattern,
-							type: attr.type,
-							controlType: 'text'
-						};
-					})
-					.toArray()
-			}
-		});
-	return xmlNodeAction;
-}
+// 				xmlProperties: wu(complexType.attributes.values())
+// 					.map((attr) => {
+// 						return {
+// 							name: attr.name,
+// 							required: attr.required,
+// 							// pattern: attr.pattern,
+// 							type: attr.type,
+// 							controlType: 'text'
+// 						};
+// 					})
+// 					.toArray()
+// 			}
+// 		});
+// 	return xmlNodeAction;
+// }

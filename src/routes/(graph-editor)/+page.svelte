@@ -24,7 +24,23 @@
 			console.log(schema);
 			const res = await Setup.setupFullGraphEditor({ container, setups: [setupSvelteRender], showContextMenu,
 			 additionalNodeItems: [
-				...(schema ? xmlNodeItems({schema, basePath: ['GEOS']}) : []),
+				...(schema ? xmlNodeItems({
+					schema, 
+					basePath: ['GEOS'],
+					priorities: {
+						'Problem': {
+							'Solvers': 10,
+							'Mesh': 9,
+							'Geometry': 8,
+							'Events': 7,
+							'ElementRegions': 6,
+							'NumericalMethods': 5,
+							'Constitutive': 4,
+							'FieldSpecifications':3,
+							'Functions': 2,
+							'Outputs':1
+						}
+					}}) : []),
 				nodeItem({
 					label: 'Example XML',
 					description: 'This an example XML node.',

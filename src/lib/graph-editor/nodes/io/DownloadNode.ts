@@ -12,7 +12,7 @@ export class DownloadNode extends Node<
 > {
 	constructor(params: NodeParams = {}) {
 		super({ label: 'Download', ...params });
-		this.addInData('name', { type: 'string', isLabelDisplayed: true, initial: 'data.txt' });
+		this.addInData('name', { type: 'string', isLabelDisplayed: true, initial: 'problem.xml' });
 		this.addInExec();
 		this.addOutExec();
 		this.addInData('data', { isLabelDisplayed: true });

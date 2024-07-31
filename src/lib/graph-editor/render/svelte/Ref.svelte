@@ -1,25 +1,27 @@
 <script lang="ts">
 	type RefUpdate = (ref: HTMLElement) => void;
 
-	import { onMount } from 'svelte';
-	import { fade, slide } from 'svelte/transition';
+	import type {HTMLAttributes} from 'svelte/elements'
+	type Props = {
+		init: RefUpdate;
+		unmount: RefUpdate;
+		
+	} & HTMLAttributes<HTMLSpanElement>
 
-	export let init: RefUpdate;
-	export let unmount: RefUpdate;
+	let {init, unmount, ...props}: Props  = $props()
 
-	let ref: HTMLElement;
 
-	$: {
+	let ref = $state<HTMLElement>();
+
+	$effect(() => {
 		// trigger 'rendered' on update
 		if (ref) init(ref);
-	}
-
-	onMount(() => {
-		init(ref);
 		return () => {
-			unmount(ref);
+			if (ref) unmount(ref);
 		};
 	});
 </script>
 
-<span {...$$restProps} bind:this={ref} class="grid {$$restProps.class}" />
+<span {...props} bind:this={ref} class="grid {props.class}">
+
+</span>

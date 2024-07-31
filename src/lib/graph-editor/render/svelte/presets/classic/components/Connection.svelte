@@ -5,19 +5,21 @@
 	import { stopPropagation } from '@selenite/commons';
 	import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 	import { assignColor } from '$graph-editor/render/utils';
+	import type { Output, Socket } from '$graph-editor/socket';
 	// svelte-ignore unused-export-let
 	type Props = {
 		//  data: Schemes['Connection'] & { isLoop?: boolean };
 		id: string;
 		selected: boolean;
+		source: Output;
 		factory: NodeFactory | undefined;
 		path: string;
 		type?: SocketType;
 		picked: boolean;
 	};
-	let { id, selected, factory, path, type, picked }: Props = $props();
+	let { id, selected, factory, path, picked, source }: Props = $props();
 
-	const color = $derived(type ? assignColor(type) : '');
+	const color = $derived(source ? assignColor(source.socket) : '');
 	// // svelte-ignore unused-export-let
 	// export let start: Position;
 	// // svelte-ignore unused-export-let

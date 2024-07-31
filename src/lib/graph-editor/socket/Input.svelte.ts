@@ -41,6 +41,7 @@ export class Input<S extends Socket = Socket>
 		// 	console.log('showcontrol', this.showControl);
 		// });
 		this.index = index;
+		this.socket.port = this;
 		this.isRequired = isRequired;
 	}
 

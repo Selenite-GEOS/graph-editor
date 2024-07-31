@@ -13,9 +13,18 @@ import { clientToSurfacePos } from '$utils/html';
 import {} from '$graph-editor/nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { XmlNode, type XmlConfig, type XmlNodeParams } from '$graph-editor/nodes/XML';
-import { newLocalId, XmlSchema, type ComplexType, type XMLTypeTree } from '@selenite/commons';
+import {
+	getSharedString,
+	newLocalId,
+	singular,
+	splitCamelCase,
+	XmlSchema,
+	type ComplexType,
+	type XMLTypeTree
+} from '@selenite/commons';
 import type { XmlAttributeDefinition } from '$graph-editor/nodes/XML/types';
 import type { DataType } from '../typed-sockets';
+import { intersection, union } from 'lodash-es';
 
 // export class ContextMenuSetup extends SetupClass {
 // 	selectedNodes: SelectorEntity[] = [];
@@ -345,7 +354,15 @@ export function xmlItem({
 	});
 }
 
-export function xmlNodeItems({schema, basePath= ['XML']}: {schema: XmlSchema, basePath?: string[]}): NodeMenuItem[] {
+export function xmlNodeItems({
+	schema,
+	basePath = ['XML'],
+	priorities
+}: {
+	schema: XmlSchema;
+	basePath?: string[];
+	priorities?: Record<string, Record<string, number>>;
+}): NodeMenuItem[] {
 	const res: Map<string, NodeMenuItem<typeof XmlNode>> = new Map();
 
 	function parseTree(tree: XMLTypeTree, path: string[]) {
@@ -357,30 +374,63 @@ export function xmlNodeItems({schema, basePath= ['XML']}: {schema: XmlSchema, ba
 			}
 			const complexType = schema.complexTypes.get(name);
 			if (complexType === undefined) {
-				console.error("failed to access complex type", complexType)
+				console.error('failed to access complex type', complexType);
 				continue;
 			}
-			const outLabel: string = `${schema.parentsMap.get(complexType.name)?.map(s => s.endsWith('s') ? s.slice(0,-1) : s).join('|') ?? complexType.name}`;
+			const parents = schema.parentsMap.get(complexType.name);
+			let outLabel = complexType.name;
+			if (parents && parents.length > 0) {
+				const sharedParent = getSharedString(parents);
+
+				if (parents.length > 1 && sharedParent.length > 0) {
+					outLabel = sharedParent;
+				} else if (parents.length === 1) {
+					const parent = parents[0];
+					const parentComplex = schema.complexTypes.get(parent);
+					if (parentComplex && parentComplex.requiredChildren.length === 0) {
+						outLabel = singular(parent)
+					}
+
+				} else {
+					const parentsChildren = wu(parents)
+						.map((p) => schema.complexTypes.get(p)?.childTypes)
+						.filter((s) => s !== undefined)
+						.map(getSharedString)
+						.filter(s => s.length > 0)
+					.toArray()
+
+					const sharedParentChildren = getSharedString(parentsChildren);
+					// .flatten()
+
+					if (sharedParentChildren.length > 0) {
+						outLabel = sharedParentChildren
+					}
+				}
+			}
 			res.set(name, {
 				label: name,
 				nodeClass: XmlNode,
 				params: {
-					
 					xmlConfig: {
+						complex: complexType,
+						priorities,
 						outLabel,
 						xmlTag: name,
 						childTypes: complexType.childTypes,
-						xmlProperties: wu(complexType.attributes.values()).map(attr => ({
-							name: attr.name,
-							type: attr.type,
-							required: attr.required,
-
-
-						} as XmlAttributeDefinition)).toArray(),
-					
+						childProps: complexType.children,
+						xmlProperties: wu(complexType.attributes.values())
+							.map(
+								(attr) =>
+									({
+										name: attr.name,
+										type: attr.type,
+										required: attr.required
+									}) as XmlAttributeDefinition
+							)
+							.toArray()
 					}
 				},
-				description: "",
+				description: '',
 				inputTypes: {},
 				outputTypes: {},
 				path,
@@ -535,12 +585,9 @@ export function contextMenuSetup({
 										const node = context.data.context as Node;
 
 										if (node.selected) {
-
-											await (factory as NodeFactory)
-											.deleteSelectedElements();
+											await (factory as NodeFactory).deleteSelectedElements();
 										} else {
-											await (factory as NodeFactory)
-												.removeNode(context.data.context);
+											await (factory as NodeFactory).removeNode(context.data.context);
 										}
 									},
 									path: [],

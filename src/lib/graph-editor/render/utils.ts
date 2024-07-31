@@ -1,6 +1,7 @@
 import type { SocketType } from '../plugins/typed-sockets';
-import { Socket, type InputControlType } from '$graph-editor/socket';
+import { Output, Socket, type InputControlType } from '$graph-editor/socket';
 import { $socketcolor } from './vars';
+import { singular } from '@selenite/commons';
 
 export const colorMap: { [key in SocketType]?: string } = {
 	string: '#d88cbb',
@@ -26,14 +27,16 @@ export const colorMap: { [key in SocketType]?: string } = {
 	groupNameRef: '#5165b2'
 };
 
-export function assignColor(s: Socket | SocketType): string {
+export function assignColor(s: Socket): string {
 	// if (s.required)
 	// 	return '#b38a8a';
-	const type = s instanceof Socket ? s.type : s;
+	const type = s.type;
 	if (type.startsWith('xml')) {
 		// return random color generated from the name and make sure saturation doesn't go over 50%
 		// Convert the string seed into a numerical value
-		const seed = type;
+		const label = s.port?.label;
+		const seed = label ? singular(label) : type;
+
 		let seedValue = 0;
 		for (let i = 0; i < seed.length; i++) {
 			seedValue += seed.charCodeAt(i);
@@ -42,18 +45,21 @@ export function assignColor(s: Socket | SocketType): string {
 		// Use the seed to generate hue and saturation values
 		const baseHue = seedValue % 360;
 		const baseSaturation = 40; // Adjust this value as needed for desired saturation
-
+		
 		// Generate a random variation in hue and saturation
-		const hueVariation = Math.random() * 30 - 15;
-		const saturationVariation = Math.random() * 20 - 10;
+		// const hueVariation = Math.random() * 30 - 15;
+		// const saturationVariation = Math.random() * 20 - 10;
 
 		// Calculate final hue and saturation values
-		const finalHue = (baseHue + hueVariation + 360) % 360;
-		const finalSaturation = Math.max(0, Math.min(100, baseSaturation + saturationVariation));
+		const finalHue = (baseHue + 360) % 360;
+		const finalSaturation = Math.max(0, Math.min(100, baseSaturation));
 
 		// Convert hue and saturation to HSL color string
 		const color = `hsl(${finalHue}, ${finalSaturation}%, 60%)`;
 
+		if (label?.includes('Parameter')) {
+			console.warn(s.node, type, seed, color);
+		}
 		return color;
 	}
 

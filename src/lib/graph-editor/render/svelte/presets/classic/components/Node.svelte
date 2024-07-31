@@ -194,21 +194,14 @@
 	class:transition-all={transitionEnabled}
 	class:text-primary={node.needsProcessing}
 	class="relative border-base-200 border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
-	{node.picked
-		? variant('primary')
-		: node.selected
-			? variant('secondary')
-			: variant('base-300')}
+	{node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300')}
 	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}"
 	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
-
-
 	on:dblclick={(e) => {
 		if (node.factory?.selector.accumulating) {
-			stopPropagation(e)
+			stopPropagation(e);
 		}
 	}}
-
 	use:clickIfNoDrag={{
 		onclick(e) {
 			if (e.button !== 0) return;
@@ -216,7 +209,7 @@
 		}
 	}}
 	on:keydown={(e) => {
-		if (e.key === 'Enter') {
+		if (!nameInput && e.key === 'Enter') {
 			node.factory?.select(node);
 		}
 	}}
@@ -225,6 +218,7 @@
 		class:disappear={disappearProcessing}
 		class:animated-diagonal={displayProcessing}
 		class="grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
+		class:min-w-[13.65rem]={xmlNode}
 		bind:clientWidth={node.width}
 		bind:clientHeight={node.height}
 	>
@@ -252,7 +246,6 @@
 							btn.classList.add('cursor-text');
 						}
 					}}
-					
 					on:click={(e) => {
 						if (e.ctrlKey || e.altKey || e.shiftKey) return;
 						if (lastPointerDownPos) {
@@ -262,7 +255,7 @@
 							if (dist > 2) return;
 						}
 						editingName = true;
-						node.factory?.unselectAll()
+						node.factory?.unselectAll();
 					}}
 					on:pointerdown={(e) => {
 						lastPointerDownPos = posFromClient(e);
@@ -281,6 +274,7 @@
 							editingName = false;
 							lastPointerDownPos = undefined;
 						}}
+						on:dblclick={stopPropagation}
 						on:pointerdown={stopPropagation}
 						value={node.name}
 						use:shortcut={{
@@ -321,7 +315,7 @@
 		<form class="grid grid-flow-dense gap-2">
 			{#each node.sortedInputs as [key, input], i (key)}
 				<div
-					class="text-md justify-items-start items-center grid grid-cols-subgrid col-start-1 col-span-2"
+					class="text-md justify-items-start items-center flex gap-2 grid-rows-subgrid col-start-1"
 					data-testid={key}
 				>
 					<Ref
@@ -352,6 +346,7 @@
 									>{/if}
 							</div>
 						{/if}
+
 						{#if input.control && input.showControl}
 							<Ref
 								class="h-full !flex items-center input-control mr-2"
@@ -373,7 +368,7 @@
 			{/each}
 			{#each node.sortedOutputs as [key, output] (key)}
 				<div
-					class="text-md justify-items-end items-center grid grid-cols-subgrid col-start-3 col-span-2"
+					class="text-md justify-items-end items-center grid grid-rows-subgrid col-start-2 gap-2 justify-end"
 					data-testid={key}
 				>
 					<div class="output-title" data-testid="output-title">
