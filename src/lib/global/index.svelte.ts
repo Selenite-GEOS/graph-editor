@@ -90,19 +90,22 @@ class ThemeControl {
 		if (browser) {
 			this.#themeIndex =
 				this.getThemeIndex(localStorage.getItem('theme')) ??
-				this.getThemeIndex((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-					? this.defaultDarkMode
-					: this.defaultLightMode)) ??
+				this.getThemeIndex(
+					window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+						? this.defaultDarkMode
+						: this.defaultLightMode
+				) ??
 				0;
+			document.body.dataset.theme = this.themes[this.#themeIndex];
 			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-				console.log("pizza", this.isDefault());
+				console.log('pizza', this.isDefault());
 				if (this.isDefault()) {
-					this.#themeIndex = this.getThemeIndex(event.matches ? this.defaultDarkMode : this.defaultLightMode) ?? 0;
+					this.#themeIndex =
+						this.getThemeIndex(event.matches ? this.defaultDarkMode : this.defaultLightMode) ?? 0;
 					document.body.dataset.theme = this.themes[this.#themeIndex];
 				}
 			});
 		} else this.#themeIndex = this.getThemeIndex(this.defaultDarkMode) ?? 0;
-		document.body.dataset.theme = this.themes[this.#themeIndex];
 	}
 
 	isDefault() {
