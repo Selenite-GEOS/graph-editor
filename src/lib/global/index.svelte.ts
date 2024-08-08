@@ -90,6 +90,7 @@ class ThemeControl {
 					? this.defaultDarkModeIndex
 					: this.defaultLightModeIndex) ?? 0;
 		} else this.#themeIndex = this.defaultDarkModeIndex ?? 0;
+		document.body.dataset.theme = this.themes[this.#themeIndex];
 	}
 	themes = $state(themes);
 	defaultDarkMode = $state('dim');
