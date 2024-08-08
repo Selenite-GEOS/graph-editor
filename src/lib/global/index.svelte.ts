@@ -3,7 +3,7 @@ import { get } from 'svelte/store';
 import type { GeosSchema } from '$lib/geos';
 import type { Action } from 'svelte/action';
 import { notifications } from '$graph-editor/plugins/notifications';
-import { isBrowser } from '@selenite/commons';
+import { browser, isBrowser } from '@selenite/commons';
 export { notifications } from '$graph-editor/plugins/notifications';
 export { getContext } from 'svelte';
 export type NewGeosContext = { geosSchema: GeosSchema };
@@ -82,22 +82,33 @@ class ThemeControl {
 		return undefined;
 	}
 
-	constructor() {
-		if (isBrowser()) {
-			this.#themeIndex =
-				this.getThemeIndex(localStorage.getItem('theme')) ??
-				(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-					? this.defaultDarkModeIndex
-					: this.defaultLightModeIndex) ?? 0;
-		} else this.#themeIndex = this.defaultDarkModeIndex ?? 0;
-		document.body.dataset.theme = this.themes[this.#themeIndex];
-	}
 	themes = $state(themes);
 	defaultDarkMode = $state('dim');
 	defaultLightMode = $state('winter');
-	private defaultDarkModeIndex = $derived(this.getThemeIndex(this.defaultDarkMode));
-	private defaultLightModeIndex = $derived(this.getThemeIndex(this.defaultLightMode));
 	#themeIndex = $state(0);
+	constructor() {
+		if (browser) {
+			this.#themeIndex =
+				this.getThemeIndex(localStorage.getItem('theme')) ??
+				this.getThemeIndex((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+					? this.defaultDarkMode
+					: this.defaultLightMode)) ??
+				0;
+			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+				console.log("pizza", this.isDefault());
+				if (this.isDefault()) {
+					this.#themeIndex = this.getThemeIndex(event.matches ? this.defaultDarkMode : this.defaultLightMode) ?? 0;
+					document.body.dataset.theme = this.themes[this.#themeIndex];
+				}
+			});
+		} else this.#themeIndex = this.getThemeIndex(this.defaultDarkMode) ?? 0;
+		document.body.dataset.theme = this.themes[this.#themeIndex];
+	}
+
+	isDefault() {
+		return browser ? localStorage.getItem('theme') === null : true;
+	}
+
 	previousTheme = $derived(
 		this.themes[(this.themes.length + this.#themeIndex - 1) % this.themes.length]
 	);
