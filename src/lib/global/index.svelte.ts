@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import type { GeosSchema } from '$lib/geos';
 import type { Action } from 'svelte/action';
 import { notifications } from '$graph-editor/plugins/notifications';
+import { isBrowser } from '@selenite/commons';
 export { notifications } from '$graph-editor/plugins/notifications';
 export { getContext } from 'svelte';
 export type NewGeosContext = { geosSchema: GeosSchema };
@@ -67,13 +68,14 @@ class ThemeControl {
 			return;
 		}
 		this.#themeIndex = i;
-		// if (typeof window !== 'undefined') {
-		localStorage.setItem('theme', this.themes[i]);
-		document.body.dataset.theme = this.themes[i];
-		// }
+		if (isBrowser()) {
+			localStorage.setItem('theme', this.themes[i]);
+			document.body.dataset.theme = this.themes[i];
+		}
 	}
 	constructor() {
-		this.theme = localStorage.getItem('theme') ?? 'dark';
+		if (isBrowser()) this.theme = localStorage.getItem('theme') ?? 'dark';
+		else this.theme = 'dark';
 	}
 	themes = $state(themes);
 	#themeIndex = $state(0);
