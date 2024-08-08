@@ -1,5 +1,5 @@
 import { BaseComponent } from '$graph-editor/components';
-import { zip } from 'wu';
+import wu from 'wu';
 import type { NodeFactory } from './NodeFactory.svelte';
 import { Layout, Vector2D } from '@selenite/commons';
 import type { GraphNode } from '$graph-editor/nodes';
@@ -10,7 +10,7 @@ export class NodeLayout extends BaseComponent<NodeFactory> {
 			console.error("Can't apply offsets, no area.");
 			return;
 		}
-		for (const [node, offset] of zip(nodes, offsets)) {
+		for (const [node, offset] of wu.zip(nodes, offsets)) {
 			const view = this.owner.area.nodeViews.get(node.id);
 			if (!view) {
 				console.error('Missing view for node.');
