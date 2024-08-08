@@ -57,6 +57,7 @@ export const darkThemes = [
 	'dim',
 	'sunset'
 ] as (typeof themes)[number][];
+
 class ThemeControl {
 	get theme() {
 		return this.themes[this.#themeIndex];
@@ -74,17 +75,27 @@ class ThemeControl {
 		}
 	}
 
-	defaultDarkMode = $state('dim');
-	defaultLightMode = $state('winter');
+	getThemeIndex(theme?: string | null) {
+		if (!theme) return undefined;
+		const i = this.themes.findIndex((t) => t === theme);
+		if (i !== -1) return i;
+		return undefined;
+	}
+
 	constructor() {
 		if (isBrowser()) {
-			this.theme =
-				localStorage.getItem('theme') ??
-				(window.matchMedia &&
-					window.matchMedia('(prefers-color-scheme: dark)').matches ? this.defaultDarkMode : this.defaultLightMode);
+			this.#themeIndex =
+				this.getThemeIndex(localStorage.getItem('theme')) ??
+				(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+					? this.defaultDarkModeIndex
+					: this.defaultLightModeIndex) ?? 0;
 		} else this.theme = this.defaultDarkMode;
 	}
 	themes = $state(themes);
+	defaultDarkMode = $state('dim');
+	defaultLightMode = $state('winter');
+	private defaultDarkModeIndex = $derived(this.getThemeIndex(this.defaultDarkMode));
+	private defaultLightModeIndex = $derived(this.getThemeIndex(this.defaultLightMode));
 	#themeIndex = $state(0);
 	previousTheme = $derived(
 		this.themes[(this.themes.length + this.#themeIndex - 1) % this.themes.length]
