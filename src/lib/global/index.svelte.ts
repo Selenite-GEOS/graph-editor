@@ -73,9 +73,16 @@ class ThemeControl {
 			document.body.dataset.theme = this.themes[i];
 		}
 	}
+
+	defaultDarkMode = $state('dim');
+	defaultLightMode = $state('winter');
 	constructor() {
-		if (isBrowser()) this.theme = localStorage.getItem('theme') ?? 'dark';
-		else this.theme = 'dark';
+		if (isBrowser()) {
+			this.theme =
+				localStorage.getItem('theme') ??
+				(window.matchMedia &&
+					window.matchMedia('(prefers-color-scheme: dark)').matches ? this.defaultDarkMode : this.defaultLightMode);
+		} else this.theme = this.defaultDarkMode;
 	}
 	themes = $state(themes);
 	#themeIndex = $state(0);
