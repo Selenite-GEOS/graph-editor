@@ -89,7 +89,7 @@ class ThemeControl {
 				(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 					? this.defaultDarkModeIndex
 					: this.defaultLightModeIndex) ?? 0;
-		} else this.theme = this.defaultDarkMode;
+		} else this.#themeIndex = this.defaultDarkModeIndex ?? 0;
 	}
 	themes = $state(themes);
 	defaultDarkMode = $state('dim');
