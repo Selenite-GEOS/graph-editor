@@ -79,7 +79,8 @@ export class GitHubDataSource implements Datasource {
             res.push({
                 id: path,
                 path: menuPath.split("/"),
-                ...graphData
+                ...graphData,
+                name: graphData.editorName
             })
         }
 		return res;
