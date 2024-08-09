@@ -19,7 +19,7 @@ import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
-import { downloadJSON } from '@selenite/commons';
+import { downloadJSON, newUuid } from '@selenite/commons';
 import { Modal } from '$graph-editor/plugins/modal';
 import type {
 	BaseComponent,
@@ -32,6 +32,7 @@ import {
 	type SelectOptions,
 	type SelectorEntity
 } from './NodeSelection.svelte';
+import { NodeStorage } from '$graph-editor/storage';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -169,6 +170,10 @@ export class NodeFactory implements ComponentSupportInterface {
 
 	getNodes(): Node[] {
 		return this.editor.getNodes();
+	}
+
+	get storage() {
+		return NodeStorage.instance;
 	}
 
 	readonly pythonDataflowEngine: PythonDataflowEngine<Schemes> = createPythonDataflowEngine();
@@ -586,6 +591,13 @@ export class NodeFactory implements ComponentSupportInterface {
 
 	downloadGraph() {
 		downloadJSON(this.editor.graphName, this.editor);
+	}
+
+	async saveToDB(): Promise<void> {
+		console.debug('Saving to DB');
+		await NodeStorage.saveGraph({
+			id: newUuid(),
+		});
 	}
 
 	loadFromFile() {

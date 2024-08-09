@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
-	import { Setup } from '$lib/graph-editor';
+	import { NodeStorage, Setup } from '$lib/graph-editor';
 	import {
 		showContextMenu,
 		ContextMenuComponent,
@@ -15,7 +15,6 @@
 	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';
-	import type { NodeParams } from '$graph-editor/nodes';
 	let editor = $state<NodeEditor>();
 	const factory = $derived(editor?.factory);
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
@@ -137,6 +136,7 @@
 		action?: (e: Event) => void;
 		props?: HTMLButtonAttributes;
 	};
+
 </script>
 
 {#snippet button({
@@ -203,6 +203,13 @@
 		{#if editor}
 			<input class="input input-bordered" bind:value={editor.graphName} />
 		{/if}
+		<aside>
+			<h2>DB</h2>
+			<p>Count : {NodeStorage.numGraphs}</p>
+		</aside>
+		<button class="btn" onclick={() => factory?.saveToDB()}>Save to DB</button>
+		<button class="btn" onclick={() => NodeStorage.clearGraphs()}>Clear DB</button>
+		<button class="btn" onclick={() => NodeStorage.pullSources()}>Pull datasources</button>
 	</div>
 	<div
 		use:shortcut={{

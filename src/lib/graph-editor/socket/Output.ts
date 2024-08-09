@@ -9,7 +9,6 @@ type OutputParams = {
 export class Output extends ClassicPreset.Output<Socket> {
 	constructor(params: OutputParams) {
 		super(params.socket, params.label, params.multipleConnections);
-		console.log('Output', params.socket);
 		params.socket.port = this;
 	}
 }

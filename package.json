@@ -1,6 +1,6 @@
 {
 	"name": "@selenite/graph-editor",
-	"version": "0.0.92",
+	"version": "0.0.93",
 	"repository": "github:ShaitanLyss/selenite-graph-editor",
 	"license": "MIT",
 	"keywords": [
@@ -77,13 +77,17 @@
 	"dependencies": {
 		"@fortawesome/free-regular-svg-icons": "^6.6.0",
 		"@fortawesome/free-solid-svg-icons": "^6.6.0",
+		"@isomorphic-git/lightning-fs": "^4.6.0",
 		"@selenite/commons": "^0.18.17",
 		"@skeletonlabs/floating-ui-svelte": "^0.3.1",
 		"autoprefixer": "^10.4.19",
 		"broadcast-channel": "^7.0.0",
+		"buffer": "^6.0.3",
 		"color": "^4.2.3",
 		"d3-shape": "^3.2.0",
+		"dexie": "^4.0.8",
 		"fast-xml-parser": "^4.4.0",
+		"isomorphic-git": "^1.27.1",
 		"lodash-es": "^4.17.21",
 		"regenerator-runtime": "^0.14.1",
 		"rete": "^2.0.3",
