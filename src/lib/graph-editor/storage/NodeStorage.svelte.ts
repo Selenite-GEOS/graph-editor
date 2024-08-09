@@ -34,8 +34,8 @@ export class NodeStorage {
 	}
 
 	static updateTimeout: NodeJS.Timeout | undefined;
-	static updateLoop() {
-		NodeStorage.pullSources();
+	static async updateLoop() {
+		await NodeStorage.pullSources();
 		NodeStorage.updateTimeout = setTimeout(NodeStorage.updateLoop, NodeStorage.pullDataSourcesInterval);
 	}
 
