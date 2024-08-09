@@ -37,7 +37,7 @@ export class GitHubDataSource implements Datasource {
         try {
             const stat = await fs.promises.stat(dir)
             console.debug('Pulling repo', repoUrl)
-            pull({
+            await pull({
                 fs,
                 http,
                 dir,
@@ -49,7 +49,7 @@ export class GitHubDataSource implements Datasource {
             })
         } catch (e) {
             console.debug('Cloning repo', repoUrl)
-            clone({
+            await clone({
                 fs,
                 http,
                 url: repoUrl,
