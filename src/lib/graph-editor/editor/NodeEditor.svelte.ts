@@ -45,7 +45,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return this.#graphName;
 	}
 	set graphName(n) {
-		this.#graphName = n.trim() !== '' ? n : get(_)('editor.default-name');
+		this.#graphName = n;
 		this.onChangeNameListeners.forEach((listener) => listener(n));
 	}
 	nameStore: Readable<string> = {
