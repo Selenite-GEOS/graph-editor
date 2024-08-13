@@ -82,7 +82,7 @@ export async function setupGraphEditor(
 export async function setupFullGraphEditor(
 	params: SetupGraphEditorParams & {
 		showContextMenu?: ShowContextMenu;
-		additionalNodeItems?: NodeMenuItem<typeof GraphNode>[];
+		additionalNodeItems?: NodeMenuItem[];
 	} = {}
 ): Promise<SetupGraphEditorResult> {
 	params.showContextMenu = showContextMenu;
@@ -163,31 +163,31 @@ export async function setupFullGraphEditor(
 				area.use(history);
 				factory.history = history;
 			},
-			{
-				name: 'comments',
-				type: 'area',
-				setup: async ({ factory, area }) => {
-					const { CommentPlugin, CommentExtensions } = await import(
-						'$graph-editor/plugins/CommentPlugin'
-					);
-					const comment = new CommentPlugin<Schemes, AreaExtra>({ factory });
-					if (!factory.selector) {
-						console.warn('Missing selector');
-						return;
-					}
-					if (!factory.accumulating) {
-						console.warn('Missing accumulating');
-						return;
-					}
-					CommentExtensions.selectable<Schemes, AreaExtra>(
-						comment,
-						factory.selector,
-						factory.accumulating
-					);
-					factory.comment = comment;
-					area.use(comment);
-				}
-			},
+			// {
+			// 	name: 'comments',
+			// 	type: 'area',
+			// 	setup: async ({ factory, area }) => {
+			// 		const { CommentPlugin, CommentExtensions } = await import(
+			// 			'$graph-editor/plugins/CommentPlugin'
+			// 		);
+			// 		const comment = new CommentPlugin<Schemes, AreaExtra>({ factory });
+			// 		if (!factory.selector) {
+			// 			console.warn('Missing selector');
+			// 			return;
+			// 		}
+			// 		if (!factory.accumulating) {
+			// 			console.warn('Missing accumulating');
+			// 			return;
+			// 		}
+			// 		CommentExtensions.selectable<Schemes, AreaExtra>(
+			// 			comment,
+			// 			factory.selector,
+			// 			factory.accumulating
+			// 		);
+			// 		factory.comment = comment;
+			// 		area.use(comment);
+			// 	}
+			// },
 			contextMenuSetup({
 				additionalNodeItems: params.additionalNodeItems,
 				showContextMenu: (params_) => {
