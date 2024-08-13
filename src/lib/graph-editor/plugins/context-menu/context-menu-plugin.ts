@@ -23,8 +23,9 @@ import {
 	type XMLTypeTree
 } from '@selenite/commons';
 import type { XmlAttributeDefinition } from '$graph-editor/nodes/XML/types';
-import type { DataType } from '../typed-sockets';
+import { areTypesCompatible, type DataType } from '../typed-sockets';
 import { intersection, union } from 'lodash-es';
+import type { SocketData } from 'rete-connection-plugin';
 
 // export class ContextMenuSetup extends SetupClass {
 // 	selectedNodes: SelectorEntity[] = [];
@@ -479,7 +480,7 @@ export function getMenuItemsFromNodeItems({
 }: {
 	factory: NodeFactory;
 	pos: Position;
-	nodeItems: NodeMenuItem<typeof Node>[];
+	nodeItems: NodeMenuItem[];
 	action?: (n: Node) => void;
 }): MenuItem[] {
 	console.log('getMenuItemsFromNodeItems', nodeItems);
@@ -524,30 +525,37 @@ export function contextMenuSetup({
 		type: 'area',
 		setup: ({ area, factory, editor }) => {
 			let lastSelectedNodes: SelectorEntity[] = [];
-			const connPlugn = factory.connectionPlugin
-			if (!connPlugn) {
+			const connPlugin = factory.connectionPlugin
+			if (!connPlugin) {
 				console.warn('Connection plugin not found');
 			} else {
-				connPlugn.addPipe((context) => {
+				connPlugin.addPipe((context) => {
 					if (context.type !== 'connectiondrop') return context;
-					console.debug(context);
+					// Type conversion is needed to work around the lack of
+					// extensibility of ConnectionPlugin
+					const {socket, initial, event, created} = context.data as {
+						socket?: SocketData & {payload: Socket}
+						initial: SocketData & {payload: Socket},
+						event?: PointerEvent
+						created: boolean
+					};
+					if (created || !event) return
 					// Check if the pointer is over a socket
 					// context.
-					if (!socketData) {
+					if (!socket) {
 						const pos = { x: event.clientX, y: event.clientY };
+						console.log("pos", pos)
 						const items: NodeMenuItem[] = [];
 						const anyItems: NodeMenuItem[] = [];
-						const side = this.lastPickedSockedData.side;
-						const { datastructure: droppedDatastructure, type: droppedType } =
-							this.lastPickedSockedData.payload;
-						for (const item of baseNodeMenuItems) {
+						const side = initial.side;
+						const sourceSocket =
+							initial.payload;
+						for (const item of [...baseNodeMenuItems, ...additionalNodeItems || []]) {
 							const types = side === 'output' ? item.inputTypes : item.outputTypes;
-							for (const [k, { type, datastructure }] of Object.entries(types)) {
-								if (
-									type === droppedType ||
-									(type === 'any' && datastructure === droppedDatastructure)
-								) {
-									(type === 'any' ? anyItems : items).push(item);
+							for (const target of Object.values(types)) {
+								if (item.nodeClass === XmlNode && !sourceSocket.type.startsWith('xmlElement') && sourceSocket.type !== "groupNameRef") continue;
+								if (side === 'output' ? areTypesCompatible(sourceSocket, target) : areTypesCompatible(target, sourceSocket)) {
+									(target.type === 'any' ? anyItems : items).push(item as NodeMenuItem);
 									break;
 								}
 							}
@@ -557,40 +565,33 @@ export function contextMenuSetup({
 							pos,
 							searchbar: true,
 							items: getMenuItemsFromNodeItems({
-								factory: this.factory,
+								factory,
 								pos,
 								nodeItems: [...items, ...anyItems],
 								action: (n) => {
 									const matchingSocket = Object.entries(
 										side === 'output' ? n.inputTypes : n.outputTypes
-									).find(([k, { type, datastructure }]) => {
-										if (
-											type === droppedType ||
-											(type === 'any' && datastructure === droppedDatastructure)
-										) {
-											return true;
-										}
-										return false;
+									).find(([k, target]) => {
+										return side === 'output' ? areTypesCompatible(sourceSocket, target) : areTypesCompatible(target, sourceSocket);
 									});
 									if (!matchingSocket) {
 										console.error("Can't find a valid key for the new node");
 										return;
 									}
 									const newNodeKey = matchingSocket[0];
-									const source = side === 'output' ? this.lastPickedSockedData!.payload.node : n;
+									const source = side === 'output' ? initial!.payload.node : n;
 									const sourceOutput =
-										side === 'output' ? this.lastPickedSockedData!.key : newNodeKey;
-									const target = side === 'output' ? n : this.lastPickedSockedData!.payload.node;
+										side === 'output' ? initial!.key : newNodeKey;
+									const target = side === 'output' ? n : initial!.payload.node;
 									const targetInput =
-										side === 'output' ? newNodeKey : this.lastPickedSockedData!.key;
+										side === 'output' ? newNodeKey : initial!.key;
 
-									this.factory
-										.getEditor()
+									editor
 										.addNewConnection(source, sourceOutput, target, targetInput);
 								}
 							}),
 							onHide: () => {
-								this.drop();
+								connPlugin.drop();
 							}
 						});
 						return;
@@ -606,33 +607,33 @@ export function contextMenuSetup({
 				}
 				
 				// Something about node selection, TODO: check what it actually does
-				if (context.type === 'pointerdown') {
-					const event = context.data.event;
-					const nodeDiv =
-						event.target instanceof HTMLElement
-							? event.target.classList.contains('node')
-								? event.target
-								: event.target.closest('.node')
-							: null;
-					if (
-						event.target instanceof HTMLElement &&
-						event.button === 2 &&
-						(event.target.classList.contains('node') || event.target.closest('.node')) !== null
-					) {
-						const entries = Array(...area.nodeViews.entries());
+				// if (context.type === 'pointerdown') {
+				// 	const event = context.data.event;
+				// 	const nodeDiv =
+				// 		event.target instanceof HTMLElement
+				// 			? event.target.classList.contains('node')
+				// 				? event.target
+				// 				: event.target.closest('.node')
+				// 			: null;
+				// 	if (
+				// 		event.target instanceof HTMLElement &&
+				// 		event.button === 2 &&
+				// 		(event.target.classList.contains('node') || event.target.closest('.node')) !== null
+				// 	) {
+				// 		const entries = Array(...area.nodeViews.entries());
 
-						const nodeId = entries.find((t) => t[1].element === nodeDiv?.parentElement)?.[0];
-						if (!nodeId) return context;
-						// factory.selectableNodes?.select(nodeId, true);
-						// const selectedNodes = wu(selector.entities.values())
-						// 	.filter((t) => editor.getNode(t.id) !== undefined)
-						// 	.toArray();
-						// console.log('remember selected', selectedNodes);
-						// if (selectedNodes.length > 0) {
-						// 	lastSelectedNodes = selectedNodes;
-						// }
-					}
-				}
+				// 		const nodeId = entries.find((t) => t[1].element === nodeDiv?.parentElement)?.[0];
+				// 		if (!nodeId) return context;
+				// 		// factory.selectableNodes?.select(nodeId, true);
+				// 		// const selectedNodes = wu(selector.entities.values())
+				// 		// 	.filter((t) => editor.getNode(t.id) !== undefined)
+				// 		// 	.toArray();
+				// 		// console.log('remember selected', selectedNodes);
+				// 		// if (selectedNodes.length > 0) {
+				// 		// 	lastSelectedNodes = selectedNodes;
+				// 		// }
+				// 	}
+				// }
 
 				// Handle context menu events
 				if (context.type === 'contextmenu') {
@@ -691,7 +692,7 @@ export function contextMenuSetup({
 					const items: MenuItem[] = getMenuItemsFromNodeItems({
 						factory,
 						pos,
-						nodeItems: [...baseNodeMenuItems, ...(additionalNodeItems || [])]
+						nodeItems: [...baseNodeMenuItems, ...(additionalNodeItems || [])] as NodeMenuItem[]
 					});
 
 					// Spawn context menu
@@ -700,12 +701,6 @@ export function contextMenuSetup({
 						pos,
 						searchbar: true
 					});
-					// spawnMoonMenu({
-					// 	items: [...variables, ...baseMenuItems],
-					// 	searchbar: true,
-					// 	pos: { x: context.data.event.clientX, y: context.data.event.clientY }
-					// });
-					// moonMenuFactoryStore.set(__factory);
 				}
 				return context;
 			});

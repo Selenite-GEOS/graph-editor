@@ -1,6 +1,6 @@
 import { type BaseSchemes, NodeEditor, type Root, Scope } from 'rete';
 import type { Connection } from '$graph-editor/nodes';
-import { ExecSocket, type Socket } from '$graph-editor/socket';
+import { ExecSocket, type Socket, type SocketDatastructure } from '$graph-editor/socket';
 import { ErrorWNotif } from '$lib/global/index.svelte';
 
 export type XMLAttrType = `xmlAttr:${string}`;
@@ -43,10 +43,38 @@ export function socketTypeExport(t: SocketType): ExportedSocketType {
 	else if (t.startsWith('xmlElement')) return 'xmlElement';
 	else throw new ErrorWNotif('Invalid socket type');
 }
+export type TypeInfo = {
+	type: SocketType;
+	datastructure: SocketDatastructure;
+}
+export function areTypesCompatible(outType: TypeInfo, inType: TypeInfo): boolean {
+	const re = /(\w+):(.+)/;
+	
+	const [, outMainType, outSubtypes] = re.exec(outType.type) || [];
+	const [, inMainType, inSubtypes] = re.exec(inType.type) || [];
+	if (inMainType && outMainType && inMainType === outMainType) {
+		if (outSubtypes === '*' || inSubtypes === '*') {
+			return true;
+		}
+		const outSubtypesArray = outSubtypes.split('|');
+		const inSubtypesArray = inSubtypes.split('|');
+		const intersection = outSubtypesArray.filter((subtype) => inSubtypesArray.includes(subtype));
+		if (intersection.length > 0) {
+			return true;
+		}
+	}
+
+	
+	return outType.datastructure === inType.datastructure && (
+		outType.type === 'any' || inType.type === 'any'
+		|| outType.type === inType.type
+	);
+}
 
 export function isConnectionInvalid(outputSocket: Socket, inputSocket: Socket) {
+	return !areTypesCompatible(outputSocket, inputSocket);
 	const re = /(\w+):(.+)/;
-
+	
 	const [, outType, outSubtypes] = re.exec(outputSocket.type) || [];
 	const [, inType, inSubtypes] = re.exec(inputSocket.type) || [];
 	if (inType && outType && inType === outType) {

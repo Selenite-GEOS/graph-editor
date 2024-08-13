@@ -61,7 +61,6 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 			| (SocketData & { payload: Socket })
 			| undefined;
 
-		// select socket on right click
 		if (event.button == 0) {
 			const node = socketData?.payload.node;
 
@@ -73,18 +72,23 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 
 			if (type === 'up' && this.picked && this.lastPickedSockedData) {
 				this.picked = false;
-				// this.emit({
-				// 	type: 'connectiondrop',
-				// 	data: {
-				// 		created: false,
-				// 		initial: this.lastPickedSockedData,
-				// 		socket: socketData ?? null,
-				// 	}
-				// })
-				
-				// return;
+				console.log('yo wtf');
+				if (!socketData) {
+					this.emit({
+						type: 'connectiondrop',
+						data: {
+							created: false,
+							initial: this.lastPickedSockedData,
+							socket: socketData ?? null,
+							event
+						}
+					});
+
+					return;
+				}
 			}
 		}
+		// select socket on right click
 		if (event.button == 2) {
 			if (type === 'up') return;
 

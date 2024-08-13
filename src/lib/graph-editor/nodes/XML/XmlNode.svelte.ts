@@ -64,11 +64,12 @@ export class XmlToString extends Node<
 	{ value: Scalar<'string'> }
 > {
 	constructor(params: NodeParams = {}) {
-		super({ label: 'To String', ...params });
+		super({ label: '', ...params });
 		this.addInData('xml', {
 			type: 'xmlElement:*'
 		});
 		this.addOutData('value', {
+			label: 'string',
 			type: 'string'
 		});
 	}

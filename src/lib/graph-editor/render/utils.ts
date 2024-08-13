@@ -32,6 +32,7 @@ export function assignColor(s: Socket): string {
 	// 	return '#b38a8a';
 	const type = s.type;
 	if (type.startsWith('xml')) {
+		if (type.endsWith('*')) return $socketcolor
 		// return random color generated from the name and make sure saturation doesn't go over 50%
 		// Convert the string seed into a numerical value
 		const label = s.port?.label;

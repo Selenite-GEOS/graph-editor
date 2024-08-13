@@ -297,7 +297,7 @@ export class Node<
 	factory = $state<NodeFactory>();
 	protected params: Params = {} as Params;
 	static id: string;
-	static nodeCounts = BigInt(0);
+	static nodeCounts = 0;
 	state = $state<{ name?: string } & Partial<State>>({} as State);
 	get name(): string | undefined {
 		return this.state.name;
@@ -686,7 +686,7 @@ export class Node<
 			}),
 			alwaysShowLabel: params?.isLabelDisplayed,
 			index: params?.index,
-			multipleConnections: params?.isArray,
+			multipleConnections: params?.type?.startsWith('xmlElement'),
 			isRequired: params?.isRequired,
 			label: params?.label ?? (key as string)
 		}) as Input<Exclude<Inputs[K], undefined>>;

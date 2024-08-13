@@ -67,6 +67,14 @@
 			}, 600);
 		}
 	});
+
+	// Display picked and selected nodes on top
+	$effect(() => {
+		const parent = (floating.elements.reference as HTMLElement | undefined | null)?.parentElement;
+		if (!parent) return;
+		parent.style.zIndex = String(node.picked ? 15 : node.selected ? 10 : 5);
+	})
+
 	let editingName = $state(false);
 	let nameInput = $state<HTMLInputElement>();
 	$effect(() => {
@@ -107,10 +115,11 @@
 	/>
 {/snippet}
 
+<!-- Node Toolbar popup -->
 {#if node.picked}
 	<!-- svelte-ignore event_directive_deprecated -->
 	<div
-		class="grid w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-50 p-2 rounded-sm select-none pointer-events-none"
+		class="grid w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-100 p-2 rounded-sm select-none pointer-events-none"
 		on:pointerdown={stopPropagation}
 		style={floating.floatingStyles}
 		{...interactions.getFloatingProps()}
@@ -222,6 +231,7 @@
 		bind:clientWidth={node.width}
 		bind:clientHeight={node.height}
 	>
+		{#if node.label && node.label !== ''}
 		<header class="grid">
 			{#if node.name || editingName}
 				<h2 class="text-sm mb-1 col-start-1">
@@ -304,7 +314,8 @@
 				{/each}
 			</aside>
 		</header>
-
+		{/if}
+		
 		{#each node.sortedControls as [key, control] (key)}
 			{#if !control.placeInHeader}
 				{@render controlSnippet(control, {

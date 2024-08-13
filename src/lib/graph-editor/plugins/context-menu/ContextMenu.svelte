@@ -40,6 +40,8 @@
 			});
 		}
 	});
+
+	$inspect(floating.elements.reference)
 </script>
 
 {#if menu.visible}

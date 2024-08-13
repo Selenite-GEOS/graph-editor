@@ -28,7 +28,8 @@ jobs:
       #     node-version: '20'
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
-      - run: bun test
+      - name: Run unit tests
+        run: bun run test run
       - run: bun package
       - uses: JS-DevTools/npm-publish@v3
         with:
