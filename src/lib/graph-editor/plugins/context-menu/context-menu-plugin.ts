@@ -10,7 +10,7 @@ import type { Position } from '$graph-editor/common';
 import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
 // Ensure all nodes are registered
-import '$graph-editor/nodes';
+import '../../nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
 import {
@@ -85,7 +85,7 @@ export function xmlNodeItems({
 	basePath?: string[];
 	priorities?: Record<string, Record<string, number>>;
 }): NodeMenuItem[] {
-	const res: Map<string, NodeMenuItem<typeof XmlNode>> = new Map();
+	const res: Map<string, NodeMenuItem> = new Map();
 
 	function parseTree(tree: XMLTypeTree, path: string[]) {
 		for (const [name, children] of Object.entries(tree)) {
