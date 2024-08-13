@@ -591,6 +591,7 @@ export function contextMenuSetup({
 								}
 							}),
 							onHide: () => {
+								console.debug("Dropping connection from context menu")
 								connPlugin.drop();
 							}
 						});

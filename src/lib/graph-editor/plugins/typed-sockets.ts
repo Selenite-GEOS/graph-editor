@@ -154,7 +154,7 @@ export class TypedSocketsPlugin<Schemes extends BaseSchemes> extends Scope<never
 								await nodeEditor.removeConnection(connection.id);
 							});
 					}
-					if (outputSocket.isArray === true && inputSocket.isArray === true) {
+					if (outputSocket.datastructure === 'array' && inputSocket.datastructure === 'array') {
 						if (conn.targetInput in inputSocket.node.ingoingDataConnections)
 							await nodeEditor.removeConnection(
 								inputSocket.node.ingoingDataConnections[conn.targetInput].id
