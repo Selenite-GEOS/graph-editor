@@ -1,7 +1,7 @@
 import { Node, XmlNode } from '$graph-editor/nodes';
 import { setupGraphEditor } from '$graph-editor/setup';
 import { ChildProps, ComplexType, XmlSchema } from '@selenite/commons';
-import { describe, it, expect, type Test } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import type { NodeFactory } from './NodeFactory.svelte';
 
 function getSchema(): XmlSchema {
