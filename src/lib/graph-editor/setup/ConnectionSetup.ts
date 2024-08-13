@@ -6,7 +6,7 @@ import { SetupClass, type SetupFunction, type SetupParams } from './Setup';
 import {
 	BidirectFlow,
 	ClassicFlow,
-	ConnectionPlugin,
+	ConnectionPlugin as BaseConnectionPlugin,
 	type EventType,
 	Presets,
 	type SocketData,
@@ -39,7 +39,7 @@ export class ConnectionDropEvent extends Event {
 	}
 }
 
-class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
+export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 	picked = false;
 	public lastClickedSocket = false;
 	public lastPickedSockedData: (SocketData & { payload: Socket }) | undefined;
@@ -73,70 +73,16 @@ class MyConnectionPlugin extends ConnectionPlugin<Schemes, AreaExtra> {
 
 			if (type === 'up' && this.picked && this.lastPickedSockedData) {
 				this.picked = false;
-				// Check if the pointer is over a socket
-
-				if (!socketData) {
-					const area: AreaPlugin<Schemes, AreaExtra> = this.parent;
-					const pos = { x: event.clientX, y: event.clientY };
-					const items: NodeMenuItem[] = [];
-					const anyItems: NodeMenuItem[] = [];
-					const side = this.lastPickedSockedData.side;
-					const { datastructure: droppedDatastructure, type: droppedType } =
-						this.lastPickedSockedData.payload;
-					for (const item of baseNodeMenuItems) {
-						const types = side === 'output' ? item.inputTypes : item.outputTypes;
-						for (const [k, { type, datastructure }] of Object.entries(types)) {
-							if (
-								type === droppedType ||
-								(type === 'any' && datastructure === droppedDatastructure)
-							) {
-								(type === 'any' ? anyItems : items).push(item);
-								break;
-							}
-						}
-					}
-					showContextMenu({
-						expand: true,
-						pos,
-						searchbar: true,
-						items: getMenuItemsFromNodeItems({
-							factory: this.factory,
-							pos,
-							nodeItems: [...items, ...anyItems],
-							action: (n) => {
-								const matchingSocket = Object.entries(
-									side === 'output' ? n.inputTypes : n.outputTypes
-								).find(([k, { type, datastructure }]) => {
-									if (
-										type === droppedType ||
-										(type === 'any' && datastructure === droppedDatastructure)
-									) {
-										return true;
-									}
-									return false;
-								});
-								if (!matchingSocket) {
-									console.error("Can't find a valid key for the new node");
-									return;
-								}
-								const newNodeKey = matchingSocket[0];
-								const source = side === 'output' ? this.lastPickedSockedData!.payload.node : n;
-								const sourceOutput =
-									side === 'output' ? this.lastPickedSockedData!.key : newNodeKey;
-								const target = side === 'output' ? n : this.lastPickedSockedData!.payload.node;
-								const targetInput = side === 'output' ? newNodeKey : this.lastPickedSockedData!.key;
-
-								this.factory
-									.getEditor()
-									.addNewConnection(source, sourceOutput, target, targetInput);
-							}
-						}),
-						onHide: () => {
-							this.drop();
-						}
-					});
-					return;
-				}
+				// this.emit({
+				// 	type: 'connectiondrop',
+				// 	data: {
+				// 		created: false,
+				// 		initial: this.lastPickedSockedData,
+				// 		socket: socketData ?? null,
+				// 	}
+				// })
+				
+				// return;
 			}
 		}
 		if (event.button == 2) {
@@ -185,7 +131,7 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 		return params;
 	}
 
-	const connectionPlugin = new MyConnectionPlugin(factory);
+	const connectionPlugin = new ConnectionPlugin(factory);
 	Presets.classic.setup();
 	// @ts-expect-error: Ignore type error
 	connectionPlugin.addPreset((socketData: SocketData & { payload: Socket }) => {
@@ -284,5 +230,6 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 		return ctx;
 	});
 	area.use(connectionPlugin);
+	factory.connectionPlugin = connectionPlugin;
 	return params;
 };

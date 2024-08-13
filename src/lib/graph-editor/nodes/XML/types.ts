@@ -1,3 +1,4 @@
+import type { DataType } from '$graph-editor/plugins/typed-sockets';
 import type { InputControlType } from '$graph-editor/socket';
 
 export type XmlData = {
@@ -12,7 +13,7 @@ type PropertyNames<T> = {
 export type XmlAttributeDefinition = {
 	options?: string[] | null;
 	name: string;
-	type: string;
+	type: DataType;
 	required?: boolean;
 	pattern?: string | null;
 	controlType?: InputControlType;

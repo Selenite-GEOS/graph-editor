@@ -1,5 +1,5 @@
 import { capitalizeWords } from '$utils/string';
-import { type Setup } from '$graph-editor/setup';
+import { type Setup } from '$graph-editor/setup/Setup';
 import { _ } from '$lib/global/index.svelte';
 import { NodeFactory } from '$graph-editor/editor';
 import { Node, nodeRegistry, type NodeConstructor, type NodeParams } from '$graph-editor/nodes';
@@ -304,7 +304,7 @@ import { intersection, union } from 'lodash-es';
 // 	}
 // }
 
-export type NodeMenuItem<NC extends new (...params: unknown[]) => Node> = {
+export type NodeMenuItem<NC extends new (...params: unknown[]) => Node = new (...params: unknown[]) => Node> = {
 	/** Label of the node. */
 	label: string;
 	/** Function that creates the node. */
@@ -406,32 +406,31 @@ export function xmlNodeItems({
 					}
 				}
 			}
+			const xmlConfig: XmlConfig = {
+				complex: complexType,
+				priorities,
+				outLabel,
+				xmlProperties: wu(complexType.attributes.values())
+					.map(
+						(attr) =>
+							({
+								name: attr.name,
+								type: attr.type,
+								required: attr.required
+							}) as XmlAttributeDefinition
+					)
+					.toArray()
+			};
+			const xmlNode = new XmlNode({xmlConfig});
 			res.set(name, {
 				label: name,
 				nodeClass: XmlNode,
 				params: {
-					xmlConfig: {
-						complex: complexType,
-						priorities,
-						outLabel,
-						xmlTag: name,
-						childTypes: complexType.childTypes,
-						childProps: complexType.children,
-						xmlProperties: wu(complexType.attributes.values())
-							.map(
-								(attr) =>
-									({
-										name: attr.name,
-										type: attr.type,
-										required: attr.required
-									}) as XmlAttributeDefinition
-							)
-							.toArray()
-					}
+					xmlConfig
 				},
 				description: '',
-				inputTypes: {},
-				outputTypes: {},
+				inputTypes: xmlNode.inputTypes,
+				outputTypes: xmlNode.outputTypes,
 				path,
 				tags: []
 			});
@@ -525,17 +524,87 @@ export function contextMenuSetup({
 		type: 'area',
 		setup: ({ area, factory, editor }) => {
 			let lastSelectedNodes: SelectorEntity[] = [];
+			const connPlugn = factory.connectionPlugin
+			if (!connPlugn) {
+				console.warn('Connection plugin not found');
+			} else {
+				connPlugn.addPipe((context) => {
+					if (context.type !== 'connectiondrop') return context;
+					console.debug(context);
+					// Check if the pointer is over a socket
+					// context.
+					if (!socketData) {
+						const pos = { x: event.clientX, y: event.clientY };
+						const items: NodeMenuItem[] = [];
+						const anyItems: NodeMenuItem[] = [];
+						const side = this.lastPickedSockedData.side;
+						const { datastructure: droppedDatastructure, type: droppedType } =
+							this.lastPickedSockedData.payload;
+						for (const item of baseNodeMenuItems) {
+							const types = side === 'output' ? item.inputTypes : item.outputTypes;
+							for (const [k, { type, datastructure }] of Object.entries(types)) {
+								if (
+									type === droppedType ||
+									(type === 'any' && datastructure === droppedDatastructure)
+								) {
+									(type === 'any' ? anyItems : items).push(item);
+									break;
+								}
+							}
+						}
+						showContextMenu({
+							expand: true,
+							pos,
+							searchbar: true,
+							items: getMenuItemsFromNodeItems({
+								factory: this.factory,
+								pos,
+								nodeItems: [...items, ...anyItems],
+								action: (n) => {
+									const matchingSocket = Object.entries(
+										side === 'output' ? n.inputTypes : n.outputTypes
+									).find(([k, { type, datastructure }]) => {
+										if (
+											type === droppedType ||
+											(type === 'any' && datastructure === droppedDatastructure)
+										) {
+											return true;
+										}
+										return false;
+									});
+									if (!matchingSocket) {
+										console.error("Can't find a valid key for the new node");
+										return;
+									}
+									const newNodeKey = matchingSocket[0];
+									const source = side === 'output' ? this.lastPickedSockedData!.payload.node : n;
+									const sourceOutput =
+										side === 'output' ? this.lastPickedSockedData!.key : newNodeKey;
+									const target = side === 'output' ? n : this.lastPickedSockedData!.payload.node;
+									const targetInput =
+										side === 'output' ? newNodeKey : this.lastPickedSockedData!.key;
+
+									this.factory
+										.getEditor()
+										.addNewConnection(source, sourceOutput, target, targetInput);
+								}
+							}),
+							onHide: () => {
+								this.drop();
+							}
+						});
+						return;
+					}
+					return context;
+				})
+			}
+			
 			area.addPipe((context) => {
 				// React to pointerdown and contextmenu events only
 				if (!(['contextmenu', 'pointerdown'] as (typeof context.type)[]).includes(context.type)) {
 					return context;
 				}
-
-				const selector = factory.selector;
-				if (!selector) {
-					console.error('Selector not available on factory');
-					return context;
-				}
+				
 				// Something about node selection, TODO: check what it actually does
 				if (context.type === 'pointerdown') {
 					const event = context.data.event;
@@ -554,14 +623,14 @@ export function contextMenuSetup({
 
 						const nodeId = entries.find((t) => t[1].element === nodeDiv?.parentElement)?.[0];
 						if (!nodeId) return context;
-						factory.selectableNodes?.select(nodeId, true);
-						const selectedNodes = wu(selector.entities.values())
-							.filter((t) => editor.getNode(t.id) !== undefined)
-							.toArray();
+						// factory.selectableNodes?.select(nodeId, true);
+						// const selectedNodes = wu(selector.entities.values())
+						// 	.filter((t) => editor.getNode(t.id) !== undefined)
+						// 	.toArray();
 						// console.log('remember selected', selectedNodes);
-						if (selectedNodes.length > 0) {
-							lastSelectedNodes = selectedNodes;
-						}
+						// if (selectedNodes.length > 0) {
+						// 	lastSelectedNodes = selectedNodes;
+						// }
 					}
 				}
 

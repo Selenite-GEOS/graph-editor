@@ -284,8 +284,8 @@ export class Node<
 
 	static description: string = '';
 	static visible: boolean = true;
-	static inputTypes?: string[];
-	static outputTypes?: string[];
+	// static inputTypes?: string[];
+	// static outputTypes?: string[];
 
 	// width = 190;
 	// height = 120;
@@ -531,11 +531,11 @@ export class Node<
 	}
 
 	getDataflowEngine() {
-		return this.factory.dataflowEngine;
+		return this.factory?.dataflowEngine;
 	}
 
 	getEditor() {
-		return this.factory.getEditor();
+		return this.factory?.getEditor();
 	}
 
 	setFactory(nodeFactory: NodeFactory) {

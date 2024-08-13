@@ -41,14 +41,14 @@ export class AddXmlAttributeControl extends Control {
 }
 
 export type XmlConfig = {
-	complex?: ComplexType | SaveData<ComplexType>;
+	complex: ComplexType | SaveData<ComplexType>;
 	priorities?: Record<string, Record<string, number>>;
-	xmlTag: string;
+	// xmlTag: string;
 	// outData?: OutDataParams;
 	outLabel?: string;
 	xmlProperties?: XmlAttributeDefinition[];
-	childTypes?: string[];
-	childProps?: ChildProps[];
+	// childTypes?: string[];
+	// childProps?: ChildProps[];
 };
 
 export type XmlNodeParams = NodeParams & {
@@ -122,10 +122,10 @@ export class XmlNode extends Node<
 		console.debug('xmlNodeParams', xmlNodeParams);
 		const { xmlProperties, priorities: indices = {} } = xmlConfig;
 		let complex = xmlConfig.complex;
-		super({ label: xmlConfig.xmlTag, ...xmlNodeParams });
 		if (!complex) {
 			throw new Error('Complex type is missing.');
 		}
+		super({ label: complex.name, ...xmlNodeParams });
 
 		if (!(complex instanceof ComplexType)) {
 			complex = ComplexType.fromObject(complex);
@@ -134,7 +134,7 @@ export class XmlNode extends Node<
 		if (!this.state.usedOptionalAttrs) {
 			this.state.usedOptionalAttrs = [];
 		}
-		this.xmlTag = xmlConfig.xmlTag;
+		this.xmlTag = complex.name;
 		// console.log(this.name);
 
 		// this.name = name + XmlNode.count;
@@ -170,7 +170,7 @@ export class XmlNode extends Node<
 		for (const child of requiredChildren) {
 			const isArray = child.maxOccurs === undefined || child.maxOccurs > 1;
 			this.addXmlInData({
-				index: -2 - (xmlConfig.priorities?.[xmlConfig.xmlTag]?.[child.type] ?? 0),
+				index: -2 - (xmlConfig.priorities?.[this.xmlTag]?.[child.type] ?? 0),
 				name: child.type,
 				type: `xmlElement:${child.type}`,
 				isArray
@@ -196,20 +196,20 @@ export class XmlNode extends Node<
 		this.addOutData('value', {
 			showLabel: true,
 			label: xmlConfig.outLabel,
-			type: `xmlElement:${xmlConfig.xmlTag}`
+			type: `xmlElement:${this.xmlTag}`
 		});
 
 		if (this.hasName) {
 			this.addOutData('name', {
 				type: 'groupNameRef'
 			});
-			XmlNode.counts[xmlConfig.xmlTag] = XmlNode.counts[xmlConfig.xmlTag]
-				? XmlNode.counts[xmlConfig.xmlTag] + 1
+			XmlNode.counts[this.xmlTag] = XmlNode.counts[this.xmlTag]
+				? XmlNode.counts[this.xmlTag] + 1
 				: 1;
 			if (!this.state.name) {
 				if ('name' in initialValues) this.name = initialValues['name'] as string;
 				else {
-					let name = xmlConfig.xmlTag;
+					let name = this.xmlTag;
 					this.name = camlelcaseize(name) + XmlNode.counts[name];
 				}
 			}
@@ -230,7 +230,7 @@ export class XmlNode extends Node<
 					const testid = input.dataset.testid;
 					if (!testid) return ctx;
 					const key = testid.split('-')[1];
-					node.removeOptionalAttribute(key);
+					// node.removeOptionalAttribute(key);
 					return ctx;
 				}
 				return ctx;
@@ -244,43 +244,43 @@ export class XmlNode extends Node<
 		return data.toXml();
 	}
 
-	addOptionalAttribute(name: string) {
-		const prop = this.params.xmlConfig.xmlProperties?.find((prop) => prop.name === name);
-		if (prop === undefined) throw new Error(`Property ${name} not found`);
-		if (!this.state.usedOptionalAttrs.includes(name)) this.state.usedOptionalAttrs.push(name);
-		this.addInAttribute(prop);
-		this.updateElement();
-		console.log('updateElement', this.controls['addXmlAttr'].id);
-		this.updateElement('control', this.controls['addXmlAttr'].id);
-	}
+	// addOptionalAttribute(name: string) {
+	// 	const prop = this.params.xmlConfig.xmlProperties?.find((prop) => prop.name === name);
+	// 	if (prop === undefined) throw new Error(`Property ${name} not found`);
+	// 	if (!this.state.usedOptionalAttrs.includes(name)) this.state.usedOptionalAttrs.push(name);
+	// 	this.addInAttribute(prop);
+	// 	this.updateElement();
+	// 	console.log('updateElement', this.controls['addXmlAttr'].id);
+	// 	this.updateElement('control', this.controls['addXmlAttr'].id);
+	// }
 
-	removeOptionalAttribute(name: string) {
-		console.log('removeOptionalAttribute', name);
-		const prop = this.params.xmlConfig.xmlProperties?.find((prop) => prop.name === name);
-		if (prop?.required === true) {
-			throw new ErrorWNotif(`Property ${name} is required and cannot be removed`);
-		}
-		if (prop === undefined) throw new Error(`Property ${name} not found`);
-		const index = this.state.usedOptionalAttrs.indexOf(name);
-		if (index !== -1) this.state.usedOptionalAttrs.splice(index, 1);
-		console.log('index', index);
-		this.removeInput(name);
-		this.height -= prop.isArray ? 58 : 65.5;
-		this.updateElement();
-		this.updateElement('control', this.controls['addXmlAttr'].id);
-	}
+	// removeOptionalAttribute(name: string) {
+	// 	console.log('removeOptionalAttribute', name);
+	// 	const prop = this.params.xmlConfig.xmlProperties?.find((prop) => prop.name === name);
+	// 	if (prop?.required === true) {
+	// 		throw new ErrorWNotif(`Property ${name} is required and cannot be removed`);
+	// 	}
+	// 	if (prop === undefined) throw new Error(`Property ${name} not found`);
+	// 	const index = this.state.usedOptionalAttrs.indexOf(name);
+	// 	if (index !== -1) this.state.usedOptionalAttrs.splice(index, 1);
+	// 	console.log('index', index);
+	// 	this.removeInput(name);
+	// 	this.height -= prop.isArray ? 58 : 65.5;
+	// 	this.updateElement();
+	// 	this.updateElement('control', this.controls['addXmlAttr'].id);
+	// }
 
-	override applyState(): void {
-		if (this.state.name) this.name = this.state.name;
-		// console.log(this.state);
-		for (const name of this.state.usedOptionalAttrs ?? []) {
-			this.addOptionalAttribute(name);
-		}
-		const { attributeValues } = this.state;
-		for (const [key, value] of Object.entries(attributeValues ?? {})) {
-			(this.inputs[key]?.control as InputControl)?.setValue(value);
-		}
-	}
+	// override applyState(): void {
+	// 	if (this.state.name) this.name = this.state.name;
+	// 	// console.log(this.state);
+	// 	for (const name of this.state.usedOptionalAttrs ?? []) {
+	// 		this.addOptionalAttribute(name);
+	// 	}
+	// 	const { attributeValues } = this.state;
+	// 	for (const [key, value] of Object.entries(attributeValues ?? {})) {
+	// 		(this.inputs[key]?.control as InputControl)?.setValue(value);
+	// 	}
+	// }
 
 	setName(name: string) {
 		this.name = name;
@@ -300,11 +300,11 @@ export class XmlNode extends Node<
 
 		const xmlTypePattern = /([^\W_]+)(?:_([^\W_]+))?/gm;
 		const [, xmlType, xmlSubType] = xmlTypePattern.exec(type) || [];
-		console.log('xmlType', xmlType, xmlSubType);
+		// console.log('xmlType', xmlType, xmlSubType);
 		if (options) {
 			controlType = 'select';
 		} else if (assignControl(xmlType as SocketType) !== undefined) {
-			type = xmlType as SocketType;
+			type = xmlType as DataType;
 			controlType = assignControl(xmlType as SocketType);
 		} else if (xmlType.startsWith('real') || xmlType.startsWith('integer')) {
 			type = xmlSubType && xmlSubType.endsWith('2d') ? 'vector' : 'number';
@@ -315,7 +315,7 @@ export class XmlNode extends Node<
 		} else if (xmlType === 'string') {
 			type = 'string';
 		} else {
-			type = xmlType;
+			type = xmlType as DataType;
 		}
 		isArray = (xmlSubType && xmlSubType.startsWith('array')) || isArray;
 
@@ -325,39 +325,38 @@ export class XmlNode extends Node<
 			label: splitCamelCase(name).join(' '),
 			isRequired: required,
 			isLabelDisplayed: true,
-			type: type as DataType,
-			isArray: isArray,
-			control: isArray
-				? undefined
-				: controlType && {
-						type: controlType,
-						options: {
-							options,
-							label: titlelize(name),
-							initial: initialValues[name],
-							pattern: pattern,
-							debouncedOnChange: (value) => {
-								console.log('debouncedOnChange', value);
-								// this.state.attributeValues[name] = value;
-								this.getDataflowEngine().reset(this.id);
-							}
-						}
-					}
+			type,
+			datastructure: isArray ? 'array' : 'scalar'
+			// control: isArray
+			// 	? undefined
+			// 	: controlType && {
+			// 			type: controlType,
+			// 			options: {
+			// 				options,
+			// 				label: titlelize(name),
+			// 				initial: initialValues[name],
+			// 				pattern: pattern,
+			// 				debouncedOnChange: (value) => {
+			// 					console.log('debouncedOnChange', value);
+			// 					// this.state.attributeValues[name] = value;
+			// 					this.getDataflowEngine().reset(this.id);
+			// 				}
+			// 			}
+			// 		}
 		});
 		if (attrInputControl) {
 			// console.log('attrInputControl', attrInputControl);
 			const val = (attrInputControl as InputControl).value;
 			if (val !== undefined) {
 				// this.state.attributeValues[name] = val;
-				setTimeout(() => {
-					this.getDataflowEngine().reset(this.id);
-				});
+				if (this.getDataflowEngine())
+					setTimeout(() => {
+						this.getDataflowEngine()?.reset(this.id);
+					});
 			}
 		} else {
 			// this.state.attributeValues[name] = initialValues[name];
 		}
-
-		this.height += isArray ? 58 : 65.5;
 	}
 
 	override data(inputs?: Record<string, unknown>): { value: XMLData; name?: string } {
@@ -395,7 +394,7 @@ export class XmlNode extends Node<
 	getProperties(inputs?: Record<string, unknown>): Record<string, unknown> {
 		const properties: Record<string, unknown> = {};
 		// console.log(this.xmlProperties);
-		const isArray = (key: string) => (this.inputs[key]?.socket as Socket).isArray;
+		const isArray = (key: string) => (this.inputs[key]?.socket as Socket).datastructure === 'array';
 		for (const key of this.xmlProperties) {
 			// console.log(key);
 			let data = this.getData(key, inputs) as
@@ -443,7 +442,6 @@ export class XmlNode extends Node<
 			index,
 			isRequired: required
 		});
-		this.height += 37;
 	}
 }
 

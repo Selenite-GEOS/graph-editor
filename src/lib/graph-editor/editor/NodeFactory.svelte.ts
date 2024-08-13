@@ -33,6 +33,8 @@ import {
 	type SelectorEntity
 } from './NodeSelection.svelte';
 import { NodeStorage } from '$graph-editor/storage';
+import { CodeIntegration } from './CodeIntegration';
+import type { ConnectionPlugin } from '$graph-editor/setup/ConnectionSetup';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -311,6 +313,7 @@ export class NodeFactory implements ComponentSupportInterface {
 	// public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
 	public arrange?: AutoArrangePlugin<Schemes>;
 	public history: HistoryPlugin<Schemes> | undefined;
+	connectionPlugin?: ConnectionPlugin;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
 	#isDataflowEnabled = true;
 
@@ -358,6 +361,8 @@ export class NodeFactory implements ComponentSupportInterface {
 
 	layout: NodeLayout;
 
+	codeIntegration: CodeIntegration;
+
 	constructor(params: {
 		editor: NodeEditor;
 		area?: AreaPlugin<Schemes, AreaExtra>;
@@ -375,6 +380,7 @@ export class NodeFactory implements ComponentSupportInterface {
 		this.layout = this.addComponentByClass(NodeLayout, {});
 		// this.selector = selector;
 		this.selector = this.addComponentByClass(NodeSelector, {});
+		this.codeIntegration = this.addComponentByClass(CodeIntegration, {});
 		this.area = area;
 		this.arrange = arrange;
 		this.makutuClasses = makutuClasses;
