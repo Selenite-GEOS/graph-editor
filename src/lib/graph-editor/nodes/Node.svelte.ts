@@ -36,11 +36,12 @@ import { getLeavesFromOutput } from './utils';
 import type { HTMLInputAttributes } from 'svelte/elements';
 import { uuidv4 } from '@selenite/commons';
 import type { SelectorEntity } from '$graph-editor/editor/NodeSelection.svelte';
+import { SvelteMap } from 'svelte/reactivity';
 
 /**
  * A map of node classes indexed by their id.
  */
-export const nodeRegistry = new Map<string, NodeConstructor>();
+export const nodeRegistry = new SvelteMap<string, NodeConstructor>();
 
 /**
  * Registers a node class.

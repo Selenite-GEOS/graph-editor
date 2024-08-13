@@ -120,7 +120,7 @@ export class XmlNode extends Node<
 			initialValues
 		};
 
-		console.debug('xmlNodeParams', xmlNodeParams);
+		// console.debug('xmlNodeParams', xmlNodeParams);
 		const { xmlProperties, priorities: indices = {} } = xmlConfig;
 		let complex = xmlConfig.complex;
 		if (!complex) {

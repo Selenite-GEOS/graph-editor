@@ -168,32 +168,44 @@ export function xmlNodeItems({
 	return [...res.values()];
 }
 
-export const baseNodeMenuItems: NodeMenuItem[] = [];
-console.log("Setting up base node menu items", nodeRegistry)
-for (const [id, nodeClass] of nodeRegistry.entries()) {
-	if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
-	const pieces = id.split('.').map(capitalizeWords);
 
-	/** Name of node in id. */
-	const idName = pieces.at(-1)!;
+export let baseNodeMenuItems: NodeMenuItem[] = [];
+const cleanup = $effect.root(() => {
+	$effect(() => {
+		const res: NodeMenuItem[] = [];
+		console.debug('Setting up base node menu items', nodeRegistry.size, nodeRegistry);
+		for (const [id, nodeClass] of nodeRegistry.entries()) {
+			if (nodeClass.visible !== undefined && !nodeClass.visible) continue;
+			const pieces = id.split('.').map(capitalizeWords);
 
-	// Autogenerate menu path from id if unspecified
-	if (nodeClass.path === undefined) {
-		const path = pieces.slice(0, -1);
-		nodeClass.path = path;
-	}
+			/** Name of node in id. */
+			const idName = pieces.at(-1)!;
 
-	const node = new nodeClass();
-	baseNodeMenuItems.push({
-		label: node.label === undefined || node.label.trim() === '' ? idName : node.label,
-		nodeClass: nodeClass as typeof Node,
-		inputTypes: node.inputTypes,
-		outputTypes: node.outputTypes,
-		path: nodeClass.path,
-		tags: nodeClass.tags ?? [],
-		description: nodeClass.description ?? ''
-	});
+			// Autogenerate menu path from id if unspecified
+			if (nodeClass.path === undefined) {
+				const path = pieces.slice(0, -1);
+				nodeClass.path = path;
+			}
+
+			const node = new nodeClass();
+			res.push({
+				label: node.label === undefined || node.label.trim() === '' ? idName : node.label,
+				nodeClass: nodeClass as typeof Node,
+				inputTypes: node.inputTypes,
+				outputTypes: node.outputTypes,
+				path: nodeClass.path,
+				tags: nodeClass.tags ?? [],
+				description: nodeClass.description ?? ''
+			});
+		}
+		baseNodeMenuItems = res;
+	})
+})
+
+if (import.meta.hot) {
+	import.meta.hot.on('vite:beforeUpdate', cleanup)
 }
+
 export function getMenuItemsFromNodeItems({
 	factory,
 	pos,
@@ -420,7 +432,7 @@ export function contextMenuSetup({
 						pos,
 						nodeItems: [...baseNodeMenuItems, ...(additionalNodeItems || [])] as NodeMenuItem[]
 					});
-
+					console.debug("settin hey", baseNodeMenuItems)
 					// Spawn context menu
 					showContextMenu({
 						items,
