@@ -12,8 +12,9 @@ async function getFs() {
     return fsInstance;
 }
 
-// @ts-expect-error
-window.Buffer = buffer.Buffer;
+if (typeof window !== 'undefined')
+    // @ts-expect-error
+    window.Buffer = buffer.Buffer;
 
 export class GitHubDataSource implements Datasource {
     url: URL;

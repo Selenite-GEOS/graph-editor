@@ -11,7 +11,7 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 	/**
 	 * Pulls the selected nodes from the graph editor to the code editor
 	 */
-	async toCode({text, schema}: {text: string, schema: XmlSchema}): Promise<string> {
+	async toCode({text ='', schema}: {text?: string, schema: XmlSchema}): Promise<string> {
         const factory = this.owner;
 		const editor = factory.editor;
 		const selectedXmlNodes = wu(factory.selector.entities.values())
