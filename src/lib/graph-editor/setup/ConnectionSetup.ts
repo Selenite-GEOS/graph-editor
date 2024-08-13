@@ -10,20 +10,22 @@ import {
 	type EventType,
 	Presets,
 	type SocketData,
-	type ClassicParams
+	type ClassicParams,
+	createPseudoconnection
 } from 'rete-connection-plugin';
 import { isConnectionInvalid } from '$graph-editor/plugins/typed-sockets';
 import type { Socket } from '$graph-editor/socket/Socket.svelte';
 import { findSocket } from '$graph-editor/socket/utils';
-import type { Node } from '$graph-editor/nodes';
+import type { Connection, Node } from '$graph-editor/nodes';
 import { XmlNode } from '$graph-editor/nodes/XML';
-import { ContextMenu} from '$graph-editor/plugins/context-menu';
+import { isEqual } from 'lodash-es';
 
 export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 	picked = false;
 	public lastClickedSocket = false;
 	public lastPickedSockedData: (SocketData & { payload: Socket }) | undefined;
-
+	/** Last picked connection. */
+	lastConn?: Connection;
 	constructor(private factory: NodeFactory) {
 		super();
 	}
@@ -40,19 +42,24 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 		const socketData = findSocket(this.socketsCache, pointedElements) as
 			| (SocketData & { payload: Socket })
 			| undefined;
-			if (event.button == 0) {
-				const node = socketData?.payload.node;
-				
-				if (type === 'down') {
-					if (socketData === undefined) return;
-					console.debug("PICK")
+		if (event.button == 0) {
+
+			if (type === 'down') {
+				if (socketData === undefined) return;
 				console.debug('Pick connection');
+				this.lastPickedSockedData = socketData as SocketData & { payload: Socket };
 				this.picked = true;
+				const node = this.factory.editor.getNode(socketData.nodeId);
+				if (node) {
+					this.lastConn =
+						socketData.side === 'output'
+							? node.outConnections[socketData.key]?.at(0)
+							: node.inConnections[socketData.key]?.at(0);
+				}
 			}
 
 			if (type === 'up' && this.picked && this.lastPickedSockedData) {
 				this.picked = false;
-				console.log('yo wtf');
 				if (!socketData) {
 					this.emit({
 						type: 'connectiondrop',
@@ -65,13 +72,23 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 					});
 
 					return;
+
+				}
+				// Fix for the case where the user drops the connection on the same socket
+				// it was picked from
+				 else {
+					if (this.lastConn && isEqual(this.lastPickedSockedData, socketData)) {
+						await this.factory.editor.addConnection(this.lastConn);
+						this.drop();
+						return;
+					}
 				}
 			}
 		}
 		// select socket on right click
 		if (event.button == 2) {
 			if (type === 'up') return;
-
+			if (!socketData) return;
 			// pickedSocket.selected = !pickedSocket.selected;
 			// @ts-expect-error: Access private field
 			const node: Node = this.editor.getNode(socketData.nodeId);
@@ -88,20 +105,12 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 			node.updateElement();
 			return;
 		}
-		super.pick(event, type);
+		await super.pick(event, type);
 	}
 }
 
 export class ConnectionSetup extends SetupClass {
 	setup(editor: NodeEditor, area: AreaPlugin<Schemes, AreaExtra>, factory: NodeFactory): void {
-		// let lastButtonClicked : number;
-		// area.container.addEventListener('pointerdown', (e) => {
-		//     e.preventDefault();
-		//     e.stopPropagation();
-		//     lastButtonClicked = e.button
-		//     console.log("pointerdown", lastButtonClicked)
-		//     return false;
-		// }, false);
 		setupConnections({ editor, area, factory });
 	}
 }
@@ -194,24 +203,6 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 				? BidirectFlow
 				: ClassicFlow
 		)(params);
-	});
-
-	connectionPlugin.addPipe(async (ctx) => {
-		// prevent the connection from moving when the drop menu is visible
-		if (ctx.type === 'pointermove' && ContextMenu.instance.visible) {
-			return;
-		}
-
-		if (ctx.type === 'connectionpick') {
-			connectionPlugin.lastPickedSockedData = ctx.data.socket as SocketData & { payload: Socket };
-		}
-		if (ctx.type === 'contextmenu' && connectionPlugin.lastClickedSocket) {
-			connectionPlugin.lastClickedSocket = false;
-			ctx.data.event.preventDefault();
-			ctx.data.event.stopPropagation();
-			return;
-		}
-		return ctx;
 	});
 	area.use(connectionPlugin);
 	factory.connectionPlugin = connectionPlugin;

@@ -323,10 +323,10 @@ export class Node<
 	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)) as [string, Control][]);
 	readonly pythonComponent: PythonNodeComponent;
 	readonly socketSelectionComponent: R_SocketSelection_NC;
-	readonly ingoingDataConnections: Record<string, Connection<Node, Node>[]> = {};
-	readonly ingoingExecConnections: Record<string, Connection<Node, Node>[]> = {};
-	readonly outgoingDataConnections: Record<string, Connection<Node, Node>[]> = {};
-	readonly outgoingExecConnections: Record<string, Connection<Node, Node>[]> = {};
+	readonly ingoingDataConnections: Record<string, Connection<Node, Node>[]> = $state({});
+	readonly ingoingExecConnections: Record<string, Connection<Node, Node>[]> = $state({});
+	readonly outgoingDataConnections: Record<string, Connection<Node, Node>[]> = $state({});
+	readonly outgoingExecConnections: Record<string, Connection<Node, Node>[]> = $state({});
 	onRemoveIngoingConnection?: (conn: Connection) => void;
 
 	initializePromise?: Promise<void>;
@@ -358,6 +358,9 @@ export class Node<
 			...Object.values(this.outgoingExecConnections)
 		].flat();
 	}
+
+	outConnections = $derived({...this.outgoingDataConnections, ...this.outgoingExecConnections})
+	inConnections = $derived({...this.ingoingDataConnections, ...this.ingoingExecConnections})
 
 	constructor(params: NodeParams = {}) {
 		const { label = '', width = 190, height = 120, factory } = params;

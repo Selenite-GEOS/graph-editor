@@ -26,6 +26,7 @@ import type { XmlAttributeDefinition } from '$graph-editor/nodes/XML/types';
 import { areTypesCompatible, type DataType } from '../typed-sockets';
 import { intersection, union } from 'lodash-es';
 import type { SocketData } from 'rete-connection-plugin';
+import { ContextMenu } from './context-menu.svelte';
 
 // export class ContextMenuSetup extends SetupClass {
 // 	selectedNodes: SelectorEntity[] = [];
@@ -530,6 +531,9 @@ export function contextMenuSetup({
 				console.warn('Connection plugin not found');
 			} else {
 				connPlugin.addPipe((context) => {
+					if (context.type === 'pointermove' && ContextMenu.instance.visible) {
+						return;
+					}
 					if (context.type !== 'connectiondrop') return context;
 					// Type conversion is needed to work around the lack of
 					// extensibility of ConnectionPlugin
