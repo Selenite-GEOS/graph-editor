@@ -17,27 +17,7 @@ import type { Socket } from '$graph-editor/socket/Socket.svelte';
 import { findSocket } from '$graph-editor/socket/utils';
 import type { Node } from '$graph-editor/nodes';
 import { XmlNode } from '$graph-editor/nodes/XML';
-import {
-	baseNodeMenuItems,
-	ContextMenu,
-	getMenuItemsFromNodeItems,
-	showContextMenu,
-	type NodeMenuItem
-} from '$graph-editor/plugins/context-menu';
-
-export class ConnectionDropEvent extends Event {
-	public readonly pos: { x: number; y: number };
-
-	constructor(
-		public readonly pointerEvent: PointerEvent,
-		public readonly drop: () => void,
-		public readonly socketData: SocketData & { payload: Socket },
-		public readonly factory: NodeFactory
-	) {
-		super('connectiondrop');
-		this.pos = { x: pointerEvent.clientX, y: pointerEvent.clientY };
-	}
-}
+import { ContextMenu} from '$graph-editor/plugins/context-menu';
 
 export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 	picked = false;
@@ -60,12 +40,12 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 		const socketData = findSocket(this.socketsCache, pointedElements) as
 			| (SocketData & { payload: Socket })
 			| undefined;
-
-		if (event.button == 0) {
-			const node = socketData?.payload.node;
-
-			if (type === 'down') {
-				if (socketData === undefined) return;
+			if (event.button == 0) {
+				const node = socketData?.payload.node;
+				
+				if (type === 'down') {
+					if (socketData === undefined) return;
+					console.debug("PICK")
 				console.debug('Pick connection');
 				this.picked = true;
 			}
