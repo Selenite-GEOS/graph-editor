@@ -97,7 +97,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 						if (ctx.data.event.button !== 0) return ctx;
 						const target = ctx.data.event.target;
 						if (target instanceof Element && !this.owner.area?.container.contains(target)) {
-							console.debug('Not contained');
+							// console.debug('Not contained');
 							return ctx;
 						}
 					}

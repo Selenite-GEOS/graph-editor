@@ -46,5 +46,6 @@ pnpm publish
 - Add array description on hover
 - Add tootip popup
 - Support scientific writing of numbers (e.g. 1e-3)
+- Code integration : Update existing node names instead of duplicating
 ### Not important
 - make node selection framework agnostic

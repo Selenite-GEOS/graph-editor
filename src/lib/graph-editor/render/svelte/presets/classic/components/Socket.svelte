@@ -38,6 +38,7 @@
 	<!-- svelte-ignore event_directive_deprecated -->
 	<div
 		class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}
+		
 		"
 		role="button"
 		tabindex="0"
@@ -61,7 +62,7 @@
 		height: $socket-size;
 		margin: $socket-margin 0;
 		vertical-align: middle;
-		background: var(--background);
+		background-color: var(--background);
 		z-index: 2;
 		box-sizing: border-box;
 
@@ -82,12 +83,20 @@
 		} */
 	}
 	.array {
+		--opacity: 15%;
 		border: 4px dashed var(--background);
-		background-color: oklch(var(--arrayBackgroundColor) / var(--tw-bg-opacity));
+		background-color: transparent;
+		background-color: color-mix(in srgb, oklch(var(--arrayBackgroundColor)), oklch(var(--b1)) var(--opacity));
 		border-radius: 0%;
 
+
 		&:hover {
-			background-color: oklch(var(--b1) / var(--tw-bg-opacity));
+			// --opacity: light-dark(25%, 15%);
+
+			@media (prefers-color-scheme: dark) {
+				filter: brightness(1.15)
+			}
 		}
+
 	}
 </style>

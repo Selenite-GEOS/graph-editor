@@ -12,7 +12,6 @@ import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
 import { ErrorWNotif, _ } from '$lib/global/index.svelte';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
-import wu from 'wu';
 import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';
 import type { HistoryPlugin } from '$graph-editor/plugins/history';
@@ -35,6 +34,7 @@ import {
 import { NodeStorage } from '$graph-editor/storage';
 import { CodeIntegration } from './CodeIntegration';
 import type { ConnectionPlugin } from '$graph-editor/setup/ConnectionSetup';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -121,6 +121,7 @@ export class NodeFactory implements ComponentSupportInterface {
 	);
 
 	lastSelectedNode = $state<Node>();
+	previewedNodes = new SvelteSet<Node>();
 
 	modalStore: Readable<Modal> = readable(Modal.instance);
 
@@ -677,6 +678,8 @@ export class NodeFactory implements ComponentSupportInterface {
 		this.selector.unselectAll();
 	}
 
+	dataflowCache = new SvelteMap<Node, Record<string, unknown>>();
+
 	async runDataflowEngines() {
 		if (!this.#isDataflowEnabled) {
 			console.warn('Dataflow engines are disabled');
@@ -690,6 +693,10 @@ export class NodeFactory implements ComponentSupportInterface {
 				// .filter((n) => n instanceof AddNode || n instanceof DisplayNode)
 				.forEach((n) => {
 					this.dataflowEngine.fetch(n.id);
+					this.dataflowEngine.cache.get(n.id)?.then((res) => {
+						console.log('Dataflow engine finished', n.label, res);
+						this.dataflowCache.set(n, res)
+					})
 					n.needsProcessing = false;
 				});
 		} catch (e) {

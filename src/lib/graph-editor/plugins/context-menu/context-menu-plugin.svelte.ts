@@ -379,6 +379,7 @@ export function contextMenuSetup({
 					if (context.data.context !== 'root') {
 						if (!(context.data.context instanceof Node)) return context;
 						console.debug('Context menu on node');
+						const node = context.data.context as Node;
 						// (factory as NodeFactory).select(context.data.context, {
 						// 	accumulate: (factory as NodeFactory).selector.entities.size > 1
 						// });
@@ -389,7 +390,7 @@ export function contextMenuSetup({
 									label: 'Delete',
 									description: 'Delete a node from the editor, removing its connections.',
 									async action() {
-										const node = context.data.context as Node;
+										
 
 										if (node.selected) {
 											await (factory as NodeFactory).deleteSelectedElements();
@@ -399,6 +400,15 @@ export function contextMenuSetup({
 									},
 									path: [],
 									tags: ['delete', 'deletion']
+								},
+								{
+									id: 'preview',
+									get label() {
+										 return node.previewed ? 'Stop Preview' : 'Preview';
+									},
+									action() {
+										node.previewed = !node.previewed;
+									},
 								}
 							],
 							pos: { x: context.data.event.clientX, y: context.data.event.clientY },

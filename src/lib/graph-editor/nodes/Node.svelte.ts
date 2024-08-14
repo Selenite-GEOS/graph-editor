@@ -150,7 +150,6 @@ export type NodeSaveData = {
 	position?: { x: number; y: number };
 	state: Record<string, unknown>;
 	inputControlValues: Node['initialValues'];
-
 	selectedInputs: string[];
 	selectedOutputs: string[];
 };
@@ -387,6 +386,20 @@ export class Node<
 	}
 	label = $state('');
 	id: string;
+
+	get previewed(): boolean {
+		return this.factory?.previewedNodes.has(this) ?? false;
+	}
+
+	set previewed(previewed: boolean) {
+		if (previewed) {
+			this.factory?.previewedNodes.clear();
+			this.factory?.previewedNodes.add(this);
+		} else {
+			this.factory?.previewedNodes.delete(this);
+		}
+	}
+
 	get selected() {
 		return this.factory?.selector.isSelected(this) ?? false;
 	}

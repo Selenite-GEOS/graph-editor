@@ -73,7 +73,7 @@
 		const parent = (floating.elements.reference as HTMLElement | undefined | null)?.parentElement;
 		if (!parent) return;
 		parent.style.zIndex = String(node.picked ? 15 : node.selected ? 10 : 5);
-	})
+	});
 
 	let editingName = $state(false);
 	let nameInput = $state<HTMLInputElement>();
@@ -202,10 +202,14 @@
 	bind:this={floating.elements.reference}
 	class:transition-all={transitionEnabled}
 	class:text-primary={node.needsProcessing}
-	class="relative border-base-200 border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
+	class="relative border-base-200 border border-opacity-0 doverflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
 	{node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300')}
-	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}"
-	style={transitionEnabled ? `max-width: ${node.width}px; max-height: ${node.height}px` : ''}
+	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}
+	{node.previewed ? 'previewed' : ''}
+	"
+	style={transitionEnabled
+		? `max-width: ${node.width}px; max-height: ${node.height}px; transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
+		: ''}
 	on:dblclick={(e) => {
 		if (node.factory?.selector.accumulating) {
 			stopPropagation(e);
@@ -232,90 +236,90 @@
 		bind:clientHeight={node.height}
 	>
 		{#if node.label && node.label !== ''}
-		<header class="grid">
-			{#if node.name || editingName}
-				<h2 class="text-sm mb-1 col-start-1">
-					{node.label}
-				</h2>
-			{/if}
-			<h1
-				class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
-				title={constructor.description}
-			>
-				<!-- svelte-ignore event_directive_deprecated -->
-				<button
-					type="button"
-					class="cursor-text pe-2"
-					use:shortcut={{
-						ctrl: true,
-						repeats: false,
-						action(btn) {
-							btn.classList.remove('cursor-text');
-						},
-						endAction(btn) {
-							btn.classList.add('cursor-text');
-						}
-					}}
-					on:click={(e) => {
-						if (e.ctrlKey || e.altKey || e.shiftKey) return;
-						if (lastPointerDownPos) {
-							const pos = posFromClient(e);
-							const dist = distance(lastPointerDownPos, pos);
-							console.debug('Dragged distance', dist);
-							if (dist > 2) return;
-						}
-						editingName = true;
-						node.factory?.unselectAll();
-					}}
-					on:pointerdown={(e) => {
-						lastPointerDownPos = posFromClient(e);
-					}}
-				>
-					{node.name ?? node.label}
-				</button>
-				{#if editingName}
-					<!-- svelte-ignore event_directive_deprecated -->
-					<input
-						bind:this={nameInput}
-						class="absolute input inset-0 text-base-content"
-						on:blur={() => {
-							if (!nameInput || !editingName) return;
-							node.name = nameInput.value;
-							editingName = false;
-							lastPointerDownPos = undefined;
-						}}
-						on:dblclick={stopPropagation}
-						on:pointerdown={stopPropagation}
-						value={node.name}
-						use:shortcut={{
-							key: 'enter',
-							ignoreElements: [],
-							action() {
-								node.name = nameInput!.value;
-								editingName = false;
-								editingName = false;
-							}
-						}}
-						use:shortcut={{
-							key: 'escape',
-							ignoreElements: [],
-							action() {
-								editingName = false;
-							}
-						}}
-					/>
+			<header class="grid">
+				{#if node.name || editingName}
+					<h2 class="text-sm mb-1 col-start-1">
+						{node.label}
+					</h2>
 				{/if}
-			</h1>
-			<aside class="col-start-2 row-span-full ms-4 max-h-0">
-				{#each node.sortedControls as [k, control]}
-					{#if control.placeInHeader}
-						{@render controlSnippet(control, {})}
+				<h1
+					class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
+					title={constructor.description}
+				>
+					<!-- svelte-ignore event_directive_deprecated -->
+					<button
+						type="button"
+						class="cursor-text pe-2"
+						use:shortcut={{
+							ctrl: true,
+							repeats: false,
+							action(btn) {
+								btn.classList.remove('cursor-text');
+							},
+							endAction(btn) {
+								btn.classList.add('cursor-text');
+							}
+						}}
+						on:click={(e) => {
+							if (e.ctrlKey || e.altKey || e.shiftKey) return;
+							if (lastPointerDownPos) {
+								const pos = posFromClient(e);
+								const dist = distance(lastPointerDownPos, pos);
+								console.debug('Dragged distance', dist);
+								if (dist > 2) return;
+							}
+							editingName = true;
+							node.factory?.unselectAll();
+						}}
+						on:pointerdown={(e) => {
+							lastPointerDownPos = posFromClient(e);
+						}}
+					>
+						{node.name ?? node.label}
+					</button>
+					{#if editingName}
+						<!-- svelte-ignore event_directive_deprecated -->
+						<input
+							bind:this={nameInput}
+							class="absolute input inset-0 text-base-content"
+							on:blur={() => {
+								if (!nameInput || !editingName) return;
+								node.name = nameInput.value;
+								editingName = false;
+								lastPointerDownPos = undefined;
+							}}
+							on:dblclick={stopPropagation}
+							on:pointerdown={stopPropagation}
+							value={node.name}
+							use:shortcut={{
+								key: 'enter',
+								ignoreElements: [],
+								action() {
+									node.name = nameInput!.value;
+									editingName = false;
+									editingName = false;
+								}
+							}}
+							use:shortcut={{
+								key: 'escape',
+								ignoreElements: [],
+								action() {
+									editingName = false;
+								}
+							}}
+						/>
 					{/if}
-				{/each}
-			</aside>
-		</header>
+				</h1>
+				<aside class="col-start-2 row-span-full ms-4 max-h-0">
+					{#each node.sortedControls as [k, control]}
+						{#if control.placeInHeader}
+							{@render controlSnippet(control, {})}
+						{/if}
+					{/each}
+				</aside>
+			</header>
 		{/if}
-		
+
 		{#each node.sortedControls as [key, control] (key)}
 			{#if !control.placeInHeader}
 				{@render controlSnippet(control, {
@@ -430,6 +434,88 @@
 </div> -->
 
 <style lang="scss">
+	@keyframes rotate {
+		100% {
+			transform: rotate(1turn);
+		}
+	}
+	@keyframes blink {
+		0%,
+		100% {
+			opacity: 0.5;
+		}
+		50% {
+			opacity: 1;
+		}
+	}
+	@keyframes outlineBlink {
+		0%,
+		100% {
+			outline-color: var(--fallback-a,oklch(var(--a)/0.5));
+		}
+		50% {
+			outline-color: var(--fallback-a,oklch(var(--a)/1));
+		}
+	}
+	.previewed {
+		position: relative;
+        animation: outlineBlink 1s ease-out infinite;
+		outline-style: solid;
+		&::before {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: -0.25rem;
+			text-align: center;
+			content: 'PREVIEWING';
+			color: oklch(var(--a));
+			font-size: x-large;
+			writing-mode: vertical-rl;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			transform: rotate(-180deg) translateX(100%);
+			animation: blink 1s ease-out infinite;
+		}
+	}
+	// .previewed {
+	// 	outline: 29px solid var(--a) !important;
+	// }
+	// 	position: relative;
+	// 	&::before {
+	// 		content: '';
+	// 		position: absolute;
+	// 		z-index: -2;
+	// 		left: -50%;
+	// 		top: -50%;
+	// 		width: 200%;
+	// 		height: 200%;
+	// 		background-color: #399953;
+	// 		background-repeat: no-repeat;
+	// 		background-size:
+	// 			50% 50%,
+	// 			50% 50%;
+	// 		background-position:
+	// 			0 0,
+	// 			100% 0,
+	// 			100% 100%,
+	// 			0 100%;
+	// 		background-image: linear-gradient(#399953, #399953), linear-gradient(#fbb300, #fbb300),
+	// 			linear-gradient(#d53e33, #d53e33), linear-gradient(#377af5, #377af5);
+	// 		animation: rotate 4s linear infinite;
+	// 	}
+	// 	&::after {
+	// 		content: '';
+	// 		position: absolute;
+	// 		z-index: -1;
+	// 		left: 6px;
+	// 		top: 6px;
+	// 		width: calc(100% - 12px);
+	// 		height: calc(100% - 12px);
+	// 		background: transparent;
+	// 		border-radius: 5px;
+	// 	}
+	// }
+
 	@property --o {
 		syntax: '<number>'; /* <- defined as type number for the transition to work */
 		initial-value: 0;
