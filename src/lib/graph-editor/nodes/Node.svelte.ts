@@ -395,6 +395,7 @@ export class Node<
 		if (previewed) {
 			this.factory?.previewedNodes.clear();
 			this.factory?.previewedNodes.add(this);
+			this.factory?.dataflowEngine.fetch(this.id);
 		} else {
 			this.factory?.previewedNodes.delete(this);
 		}
