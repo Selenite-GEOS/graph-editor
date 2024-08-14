@@ -66,6 +66,14 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return super.getNode(id);
 	}
 
+	override removeNode(id: string) {
+		const node = this.getNode(id);
+		if (node) {
+			this.previewedNodes.delete(node);
+		}
+		return super.removeNode(id);
+	}
+
 	get nodes() {
 		return this.getNodes();
 	}
