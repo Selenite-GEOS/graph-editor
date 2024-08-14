@@ -49,5 +49,7 @@ pnpm publish
 - Code integration : Update existing node names instead of duplicating
 - Make history undo / redo use factory.bulkOperation
 - Add index to Context Menu items and fix sorting / enter
+- Add variables
+- Add minimap
 ### Not important
 - make node selection framework agnostic
