@@ -386,6 +386,15 @@ export function contextMenuSetup({
 						showContextMenu({
 							items: [
 								{
+									id: 'preview',
+									get label() {
+										 return node.previewed ? 'Stop Preview' : 'Preview';
+									},
+									action() {
+										node.previewed = !node.previewed;
+									},
+								},
+								{
 									id: 'delete',
 									label: 'Delete',
 									description: 'Delete a node from the editor, removing its connections.',
@@ -401,15 +410,6 @@ export function contextMenuSetup({
 									path: [],
 									tags: ['delete', 'deletion']
 								},
-								{
-									id: 'preview',
-									get label() {
-										 return node.previewed ? 'Stop Preview' : 'Preview';
-									},
-									action() {
-										node.previewed = !node.previewed;
-									},
-								}
 							],
 							pos: { x: context.data.event.clientX, y: context.data.event.clientY },
 							searchbar: false
