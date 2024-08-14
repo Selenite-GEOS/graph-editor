@@ -51,5 +51,9 @@ pnpm publish
 - Add index to Context Menu items and fix sorting / enter
 - Add variables
 - Add minimap
+- Add smarter drop from node
+- Add auto connection
+- Add magnetic connection
+- Add panning viewport
 ### Not important
 - make node selection framework agnostic
