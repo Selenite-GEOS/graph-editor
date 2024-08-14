@@ -29,7 +29,7 @@ export class DOMSocketPosition<K> extends BaseSocketPosition<Schemes, K> {
 
 	async calculatePosition(nodeId: string, side: Side, key: string, element: HTMLElement) {
 		const view = this.area?.nodeViews.get(nodeId);
-		console.debug('calculate position');
+		// console.debug('calculate position');
 		if (!view?.element) return null;
 		const position = await getElementCenter(element, view.element);
 

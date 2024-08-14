@@ -25,7 +25,7 @@
 	let { data: inputControl, inputTextSize = 'text-md', focus = false }: Props = $props();
 	let type = $derived(inputControl.type);
 	const isCheckbox = $derived(type === 'checkbox');
-	$inspect(inputControl.value).with(console.debug);
+	// $inspect(inputControl.value).with(console.debug);
 	const modal = Modal.instance;
 	const simpleTypes = ['checkbox', 'group-name-ref', 'integer', 'number', 'text'] as const;
 	const inputType: Record<(typeof simpleTypes)[number], HTMLInputTypeAttribute> = {
@@ -88,11 +88,11 @@
 		inputControl.type = socketToControl[k];
 		console.debug('control type', inputControl.type);
 	}
-	$inspect('InputControl:Type', inputControl.type).with(console.debug);
+	// $inspect('InputControl:Type', inputControl.type).with(console.debug);
 	let focusableInput = $state<HTMLInputElement>();
 	$effect(() => {
 		if (focus) {
-			console.log('Focus', focusableInput);
+			// console.log('Focus', focusableInput);
 			focusableInput?.focus();
 		}
 	});
