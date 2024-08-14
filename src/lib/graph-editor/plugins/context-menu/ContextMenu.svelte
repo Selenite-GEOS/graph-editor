@@ -25,7 +25,7 @@
 	import Portal from 'svelte-portal';
 	import Menu from './Menu.svelte';
 	import { fade } from 'svelte/transition';
-	import { untrack } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	let searchInput = $state<HTMLInputElement>();
 	let menuCmpnt = $state<Menu>();
 	$effect(() => {
@@ -41,6 +41,19 @@
 		}
 	});
 
+	const menuElmnt = $derived(floating.elements.floating);
+	
+	// Set min size to initial size
+	$effect(() => {
+		if (!menu.visible || !menuElmnt) return;
+
+		// Wait for first state render
+		tick().then(() => {
+			const { width, height } = menuElmnt.getBoundingClientRect();
+			menu.minHeight = height;
+			menu.minWidth = width;
+		});
+	});
 </script>
 
 {#if menu.visible}
@@ -98,7 +111,9 @@
 				ignoreElements: []
 			}}
 			bind:this={floating.elements.floating}
-			style={floating.floatingStyles}
+			style={floating.floatingStyles +
+				`min-height: ${menu.minHeight}px;` +
+				`min-width: ${menu.minWidth}px;`}
 			role="menu"
 			tabindex="0"
 			transition:fade={{ duration: 200 }}
@@ -114,19 +129,20 @@
 			on:blur={() => {
 				menu.focused = false;
 			}}
-			class="floating z-20 context-menu flex flex-col overflow-x-clip scrollbar-corner-rounded-full scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 scrollbar-track-slate-900 overflow-y-auto rounded-box border shadow-lg border-base-300"
+			class="floating z-20 grid items-start grid-rows-[0fr,1fr] context-menu flex-col overflow-x-clip scrollbar-corner-rounded-full scrollbar-thin scrollbar-track-rounded-full scrollbar-thumb-rounded-full scrollbar-thumb-slate-300 scrollbar-track-slate-900 overflow-y-auto rounded-box border shadow-lg border-base-300"
 		>
 			{#if menu.searchbar}
 				<input
 					bind:this={searchInput}
 					type="text"
-					class="p-3 rounded-t-box"
+					class="p-3 rounded-t-box row-start-1"
 					placeholder="Search..."
 					bind:value={menu.query}
 				/>
 			{/if}
 			<Menu
 				bind:this={menuCmpnt}
+				class="row-start-2 h-full"
 				items={menu.filteredItems}
 				sort={menu.query.trim().length === 0}
 				onclick={() => {

@@ -6,7 +6,10 @@
 		ContextMenuComponent,
 		nodeItem,
 		xmlItem,
-		xmlNodeItems
+		xmlNodeItems,
+
+		contextMenu
+
 	} from '$graph-editor/plugins/context-menu';
 	import { AreaExtensions } from 'rete-area-plugin';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
@@ -215,6 +218,7 @@
 		use:shortcut={{
 			key: 'a',
 			async action(e) {
+				if (contextMenu.visible) return;
 				await editor?.factory?.arrange?.layout();
 				const area = editor?.factory?.area;
 				if (!area) return;

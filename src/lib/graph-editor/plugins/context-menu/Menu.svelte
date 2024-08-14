@@ -69,11 +69,11 @@
 	}
 </script>
 
+<div class="p-2 bg-neutral bg-opacity-100 text-neutral-content {classes}">
 <TreeComponent
 	bind:this={treeCmpnt}
 	bind:element={treeElement}
 	{tree}
-	class="p-2 bg-neutral bg-opacity-100 text-neutral-content {classes}"
 >
 	{#snippet leaf(item: MenuItem)}
 		<!-- svelte-ignore event_directive_deprecated -->
@@ -89,3 +89,4 @@
 		>
 	{/snippet}
 </TreeComponent>
+</div>

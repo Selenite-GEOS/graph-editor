@@ -51,14 +51,14 @@
 	}
 </script>
 
-<div bind:this={element} class="grid grid-cols-[1rem,1fr] gap-1 {classes}" class:hidden={!expanded}>
+<div bind:this={element} class="grid items-start grid-cols-[1rem,1fr] gap-1 {classes}" class:hidden={!expanded}>
 	{#each tree as elmnt, i (i)}
 		{#if isForest(elmnt)}
-			<div class="grid grid-cols-subgrid grid-rows-subgrid col-span-2">
+			<div class="grid items-start grid-cols-subgrid grid-rows-subgrid col-span-2">
 				<!-- svelte-ignore event_directive_deprecated -->
 				<button
 					type="button"
-					class="ps-2 text-start gap-4 grid grid-cols-subgrid grid-rows-subgrid items-center col-span-2 truncate"
+					class="ps-2 text-start gap-4 grid items-start grid-cols-subgrid grid-rows-subgrid items-center col-span-2 truncate"
 					on:click={() => toggleExpanded(i)}
 				>
 					<Fa
