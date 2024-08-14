@@ -7,6 +7,8 @@ import { get, writable, type Readable, type Writable } from 'svelte/store';
 import { NodeFactory } from './NodeFactory.svelte';
 import wu from 'wu';
 import { _, ErrorWNotif } from '$lib/global/index.svelte';
+import { SvelteSet } from 'svelte/reactivity';
+import type { SaveData } from '@selenite/commons';
 
 export type CommentSaveData = {
 	id: string;
@@ -14,13 +16,7 @@ export type CommentSaveData = {
 	links: string[];
 };
 
-export type NodeEditorSaveData = {
-	nodes: NodeSaveData[];
-	connections: ConnectionSaveData[];
-	editorName: string;
-	variables: Record<string, Variable>;
-	comments?: CommentSaveData[];
-};
+export type NodeEditorSaveData = SaveData<NodeEditor>
 
 /**
  * A graph editor for visual programming.
@@ -33,6 +29,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return this.factory?.getArea();
 	}
 	variables: Writable<Record<string, Variable>> = writable({});
+	previewedNodes = new SvelteSet<Node>();
 
 	// constructor() {
 	// }
@@ -105,7 +102,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		this.onChangeNameListeners.push(listener);
 	}
 
-	toJSON(): NodeEditorSaveData {
+	toJSON() {
 		const variables = get(this.variables);
 
 		for (const v of Object.values(variables)) {
@@ -115,6 +112,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return {
 			editorName: this.graphName,
 			variables,
+			previewedNodes: Array.from(this.previewedNodes).map((node) => node.id),
 			nodes: this.getNodes().map((node) => node.toJSON()),
 			connections: this.getConnections().map((conn) => conn.toJSON()),
 			comments: this.factory?.comment

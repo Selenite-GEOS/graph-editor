@@ -121,7 +121,11 @@ export class NodeFactory implements ComponentSupportInterface {
 	);
 
 	lastSelectedNode = $state<Node>();
-	previewedNodes = new SvelteSet<Node>();
+	editor: NodeEditor;
+	get previewedNodes() {
+		return this.editor.previewedNodes;
+	}
+
 
 	modalStore: Readable<Modal> = readable(Modal.instance);
 
@@ -262,7 +266,10 @@ export class NodeFactory implements ComponentSupportInterface {
 			this.editor.variables.set(editorSaveData.variables);
 			this.editor.setName(editorSaveData.editorName);
 			for (const nodeSaveData of editorSaveData.nodes) {
-				await this.loadNode(nodeSaveData);
+				const node = await this.loadNode(nodeSaveData);
+				if (editorSaveData.previewedNodes?.includes(node.id)) {
+					this.editor.previewedNodes.add(node)
+				}
 			}
 
 			for (const commentSaveData of editorSaveData.comments ?? []) {
@@ -303,7 +310,7 @@ export class NodeFactory implements ComponentSupportInterface {
 		});
 	}
 	area = $state<AreaPlugin<Schemes, AreaExtra>>();
-	editor: NodeEditor;
+	
 	public readonly makutuClasses?: MakutuClassRepository;
 
 	public readonly dataflowEngine = createDataflowEngine();
