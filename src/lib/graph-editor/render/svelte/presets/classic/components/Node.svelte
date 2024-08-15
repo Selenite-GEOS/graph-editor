@@ -211,6 +211,9 @@
 		? `max-width: ${node.width}px; max-height: ${node.height}px; transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
 		: ''}
 	on:dblclick={(e) => {
+		stopPropagation(e);
+		node.factory?.centerView([node]);
+		node.factory?.selector.unselect(node);
 		if (node.factory?.selector.accumulating) {
 			stopPropagation(e);
 		}
