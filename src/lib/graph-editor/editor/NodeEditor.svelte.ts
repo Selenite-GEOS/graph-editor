@@ -7,7 +7,7 @@ import { NodeFactory } from './NodeFactory.svelte';
 import wu from 'wu';
 import { _ } from '$lib/global/index.svelte';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import type { SaveData } from '@selenite/commons';
+import { animationFrame, browser, type SaveData } from '@selenite/commons';
 import type { Schemes } from '$graph-editor/schemes';
 
 export type CommentSaveData = {
@@ -270,16 +270,30 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return true;
 	}
 
+	clearing = $state(false)
+
 	async clear() {
+		if (this.nodesMap.size === 0) return true;
 		if (!(await this.emit({ type: 'clear' }))) {
 			await this.emit({ type: 'clearcancelled' });
 			return false;
+		}
+		this.clearing = true;
+		if (browser) {
+			document.body.style.cursor = 'wait';
+			await animationFrame(2)
 		}
 
 		for (const connection of this.connectionsMap.values()) await this.removeConnection(connection);
 		for (const node of this.nodesMap.values()) await this.removeNode(node);
 
+		if (browser) {
+			document.body.style.cursor = '';
+
+		}
+
 		await this.emit({ type: 'cleared' });
+		this.clearing = false;
 		return true;
 	}
 

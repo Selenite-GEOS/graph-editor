@@ -44,7 +44,7 @@
             if (!schema) return;
             factory?.codeIntegration.toGraph({text: $textareaContent, schema})
         }}> To graph </button>
-        <button class="btn btn-warning pointer-events-auto" onclick={() => factory?.clear()}>
+        <button class="btn btn-warning pointer-events-auto" disabled={factory?.editor.clearing ?? false} onclick={() => factory?.clear()}>
             Clear
         </button>
 	</div>
