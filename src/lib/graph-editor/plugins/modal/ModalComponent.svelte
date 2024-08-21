@@ -41,7 +41,7 @@
 			{/if}
 			<div class="text-base-content">
 				{#if isComponentModalSettings(lastModal)}
-					<svelte:component this={lastModal.component} {...lastModal.props} modal={lastModal} />
+					<lastModal.component {...lastModal?.props} modal={lastModal} />
 				{:else if isSnippetModalSettings(lastModal)}
 					{@render lastModal.snippet(lastModal.props)}
 				{/if}

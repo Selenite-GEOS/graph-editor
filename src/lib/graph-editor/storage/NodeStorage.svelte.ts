@@ -63,6 +63,6 @@ export class NodeStorage {
 		const res = (await Promise.all(NodeStorage.sources.map((source) => source.getGraphs()))).flat();
 
 		NodeStorage.mainStorage.saveGraphs(res);
-		console.log('Pulled sources', res);
+		console.debug('Pulled sources', res);
 	}
 }

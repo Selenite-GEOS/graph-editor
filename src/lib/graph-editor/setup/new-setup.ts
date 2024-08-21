@@ -18,6 +18,7 @@ import { gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines'
 import { notificationsSetup } from '$graph-editor/plugins/notifications';
 import type { GraphNode } from '$graph-editor/nodes';
 import { HistoryPlugin } from '$graph-editor/plugins/history';
+import { setupSvelteRender } from '$graph-editor/render';
 
 export type XmlContext = {};
 
@@ -203,5 +204,18 @@ export async function setupFullGraphEditor(
 			// new RenderSetup(),
 			// new ContextMenuSetup()
 		]
+	});
+}
+
+export async function setupSvelteGraphEditor(
+	params: SetupGraphEditorParams & {
+		showContextMenu?: ShowContextMenu;
+		additionalNodeItems?: NodeMenuItem[];
+	} = {}
+): Promise<SetupGraphEditorResult> {
+	return setupFullGraphEditor({...params, setups: [
+		...params.setups ?? [],
+		setupSvelteRender
+	]
 	});
 }

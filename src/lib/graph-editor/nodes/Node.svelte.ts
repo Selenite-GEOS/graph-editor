@@ -34,7 +34,7 @@ import type { Schemes } from '$graph-editor/schemes';
 import { structures } from 'rete-structures';
 import { getLeavesFromOutput } from './utils';
 import type { HTMLInputAttributes } from 'svelte/elements';
-import { uuidv4 } from '@selenite/commons';
+import { uuidv4, type SaveData } from '@selenite/commons';
 import type { SelectorEntity } from '$graph-editor/editor/NodeSelection.svelte';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -139,7 +139,7 @@ export interface NodeParams {
 	height?: number;
 	factory?: NodeFactory;
 	params?: Record<string, unknown>;
-	initialValues?: Node['initialValues'];
+	initialValues?: Node['initialValues'] | Record<string, unknown>;
 	state?: Record<string, unknown>;
 }
 
@@ -245,7 +245,7 @@ export class Node<
 {
 	#width = $state(100);
 	#height = $state(50);
-
+	visible = $state(true);
 	get width() {
 		return this.#width;
 	}
@@ -291,6 +291,8 @@ export class Node<
 	// height = 120;
 	private components: BaseComponent[] = [];
 	static activeFactory: NodeFactory | undefined;
+
+	inEditor = $derived(this.editor?.hasNode(this) ?? false);
 	private outData: Record<string, unknown> = {};
 	private resolveEndExecutes = new Stack<() => void>();
 	private naturalFlowExec: string | undefined = 'exec';
@@ -359,14 +361,19 @@ export class Node<
 		].flat();
 	}
 
-	outConnections = $derived({...this.outgoingDataConnections, ...this.outgoingExecConnections})
-	inConnections = $derived({...this.ingoingDataConnections, ...this.ingoingExecConnections})
+	outConnections = $derived({ ...this.outgoingDataConnections, ...this.outgoingExecConnections });
+	inConnections = $derived({ ...this.ingoingDataConnections, ...this.ingoingExecConnections });
 
 	constructor(params: NodeParams = {}) {
 		const { label = '', width = 190, height = 120, factory } = params;
 		this.id = uuidv4();
 		this.label = label;
-		this.initialValues = params.initialValues;
+		this.initialValues =
+			params.initialValues === undefined
+				? undefined
+				: 'inputs' in params.initialValues
+					? (params.initialValues as Node['initialValues'])
+					: { inputs: params.initialValues, controls: {} };
 		this.pythonComponent = this.addComponentByClass(PythonNodeComponent);
 		this.socketSelectionComponent = this.addComponentByClass(R_SocketSelection_NC);
 		this.state = (params.state ?? {}) as State;
@@ -477,7 +484,7 @@ export class Node<
 				`A node can't be saved as it's missing in the node registry. Node : ${this.label}`
 			);
 		}
-		console.debug('Saving', this);
+		// console.debug('Saving', this);
 		const inputControlValues: Node['initialValues'] = { inputs: {}, controls: {} };
 		const selectedInputs: string[] = [];
 		const selectedOutputs: string[] = [];
@@ -504,10 +511,43 @@ export class Node<
 			params: this.params,
 			state: $state.snapshot(this.state) as State,
 			position: this.getArea()?.nodeViews.get(this.id)?.position,
-			inputControlValues: inputControlValues,
+			inputControlValues: $state.snapshot(inputControlValues),
 			selectedInputs,
 			selectedOutputs
 		};
+	}
+
+	static async fromJSON(
+		data: SaveData<Node>,
+		{ factory }: { factory?: NodeFactory }
+	): Promise<Node> {
+		const nodeClass = nodeRegistry.get(data.type);
+		if (!nodeClass) {
+			throw new Error(`Node class ${data.type} not found`);
+		}
+
+		const node = new nodeClass({
+			...data.params,
+			factory,
+			initialValues: data.inputControlValues,
+			state: data.state
+		});
+		node.id = data.id;
+		if (node.initializePromise) {
+			await node.initializePromise;
+			if (node.afterInitialize) node.afterInitialize();
+		}
+
+		node.applyState();
+
+		for (const key of data.selectedInputs) {
+			node.selectInput(key);
+		}
+
+		for (const key of data.selectedOutputs) {
+			node.selectOutput(key);
+		}
+		return node;
 	}
 
 	selectInput(key: string) {
@@ -717,7 +757,7 @@ export class Node<
 				props: params?.props,
 				socketType: params?.type ?? 'any',
 				datastructure: params?.datastructure ?? 'scalar',
-				initial: this.initialValues?.inputs[key] ?? params?.initial,
+				initial: this.initialValues?.inputs?.[key] ?? params?.initial,
 				changeType: params?.changeType
 			});
 			input.addControl(inputControl);
@@ -735,37 +775,14 @@ export class Node<
 		type = 'any',
 		index = undefined
 	}: InDataParams<N>): Input {
-		const input = new Input(
-			new Socket({
-				name: socketLabel,
-				isArray: isArray,
-				type: type,
-				isRequired: isRequired,
-				node: this
-			}),
-			displayName,
-			isArray,
-			{ isRequired: isRequired, index }
-		);
-		if (control) {
-			if (control.options) {
-				const debouncedOnChange = control.options.debouncedOnChange;
-				control.options.debouncedOnChange = (value: unknown) => {
-					if (debouncedOnChange) debouncedOnChange(value as N);
-					this.getDataflowEngine().reset(this.id);
-				};
-			}
-			input.addControl(
-				new InputControl({
-					type: control.type,
-					initial: control.options.initial,
-					readonly: control.options.readonly,
-					onChange: control.options.change
-				})
-			);
-		}
-		this.addInput(name, input as unknown as Input<Exclude<Inputs[keyof Inputs], undefined>>);
-		return input;
+		return this.addInData(name, {
+			label: socketLabel === '' ? displayName : socketLabel,
+			type,
+			datastructure: isArray ? 'array' : 'scalar',
+			isRequired,
+			index,
+			control
+		});
 	}
 
 	makeInputControl<T extends InputControlType, D extends SocketDatastructure = SocketDatastructure>(
@@ -915,6 +932,12 @@ export class Connection<
 	// 	super(source, sourceOutput, target, targetInput);
 
 	// }
+	visible = $derived.by(() => {
+		const source = this.factory?.editor.getNode(this.source);
+		const target = this.factory?.editor.getNode(this.target);
+		if (!source || !target) return true;
+		return source.visible && target.visible;
+});
 	get selected(): boolean {
 		return this.factory ? this.factory.selector.isSelected(this as SelectorEntity) : false;
 	}

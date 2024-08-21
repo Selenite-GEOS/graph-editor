@@ -113,7 +113,7 @@
 			return;
 		}
 		const saveData = editor.toJSON();
-		console.debug('Save');
+		console.log('Save', saveData, editor);
 		$saveData = saveData;
 		notifications.success({
 			autoClose: 3000,
@@ -162,7 +162,7 @@
 	</button>
 {/snippet}
 
-<ContextMenuComponent />
+
 <div class="h-[100vh] grid relative bg-base-200">
 	<div class="z-10 absolute top-4 left-4 flex gap-2 items-end">
 		<button

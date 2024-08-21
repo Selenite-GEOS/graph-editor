@@ -82,7 +82,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 						const { id, position, previous } = ctx.data;
 						const node = factory.getNode(id);
 						if (!node) {
-							console.error("Couldn't find node.");
+							// console.error("Couldn't find node.");
 							return ctx;
 						}
 						const dx = position.x - previous.x;
@@ -260,7 +260,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 
 	selectAll() {
 		const editor = this.owner.editor;
-		wu.chain<SelectorEntity>(editor.nodes, editor.connections).forEach((e) => this.entities.add(e));
+		wu.chain<SelectorEntity>(editor.nodesArray, editor.connectionsArray).forEach((e) => this.entities.add(e));
 		// this.comment?.comments.forEach((comment) => {
 		// 	this.comment?.select(comment.id);
 		// });

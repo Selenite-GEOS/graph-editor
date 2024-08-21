@@ -18,7 +18,8 @@
 	};
 </script>
 
-{#snippet notification(notif: DisplayedNotification)}
+{#snippet notification(displayedNotif: DisplayedNotification)}
+	{@const notif = displayedNotif.notif}
 	<article
 		role="alert"
 		class="alert shadow-lg w-[25rem]"
@@ -43,7 +44,7 @@
 			<button
 				type="button"
 				class="btn btn-sm btn-ghost place-self-end self-center"
-				onclick={() => notif.remove()}
+				onclick={() => displayedNotif.remove()}
 			>
 				<Fa icon={faTimes} class="opacity-75" />
 			</button>

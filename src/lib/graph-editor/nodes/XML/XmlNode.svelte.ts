@@ -30,6 +30,7 @@ import {
 	getSharedString,
 	singular,
 	splitCamelCase,
+	XmlSchema,
 	type ChildProps,
 	type SaveData
 } from '@selenite/commons';
@@ -53,6 +54,7 @@ export type XmlConfig = {
 
 export type XmlNodeParams = NodeParams & {
 	xmlConfig: XmlConfig;
+	schema?: XmlSchema;
 	initialValues?: Record<string, unknown>;
 };
 
@@ -84,7 +86,7 @@ export class XmlToString extends Node<
 @registerNode('xml.XML', 'abstract')
 export class XmlNode extends Node<
 	Record<string, Socket<DataType>>,
-	{ value: Scalar; name?: Scalar<'groupNameRef'> },
+	{ value: Scalar; name: Scalar<'groupNameRef'> },
 	{ addXmlAttr: AddXmlAttributeControl },
 	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[] }
 > {
@@ -111,14 +113,33 @@ export class XmlNode extends Node<
 		return super.name;
 	}
 
+	toJSON(): SaveData<Node> {
+		const json = super.toJSON() as SaveData<Node> & { params: XmlNodeParams };
+		return {
+			...json,
+			params: {
+				...json.params,
+				xmlConfig: {
+					...json.params.xmlConfig,
+					complex: (json.params.xmlConfig.complex as ComplexType).toJSON()
+				}
+			}
+			
+		};
+	}
+
+	childrenSockets = new Map<string, string>();
+
 	constructor(xmlNodeParams: XmlNodeParams) {
 		let { initialValues = {} } = xmlNodeParams;
 		const xmlConfig = xmlNodeParams.xmlConfig;
+		const schema = xmlNodeParams.schema;
 		xmlNodeParams.params = {
 			...xmlNodeParams.params,
 			xmlConfig,
 			initialValues
 		};
+		
 
 		// console.debug('xmlNodeParams', xmlNodeParams);
 		const { xmlProperties, priorities: indices = {} } = xmlConfig;
@@ -170,27 +191,62 @@ export class XmlNode extends Node<
 		const isOnlyOptChildren = requiredChildren.length === 0;
 		for (const child of requiredChildren) {
 			const isArray = child.maxOccurs === undefined || child.maxOccurs > 1;
+			const key = `child:${child.type}`;
 			this.addXmlInData({
 				index: -2 - (xmlConfig.priorities?.[this.xmlTag]?.[child.type] ?? 0),
-				name: child.type,
+				name: key,
 				type: `xmlElement:${child.type}`,
 				isArray
 			});
+			this.childrenSockets.set(child.type, key);
 		}
 		const optChildTypes = complex.optionalChildTypes;
 		if (optChildTypes.length > 0) {
 			const sharedChildType = getSharedString(optChildTypes, { pluralize: true });
+			const key = `child:${
+				sharedChildType.length > 0 ? sharedChildType : isOnlyOptChildren ? this.xmlTag : 'optional'
+			}`;
 			this.addXmlInData({
 				index: -1,
-				name:
-					sharedChildType.length > 0
-						? sharedChildType
-						: isOnlyOptChildren
-							? this.xmlTag
-							: 'optional',
+				name: key,
 				isArray: true,
 				type: `xmlElement:${optChildTypes.join('|')}`
 			});
+			for (const childType of optChildTypes) {
+				this.childrenSockets.set(childType, key);
+			}
+		}
+
+		if (!xmlConfig.outLabel && schema) {
+			xmlConfig.outLabel = complex.name;
+			const parents = schema.parentsMap.get(complex.name);
+			if (parents && parents.length > 0) {
+				const sharedParent = getSharedString(parents);
+
+				if (parents.length > 1 && sharedParent.length > 0) {
+					xmlConfig.outLabel = sharedParent;
+				} else if (parents.length === 1) {
+					const parent = parents[0];
+					const parentComplex = schema.complexTypes.get(parent);
+					if (parentComplex && parentComplex.requiredChildren.length === 0) {
+						xmlConfig.outLabel = singular(parent);
+					}
+				} else {
+					const parentsChildren = wu(parents)
+						.map((p) => schema.complexTypes.get(p)?.childTypes)
+						.filter((s) => s !== undefined)
+						.map(getSharedString)
+						.filter((s) => s.length > 0)
+						.toArray();
+
+					const sharedParentChildren = getSharedString(parentsChildren);
+					// .flatten()
+
+					if (sharedParentChildren.length > 0) {
+						xmlConfig.outLabel = sharedParentChildren;
+					}
+				}
+			}
 		}
 
 		// Add XML output
@@ -285,6 +341,10 @@ export class XmlNode extends Node<
 
 	setName(name: string) {
 		this.name = name;
+	}
+
+	getChildSocket(type: string): string {
+
 	}
 
 	addInAttribute({
@@ -437,7 +497,7 @@ export class XmlNode extends Node<
 	}) {
 		this.xmlInputs[name] = { tag: tag };
 		this.addInData(name, {
-			label: name,
+			label: name.startsWith('child:') ? name.split(':')[1] : name,
 			type: type,
 			datastructure: isArray ? 'array' : 'scalar',
 			index,

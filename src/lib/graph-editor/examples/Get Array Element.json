@@ -1,0 +1,281 @@
+{
+    "editorName": "Get Array Element",
+    "graphName": "Get Array Element",
+    "variables": {},
+    "previewedNodes": [],
+    "nodes": [
+        {
+            "id": "73c3b83e-41ea-4d42-87e2-52860b138783",
+            "type": "array.Array",
+            "params": {},
+            "state": {
+                "type": "string",
+                "controlType": "text",
+                "dynamicTypeCmpnt": {
+                    "type": "string"
+                }
+            },
+            "position": {
+                "x": -480.1149634956615,
+                "y": -222.57477118597126
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": [
+                        "A",
+                        "brand",
+                        "new"
+                    ]
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "ac3cb2dd-e287-4dc7-91db-401b6ea4277d",
+            "type": "array.GetArrayElement",
+            "params": {},
+            "state": {
+                "dynamicTypeCmpnt": {
+                    "type": "string"
+                }
+            },
+            "position": {
+                "x": 55.641969802904725,
+                "y": -222.57477118597126
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "array": [
+                        ""
+                    ],
+                    "index": 3
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "ffe708ef-d364-40e1-9940-380b0f01726b",
+            "type": "io.DisplayNode",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": 506.13379123377854,
+                "y": -222.57477118597126
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "Array at 1 : brand"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "3c26f4fd-25c9-4bf7-9116-64348f5751cd",
+            "type": "string.Format",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": 387.1966413085982,
+                "y": -12.335934291418504
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "format": "Array at {i} : {name}",
+                    "data-i": "",
+                    "data-name": ""
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "c74964a7-a078-4344-9783-53ccaeb9e1e0",
+            "type": "array.MergeArrays",
+            "params": {},
+            "state": {
+                "dynamicTypeCmpnt": {
+                    "type": "string"
+                }
+            },
+            "position": {
+                "x": -264.03854441202884,
+                "y": 11.703011244985152
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "a": [
+                        ""
+                    ],
+                    "b": [
+                        ""
+                    ]
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "7597f079-d009-46ca-9b79-1b12644b4a85",
+            "type": "array.Array",
+            "params": {},
+            "state": {
+                "dynamicTypeCmpnt": {
+                    "type": "string"
+                }
+            },
+            "position": {
+                "x": -480.1149634956615,
+                "y": 216.48421166696357
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": [
+                        "World!"
+                    ]
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "12501294-a3bb-493b-b3a4-8a6bf73bfff3",
+            "type": "integer.IntegerNode",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": -67.40997838586676,
+                "y": 13.37547894958037
+            },
+            "inputControlValues": {
+                "inputs": {},
+                "controls": {
+                    "value": 1
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "6e076fda-a525-4ddf-8ca8-679377644ff6",
+            "type": "array.join",
+            "params": {},
+            "state": {
+                "dynamicTypeCmpnt": {
+                    "type": "string"
+                }
+            },
+            "position": {
+                "x": -32.32777559528257,
+                "y": 322.2168937123278
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "array": [
+                        ""
+                    ],
+                    "separator": "\\n"
+                },
+                "controls": {}
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        },
+        {
+            "id": "186b4e1c-0006-48e0-bff3-c54a78b058c0",
+            "type": "io.DisplayNode",
+            "params": {},
+            "state": {},
+            "position": {
+                "x": 506.13379123377854,
+                "y": 292.4226598303174
+            },
+            "inputControlValues": {
+                "inputs": {
+                    "input": ""
+                },
+                "controls": {
+                    "display": "A\nbrand\nnew\nWorld!"
+                }
+            },
+            "selectedInputs": [],
+            "selectedOutputs": []
+        }
+    ],
+    "connections": [
+        {
+            "id": "7a8bb4aca80d9746",
+            "source": "ac3cb2dd-e287-4dc7-91db-401b6ea4277d",
+            "target": "3c26f4fd-25c9-4bf7-9116-64348f5751cd",
+            "sourceOutput": "value",
+            "targetInput": "data-name"
+        },
+        {
+            "id": "4a6fd43996e5b794",
+            "source": "3c26f4fd-25c9-4bf7-9116-64348f5751cd",
+            "target": "ffe708ef-d364-40e1-9940-380b0f01726b",
+            "sourceOutput": "result",
+            "targetInput": "input"
+        },
+        {
+            "id": "b718afc727f42bee",
+            "source": "c74964a7-a078-4344-9783-53ccaeb9e1e0",
+            "target": "ac3cb2dd-e287-4dc7-91db-401b6ea4277d",
+            "sourceOutput": "value",
+            "targetInput": "array"
+        },
+        {
+            "id": "ae5238d92153db4e",
+            "source": "73c3b83e-41ea-4d42-87e2-52860b138783",
+            "target": "c74964a7-a078-4344-9783-53ccaeb9e1e0",
+            "sourceOutput": "value",
+            "targetInput": "a"
+        },
+        {
+            "id": "2d0aea892792e543",
+            "source": "7597f079-d009-46ca-9b79-1b12644b4a85",
+            "target": "c74964a7-a078-4344-9783-53ccaeb9e1e0",
+            "sourceOutput": "value",
+            "targetInput": "b"
+        },
+        {
+            "id": "40274b8649da2ebb",
+            "source": "12501294-a3bb-493b-b3a4-8a6bf73bfff3",
+            "target": "ac3cb2dd-e287-4dc7-91db-401b6ea4277d",
+            "sourceOutput": "value",
+            "targetInput": "index"
+        },
+        {
+            "id": "725fe5a024187f8f",
+            "source": "12501294-a3bb-493b-b3a4-8a6bf73bfff3",
+            "target": "3c26f4fd-25c9-4bf7-9116-64348f5751cd",
+            "sourceOutput": "value",
+            "targetInput": "data-i"
+        },
+        {
+            "id": "5b908d8c6172452c",
+            "source": "c74964a7-a078-4344-9783-53ccaeb9e1e0",
+            "target": "6e076fda-a525-4ddf-8ca8-679377644ff6",
+            "sourceOutput": "value",
+            "targetInput": "array"
+        },
+        {
+            "id": "21cdcb9283a5b902",
+            "source": "6e076fda-a525-4ddf-8ca8-679377644ff6",
+            "target": "186b4e1c-0006-48e0-bff3-c54a78b058c0",
+            "sourceOutput": "value",
+            "targetInput": "input"
+        }
+    ],
+    "comments": []
+}

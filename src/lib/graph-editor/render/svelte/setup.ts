@@ -11,6 +11,7 @@ import type { Component } from 'svelte';
 import { getSvelteRenderer, type SvelteRenderer } from './renderer.svelte';
 import { ButtonControl, InputControl, Socket } from '$graph-editor/socket';
 import { getDOMSocketPosition } from '../sockets-position.ts/dom-socket-position';
+import type { Setup } from '$graph-editor/setup/Setup';
 
 type ComponentProps = Record<string, any> | undefined | void | null;
 type RenderResult = { component: Component; props: ComponentProps } | undefined | void | null;
@@ -179,3 +180,10 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 
 	return params;
 };
+
+
+export const svelteRenderSetup: Setup = {
+	name: 'Svelte Render',
+	type: 'area',
+	setup: setupSvelteRender
+}

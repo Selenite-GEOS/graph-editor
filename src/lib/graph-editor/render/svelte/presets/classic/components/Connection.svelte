@@ -16,28 +16,12 @@
 		path: string;
 		type?: SocketType;
 		picked: boolean;
+		
 	};
-	let { id, selected, factory, path, picked, source }: Props = $props();
+	let { id, selected, factory, path, picked, source, visible }: Partial<Omit<Connection, "source">> & Props = $props();
 
 	const color = $derived(source ? assignColor(source.socket) : '');
-	// // svelte-ignore unused-export-let
-	// export let start: Position;
-	// // svelte-ignore unused-export-let
-	// export let end: Position;
-	// // svelte-ignore unused-export-let
-	// export let targetInput: string;
-	// // svelte-ignore unused-export-let
-	// export let target: string;
-	// // svelte-ignore unused-export-let
-	// export let source: string;
-	// // svelte-ignore unused-export-let
-	// export let sourceOutput: string;
-	// // svelte-ignore unused-export-let
-	// export let isPseudo = undefined;
-	// // svelte-ignore unused-export-let
-	// export let id: string;
-	// // svelte-ignore unused-export-let
-	// export let path: string;
+
 
 	function onClick() {
 		if (!factory) throw new ErrorWNotif('No factory');
@@ -72,7 +56,9 @@
 <!-- svelte-ignore event_directive_deprecated -->
 <svg
 	data-testid="connection"
+	class:opacity-0={visible !== undefined && !visible}
 	class="group hover:cursor-pointer -z-10"
+	
 	on:dblclick={stopPropagation}
 	on:click|stopPropagation={() => onClick()}
 	on:keypress={(e) => {
@@ -83,6 +69,9 @@
 	}}
 	on:contextmenu|preventDefault|stopPropagation={openContextMenu}
 >
+	<title>
+		{source ? source.socket.type : ""}
+	</title>
 	<path class="stroke-transparent pointer-events-auto" d={path} fill="none" stroke-width={'20px'} />
 	<path
 		class="visible-path pointers-events-none"

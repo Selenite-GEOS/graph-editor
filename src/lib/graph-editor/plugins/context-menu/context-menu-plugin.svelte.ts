@@ -99,39 +99,11 @@ export function xmlNodeItems({
 				console.error('failed to access complex type', complexType);
 				continue;
 			}
-			const parents = schema.parentsMap.get(complexType.name);
-			let outLabel = complexType.name;
-			if (parents && parents.length > 0) {
-				const sharedParent = getSharedString(parents);
-
-				if (parents.length > 1 && sharedParent.length > 0) {
-					outLabel = sharedParent;
-				} else if (parents.length === 1) {
-					const parent = parents[0];
-					const parentComplex = schema.complexTypes.get(parent);
-					if (parentComplex && parentComplex.requiredChildren.length === 0) {
-						outLabel = singular(parent);
-					}
-				} else {
-					const parentsChildren = wu(parents)
-						.map((p) => schema.complexTypes.get(p)?.childTypes)
-						.filter((s) => s !== undefined)
-						.map(getSharedString)
-						.filter((s) => s.length > 0)
-						.toArray();
-
-					const sharedParentChildren = getSharedString(parentsChildren);
-					// .flatten()
-
-					if (sharedParentChildren.length > 0) {
-						outLabel = sharedParentChildren;
-					}
-				}
-			}
+			
+			
 			const xmlConfig: XmlConfig = {
 				complex: complexType,
 				priorities,
-				outLabel,
 				xmlProperties: wu(complexType.attributes.values())
 					.map(
 						(attr) =>
@@ -148,6 +120,7 @@ export function xmlNodeItems({
 				label: name,
 				nodeClass: XmlNode,
 				params: {
+					schema,
 					xmlConfig
 				},
 				description: '',

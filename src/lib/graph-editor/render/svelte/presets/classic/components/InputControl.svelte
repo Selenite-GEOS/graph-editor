@@ -88,6 +88,7 @@
 		inputControl.type = socketToControl[k];
 		console.debug('control type', inputControl.type);
 	}
+
 	// $inspect('InputControl:Type', inputControl.type).with(console.debug);
 	let focusableInput = $state<HTMLInputElement>();
 	$effect(() => {
@@ -102,7 +103,7 @@
 {#snippet input(props: HTMLInputAttributes = {})}
 	<input
 		bind:this={focusableInput}
-		value={inputControl.value}
+		value={inputControl.value ?? ""}
 		ondblclick={stopPropagation}
 		onpointerdown={stopPropagation}
 		{...props}
@@ -156,7 +157,7 @@
 		</div>
 	{:else if type === 'textarea'}
 		<textarea
-			use:autosize
+			use:autosize={inputControl.value}
 			{...inputProps as HTMLTextareaAttributes}
 			class="textarea text-start max-h-[20rem] min-w-[11rem] text-base-content"
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea

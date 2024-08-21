@@ -18,7 +18,7 @@ import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
-import { downloadJSON, newUuid } from '@selenite/commons';
+import { downloadJSON, newUuid, type SaveData } from '@selenite/commons';
 import { Modal } from '$graph-editor/plugins/modal';
 import type {
 	BaseComponent,
@@ -32,7 +32,7 @@ import {
 	type SelectorEntity
 } from './NodeSelection.svelte';
 import { NodeStorage } from '$graph-editor/storage';
-import { CodeIntegration } from './CodeIntegration';
+import { CodeIntegration } from './CodeIntegration.svelte';
 import type { ConnectionPlugin } from '$graph-editor/setup/ConnectionSetup';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 
@@ -113,6 +113,8 @@ export class NodeFactory implements ComponentSupportInterface {
 			let res = '';
 			if (notif.title) res += notif.title + ':';
 			console.warn(res, notif.message);
+		},
+		hide() {
 		}
 	};
 	public readonly connectionPathType: Writable<ConnectionPathType> = persisted(
@@ -125,7 +127,6 @@ export class NodeFactory implements ComponentSupportInterface {
 	get previewedNodes() {
 		return this.editor.previewedNodes;
 	}
-
 
 	modalStore: Readable<Modal> = readable(Modal.instance);
 
@@ -173,6 +174,16 @@ export class NodeFactory implements ComponentSupportInterface {
 		await this.editor.addNode(new nodeClass(paramsWithFactory));
 		if (!this.lastAddedNode) throw new Error('lastAddedNode is undefined');
 		return this.lastAddedNode as T;
+	}
+
+	async addNodes(nodes: (Node | SaveData<Node>)[]) {
+		await this.bulkOperation(async () => {
+			for (const node of nodes) {
+				await this.editor.addNode(
+					node instanceof Node ? node : await Node.fromJSON(node, { factory: this })
+				);
+			}
+		});
 	}
 
 	getNodes(): Node[] {
@@ -268,7 +279,7 @@ export class NodeFactory implements ComponentSupportInterface {
 			for (const nodeSaveData of editorSaveData.nodes) {
 				const node = await this.loadNode(nodeSaveData);
 				if (editorSaveData.previewedNodes?.includes(node.id)) {
-					this.editor.previewedNodes.add(node)
+					this.editor.previewedNodes.add(node);
 				}
 			}
 
@@ -310,7 +321,7 @@ export class NodeFactory implements ComponentSupportInterface {
 		});
 	}
 	area = $state<AreaPlugin<Schemes, AreaExtra>>();
-	
+
 	public readonly makutuClasses?: MakutuClassRepository;
 
 	public readonly dataflowEngine = createDataflowEngine();
@@ -360,10 +371,8 @@ export class NodeFactory implements ComponentSupportInterface {
 	 * Removes all nodes and connections from the editor.
 	 */
 	async clear() {
-		this.bulkOperation(async () => {
-			for (const node of this.nodes) {
-				await this.removeNode(node);
-			}
+		await this.bulkOperation(async () => {
+			await this.editor.clear();
 		});
 	}
 
@@ -610,7 +619,7 @@ export class NodeFactory implements ComponentSupportInterface {
 	async saveToDB(): Promise<void> {
 		console.debug('Saving to DB');
 		await NodeStorage.saveGraph({
-			id: newUuid(),
+			id: newUuid()
 		});
 	}
 
@@ -667,6 +676,10 @@ export class NodeFactory implements ComponentSupportInterface {
 		}
 		if (this.area) AreaExtensions.zoomAt(this.area, [node], { scale: undefined });
 	}
+	focusNodes(nodes?: Node[], options: AreaExtensions.ZoomAt = {}): void {
+		if (this.area)
+			AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes(), options);
+	}
 
 	select(entity: SelectorEntity, options: SelectOptions = {}) {
 		this.selector.select(entity, options);
@@ -674,6 +687,10 @@ export class NodeFactory implements ComponentSupportInterface {
 
 	selectConnection(id: string) {
 		const conn = this.editor.getConnection(id);
+		if (!conn) {
+			console.warn('selectConnection: Connection not found', id);
+			return;
+		}
 		this.selector.select(conn);
 	}
 
@@ -701,9 +718,9 @@ export class NodeFactory implements ComponentSupportInterface {
 				.forEach((n) => {
 					this.dataflowEngine.fetch(n.id);
 					this.dataflowEngine.cache.get(n.id)?.then((res) => {
-						console.log('Dataflow engine finished', n.label, res);
-						this.dataflowCache.set(n, res)
-					})
+						// console.log('Dataflow engine finished', n.label, res);
+						this.dataflowCache.set(n, res);
+					});
 					n.needsProcessing = false;
 				});
 		} catch (e) {

@@ -200,16 +200,17 @@
 	tabindex="0"
 	{...interactions.getReferenceProps()}
 	bind:this={floating.elements.reference}
-	class:transition-all={transitionEnabled}
 	class:text-primary={node.needsProcessing}
-	class="relative border-base-200 border border-opacity-0 doverflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
-	{node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300')}
-	{themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}
-	{node.previewed ? 'previewed' : ''}
-	"
-	style={transitionEnabled
-		? `max-width: ${node.width}px; max-height: ${node.height}px; transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
-		: ''}
+	class:transition-all={transitionEnabled}
+	class:opacity-0={!node.visible}
+	class={`relative border-base-200 border border-opacity-0 doverflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
+	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300')}
+	${themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}
+	${node.previewed ? 'previewed' : ''}
+	`}
+	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${transitionEnabled
+		? `transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
+		: ''}`}
 	on:dblclick={(e) => {
 		stopPropagation(e);
 		node.factory?.centerView([node]);

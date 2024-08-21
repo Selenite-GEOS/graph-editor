@@ -109,4 +109,11 @@ describe('CodeIntegration', () => {
             expect(res).toBe('<Test />\n');
         });
 	});
+	describe('toGraph', async () => {
+		it('should create a graph from a given xml string', async () => {
+			const { factory} = await setupGraphEditor();
+			const schema = getSchema();
+			factory.codeIntegration.toGraph({schema, text: '<Test>\n  <TestA />\n</Test>\n'});
+		})
+	})
 });

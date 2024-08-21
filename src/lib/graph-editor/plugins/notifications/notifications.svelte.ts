@@ -1,4 +1,5 @@
-import type { Setup } from '$graph-editor/setup';
+import type { Setup } from '$graph-editor/setup/Setup';
+import { tick } from 'svelte';
 
 export type NotificationParams = {
 	title?: string;
@@ -8,13 +9,18 @@ export type NotificationParams = {
 	autoClose?: boolean | number;
 	withCloseButton?: boolean;
 };
-export type DisplayedNotification = NotificationParams & { visible: boolean; remove: () => void };
+export type DisplayedNotification = {
+	notif: NotificationParams;
+	visible: boolean;
+	remove: () => void;
+};
 export type NotificationsManager = {
 	show: (params: NotificationParams) => void;
 	success: (params: Omit<NotificationParams, 'color'>) => void;
 	warn: (params: Omit<NotificationParams, 'color'>) => void;
 	error: (params: Omit<NotificationParams, 'color'>) => void;
 	info: (params: Omit<NotificationParams, 'color'>) => void;
+	hide: (id: string) => void;
 };
 
 /**
@@ -37,10 +43,15 @@ class Notifications implements NotificationsManager {
 
 	private constructor() {}
 
-	show(notif: NotificationParams) {
+	hide(id: string) {
+		const notif = this.displayed.filter((n) => n.notif.id === id).forEach((n) => n.remove());
+		this.queue = this.queue.filter((n) => n.id !== id);
+	}
+
+	async show(notif: NotificationParams) {
 		console.debug('showing notification with title:', notif.title, 'and message:', notif.message);
 		this.queue.push(notif);
-		this.updateDisplayed();
+		await this.updateDisplayed();
 	}
 
 	success(notif: Omit<NotificationParams, 'color'>) {
@@ -74,8 +85,9 @@ class Notifications implements NotificationsManager {
 				let hideTimeout: NodeJS.Timeout | undefined;
 				let removeTimeout: NodeJS.Timeout | undefined;
 				let hideTime = typeof notif.autoClose === 'number' ? notif.autoClose : this.autoHideTime;
+
 				const displayedNotif: DisplayedNotification = $state({
-					...notif,
+					notif,
 					visible: true,
 					remove: () => {
 						displayedNotif.remove = () => {
@@ -89,6 +101,7 @@ class Notifications implements NotificationsManager {
 				});
 
 				this.displayed.push(displayedNotif);
+				// await tick();
 				if (notif.autoClose !== false) {
 					// Hide notif timeout
 					hideTimeout = setTimeout(() => {

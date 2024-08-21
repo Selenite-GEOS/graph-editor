@@ -199,7 +199,7 @@ export class InputControl<
 
 	set value(v: SocketValueWithDatastructure<InputControlValueType<T>, D>) {
 		this.#value = v;
-		if (this.onChange && v !== undefined && !this.readonly) this.onChange(v);
+		if (this.onChange && !this.readonly) this.onChange(v);
 	}
 
 	get socketType() {

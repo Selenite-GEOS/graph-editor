@@ -2,7 +2,7 @@ import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import type { AreaExtra } from '$graph-editor/area';
 import type { Schemes } from '$graph-editor/schemes';
 import { AreaPlugin, type Area2D } from 'rete-area-plugin';
-import { SetupClass, type SetupFunction } from './Setup';
+import { SetupClass, type Setup, type SetupFunction } from './Setup';
 import type { Root } from 'rete';
 
 export class AreaSetup extends SetupClass {
@@ -44,3 +44,16 @@ export const setupArea: SetupFunction = (params) => {
 		area
 	};
 };
+
+
+export const arrangeSetup: Setup = {
+	name: 'Arrange', 
+	type: 'area',
+	setup: async ({area, factory}) => {
+		const { AutoArrangePlugin, Presets: ArrangePresets } = await import('rete-auto-arrange-plugin');
+		const arrange = new AutoArrangePlugin<Schemes>();
+		arrange.addPreset(ArrangePresets.classic.setup());
+		area.use(arrange);
+		factory.arrange = arrange;
+	}
+}

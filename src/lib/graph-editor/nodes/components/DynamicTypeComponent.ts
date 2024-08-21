@@ -19,13 +19,13 @@ export class DynamicTypeComponent<
 	constructor(
 		params: NodeComponentParams<Inputs, Outputs> & {
 			initial?: SocketType;
-			inputs: (keyof Inputs)[];
-			outputs: (keyof Outputs)[];
+			inputs?: (keyof Inputs)[];
+			outputs?: (keyof Outputs)[];
 		}
 	) {
 		super(params);
-		this.dynamicTypeInputs = params.inputs;
-		this.dynamicTypeOutputs = params.outputs;
+		this.dynamicTypeInputs = params.inputs ?? [];
+		this.dynamicTypeOutputs = params.outputs ?? [];
 		const node = this.node as Node<
 			Record<string, Socket>,
 			Record<string, Socket>,
@@ -41,15 +41,15 @@ export class DynamicTypeComponent<
 		const editor = factory.editor;
 		// const isSetupState = factory.useState('dynamic-type-component', 'isSetup', false)
 		console.debug('Adding dynamic type pipe');
-		node.getEditor().addPipe((context) => {
+		node.getEditor()?.addPipe((context) => {
 			if (context.type !== 'connectioncreated' && context.type !== 'connectionremoved')
 				return context;
 
 			const conn = context.data;
 
 			if (
-				(conn.target !== node.id || !params.inputs.includes(conn.targetInput)) &&
-				(conn.source !== node.id || !params.outputs.includes(conn.sourceOutput))
+				(conn.target !== node.id || !this.dynamicTypeInputs.includes(conn.targetInput)) &&
+				(conn.source !== node.id || !this.dynamicTypeOutputs.includes(conn.sourceOutput))
 			)
 				return context;
 
