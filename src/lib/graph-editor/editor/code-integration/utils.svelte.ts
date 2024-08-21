@@ -182,6 +182,7 @@ export function parsedXmlToGraph({
 				// nodes.push(makeArrayNode as Node);
 
 				// Gather array group name links
+
 				if (attrDef.type === 'groupNameRef_array') {
 					for (const [inputKey, t] of Object.entries(initialValues)) {
 						if (typeof t !== 'string') {
@@ -240,5 +241,18 @@ export function parsedXmlToGraph({
 		}
 	}
 	rec({ xml });
+	console.debug("links", groupNameLinks);
+	for (const { source, target } of groupNameLinks) {
+		const sourceNode = nameToXmlNode.get(source);
+		if (!sourceNode) {
+			console.warn('Source node not found', source);
+			continue;
+		}
+		if (source === "sink") {
+			console.debug('source')
+
+		}
+		connections.push(new Connection(sourceNode, 'name', target.node, target.key) as Connection);
+	}
 	return { nodes, connections };
 }

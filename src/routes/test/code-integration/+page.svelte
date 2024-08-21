@@ -34,12 +34,12 @@
 </script>
 
 <div class="relative">
-<div class="h-screen grid grid-flow-col grid-cols-2 gap-2">
+<div class="h-screen grid grid-flow-col grid-cols-[2fr,1fr] gap-2">
 	<div bind:this={container}></div>
 	<textarea class="textarea-bordered textarea" bind:value={$textareaContent}
 	></textarea>
 </div>
-<div class="absolute inset-0 z-10 row-span-2 row-start-1 col-start-1 grid items-center justify-center grid-flow-col gap-2 pointer-events-none">
+<div class="absolute inset-0 z-10 row-span-2 row-start-1 col-start-1 grid items-start p-4 justify-center grid-flow-col gap-2 pointer-events-none">
 		<button class="btn btn-primary pointer-events-auto" onclick={() => {
             if (!schema) return;
             factory?.codeIntegration.toGraph({text: $textareaContent, schema})

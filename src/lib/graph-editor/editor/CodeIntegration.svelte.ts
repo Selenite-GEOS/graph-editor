@@ -4,6 +4,7 @@ import type { NodeFactory } from './NodeFactory.svelte';
 import { Connection, Node, XmlNode } from '$graph-editor/nodes';
 import {
 	animationFrame,
+	browser,
 	buildXml,
 	mergeParsedXml,
 	newLocalId,
@@ -28,6 +29,7 @@ function instantiateWorker() {
 	}
 }
 
+if (browser)
 requestIdleCallback(() => {
 	instantiateWorker();
 });
@@ -82,6 +84,7 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 	async toGraph({ text, schema }: { schema: XmlSchema; text: string }) {
 		const t0 = performance.now();
 		const factory = this.owner;
+		if (!browser) return;
 		instantiateWorker();
 		if (!worker) throw new ErrorWNotif('Worker not instantiated');
 		const msg: WorkerMessage = { type: 'xmlToGraph', xml: text, schema: schema.toJSON() };
@@ -150,19 +153,6 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 		
 
 		await factory.bulkOperation(async () => {
-			await factory.bulkOperation(async () => {
-
-				for (const { source, target } of groupNameLinks) {
-					const sourceNode = nameToXmlNode.get(source);
-					if (!sourceNode) {
-						console.warn('Source node not found', source);
-						continue;
-					}
-					connsToAdd.push(
-						new Connection(sourceNode, 'name', target.node, target.key) as Connection
-					);
-				}
-			});
 			const area = factory.getArea();
 			let leftBound = 0;
 			if (area) {

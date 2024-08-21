@@ -1,7 +1,7 @@
 import { type BaseSchemes, NodeEditor, type Root, Scope } from 'rete';
 import type { Connection } from '$graph-editor/nodes';
 import { ExecSocket, type Socket, type SocketDatastructure } from '$graph-editor/socket';
-import { ErrorWNotif } from '$lib/global/index.svelte';
+import { ErrorWNotif, notifications } from '$lib/global/index.svelte';
 
 export type XMLAttrType = `xmlAttr:${string}`;
 export type XMLElementType = `xmlElement:${string}`;
@@ -64,6 +64,9 @@ export function areTypesCompatible(outType: TypeInfo, inType: TypeInfo): boolean
 		}
 	}
 
+	if (outType.type === 'groupNameRef' && inType.type === 'groupNameRef') {
+		return true;
+	}
 	
 	return outType.datastructure === inType.datastructure && (
 		outType.type === 'any' || inType.type === 'any'
@@ -127,9 +130,11 @@ export class TypedSocketsPlugin<Schemes extends BaseSchemes> extends Scope<never
 				const inputSocket = this.getInputSocket(conn.target, conn.targetInput);
 
 				if (isConnectionInvalid(outputSocket, inputSocket)) {
-					console.log(
-						`Connection between ${conn.source} and ${conn.target} is not allowed. Output socket type is ${outputSocket.type} and input socket type is ${inputSocket.type}`
+					const eMessage = `Connection between ${conn.source} and ${conn.target} is not allowed. Output socket type is ${outputSocket.type} and input socket type is ${inputSocket.type}`;
+					console.error(
+						eMessage
 					);
+					notifications.error({message: eMessage});
 					let nodeEditor: NodeEditor<Schemes>;
 
 					if ((nodeEditor = scope as NodeEditor<Schemes>) && this.lastConnectionRemove) {

@@ -104,5 +104,11 @@ describe('typed-socket', () => {
                 {type: 'xmlElement:A', datastructure: 'array'}
             )).toBe(true)
         })
+        it('should allow connection from group name ref scalar to group name ref array', () => {
+            expect(areTypesCompatible(
+                {type: 'groupNameRef', datastructure: 'scalar'},
+                {type: 'groupNameRef', datastructure: 'array'}
+            )).toBe(true)
+        });
 	});
 });

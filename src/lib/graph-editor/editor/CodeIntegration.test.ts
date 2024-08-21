@@ -73,13 +73,13 @@ async function getGraph({toSelect}: {toSelect: string[]}): Promise<{factory: Nod
             complex: schema.complexTypes.get('TestA')!,
         }
     })
-    await editor.addNewConnection(nodes["TestA"], "value", nodes["Test"], "Tests");
+    await editor.addNewConnection(nodes["TestA"], "value", nodes["Test"], "child:Tests");
     nodes["TestB"] = await factory.addNode(XmlNode, {
         xmlConfig: {
             complex: schema.complexTypes.get('TestB')!,
         }
     })
-    await editor.addNewConnection(nodes["TestB"], "value", nodes["Test"], "Tests");
+    await editor.addNewConnection(nodes["TestB"], "value", nodes["Test"], "child:Tests");
     for (const key of toSelect) {
         if (!(key in nodes)) throw new Error(`Node ${key} not found`);
         factory.select(nodes[key as keyof TestNodes]!);
