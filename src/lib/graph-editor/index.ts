@@ -1,6 +1,6 @@
 /**
  * This module contains the main components for the graph editor.
- * @module graph-editor
+ * @module
  */
 
 export * as Nodes from './nodes';

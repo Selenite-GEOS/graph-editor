@@ -10,6 +10,11 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec,test.svelte}.{js,ts}'],
 		environment: 'jsdom'
 	},
+	resolve: process.env.VITEST
+		? {
+				conditions: ['browser']
+			}
+		: undefined,
 	server: {
 		port: 1501
 	}
