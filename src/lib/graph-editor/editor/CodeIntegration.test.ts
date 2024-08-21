@@ -11,7 +11,7 @@ function getSchema(): XmlSchema {
 			name: 'Test',
 			children: [
 				new ChildProps({
-					type: 'TestA',
+					type: 'TestA'
 				}),
 				new ChildProps({
 					type: 'TestB'
@@ -45,7 +45,7 @@ function getSchema(): XmlSchema {
 }
 
 /**
- * 
+ *
  * Graph Editor Schema:
  * <Test>
  *   <TestA a="string" />
@@ -54,66 +54,79 @@ function getSchema(): XmlSchema {
  * <Test />
  */
 type TestNodes = Record<'TestA' | 'TestB' | 'Test' | 'LonerTest', Node>;
-async function getGraph({toSelect}: {toSelect: string[]}): Promise<{factory: NodeFactory, schema: XmlSchema} & TestNodes> {
+async function getGraph({
+	toSelect
+}: {
+	toSelect: string[];
+}): Promise<{ factory: NodeFactory; schema: XmlSchema } & TestNodes> {
 	const { factory, editor } = await setupGraphEditor();
 	const schema = getSchema();
-    const nodes: Partial<TestNodes> = {}
-    nodes["Test"] = await factory.addNode(XmlNode, {
-        xmlConfig: {
-            complex: schema.complexTypes.get('Test')!,
-        }
-    })
-    nodes['LonerTest'] = await factory.addNode(XmlNode, {
-        xmlConfig: {
-            complex: schema.complexTypes.get('Test')!,
-        }
-    })
-    nodes["TestA"] = await factory.addNode(XmlNode, {
-        xmlConfig: {
-            complex: schema.complexTypes.get('TestA')!,
-        }
-    })
-    await editor.addNewConnection(nodes["TestA"], "value", nodes["Test"], "child:Tests");
-    nodes["TestB"] = await factory.addNode(XmlNode, {
-        xmlConfig: {
-            complex: schema.complexTypes.get('TestB')!,
-        }
-    })
-    await editor.addNewConnection(nodes["TestB"], "value", nodes["Test"], "child:Tests");
-    for (const key of toSelect) {
-        if (!(key in nodes)) throw new Error(`Node ${key} not found`);
-        factory.select(nodes[key as keyof TestNodes]!);
-    }
-    return {
-        factory,
-        schema,
-        ...nodes as TestNodes
-    }
+	const nodes: Partial<TestNodes> = {};
+	nodes['Test'] = await factory.addNode(XmlNode, {
+		xmlConfig: {
+			complex: schema.complexTypes.get('Test')!
+		}
+	});
+	nodes['LonerTest'] = await factory.addNode(XmlNode, {
+		xmlConfig: {
+			complex: schema.complexTypes.get('Test')!
+		}
+	});
+
+	nodes['TestA'] = await factory.addNode(XmlNode, {
+		xmlConfig: {
+			complex: schema.complexTypes.get('TestA')!
+		}
+	});
+
+	await editor.addNewConnection(nodes['TestA'], 'value', nodes['Test'], 'child:Tests')
+
+	nodes['TestA2'] = await factory.addNode(XmlNode, {
+		xmlConfig: {
+			complex: schema.complexTypes.get('TestA')!
+		}
+	});
+	await editor.addNewConnection(nodes['TestA2'], 'value', nodes['Test'], 'child:Tests');
+	nodes['TestB'] = await factory.addNode(XmlNode, {
+		xmlConfig: {
+			complex: schema.complexTypes.get('TestB')!
+		}
+	});
+	await editor.addNewConnection(nodes['TestB'], 'value', nodes['Test'], 'child:Tests');
+	for (const key of toSelect) {
+		if (!(key in nodes)) throw new Error(`Node ${key} not found`);
+		factory.select(nodes[key as keyof TestNodes]!);
+	}
+	return {
+		factory,
+		schema,
+		...(nodes as TestNodes)
+	};
 }
 
 describe('CodeIntegration', () => {
 	describe('toCode', () => {
 		it('should return the xml of a selected node in a graph', async () => {
-            const {factory, schema} = await getGraph({toSelect: ['TestA']});
+			const { factory, schema } = await getGraph({ toSelect: ['TestA'] });
 			const res = await factory.codeIntegration.toCode({ schema });
 			expect(res).toBe('<Test>\n  <TestA />\n</Test>\n');
 		});
-        it('should return the xml of a selected node including its children', async () => {
-            const {factory, schema} = await getGraph({toSelect: ['Test']});
-            const res = await factory.codeIntegration.toCode({ schema });
-            expect(res).toBe('<Test>\n  <TestA />\n  <TestB />\n</Test>\n');
-        });
-        it('should return the xml of a selected node with no type path and no children', async () => {
-            const {factory, schema} = await getGraph({toSelect: ['LonerTest']});
-            const res = await factory.codeIntegration.toCode({ schema });
-            expect(res).toBe('<Test />\n');
-        });
+		it('should return the xml of a selected node including its children', async () => {
+			const { factory, schema } = await getGraph({ toSelect: ['Test'] });
+			const res = await factory.codeIntegration.toCode({ schema });
+			expect(res).toBe('<Test>\n  <TestA />\n  <TestA />\n  <TestB />\n</Test>\n');
+		});
+		it('should return the xml of a selected node with no type path and no children', async () => {
+			const { factory, schema } = await getGraph({ toSelect: ['LonerTest'] });
+			const res = await factory.codeIntegration.toCode({ schema });
+			expect(res).toBe('<Test />\n');
+		});
 	});
 	describe('toGraph', async () => {
 		it('should create a graph from a given xml string', async () => {
-			const { factory} = await setupGraphEditor();
+			const { factory } = await setupGraphEditor();
 			const schema = getSchema();
-			factory.codeIntegration.toGraph({schema, text: '<Test>\n  <TestA />\n</Test>\n'});
-		})
-	})
+			factory.codeIntegration.toGraph({ schema, text: '<Test>\n  <TestA />\n</Test>\n' });
+		});
+	});
 });

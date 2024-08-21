@@ -66,18 +66,14 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	id = newLocalId('node-editor');
 
 	nodesMap = new SvelteMap<string, Node>();
-	connectionsMap = new SvelteMap<string, Connection>();
-
-
-	nodesArray = $derived(Array.from(this.nodesMap.values()));
-	connectionsArray = $derived(Array.from(this.connectionsMap.values()));
+	connectionsMap = new SvelteMap<string, Connection>();	
 
 	get nodes() {
-		return this.nodesArray;
+		return this.getNodes();
 	}
 
 	get connections() {
-		return this.connectionsArray;
+		return this.getConnections();
 	}
 
 	constructor() {
@@ -103,7 +99,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	 * @returns An array of all nodes in the editor
 	 */
 	getNodes():  Node[] {
-		return [...this.nodesArray];
+		return [...this.nodesMap.values()];
 	}
 
 	/**
@@ -121,7 +117,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	 * @returns An array of all connections in the editor
 	 */
 	getConnections(): Connection[] {
-		return [...this.connectionsArray];
+		return [...this.connectionsMap.values()];
 	}
 
 	/**
@@ -220,6 +216,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		}
 		try {
 			const conn = new Connection(source_, sourceOutput, target_, targetInput);
+			conn.factory = this.factory;
 		 await this.addConnection(new Connection(source_, sourceOutput, target_, targetInput));
 			return conn;
 		} catch (e) {
@@ -279,8 +276,8 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 			return false;
 		}
 
-		for (const connection of this.connectionsArray) await this.removeConnection(connection);
-		for (const node of this.nodesArray) await this.removeNode(node);
+		for (const connection of this.connectionsMap.values()) await this.removeConnection(connection);
+		for (const node of this.nodesMap.values()) await this.removeNode(node);
 
 		await this.emit({ type: 'cleared' });
 		return true;

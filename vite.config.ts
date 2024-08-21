@@ -7,7 +7,8 @@ export default defineConfig({
 		target: 'es2022'
 	},
 	test: {
-		include: ['src/**/*.{test,spec}.{js,ts}']
+		include: ['src/**/*.{test,spec,test.svelte}.{js,ts}'],
+		environment: 'jsdom'
 	},
 	server: {
 		port: 1501

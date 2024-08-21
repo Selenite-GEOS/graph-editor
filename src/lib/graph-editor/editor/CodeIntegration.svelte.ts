@@ -29,7 +29,7 @@ function instantiateWorker() {
 	}
 }
 
-if (browser)
+if (typeof requestIdleCallback !== 'undefined')
 requestIdleCallback(() => {
 	instantiateWorker();
 });
@@ -84,7 +84,7 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 	async toGraph({ text, schema }: { schema: XmlSchema; text: string }) {
 		const t0 = performance.now();
 		const factory = this.owner;
-		if (!browser) return;
+		if (typeof Worker === "undefined") return;
 		instantiateWorker();
 		if (!worker) throw new ErrorWNotif('Worker not instantiated');
 		const msg: WorkerMessage = { type: 'xmlToGraph', xml: text, schema: schema.toJSON() };
