@@ -1,7 +1,7 @@
 import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import type { AreaExtra } from '$graph-editor/area';
 import type { Schemes } from '$graph-editor/schemes';
-import type { AreaPlugin } from 'rete-area-plugin';
+import type { AreaPlugin, RenderSignal } from 'rete-area-plugin';
 import { SetupClass, type SetupFunction, type SetupParams } from './Setup';
 import {
 	BidirectFlow,
@@ -11,7 +11,7 @@ import {
 	Presets,
 	type SocketData,
 	type ClassicParams,
-	createPseudoconnection
+	type Side
 } from 'rete-connection-plugin';
 import { isConnectionInvalid } from '$graph-editor/plugins/typed-sockets';
 import type { Socket } from '$graph-editor/socket/Socket.svelte';
@@ -19,6 +19,8 @@ import { findSocket } from '$graph-editor/socket/utils';
 import type { Connection, Node } from '$graph-editor/nodes';
 import { XmlNode } from '$graph-editor/nodes/XML';
 import { isEqual } from 'lodash-es';
+import type { Scope } from 'rete';
+import type { Position } from 'rete-connection-plugin/_types/types';
 
 export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 	picked = false;
@@ -26,8 +28,59 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 	public lastPickedSockedData: (SocketData & { payload: Socket }) | undefined;
 	/** Last picked connection. */
 	lastConn?: Connection;
-	constructor(private factory: NodeFactory) {
+	constructor(
+		protected factory: NodeFactory,
+		protected area: AreaPlugin<Schemes, AreaExtra>
+	) {
 		super();
+	}
+	override setParent(
+		scope: Scope<
+			| AreaExtra
+			| (
+					| { type: 'pointermove'; data: { position: Position; event: PointerEvent } }
+					| { type: 'pointerup'; data: { position: Position; event: PointerEvent } }
+					| RenderSignal<'socket', { nodeId: string; side: Side; key: string }>
+					| { type: 'unmount'; data: { element: HTMLElement } }
+			  ),
+			[]
+		>
+	): void {
+		super.setParent(scope);
+		// @ts-expect-error: Access private field
+		this.areaPlugin = this.area;
+		// @ts-expect-error: Access private field
+		this.editor = this.factory.editor;
+
+		const pointerdownSocket = (e: PointerEvent) => {
+			this.pick(e, 'down');
+		};
+
+		// eslint-disable-next-line max-statements
+		this.addPipe((context) => {
+			if (!context || typeof context !== 'object' || !('type' in context)) return context;
+
+			if (context.type === 'pointermove') {
+				this.update();
+			} else if (context.type === 'pointerup') {
+				this.pick(context.data.event, 'up');
+			} else if (context.type === 'render') {
+				if (context.data.type === 'socket') {
+					const { element } = context.data;
+
+					element.addEventListener('pointerdown', pointerdownSocket);
+					// @ts-expect-error: Access private field
+					this.socketsCache.set(element, context.data);
+				}
+			} else if (context.type === 'unmount') {
+				const { element } = context.data;
+
+				element.removeEventListener('pointerdown', pointerdownSocket);
+				// @ts-expect-error: Access private field
+				this.socketsCache.delete(element);
+			}
+			return context;
+		});
 	}
 
 	/**
@@ -43,7 +96,6 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 			| (SocketData & { payload: Socket })
 			| undefined;
 		if (event.button == 0) {
-
 			if (type === 'down') {
 				if (socketData === undefined) return;
 				console.debug('Pick connection');
@@ -72,11 +124,10 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 					});
 
 					return;
-
 				}
 				// Fix for the case where the user drops the connection on the same socket
 				// it was picked from
-				 else {
+				else {
 					if (this.lastConn && isEqual(this.lastPickedSockedData, socketData)) {
 						await this.factory.editor.addConnection(this.lastConn);
 						this.drop();
@@ -124,7 +175,7 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 		return params;
 	}
 
-	const connectionPlugin = new ConnectionPlugin(factory);
+	const connectionPlugin = new ConnectionPlugin(factory, area);
 	Presets.classic.setup();
 	// @ts-expect-error: Ignore type error
 	connectionPlugin.addPreset((socketData: SocketData & { payload: Socket }) => {

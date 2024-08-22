@@ -1,16 +1,16 @@
 import { Connection, Node } from '$graph-editor/nodes/Node.svelte';
 import { XmlNode } from '$graph-editor/nodes/XML/XmlNode.svelte';
-import { MakeArrayNode } from '$graph-editor/nodes/data/array';
-import type { XmlAttributeDefinition } from '$graph-editor/nodes/XML/types';
 import { ErrorWNotif } from '$lib/global';
 import {
+	animationFrame,
 	getElementFromParsedXml,
 	getXmlAttributes,
+	newLocalId,
 	parseXml,
 	XmlSchema,
-	type ParsedXmlNodes
+	type ParsedXmlNodes,
+	type SaveData
 } from '@selenite/commons';
-import wu from 'wu';
 import type { NodeFactory } from '../NodeFactory.svelte';
 
 export function xmlToGraph(params: { xml: string; schema: XmlSchema; factory?: NodeFactory }) {
@@ -245,4 +245,59 @@ export function parsedXmlToGraph({
 		connections.push(new Connection(sourceNode, 'name', target.node, target.key) as Connection);
 	}
 	return { nodes, connections };
+}
+
+
+export async function addGraphToEditor({factory, nodes, connections, t0}: {factory: NodeFactory, nodes: (Node | SaveData<Node>)[], connections: (Connection | SaveData<Connection>)[], t0: number}) {
+	let addedNodes: Node[] = $state([]);
+	let addedConns: Connection[] = $state([]);
+	const notifId = newLocalId('code-integration-progress');
+	factory.notifications.show({
+		id: notifId,
+		title: 'Code Integration',
+		autoClose: false,
+		get message() {
+			return `Progress: ${(((addedNodes.length + addedConns.length) / (nodes.length + connections.length)) * 100).toFixed(2)}%`;
+		}
+	});
+
+	for (const [i, node] of nodes.entries()) {
+		const n = node instanceof Node ? node : await Node.fromJSON(node, { factory });
+		n.visible = false;
+		if (n) {
+			await factory.editor.addNode(n);
+		}
+		addedNodes.push(n);
+		if (i % 10 === 9) await animationFrame();
+	}
+	for (const [i, conn] of connections.entries()) {
+		const addedConn = await factory.editor.addNewConnection(
+			conn.source,
+			conn.sourceOutput,
+			conn.target,
+			conn.targetInput
+		);
+		if (addedConn) {
+			addedConns.push(addedConn);
+		} else {
+			console.warn('Failed to add connection', conn);
+		}
+
+		if (i % 10 === 9) await animationFrame();
+	}
+	await animationFrame(2);
+	await factory.arrange?.layout();
+	for (const node of addedNodes) {
+		node.visible = true;
+	}
+
+	factory.focusNodes(addedNodes);
+	setTimeout(() => {
+		factory.notifications.hide(notifId);
+	}, 1000);
+	if (import.meta.env.MODE === 'development')
+		factory.notifications.info({
+			title: 'Graph Editor',
+			message: 'It took ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s to parse the xml'
+		});
 }

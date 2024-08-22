@@ -9,7 +9,8 @@ export default defineConfig({
 
 	},
 	ssr: {
-		noExternal: ['@selenite/commons']
+		noExternal: ['@selenite/commons'],
+		
 	},
 	test: {
 		include: ['src/**/*.{test,spec,test.svelte}.{js,ts}'],

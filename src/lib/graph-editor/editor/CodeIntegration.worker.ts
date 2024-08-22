@@ -3,11 +3,8 @@
 // // import { ErrorWNotif } from '$lib/global';
 import type { Connection, GraphNode } from '$graph-editor/nodes';
 import {
-	ComplexType,
-	parseXml,
 	XmlSchema,
-	type SaveData,
-	type SimpleType} from '@selenite/commons';
+	type SaveData} from '@selenite/commons';
 import { xmlToGraph } from './code-integration/utils.svelte';
 // import { xmlToGraph } from './CodeIntegration.svelte';
 export type WorkerMessage = {
