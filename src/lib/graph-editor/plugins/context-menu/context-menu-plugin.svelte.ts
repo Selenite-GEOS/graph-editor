@@ -99,21 +99,9 @@ export function xmlNodeItems({
 				console.error('failed to access complex type', complexType);
 				continue;
 			}
-			
-			
 			const xmlConfig: XmlConfig = {
 				complex: complexType,
 				priorities,
-				xmlProperties: wu(complexType.attributes.values())
-					.map(
-						(attr) =>
-							({
-								name: attr.name,
-								type: attr.type,
-								required: attr.required
-							}) as XmlAttributeDefinition
-					)
-					.toArray()
 			};
 			const xmlNode = new XmlNode({xmlConfig});
 			res.set(name, {

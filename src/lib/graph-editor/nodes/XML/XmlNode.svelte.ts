@@ -1,27 +1,23 @@
 import {
-	hidden,
 	Node,
 	path,
 	registerConverter,
 	registerNode,
 	type NodeParams,
-	type OutDataParams,
 	type SocketsValues
 } from '$graph-editor/nodes/Node.svelte';
 import type { XmlAttributeDefinition } from './types';
-import { camlelcaseize, titlelize } from '$lib/utils/string';
+import { camlelcaseize } from '$lib/utils/string';
 import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
 import {
 	type InputControl,
+	type InputControlType,
 	type Scalar,
 	type Socket,
 	assignControl,
 	Control
 } from '$graph-editor/socket';
-import { ErrorWNotif } from '$lib/global/index.svelte';
-import type { GeosSchema } from '$lib/geos';
-import type { NodeFactory } from '$graph-editor/editor';
 import 'regenerator-runtime/runtime';
 import wu from 'wu';
 import { formatXml } from '$utils';
@@ -31,9 +27,10 @@ import {
 	singular,
 	splitCamelCase,
 	XmlSchema,
-	type ChildProps,
+	type Attribute,
 	type SaveData
 } from '@selenite/commons';
+import { SvelteSet } from 'svelte/reactivity';
 
 export class AddXmlAttributeControl extends Control {
 	constructor(public readonly xmlNode: XmlNode) {
@@ -47,7 +44,6 @@ export type XmlConfig = {
 	// xmlTag: string;
 	// outData?: OutDataParams;
 	outLabel?: string;
-	xmlProperties?: XmlAttributeDefinition[];
 	// childTypes?: string[];
 	// childProps?: ChildProps[];
 };
@@ -90,13 +86,26 @@ export class XmlNode extends Node<
 	{ addXmlAttr: AddXmlAttributeControl },
 	{ attributeValues: Record<string, unknown>; usedOptionalAttrs: string[] }
 > {
+	addOptionalAttribute(name: string) {
+		this.usedOptionalAttrs.add(name);
+		this.state.usedOptionalAttrs = Array.from(this.usedOptionalAttrs);
+		const attr = this.complex.attributes.get(name);
+		if (attr === undefined) throw new Error(`Property ${name} not found`);
+		this.addInAttribute(attr);
+	}
+	removeOptionalAttribute(name: string) {
+		this.usedOptionalAttrs.delete(name);
+		this.state.usedOptionalAttrs = Array.from(this.usedOptionalAttrs);
+		this.removeInput(name);
+	}
 	static counts: Record<string, number> = {};
 
 	xmlTag: string;
 	xmlInputs: Record<string, { tag?: string }> = {};
 	xmlProperties: Set<string> = new Set();
-	optionalXmlAttributes: Set<string> = new Set();
-	xmlVectorProperties: Set<string> = new Set();
+	optionalXmlAttributes: Set<string> = new SvelteSet<string>();
+	usedOptionalAttrs = new SvelteSet<string>();
+	xmlVectorProperties: Set<string> = new SvelteSet<string>();
 
 	hasName = $state(false);
 
@@ -115,21 +124,21 @@ export class XmlNode extends Node<
 
 	toJSON(): SaveData<Node> {
 		const json = super.toJSON() as SaveData<Node> & { params: XmlNodeParams };
+		const complex = json.params.xmlConfig.complex as ComplexType | SaveData<ComplexType>;
 		return {
 			...json,
 			params: {
 				...json.params,
 				xmlConfig: {
 					...json.params.xmlConfig,
-					complex: (json.params.xmlConfig.complex as ComplexType).toJSON()
+					complex: complex instanceof ComplexType ? complex.toJSON() : complex
 				}
 			}
-			
 		};
 	}
 
 	childrenSockets = new Map<string, string>();
-
+	complex: ComplexType;
 	constructor(xmlNodeParams: XmlNodeParams) {
 		let { initialValues = {} } = xmlNodeParams;
 		const xmlConfig = xmlNodeParams.xmlConfig;
@@ -139,11 +148,10 @@ export class XmlNode extends Node<
 			xmlConfig,
 			initialValues
 		};
-		
 
-		// console.debug('xmlNodeParams', xmlNodeParams);
-		const { xmlProperties, priorities: indices = {} } = xmlConfig;
+		const { priorities: indices = {} } = xmlConfig;
 		let complex = xmlConfig.complex;
+
 		if (!complex) {
 			throw new Error('Complex type is missing.');
 		}
@@ -152,38 +160,36 @@ export class XmlNode extends Node<
 		if (!(complex instanceof ComplexType)) {
 			complex = ComplexType.fromObject(complex);
 		}
+		this.complex = complex;
+
+		if (this.state.usedOptionalAttrs) {
+			this.usedOptionalAttrs = new SvelteSet(this.state.usedOptionalAttrs);
+		}
 
 		if (!this.state.usedOptionalAttrs) {
 			this.state.usedOptionalAttrs = [];
 		}
 		this.xmlTag = complex.name;
-		// console.log(this.name);
 
-		// this.name = name + XmlNode.count;
 		initialValues = initialValues !== undefined ? initialValues : {};
-		if (xmlProperties)
-			xmlProperties.forEach(({ name, type, isArray, controlType, required, pattern }) => {
-				if (name === 'name') {
-					this.hasName = true;
-					return;
-				}
-				if (required || name in initialValues) {
-					this.addInAttribute({
-						name,
-						type,
-						isArray,
-						controlType,
-						required,
-						pattern,
-						initialValues
-					});
-				} else {
-					this.optionalXmlAttributes.add(name);
-				}
-			});
+		for (const attr of complex.attributes.values()) {
+			const {name, required} = attr;
+			
+			if (name === 'name') {
+				this.hasName = true;
+				continue;
+			}
+			if (required || name in initialValues) {
+				this.addInAttribute({...attr, initialValues});
+			}
+			if (!required) this.optionalXmlAttributes.add(name);
+		}
 
 		if (this.optionalXmlAttributes.size > 0) {
-			// this.addControl('addXmlAttr', new AddXmlAttributeControl(this));
+			this.addControl('addXmlAttr', new AddXmlAttributeControl(this));
+		}
+		for (const name of this.usedOptionalAttrs) {
+			this.addOptionalAttribute(name);
 		}
 
 		// Add XML element inputs
@@ -343,22 +349,19 @@ export class XmlNode extends Node<
 		this.name = name;
 	}
 
-	getChildSocket(type: string): string {
-
-	}
+	getChildSocket(type: string): string {}
 
 	addInAttribute({
 		name,
 		type,
-		isArray,
-		controlType,
+		default: default_,
 		required,
-		options,
-		pattern,
+		doc,
 		initialValues = {}
-	}: XmlAttributeDefinition & { initialValues?: Record<string, unknown> }) {
+	}: Attribute & { initialValues?: Record<string, unknown> }) {
 		this.xmlProperties.add(name);
-
+		const options = undefined;
+		let controlType: InputControlType | undefined
 		const xmlTypePattern = /([^\W_]+)(?:_([^\W_]+))?/gm;
 		const [, xmlType, xmlSubType] = xmlTypePattern.exec(type) || [];
 		// console.log('xmlType', xmlType, xmlSubType);
@@ -378,7 +381,7 @@ export class XmlNode extends Node<
 		} else {
 			type = xmlType as DataType;
 		}
-		isArray = (xmlSubType && xmlSubType.startsWith('array')) || isArray;
+		const isArray = (xmlSubType && xmlSubType.startsWith('array'));
 
 		if (type === 'vector') this.xmlVectorProperties.add(name);
 
@@ -386,24 +389,8 @@ export class XmlNode extends Node<
 			label: splitCamelCase(name).join(' '),
 			isRequired: required,
 			isLabelDisplayed: true,
-			type,
+			type: type as DataType,
 			datastructure: isArray ? 'array' : 'scalar'
-			// control: isArray
-			// 	? undefined
-			// 	: controlType && {
-			// 			type: controlType,
-			// 			options: {
-			// 				options,
-			// 				label: titlelize(name),
-			// 				initial: initialValues[name],
-			// 				pattern: pattern,
-			// 				debouncedOnChange: (value) => {
-			// 					console.log('debouncedOnChange', value);
-			// 					// this.state.attributeValues[name] = value;
-			// 					this.getDataflowEngine().reset(this.id);
-			// 				}
-			// 			}
-			// 		}
 		});
 		if (attrInputControl) {
 			// console.log('attrInputControl', attrInputControl);

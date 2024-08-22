@@ -67,3 +67,5 @@ export class Modal {
 		this.queue.pop();
 	}
 }
+
+export const modals = Modal.instance;
