@@ -42,7 +42,7 @@
 	// })
 	let inputProps: HTMLInputAttributes = $derived({
 		placeholder: inputControl.socketType,
-		title: isCheckbox ? String(inputControl.value) : undefined,
+		title: isCheckbox ? String(Boolean(inputControl.value)) : undefined,
 		readonly: inputControl.readonly,
 		type: simpleTypes.includes(type as (typeof simpleTypes)[number])
 			? inputType[type as (typeof simpleTypes)[number]]
@@ -99,12 +99,12 @@
 	});
 </script>
 
-<!-- TODO maybe move pointerdown and dblclick stop propagation to framework agnostic logic -->
+<!-- TODO maybe move pointerdown stop propagation to framework agnostic logic -->
 {#snippet input(props: HTMLInputAttributes = {})}
 	<input
 		bind:this={focusableInput}
 		value={inputControl.value ?? ""}
-		ondblclick={stopPropagation}
+		ondblclick={props.type === "checkbox" ? stopPropagation: undefined}
 		onpointerdown={stopPropagation}
 		{...props}
 		class="{props.class} text-base-content"
@@ -160,6 +160,8 @@
 			use:autosize={inputControl.value}
 			{...inputProps as HTMLTextareaAttributes}
 			class="textarea text-start max-h-[20rem] min-w-[11rem] text-base-content"
+			onscroll={stopPropagation}
+			onmousewheel={stopPropagation}
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea
 		>
 	{:else}

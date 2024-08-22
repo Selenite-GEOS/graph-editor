@@ -68,11 +68,12 @@
 		}
 	});
 
+	let hovered = $state(false)
 	// Display picked and selected nodes on top
 	$effect(() => {
 		const parent = (floating.elements.reference as HTMLElement | undefined | null)?.parentElement;
 		if (!parent) return;
-		parent.style.zIndex = String(node.picked ? 15 : node.selected ? 10 : 5);
+		parent.style.zIndex = String(hovered ?  20 : node.picked ? 15 : node.selected ? 10 : 5);
 	});
 
 	let editingName = $state(false);
@@ -198,19 +199,21 @@
 <section
 	role="cell"
 	tabindex="0"
+	title={node.description ?? constructor.description}
 	{...interactions.getReferenceProps()}
 	bind:this={floating.elements.reference}
 	class:text-primary={node.needsProcessing}
 	class:transition-all={transitionEnabled}
 	class:opacity-0={!node.visible}
-	class={`relative border-base-200 border border-opacity-0 doverflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
-	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300')}
-	${themeControl.isLight ? 'hover:brightness-105' : 'hover:brightness-[1.15]'}
+	class={`relative border-base-200 group border border-opacity-0 doverflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
+	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + " focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85"}
 	${node.previewed ? 'previewed' : ''}
 	`}
 	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${transitionEnabled
 		? `transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
 		: ''}`}
+	on:pointerenter={() => hovered = true}
+	on:pointerleave={() => hovered = false}
 	on:dblclick={(e) => {
 		stopPropagation(e);
 		node.factory?.centerView([node]);
@@ -248,7 +251,6 @@
 				{/if}
 				<h1
 					class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
-					title={constructor.description}
 				>
 					<!-- svelte-ignore event_directive_deprecated -->
 					<button
@@ -353,7 +355,7 @@
 							})}
 						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 					/>
-					<div>
+					<div title={input.description}>
 						{#if !input.control || !input.showControl || input.alwaysShowLabel === true}
 							<div
 								class="input-title {input.control && input.showControl ? 'ms-0 mb-1' : ''}"
@@ -389,8 +391,9 @@
 				<div
 					class="text-md justify-items-end items-center grid grid-rows-subgrid col-start-2 gap-2 justify-end"
 					data-testid={key}
+					
 				>
-					<div class="output-title" data-testid="output-title">
+					<div class="output-title" data-testid="output-title" title={output.description}>
 						{capitalize(output.label || '')}{#if output.socket.isRequired}<span
 								class="ps-0.5 text-lg"
 								title="required">*</span

@@ -4,11 +4,15 @@ import wasmPack from 'vite-plugin-wasm-pack';
 export default defineConfig({
 	plugins: [sveltekit(), wasmPack([], ['@selenite/commons-rs'])],
 	build: {
-		target: 'es2022'
+		target: 'es2022',
+
+
+	},
+	ssr: {
+		noExternal: ['@selenite/commons']
 	},
 	test: {
 		include: ['src/**/*.{test,spec,test.svelte}.{js,ts}'],
-		environment: 'jsdom'
 	},
 	resolve: process.env.VITEST
 		? {

@@ -19,14 +19,15 @@ export class Input<S extends Socket = Socket>
 	showControl = $state(true);
 
 	alwaysShowLabel = $state(false);
-
+	description?: string
 	constructor({
 		socket,
 		multipleConnections,
 		alwaysShowLabel = false,
 		label,
 		isRequired = false,
-		index
+		index,
+		description
 	}: {
 		socket: S;
 		label?: string;
@@ -34,9 +35,11 @@ export class Input<S extends Socket = Socket>
 		multipleConnections?: boolean;
 		isRequired?: boolean;
 		index?: number;
+		description?: string;
 	}) {
 		super(socket, label, multipleConnections);
 		this.alwaysShowLabel = alwaysShowLabel;
+		this.description = description
 		// $effect.root(() => {
 		// 	console.log('showcontrol', this.showControl);
 		// });

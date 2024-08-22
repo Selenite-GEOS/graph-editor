@@ -2,6 +2,7 @@ import { ButtonControl, Socket, type Exec, type Scalar } from '$graph-editor/soc
 import { formatXml } from '$utils';
 import { Node, path, registerNode, type NodeParams } from '$graph-editor/nodes/Node.svelte';
 import { download } from '@selenite/commons';
+import { XMLData } from '../XML';
 
 @registerNode('io.Download')
 @path('I/O')
@@ -24,7 +25,10 @@ export class DownloadNode extends Node<
 
 	async download() {
 		const inputs = await this.fetchInputs();
-		const data = this.getData('data', inputs);
+		let data = this.getData('data', inputs);
+		if (data instanceof XMLData) {
+			data = formatXml({ xml: data.toXml() });
+		}
 		const name = this.getData('name', inputs);
 		download(name, data);
 	}

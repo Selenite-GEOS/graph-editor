@@ -78,7 +78,7 @@ export function parsedXmlToGraph({
 						.slice(1, -1)
 						.split(',')
 						.map((t) => t.trim());
-					console.log('R1Tensor', a, { x: a[0], y: a[1], z: a[2] });
+					// console.log('R1Tensor', a, { x: a[0], y: a[1], z: a[2] });
 					xmlAttributes[k] = { x: a[0], y: a[1], z: a[2] };
 					continue;
 				}
@@ -97,7 +97,6 @@ export function parsedXmlToGraph({
 						.replaceAll('{', '[')
 						.replaceAll('}', ']')
 						.replaceAll(/[a-zA-Z0-9.\-_/]+/g, (t) => {
-							console.log('t', t);
 							// if (t === '') return '';
 							// if (t === ',') return ',';
 							return `"${t}"`;
@@ -140,21 +139,12 @@ export function parsedXmlToGraph({
 				factory,
 				initialValues: xmlAttributes,
 				schema,
-				xmlConfig: {
-					complex,
-					xmlProperties: wu(complex.attributes.values())
-						.map((attr) => {
-							return {
-								name: attr.name,
-								required: attr.required,
-								// pattern: attr.pattern,
-								type: attr.type,
-								controlType: 'text'
-							} as XmlAttributeDefinition;
-						})
-						.toArray()
-				}
+				xmlConfig: {complex}
 			});
+			for (const k of Object.keys(xmlAttributes)) {
+				if (node.optionalXmlAttributes.has(k))
+					node.addOptionalAttribute(k);	
+			}
 			nodes.push(node);
 			// Automatically select output of root types like Solvers, Mesh...
 			if (rootTypes.includes(complex.name.trim())) {

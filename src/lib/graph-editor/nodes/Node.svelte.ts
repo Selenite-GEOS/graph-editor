@@ -134,6 +134,7 @@ export interface NodeParams {
 	// 			[key in string]: Control;
 	// 		}>
 	label?: string;
+	description?: string;
 	name?: string;
 	width?: number;
 	height?: number;
@@ -311,6 +312,7 @@ export class Node<
 		}
 		this.state.name = n;
 	}
+	description = $state<string>();
 	inputs: { [key in keyof Inputs]?: Input<Exclude<Inputs[key], undefined>> | undefined } = $state(
 		{}
 	);
@@ -333,8 +335,8 @@ export class Node<
 
 	initializePromise?: Promise<void>;
 	initialValues?: {
-		inputs: Record<string, unknown>;
-		controls: Record<string, unknown>;
+		inputs?: Record<string, unknown>;
+		controls?: Record<string, unknown>;
 	};
 	afterInitialize?: () => void;
 
@@ -383,6 +385,7 @@ export class Node<
 			delete params.params['factory'];
 		}
 		this.params = params.params || {};
+		this.description = params.description;
 		this.factory = factory;
 		// if (factory === undefined) {
 		// 	throw new Error(name + ': Factory is undefined');
@@ -421,6 +424,11 @@ export class Node<
 	}
 	removeInput(key: keyof Inputs): void {
 		delete this.inputs[key];
+		if (key in this.inConnections) {
+			for (const conn of this.inConnections[key]) {
+				this.editor?.removeConnection(conn);
+			}
+		}
 	}
 	hasOutput<K extends keyof Outputs>(key: K) {
 		return key in this.outputs;
@@ -681,6 +689,7 @@ export class Node<
 			type: Outputs[K]['type'];
 			isArray?: boolean;
 			label?: string;
+			description?: string;
 		}
 	) {
 		if (key in this.outputs) {
@@ -694,7 +703,8 @@ export class Node<
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			label: (params.showLabel ?? true) ? (params.label ?? key) : undefined
+			label: (params.showLabel ?? true) ? (params.label ?? key) : undefined,
+			description: params.description
 		});
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 		return output.socket;
@@ -724,6 +734,7 @@ export class Node<
 				: Inputs[K]['datastructure'];
 			control?: Partial<InputControlParams<InputControlType>>;
 			label?: string;
+			description?: string;
 			isRequired?: boolean;
 			isLabelDisplayed?: boolean;
 			initial?: SocketValueType<Inputs[K]['type']>;
@@ -744,6 +755,7 @@ export class Node<
 			}),
 			alwaysShowLabel: params?.isLabelDisplayed,
 			index: params?.index,
+			description: params?.description,
 			multipleConnections: params?.type?.startsWith('xmlElement'),
 			isRequired: params?.isRequired,
 			label: params?.label ?? (key as string)
@@ -909,6 +921,7 @@ export class Node<
 	}
 
 	updateElement(type: GetRenderTypes<AreaExtra> = 'node', id?: string): void {
+		return;
 		if (id === undefined) id = this.id;
 		const area = this.getArea();
 		if (area) {

@@ -1,8 +1,9 @@
 import { ErrorWNotif } from '$lib/global/index.svelte';
+import { formatXMLArray } from '@selenite/commons';
 
-function arrayToXml(obj: object): string {
+function formatToXML(obj: object): string {
 	if (obj instanceof Array) {
-		return '{ ' + obj.map((value) => arrayToXml(value)).join(', ') + ' }';
+		return formatXMLArray(obj);
 	}
 	if (typeof obj === 'boolean') {
 		return obj ? '1' : '0';
@@ -32,14 +33,13 @@ export class XMLData {
 		this.properties = properties;
 		this.children = children;
 	}
-
+	
 	toXml(): string {
 		let xml = `<${this.tag}`;
 		if (this.name) xml += ` name="${this.name}"`;
-
 		Object.entries(this.properties).forEach(([name, value]) => {
 			// console.log(`property: ${name} value: ${JSON.stringify(value)}`)
-			const val = arrayToXml(value);
+			const val = formatToXML(value);
 
 			xml += ` ${name}="${val}"`;
 		});

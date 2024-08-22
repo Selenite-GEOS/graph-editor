@@ -39,7 +39,9 @@
 
 <button
 	type="button"
+	title="Select optional attributes to use."
 	class="btn btn-neutral"
+	class:btn-ghost={false && xmlNode.selected}
 	onclick={() => {
 		modals.show({
 			snippet: OptionalAttributesModal,

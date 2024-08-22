@@ -109,12 +109,12 @@ describe('CodeIntegration', () => {
 		it('should return the xml of a selected node in a graph', async () => {
 			const { factory, schema } = await getGraph({ toSelect: ['TestA'] });
 			const res = await factory.codeIntegration.toCode({ schema });
-			expect(res).toBe('<Test>\n  <TestA />\n</Test>\n');
+			expect(res).toBe('<Test>\n  <TestA a="" />\n</Test>\n');
 		});
 		it('should return the xml of a selected node including its children', async () => {
 			const { factory, schema } = await getGraph({ toSelect: ['Test'] });
 			const res = await factory.codeIntegration.toCode({ schema });
-			expect(res).toBe('<Test>\n  <TestA />\n  <TestA />\n  <TestB />\n</Test>\n');
+			expect(res).toBe('<Test>\n  <TestA a="" />\n  <TestA a="" />\n  <TestB />\n</Test>\n');
 		});
 		it('should return the xml of a selected node with no type path and no children', async () => {
 			const { factory, schema } = await getGraph({ toSelect: ['LonerTest'] });

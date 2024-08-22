@@ -11,6 +11,8 @@
 	$effect(() => {
 		onRendered();
 	});
+
+	const dyn = $derived({component})
 </script>
 
-<svelte:component this={component} {...props} />
+<dyn.component {...props} />

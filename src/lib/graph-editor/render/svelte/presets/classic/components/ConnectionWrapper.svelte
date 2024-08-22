@@ -47,11 +47,10 @@
 			unwatch2 && unwatch2();
 		};
 	});
+	const dyn = $derived({component})
 </script>
 
-<!-- svelte-ignore svelte_component_deprecated -->
-<svelte:component
-	this={component}
+<dyn.component
 	{...data}
 	{source}
 	start={observedStart}

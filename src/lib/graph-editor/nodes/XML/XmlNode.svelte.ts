@@ -55,6 +55,7 @@ export type XmlNodeParams = NodeParams & {
 };
 
 @registerNode('xml.ToString')
+// @ts-expect-error TODO: fix this type error
 @registerConverter('xmlElement:*', 'string')
 @path('XML')
 export class XmlToString extends Node<
@@ -92,11 +93,13 @@ export class XmlNode extends Node<
 		const attr = this.complex.attributes.get(name);
 		if (attr === undefined) throw new Error(`Property ${name} not found`);
 		this.addInAttribute(attr);
+		this.processDataflow();
 	}
 	removeOptionalAttribute(name: string) {
 		this.usedOptionalAttrs.delete(name);
 		this.state.usedOptionalAttrs = Array.from(this.usedOptionalAttrs);
 		this.removeInput(name);
+		this.processDataflow();
 	}
 	static counts: Record<string, number> = {};
 
@@ -171,17 +174,22 @@ export class XmlNode extends Node<
 		}
 		this.xmlTag = complex.name;
 
-		initialValues = initialValues !== undefined ? initialValues : {};
+		initialValues = initialValues ?? {};
+		// this.initialValues = {inputs: initialValues};
 		for (const attr of complex.attributes.values()) {
-			const {name, required} = attr;
-			
+			const { name, required } = attr;
+
 			if (name === 'name') {
 				this.hasName = true;
 				continue;
 			}
-			if (required || name in initialValues) {
-				this.addInAttribute({...attr, initialValues});
+			if (required) {
+				this.addInAttribute({ ...attr, initialValues });
 			}
+
+			// if (!(name in this.initialValues.inputs!)) {
+			// 	this.initialValues.inputs![name] = attr.default;
+			// }
 			if (!required) this.optionalXmlAttributes.add(name);
 		}
 
@@ -200,6 +208,7 @@ export class XmlNode extends Node<
 			const key = `child:${child.type}`;
 			this.addXmlInData({
 				index: -2 - (xmlConfig.priorities?.[this.xmlTag]?.[child.type] ?? 0),
+				description: 'Required child.',
 				name: key,
 				type: `xmlElement:${child.type}`,
 				isArray
@@ -215,6 +224,7 @@ export class XmlNode extends Node<
 			this.addXmlInData({
 				index: -1,
 				name: key,
+				description: 'Optional children of this node.',
 				isArray: true,
 				type: `xmlElement:${optChildTypes.join('|')}`
 			});
@@ -223,6 +233,8 @@ export class XmlNode extends Node<
 			}
 		}
 
+		// Compute label of XML output
+		// Computations are a bit complex in order to provide a meaningful label
 		if (!xmlConfig.outLabel && schema) {
 			xmlConfig.outLabel = complex.name;
 			const parents = schema.parentsMap.get(complex.name);
@@ -246,7 +258,6 @@ export class XmlNode extends Node<
 						.toArray();
 
 					const sharedParentChildren = getSharedString(parentsChildren);
-					// .flatten()
 
 					if (sharedParentChildren.length > 0) {
 						xmlConfig.outLabel = sharedParentChildren;
@@ -259,12 +270,24 @@ export class XmlNode extends Node<
 		this.addOutData('value', {
 			showLabel: true,
 			label: xmlConfig.outLabel,
+			description:
+				'XML representation of this element.\n\nIt can be downloaded with a `Download` node, or connected to other elements.',
 			type: `xmlElement:${this.xmlTag}`
 		});
+		this.description =
+			(xmlConfig.outLabel !== complex.name ? `${xmlConfig.outLabel}: ` : '') +
+			`${complex.name}\n\n` +
+			(complex.requiredChildren.length > 0
+				? `Required children: \n${complex.requiredChildren.map((s) => `- ${s.type}`).join('\n')}\n\n`
+				: '') +
+			(complex.optionalChildTypes.length > 0
+				? `Optional children:\n${complex.optionalChildTypes.map((s) => `- ${s}`).join('\n')}`
+				: '');
 
 		if (this.hasName) {
 			this.addOutData('name', {
-				type: 'groupNameRef'
+				type: 'groupNameRef',
+				description: 'Name of the element.\n\nIt can be used as a reference in other nodes.'
 			});
 			XmlNode.counts[this.xmlTag] = XmlNode.counts[this.xmlTag]
 				? XmlNode.counts[this.xmlTag] + 1
@@ -277,28 +300,6 @@ export class XmlNode extends Node<
 				}
 			}
 		}
-
-		if (!this.factory) return;
-		const pipeSetup = this.factory.useState('XmlNode', 'pipeSetup', false);
-		if (!pipeSetup.value) {
-			pipeSetup.value = true;
-			this.factory.getArea()?.addPipe((ctx) => {
-				if (ctx.type === 'contextmenu') {
-					const { context, event } = ctx.data;
-					if (!(context instanceof XmlNode)) return ctx;
-					const node = context;
-					if (!(event.target instanceof HTMLSpanElement)) return ctx;
-					const input = event.target.closest('.rete-input');
-					if (!(input instanceof HTMLElement)) return ctx;
-					const testid = input.dataset.testid;
-					if (!testid) return ctx;
-					const key = testid.split('-')[1];
-					// node.removeOptionalAttribute(key);
-					return ctx;
-				}
-				return ctx;
-			});
-		}
 	}
 
 	async getXml(): Promise<string> {
@@ -307,49 +308,9 @@ export class XmlNode extends Node<
 		return data.toXml();
 	}
 
-	// addOptionalAttribute(name: string) {
-	// 	const prop = this.params.xmlConfig.xmlProperties?.find((prop) => prop.name === name);
-	// 	if (prop === undefined) throw new Error(`Property ${name} not found`);
-	// 	if (!this.state.usedOptionalAttrs.includes(name)) this.state.usedOptionalAttrs.push(name);
-	// 	this.addInAttribute(prop);
-	// 	this.updateElement();
-	// 	console.log('updateElement', this.controls['addXmlAttr'].id);
-	// 	this.updateElement('control', this.controls['addXmlAttr'].id);
-	// }
-
-	// removeOptionalAttribute(name: string) {
-	// 	console.log('removeOptionalAttribute', name);
-	// 	const prop = this.params.xmlConfig.xmlProperties?.find((prop) => prop.name === name);
-	// 	if (prop?.required === true) {
-	// 		throw new ErrorWNotif(`Property ${name} is required and cannot be removed`);
-	// 	}
-	// 	if (prop === undefined) throw new Error(`Property ${name} not found`);
-	// 	const index = this.state.usedOptionalAttrs.indexOf(name);
-	// 	if (index !== -1) this.state.usedOptionalAttrs.splice(index, 1);
-	// 	console.log('index', index);
-	// 	this.removeInput(name);
-	// 	this.height -= prop.isArray ? 58 : 65.5;
-	// 	this.updateElement();
-	// 	this.updateElement('control', this.controls['addXmlAttr'].id);
-	// }
-
-	// override applyState(): void {
-	// 	if (this.state.name) this.name = this.state.name;
-	// 	// console.log(this.state);
-	// 	for (const name of this.state.usedOptionalAttrs ?? []) {
-	// 		this.addOptionalAttribute(name);
-	// 	}
-	// 	const { attributeValues } = this.state;
-	// 	for (const [key, value] of Object.entries(attributeValues ?? {})) {
-	// 		(this.inputs[key]?.control as InputControl)?.setValue(value);
-	// 	}
-	// }
-
 	setName(name: string) {
 		this.name = name;
 	}
-
-	getChildSocket(type: string): string {}
 
 	addInAttribute({
 		name,
@@ -361,12 +322,16 @@ export class XmlNode extends Node<
 	}: Attribute & { initialValues?: Record<string, unknown> }) {
 		this.xmlProperties.add(name);
 		const options = undefined;
-		let controlType: InputControlType | undefined
+		let controlType: InputControlType | undefined;
 		const xmlTypePattern = /([^\W_]+)(?:_([^\W_]+))?/gm;
 		const [, xmlType, xmlSubType] = xmlTypePattern.exec(type) || [];
 		// console.log('xmlType', xmlType, xmlSubType);
 		if (options) {
 			controlType = 'select';
+		} else if (xmlType === 'integer' && doc && doc.startsWith('Set to 1 to')) {
+			doc = doc.replace('Set to 1 to', 'Set to true to');
+			type = 'boolean';
+			controlType = 'checkbox';
 		} else if (assignControl(xmlType as SocketType) !== undefined) {
 			type = xmlType as DataType;
 			controlType = assignControl(xmlType as SocketType);
@@ -376,37 +341,31 @@ export class XmlNode extends Node<
 		} else if (xmlType.startsWith('R1Tensor')) {
 			type = 'vector';
 			controlType = assignControl(type as SocketType);
+			if (default_) {
+				const a = default_ as Array<number>;
+				default_ = { x: a[0], y: a[1], z: a[2] };
+			}
 		} else if (xmlType === 'string') {
 			type = 'string';
 		} else {
 			type = xmlType as DataType;
 		}
-		const isArray = (xmlSubType && xmlSubType.startsWith('array'));
+		const isArray = xmlSubType && xmlSubType.startsWith('array');
 
 		if (type === 'vector') this.xmlVectorProperties.add(name);
 
-		const { control: attrInputControl } = this.addInData(name, {
+		this.addInData(name, {
 			label: splitCamelCase(name).join(' '),
+			description: doc?.replaceAll(':ref:', ''),
+			initial: initialValues[name] ?? default_,
 			isRequired: required,
 			isLabelDisplayed: true,
 			type: type as DataType,
 			datastructure: isArray ? 'array' : 'scalar'
 		});
-		if (attrInputControl) {
-			// console.log('attrInputControl', attrInputControl);
-			const val = (attrInputControl as InputControl).value;
-			if (val !== undefined) {
-				// this.state.attributeValues[name] = val;
-				if (this.getDataflowEngine())
-					setTimeout(() => {
-						this.getDataflowEngine()?.reset(this.id);
-					});
-			}
-		} else {
-			// this.state.attributeValues[name] = initialValues[name];
-		}
 	}
 
+	// @ts-expect-error TODO: fix this type error
 	override data(inputs?: Record<string, unknown>): { value: XMLData; name?: string } {
 		let children: XMLData[] = [];
 		for (const [key, { tag }] of Object.entries(this.xmlInputs)) {
@@ -434,36 +393,48 @@ export class XmlNode extends Node<
 			name: this.hasName ? this.name : undefined,
 			properties: this.getProperties(inputs)
 		});
-		// console.log(xmlData);
 
 		return { value: xmlData, name: this.name };
 	}
 
 	getProperties(inputs?: Record<string, unknown>): Record<string, unknown> {
 		const properties: Record<string, unknown> = {};
-		// console.log(this.xmlProperties);
 		const isArray = (key: string) => (this.inputs[key]?.socket as Socket).datastructure === 'array';
+		function prepData(data: unknown, type: DataType) {
+			if (typeof data === 'boolean' && type === 'integer') {
+				return data ? 1 : 0;
+			}
+			return data;
+		}
 		for (const key of this.xmlProperties) {
-			// console.log(key);
-			let data = this.getData(key, inputs) as
-				| Record<string, unknown>
-				| Array<Record<string, unknown>>;
+			let data = this.getData(key, inputs) as unknown | unknown[];
 			if (data !== undefined) {
 				if (isArray(key) && !(data instanceof Array)) {
 					data = [data];
 				}
+
+				// Ensure that integer properties are not booleans
+				const type = this.complex.attributes.get(key)?.type;
+				if (type === 'integer') {
+					if (isArray(key)) {
+						data = (data as number[]).map((v) => prepData(v, type));
+					} else {
+						data = prepData(data as number, type);
+					}
+				} else {
+				}
+
 				if (this.xmlVectorProperties.has(key)) {
 					if (isArray(key)) {
 						properties[key] = (data as Array<Record<string, number>>).map((value) =>
 							Object.values(value)
 						);
-					} else properties[key] = Object.values(data);
+					} else properties[key] = Object.values(data as Record<string, number>);
 				} else {
 					properties[key] = data;
 				}
 			}
 		}
-		// console.log(properties);
 		return properties;
 	}
 
@@ -473,7 +444,8 @@ export class XmlNode extends Node<
 		type = 'any',
 		isArray = false,
 		index,
-		required
+		required,
+		description
 	}: {
 		name: string;
 		tag?: string;
@@ -481,62 +453,16 @@ export class XmlNode extends Node<
 		isArray?: boolean;
 		index?: number;
 		required?: boolean;
+		description?: string;
 	}) {
 		this.xmlInputs[name] = { tag: tag };
 		this.addInData(name, {
 			label: name.startsWith('child:') ? name.split(':')[1] : name,
 			type: type,
+			description,
 			datastructure: isArray ? 'array' : 'scalar',
 			index,
 			isRequired: required
 		});
 	}
 }
-
-// export function makeXmlNodeAction({
-// 	complexType
-// }: {
-// 	complexType: ReturnType<GeosSchema['complexTypes']['get']>;
-// }) {
-// 	if (!complexType) throw new ErrorWNotif('Complex type is not valid');
-// 	const name = complexType.name.match(/^(.*)Type$/)?.at(1);
-// 	if (!name) throw new Error(`Invalid complex type name: ${complexType.name}`);
-
-// 	const hasNameAttribute = complexType.attributes.has('name');
-// 	// if (hasNameAttribute) complexTypesWithName.push(name);
-// 	// complexTypes.push(name);
-
-// 	const xmlNodeAction: (factory: NodeFactory) => Node = (factory) =>
-// 		new XmlNode({
-// 			label: name,
-// 			factory: factory,
-
-// 			xmlConfig: {
-// 				noName: !hasNameAttribute,
-// 				childTypes: complexType.childTypes.map((childType) => {
-// 					const childName = childType.match(/^(.*)Type$/)?.at(1);
-// 					if (!childName) return childType;
-// 					return childName;
-// 				}),
-// 				xmlTag: name,
-// 				outData: {
-// 					name: name,
-// 					type: `xmlElement:${name}`,
-// 					socketLabel: name
-// 				},
-
-// 				xmlProperties: wu(complexType.attributes.values())
-// 					.map((attr) => {
-// 						return {
-// 							name: attr.name,
-// 							required: attr.required,
-// 							// pattern: attr.pattern,
-// 							type: attr.type,
-// 							controlType: 'text'
-// 						};
-// 					})
-// 					.toArray()
-// 			}
-// 		});
-// 	return xmlNodeAction;
-// }
