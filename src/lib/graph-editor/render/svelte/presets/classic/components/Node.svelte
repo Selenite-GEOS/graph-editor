@@ -3,13 +3,10 @@
 	import Ref from '$graph-editor/render/svelte/Ref.svelte';
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
-	import { themeControl } from '$lib/global/index.svelte';
 	import {
 		capitalize,
-		clickIfDrag,
 		clickIfNoDrag,
 		distance,
-		getJustifyBetweenOffsets,
 		posFromClient,
 		shortcut,
 		stopPropagation
@@ -18,11 +15,9 @@
 	import type { Position } from '$graph-editor/common';
 	import { Control } from '$graph-editor/socket';
 	import { variant } from '$utils';
-	import type { ActionReturn } from 'svelte/action';
 	import {
 		flip,
 		offset,
-		useDismiss,
 		useFloating,
 		useInteractions,
 		useRole
@@ -68,12 +63,12 @@
 		}
 	});
 
-	let hovered = $state(false)
+	let hovered = $state(false);
 	// Display picked and selected nodes on top
 	$effect(() => {
 		const parent = (floating.elements.reference as HTMLElement | undefined | null)?.parentElement;
 		if (!parent) return;
-		parent.style.zIndex = String(hovered ?  20 : node.picked ? 15 : node.selected ? 10 : 5);
+		parent.style.zIndex = String(hovered ? 20 : node.picked ? 15 : node.selected ? 10 : 5);
 	});
 
 	let editingName = $state(false);
@@ -92,10 +87,26 @@
 	const interactions = useInteractions([role]);
 
 	node.area?.addPipe((ctx) => {
-		if (ctx.type === 'translated') {
+		if (ctx.type === 'translated' || ctx.type === 'zoomed') {
 			floating.update();
+			update();
 		}
 		return ctx;
+	});
+	const zoom = $derived(node.factory?.transform.zoom ?? 1);
+	const showNamePopup = $derived(zoom < 0.5 && (node.name || xmlNode));
+	let arrowElmnt = writable<HTMLElement>();
+	import { createFloatingActions } from 'svelte-floating-ui';
+	import * as dom from 'svelte-floating-ui/dom';
+	import { writable } from 'svelte/store';
+	import Portal from 'svelte-portal';
+	const [floatingRef, floatingContent, update] = createFloatingActions({
+		middleware: [dom.offset(7.5)],
+		placement: 'top'
+	});
+	$effect(() => {
+		if (!node.area || node.area.container.style.position === 'relative') return;
+		node.area.container.style.position = 'relative';
 	});
 </script>
 
@@ -115,6 +126,31 @@
 		unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 	/>
 {/snippet}
+
+<!-- Small zoom name popup-->
+{#if showNamePopup && node.area}
+	<Portal target={node.area?.container}>
+		<!-- svelte-ignore event_directive_deprecated -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<button
+			use:floatingContent
+			class="bg-neutral text-neutral-content hover:z-20 select-none"
+			on:dblclick={(e) => {
+				stopPropagation(e);
+			}}
+			use:clickIfNoDrag={{
+				onclick: (e) => {
+					node.factory?.centerView([node]);
+				}
+			}}
+			hidden={!node.visible}
+			style="padding: {0.4}rem; border-radius: {0.5}rem"
+		>
+			<span style="font-size: {1}rem;">{node.name ?? node.label}</span>
+			<!-- <div class="bg-red-500 h-2 w-2" bind:this={$arrowElmnt}></div> -->
+		</button>
+	</Portal>
+{/if}
 
 <!-- Node Toolbar popup -->
 {#if node.picked}
@@ -202,18 +238,21 @@
 	title={node.description ?? constructor.description}
 	{...interactions.getReferenceProps()}
 	bind:this={floating.elements.reference}
+	use:floatingRef
 	class:text-primary={node.needsProcessing}
 	class:transition-all={transitionEnabled}
 	class:opacity-0={!node.visible}
-	class={`relative border-base-200 group border border-opacity-0 doverflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
-	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + " focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85"}
+	class={`relative border-base-200 group border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
+	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + ' focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
 	${node.previewed ? 'previewed' : ''}
 	`}
-	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${transitionEnabled
-		? `transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
-		: ''}`}
-	on:pointerenter={() => hovered = true}
-	on:pointerleave={() => hovered = false}
+	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
+		transitionEnabled
+			? `transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
+			: ''
+	}`}
+	on:pointerenter={() => (hovered = true)}
+	on:pointerleave={() => (hovered = false)}
 	on:dblclick={(e) => {
 		stopPropagation(e);
 		node.factory?.centerView([node]);
@@ -249,9 +288,7 @@
 						{node.label}
 					</h2>
 				{/if}
-				<h1
-					class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1"
-				>
+				<h1 class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1">
 					<!-- svelte-ignore event_directive_deprecated -->
 					<button
 						type="button"
@@ -391,7 +428,6 @@
 				<div
 					class="text-md justify-items-end items-center grid grid-rows-subgrid col-start-2 gap-2 justify-end"
 					data-testid={key}
-					
 				>
 					<div class="output-title" data-testid="output-title" title={output.description}>
 						{capitalize(output.label || '')}{#if output.socket.isRequired}<span
@@ -458,15 +494,16 @@
 	@keyframes outlineBlink {
 		0%,
 		100% {
-			outline-color: var(--fallback-a,oklch(var(--a)/0.5));
+			outline-color: var(--fallback-a, oklch(var(--a) / 0.5));
 		}
 		50% {
-			outline-color: var(--fallback-a,oklch(var(--a)/1));
+			outline-color: var(--fallback-a, oklch(var(--a) / 1));
 		}
 	}
 	.previewed {
+		overflow: visible;
 		position: relative;
-        animation: outlineBlink 1s ease-out infinite;
+		animation: outlineBlink 1s ease-out infinite;
 		outline-style: solid;
 		&::before {
 			position: absolute;

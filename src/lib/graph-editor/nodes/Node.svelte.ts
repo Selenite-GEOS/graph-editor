@@ -703,7 +703,7 @@ export class Node<
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			label: (params.showLabel ?? true) ? (params.label ?? key) : undefined,
+			label: (params.showLabel ?? true) ? (params.label ?? (key !== 'value' ? key : undefined)) : undefined,
 			description: params.description
 		});
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
@@ -758,7 +758,7 @@ export class Node<
 			description: params?.description,
 			multipleConnections: params?.type?.startsWith('xmlElement'),
 			isRequired: params?.isRequired,
-			label: params?.label ?? (key as string)
+			label: params?.label ?? (key !== 'value' ? (key as string) : undefined)
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
 		const controlType = assignControl(params?.type ?? 'any');

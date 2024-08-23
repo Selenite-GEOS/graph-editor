@@ -1,6 +1,6 @@
 {
 	"name": "@selenite/graph-editor",
-	"version": "0.0.116",
+	"version": "0.0.117",
 	"homepage": "https://selenite-geos.github.io/docs/developper/components/#graph-editor",
 	"repository": "github:Selenite-GEOS/graph-editor",
 	"license": "MIT",
@@ -107,6 +107,7 @@
 		"sass": "^1.77.8",
 		"svelte-css-vars": "^0.0.3",
 		"svelte-fa": "^4.0.2",
+		"svelte-floating-ui": "^1.5.9",
 		"svelte-i18n": "^4.0.0",
 		"svelte-persisted-store": "^0.11.0",
 		"svelte-portal": "^2.2.1",

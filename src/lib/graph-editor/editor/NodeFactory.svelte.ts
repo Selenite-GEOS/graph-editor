@@ -244,6 +244,10 @@ export class NodeFactory implements ComponentSupportInterface {
 			throw new Error(`Node class ${nodeSaveData.type} not found`);
 		}
 	}
+	effetRootCleanup: (() => void) | undefined;
+	private cleanup() {
+		this.effetRootCleanup?.();
+	}
 
 	destroyArea() {
 		this.destroy();
@@ -252,6 +256,7 @@ export class NodeFactory implements ComponentSupportInterface {
 	destroy() {
 		console.log('Destroying area.');
 		this.area?.destroy();
+		this.cleanup();
 		for (const c of this.components) {
 			c.cleanup?.();
 		}
@@ -320,7 +325,22 @@ export class NodeFactory implements ComponentSupportInterface {
 			});
 		});
 	}
-	area = $state<AreaPlugin<Schemes, AreaExtra>>();
+	#area = $state<AreaPlugin<Schemes, AreaExtra>>();
+
+	get area() {
+		return this.#area;
+	}
+	transform = $state({zoom: 1});
+	set area(area: AreaPlugin<Schemes, AreaExtra> | undefined) {
+		if (area === this.#area) return;
+		this.#area = area;
+		this.#area?.addPipe((ctx) => {
+			if (ctx.type === "zoomed") {
+				this.transform.zoom = ctx.data.zoom;
+			}
+			return ctx;
+		})		
+	}
 
 	public readonly makutuClasses?: MakutuClassRepository;
 
@@ -710,7 +730,7 @@ export class NodeFactory implements ComponentSupportInterface {
 			return;
 		}
 		await tick();
-		console.log('Running dataflow engines');
+		console.debug('Running dataflow engines');
 		try {
 			this.editor
 				.getNodes()
