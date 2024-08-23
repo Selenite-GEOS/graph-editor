@@ -87,7 +87,7 @@
 	const interactions = useInteractions([role]);
 
 	node.area?.addPipe((ctx) => {
-		if (ctx.type === 'translated' || ctx.type === 'zoomed') {
+		if (ctx.type === 'translated' || ctx.type === 'zoomed' || ctx.type === 'nodetranslated' && ctx.data.id === node.id) {
 			floating.update();
 			update();
 		}
