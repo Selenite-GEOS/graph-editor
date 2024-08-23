@@ -70,7 +70,7 @@
 		if (!parent) return;
 		parent.style.zIndex = String(hovered ? 20 : node.picked ? 15 : node.selected ? 10 : 5);
 	});
-
+	const zoomThreshold = 0.5;
 	// Add hide names pipe
 	$effect(() => {
 		if (!node.factory || !node.area) return;
@@ -82,7 +82,7 @@
 		console.log('Adding hide label pipe');
 		node.area.addPipe((ctx) => {
 			if (ctx.type === 'zoomed') {
-				if (ctx.data.zoom > 0.5) {
+				if (ctx.data.zoom > zoomThreshold) {
 					node.area?.container.classList.add('hideFloatingLabel');
 				} else {
 					node.area?.container.classList.remove('hideFloatingLabel');
@@ -106,15 +106,16 @@
 	});
 	const role = useRole(floating.context);
 	const interactions = useInteractions([role]);
-
 	node.area?.addPipe((ctx) => {
 		if (
 			ctx.type === 'translated' ||
 			ctx.type === 'zoomed' ||
 			(ctx.type === 'nodetranslated' && ctx.data.id === node.id)
 		) {
-			floating.update();
-			update();
+			if (node.picked)
+				floating.update();
+			if (node.factory && node.factory.transform.zoom < zoomThreshold)
+				update();
 		}
 		return ctx;
 	});
