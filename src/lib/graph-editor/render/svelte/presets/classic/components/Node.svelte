@@ -104,10 +104,6 @@
 		middleware: [dom.offset(7.5)],
 		placement: 'top'
 	});
-	$effect(() => {
-		if (!node.area || node.area.container.style.position === 'relative') return;
-		node.area.container.style.position = 'relative';
-	});
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
