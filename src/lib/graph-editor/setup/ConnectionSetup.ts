@@ -46,7 +46,7 @@ export class ConnectionPlugin extends BaseConnectionPlugin<Schemes, AreaExtra> {
 			[]
 		>
 	): void {
-		super.setParent(scope);
+		// super.setParent(scope);
 		// @ts-expect-error: Access private field
 		this.areaPlugin = this.area;
 		// @ts-expect-error: Access private field
