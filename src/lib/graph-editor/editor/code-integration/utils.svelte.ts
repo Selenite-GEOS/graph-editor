@@ -249,6 +249,8 @@ export function parsedXmlToGraph({
 
 
 export async function addGraphToEditor({factory, nodes, connections, t0}: {factory: NodeFactory, nodes: (Node | SaveData<Node>)[], connections: (Connection | SaveData<Connection>)[], t0: number}) {
+	if (nodes.length === 0 && connections.length === 0) return;
+
 	let addedNodes: Node[] = $state([]);
 	let addedConns: Connection[] = $state([]);
 	const notifId = newLocalId('code-integration-progress');
@@ -260,6 +262,7 @@ export async function addGraphToEditor({factory, nodes, connections, t0}: {facto
 			return `Progress: ${(((addedNodes.length + addedConns.length) / (nodes.length + connections.length)) * 100).toFixed(2)}%`;
 		}
 	});
+
 
 	for (const [i, node] of nodes.entries()) {
 		let n: Node;

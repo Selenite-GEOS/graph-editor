@@ -56,5 +56,6 @@ pnpm publish
 - Add magnetic connection
 - Add panning viewport
 - Fix format node handling of invalid formats (ie. do nothing)
+- Add progress to big clears
 ### Not important
 - make node selection framework agnostic
