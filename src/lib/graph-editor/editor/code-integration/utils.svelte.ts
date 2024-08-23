@@ -262,7 +262,13 @@ export async function addGraphToEditor({factory, nodes, connections, t0}: {facto
 	});
 
 	for (const [i, node] of nodes.entries()) {
-		const n = node instanceof Node ? node : await Node.fromJSON(node, { factory });
+		let n: Node;
+		if (node instanceof Node) {
+			n = node;
+			n.factory = factory;
+		} else {
+			n = await Node.fromJSON(node, {factory});
+		}
 		n.visible = false;
 		if (n) {
 			await factory.editor.addNode(n);

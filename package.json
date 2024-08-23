@@ -1,6 +1,6 @@
 {
 	"name": "@selenite/graph-editor",
-	"version": "0.0.114",
+	"version": "0.0.115",
 	"homepage": "https://selenite-geos.github.io/docs/developper/components/#graph-editor",
 	"repository": "github:Selenite-GEOS/graph-editor",
 	"license": "MIT",
