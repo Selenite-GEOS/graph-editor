@@ -130,7 +130,7 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<button
 			use:floatingContent
-			class="bg-neutral text-neutral-content hover:z-20 select-none"
+			class="bg-neutral text-neutral-content hover:z-20 select-none p-[0.4rem] rounded-[0.5rem]"
 			on:dblclick={(e) => {
 				stopPropagation(e);
 			}}
@@ -140,10 +140,8 @@
 				}
 			}}
 			hidden={!node.visible}
-			style="padding: {0.4}rem; border-radius: {0.5}rem"
 		>
-			<span style="font-size: {1}rem;">{node.name ?? node.label}</span>
-			<!-- <div class="bg-red-500 h-2 w-2" bind:this={$arrowElmnt}></div> -->
+			{node.name ?? node.label}
 		</button>
 	</Portal>
 {/if}
