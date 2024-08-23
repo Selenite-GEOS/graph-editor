@@ -112,8 +112,7 @@
 			ctx.type === 'zoomed' ||
 			(ctx.type === 'nodetranslated' && ctx.data.id === node.id)
 		) {
-			if (node.picked)
-				floating.update();
+			if (node.picked) floating.update();
 			// if (node.factory && node.factory.transform.zoom < zoomThreshold)
 			// 	update();
 		}
@@ -131,6 +130,7 @@
 			animationFrame: true
 		}
 	});
+	const nodeElmnt = $derived(floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined);
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
@@ -150,9 +150,8 @@
 	/>
 {/snippet}
 
-{#if true}
-	<!-- Small zoom name popup-->
-	 {#if showNamePopup && node.visible}
+<!-- Small zoom name popup-->
+{#if showNamePopup && node.visible}
 	<Portal target={node.area?.container}>
 		<!-- svelte-ignore event_directive_deprecated -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -165,298 +164,299 @@
 			use:clickIfNoDrag={{
 				onclick: (e) => {
 					node.factory?.centerView([node]);
+					nodeElmnt?.focus();
 				}
 			}}
 		>
 			{node.name ?? node.label}
 		</button>
 	</Portal>
-	{/if}
+{/if}
 
-	<!-- Node Toolbar popup -->
-	{#if node.picked}
-		<!-- svelte-ignore event_directive_deprecated -->
-		<div
-			class="grid w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-100 p-2 rounded-sm select-none pointer-events-none"
-			on:pointerdown={stopPropagation}
-			style={floating.floatingStyles}
-			{...interactions.getFloatingProps()}
-			transition:fade={{ duration: 175 }}
-			bind:this={floating.elements.floating}
-		>
-			<button
-				title="Align top"
-				type="button"
-				class="btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.alignTop()}
-			>
-				<Fa icon={faArrowsUpToLine} rotate="0" />
-			</button>
-			<button
-				title="Align middle"
-				type="button"
-				class="btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.alignMiddle()}
-			>
-				<Fa icon={faAlignCenter} rotate={90} />
-			</button>
-			<button
-				title="Align bottom"
-				type="button"
-				class="btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.alignBottom()}
-			>
-				<Fa icon={faArrowsUpToLine} rotate={180} />
-			</button>
-			<button
-				title="Space even vertical"
-				type="button"
-				class=" btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.spaceVertical()}
-			>
-				<Fa icon={faArrowsLeftRight} rotate={90} />
-			</button>
-			<!-- svelte-ignore event_directive_deprecated -->
-			<button
-				title="Align left"
-				type="button"
-				class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.justifyLeft()}
-			>
-				<Fa icon={faAlignLeft} />
-			</button>
-			<button
-				title="Center"
-				type="button"
-				class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.justifyCenter()}
-			>
-				<Fa icon={faAlignCenter} />
-			</button>
-			<button
-				title="Align right"
-				type="button"
-				class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.justifyRight()}
-			>
-				<Fa icon={faAlignRight} />
-			</button>
-			<button
-				title="Space even horizontal"
-				type="button"
-				class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
-				on:click={() => node.factory?.layout.justifyBetween()}
-			>
-				<Fa icon={faArrowsLeftRight} />
-			</button>
-		</div>
-	{/if}
-
+<!-- Node Toolbar popup -->
+{#if node.picked}
 	<!-- svelte-ignore event_directive_deprecated -->
-	<section
-		role="cell"
-		tabindex="0"
-		title={node.description ?? constructor.description}
-		{...interactions.getReferenceProps()}
-		bind:this={floating.elements.reference}
-		use:floatingRef
-		class:text-primary={node.needsProcessing}
-		class:transition-all={transitionEnabled}
-		class:opacity-0={!node.visible}
-		class={`relative border-base-200 group border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
+	<div
+		class="grid w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-100 p-2 rounded-sm select-none pointer-events-none"
+		on:pointerdown={stopPropagation}
+		style={floating.floatingStyles}
+		{...interactions.getFloatingProps()}
+		transition:fade={{ duration: 175 }}
+		bind:this={floating.elements.floating}
+	>
+		<button
+			title="Align top"
+			type="button"
+			class="btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.alignTop()}
+		>
+			<Fa icon={faArrowsUpToLine} rotate="0" />
+		</button>
+		<button
+			title="Align middle"
+			type="button"
+			class="btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.alignMiddle()}
+		>
+			<Fa icon={faAlignCenter} rotate={90} />
+		</button>
+		<button
+			title="Align bottom"
+			type="button"
+			class="btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.alignBottom()}
+		>
+			<Fa icon={faArrowsUpToLine} rotate={180} />
+		</button>
+		<button
+			title="Space even vertical"
+			type="button"
+			class=" btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.spaceVertical()}
+		>
+			<Fa icon={faArrowsLeftRight} rotate={90} />
+		</button>
+		<!-- svelte-ignore event_directive_deprecated -->
+		<button
+			title="Align left"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyLeft()}
+		>
+			<Fa icon={faAlignLeft} />
+		</button>
+		<button
+			title="Center"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyCenter()}
+		>
+			<Fa icon={faAlignCenter} />
+		</button>
+		<button
+			title="Align right"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyRight()}
+		>
+			<Fa icon={faAlignRight} />
+		</button>
+		<button
+			title="Space even horizontal"
+			type="button"
+			class="row-start-2 btn btn-ghost btn-sm pointer-events-auto"
+			on:click={() => node.factory?.layout.justifyBetween()}
+		>
+			<Fa icon={faArrowsLeftRight} />
+		</button>
+	</div>
+{/if}
+
+<!-- svelte-ignore event_directive_deprecated -->
+<section
+	role="cell"
+	tabindex="0"
+	title={node.description ?? constructor.description}
+	{...interactions.getReferenceProps()}
+	bind:this={floating.elements.reference}
+	use:floatingRef
+	class:text-primary={node.needsProcessing}
+	class:transition-all={transitionEnabled}
+	class:opacity-0={!node.visible}
+	class={`relative border-base-200 group border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
 	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + ' focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
 	${node.previewed ? 'previewed' : ''}
 	`}
-		style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
-			transitionEnabled
-				? `transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
-				: ''
-		}`}
-		on:pointerenter={() => (hovered = true)}
-		on:pointerleave={() => (hovered = false)}
-		on:dblclick={(e) => {
+	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
+		transitionEnabled
+			? `transition-property: max-width, color, background-color, border-color, text-decoration-color, fill, stroke`
+			: ''
+	}`}
+	on:pointerenter={() => (hovered = true)}
+	on:pointerleave={() => (hovered = false)}
+	on:dblclick={(e) => {
+		stopPropagation(e);
+		node.factory?.centerView([node]);
+		node.factory?.selector.unselect(node);
+		if (node.factory?.selector.accumulating) {
 			stopPropagation(e);
-			node.factory?.centerView([node]);
-			node.factory?.selector.unselect(node);
-			if (node.factory?.selector.accumulating) {
-				stopPropagation(e);
-			}
-		}}
-		use:clickIfNoDrag={{
-			onclick(e) {
-				if (e.button !== 0) return;
-				node.factory?.select(node);
-			}
-		}}
-		on:keydown={(e) => {
-			if (!nameInput && e.key === 'Enter') {
-				node.factory?.select(node);
-			}
-		}}
+		}
+	}}
+	use:clickIfNoDrag={{
+		onclick(e) {
+			if (e.button !== 0) return;
+			node.factory?.select(node);
+		}
+	}}
+	on:keydown={(e) => {
+		if (!nameInput && e.key === 'Enter') {
+			node.factory?.select(node);
+		}
+	}}
+>
+	<div
+		class:disappear={disappearProcessing}
+		class:animated-diagonal={displayProcessing}
+		class="grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
+		class:min-w-[13.65rem]={xmlNode}
+		bind:clientWidth={node.width}
+		bind:clientHeight={node.height}
 	>
-		<div
-			class:disappear={disappearProcessing}
-			class:animated-diagonal={displayProcessing}
-			class="grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
-			class:min-w-[13.65rem]={xmlNode}
-			bind:clientWidth={node.width}
-			bind:clientHeight={node.height}
-		>
-			{#if node.label && node.label !== ''}
-				<header class="grid">
-					{#if node.name || editingName}
-						<h2 class="text-sm mb-1 col-start-1">
-							{node.label}
-						</h2>
-					{/if}
-					<h1 class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1">
+		{#if node.label && node.label !== ''}
+			<header class="grid">
+				{#if node.name || editingName}
+					<h2 class="text-sm mb-1 col-start-1">
+						{node.label}
+					</h2>
+				{/if}
+				<h1 class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1">
+					<!-- svelte-ignore event_directive_deprecated -->
+					<button
+						type="button"
+						class="cursor-text pe-2"
+						use:shortcut={{
+							ctrl: true,
+							repeats: false,
+							action(btn) {
+								btn.classList.remove('cursor-text');
+							},
+							endAction(btn) {
+								btn.classList.add('cursor-text');
+							}
+						}}
+						on:click={(e) => {
+							if (e.ctrlKey || e.altKey || e.shiftKey) return;
+							if (lastPointerDownPos) {
+								const pos = posFromClient(e);
+								const dist = distance(lastPointerDownPos, pos);
+								console.debug('Dragged distance', dist);
+								if (dist > 2) return;
+							}
+							editingName = true;
+							node.factory?.unselectAll();
+						}}
+						on:pointerdown={(e) => {
+							lastPointerDownPos = posFromClient(e);
+						}}
+					>
+						{node.name ?? node.label}
+					</button>
+					{#if editingName}
 						<!-- svelte-ignore event_directive_deprecated -->
-						<button
-							type="button"
-							class="cursor-text pe-2"
+						<input
+							bind:this={nameInput}
+							class="absolute input inset-0 text-base-content"
+							on:blur={() => {
+								if (!nameInput || !editingName) return;
+								node.name = nameInput.value;
+								editingName = false;
+								lastPointerDownPos = undefined;
+							}}
+							on:dblclick={stopPropagation}
+							on:pointerdown={stopPropagation}
+							value={node.name}
 							use:shortcut={{
-								ctrl: true,
-								repeats: false,
-								action(btn) {
-									btn.classList.remove('cursor-text');
-								},
-								endAction(btn) {
-									btn.classList.add('cursor-text');
-								}
-							}}
-							on:click={(e) => {
-								if (e.ctrlKey || e.altKey || e.shiftKey) return;
-								if (lastPointerDownPos) {
-									const pos = posFromClient(e);
-									const dist = distance(lastPointerDownPos, pos);
-									console.debug('Dragged distance', dist);
-									if (dist > 2) return;
-								}
-								editingName = true;
-								node.factory?.unselectAll();
-							}}
-							on:pointerdown={(e) => {
-								lastPointerDownPos = posFromClient(e);
-							}}
-						>
-							{node.name ?? node.label}
-						</button>
-						{#if editingName}
-							<!-- svelte-ignore event_directive_deprecated -->
-							<input
-								bind:this={nameInput}
-								class="absolute input inset-0 text-base-content"
-								on:blur={() => {
-									if (!nameInput || !editingName) return;
-									node.name = nameInput.value;
+								key: 'enter',
+								ignoreElements: [],
+								action() {
+									node.name = nameInput!.value;
 									editingName = false;
-									lastPointerDownPos = undefined;
-								}}
-								on:dblclick={stopPropagation}
-								on:pointerdown={stopPropagation}
-								value={node.name}
-								use:shortcut={{
-									key: 'enter',
-									ignoreElements: [],
-									action() {
-										node.name = nameInput!.value;
-										editingName = false;
-										editingName = false;
-									}
-								}}
-								use:shortcut={{
-									key: 'escape',
-									ignoreElements: [],
-									action() {
-										editingName = false;
-									}
-								}}
+									editingName = false;
+								}
+							}}
+							use:shortcut={{
+								key: 'escape',
+								ignoreElements: [],
+								action() {
+									editingName = false;
+								}
+							}}
+						/>
+					{/if}
+				</h1>
+				<aside class="col-start-2 row-span-full ms-4 max-h-0">
+					{#each node.sortedControls as [k, control]}
+						{#if control.placeInHeader}
+							{@render controlSnippet(control, {})}
+						{/if}
+					{/each}
+				</aside>
+			</header>
+		{/if}
+
+		{#each node.sortedControls as [key, control] (key)}
+			{#if !control.placeInHeader}
+				{@render controlSnippet(control, {
+					class: 'h-full !flex items-center justify-center control col-span-full'
+				})}
+			{/if}
+		{/each}
+		<form class="grid grid-flow-dense gap-2">
+			{#each node.sortedInputs as [key, input], i (key)}
+				<div
+					class="text-md justify-items-start items-center flex gap-2 grid-rows-subgrid col-start-1"
+					data-testid={key}
+				>
+					<Ref
+						data-testid="input-socket"
+						init={(element) =>
+							emit({
+								type: 'render',
+								data: {
+									type: 'socket',
+									side: 'input',
+									key,
+									nodeId: node.id,
+									element,
+									payload: input.socket
+								}
+							})}
+						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+					/>
+					<div title={input.description}>
+						{#if !input.control || !input.showControl || input.alwaysShowLabel === true}
+							<div
+								class="input-title {input.control && input.showControl ? 'ms-0 mb-1' : ''}"
+								data-testid="input-title"
+							>
+								{capitalize(input.label || '')}{#if input.socket.isRequired}<span
+										class="ps-0.5 text-lg"
+										title="required">*</span
+									>{/if}
+							</div>
+						{/if}
+
+						{#if input.control && input.showControl}
+							<Ref
+								class="h-full !flex items-center input-control mr-2"
+								data-testid="input-control"
+								init={(element) =>
+									emit({
+										type: 'render',
+										data: {
+											type: 'control',
+											element,
+											payload: input.control!
+										}
+									})}
+								unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 							/>
 						{/if}
-					</h1>
-					<aside class="col-start-2 row-span-full ms-4 max-h-0">
-						{#each node.sortedControls as [k, control]}
-							{#if control.placeInHeader}
-								{@render controlSnippet(control, {})}
-							{/if}
-						{/each}
-					</aside>
-				</header>
-			{/if}
-
-			{#each node.sortedControls as [key, control] (key)}
-				{#if !control.placeInHeader}
-					{@render controlSnippet(control, {
-						class: 'h-full !flex items-center justify-center control col-span-full'
-					})}
-				{/if}
-			{/each}
-			<form class="grid grid-flow-dense gap-2">
-				{#each node.sortedInputs as [key, input], i (key)}
-					<div
-						class="text-md justify-items-start items-center flex gap-2 grid-rows-subgrid col-start-1"
-						data-testid={key}
-					>
-						<Ref
-							data-testid="input-socket"
-							init={(element) =>
-								emit({
-									type: 'render',
-									data: {
-										type: 'socket',
-										side: 'input',
-										key,
-										nodeId: node.id,
-										element,
-										payload: input.socket
-									}
-								})}
-							unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-						/>
-						<div title={input.description}>
-							{#if !input.control || !input.showControl || input.alwaysShowLabel === true}
-								<div
-									class="input-title {input.control && input.showControl ? 'ms-0 mb-1' : ''}"
-									data-testid="input-title"
-								>
-									{capitalize(input.label || '')}{#if input.socket.isRequired}<span
-											class="ps-0.5 text-lg"
-											title="required">*</span
-										>{/if}
-								</div>
-							{/if}
-
-							{#if input.control && input.showControl}
-								<Ref
-									class="h-full !flex items-center input-control mr-2"
-									data-testid="input-control"
-									init={(element) =>
-										emit({
-											type: 'render',
-											data: {
-												type: 'control',
-												element,
-												payload: input.control!
-											}
-										})}
-									unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-								/>
-							{/if}
-						</div>
 					</div>
-				{/each}
-				{#each node.sortedOutputs as [key, output] (key)}
-					<div
-						class="text-md justify-items-end items-center grid grid-rows-subgrid col-start-2 gap-2 justify-end"
-						data-testid={key}
-					>
-						<div class="output-title" data-testid="output-title" title={output.description}>
-							{capitalize(output.label || '')}{#if output.socket.isRequired}<span
-									class="ps-0.5 text-lg"
-									title="required">*</span
-								>{/if}
-						</div>
-						<!-- <Ref
+				</div>
+			{/each}
+			{#each node.sortedOutputs as [key, output] (key)}
+				<div
+					class="text-md justify-items-end items-center grid grid-rows-subgrid col-start-2 gap-2 justify-end"
+					data-testid={key}
+				>
+					<div class="output-title" data-testid="output-title" title={output.description}>
+						{capitalize(output.label || '')}{#if output.socket.isRequired}<span
+								class="ps-0.5 text-lg"
+								title="required">*</span
+							>{/if}
+					</div>
+					<!-- <Ref
 						class="h-full !flex items-center output-control"
 						data-testid="output-control"
 						init={(element) =>
@@ -470,29 +470,28 @@
 							})}
 						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 					/> -->
-						<Ref
-							data-testid="output-socket"
-							class="text-end col-start-2"
-							init={(element) =>
-								emit({
-									type: 'render',
-									data: {
-										type: 'socket',
-										side: 'output',
-										key,
-										nodeId: node.id,
-										element,
-										payload: output.socket
-									}
-								})}
-							unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
-						/>
-					</div>
-				{/each}
-			</form>
-		</div>
-	</section>
-{/if}
+					<Ref
+						data-testid="output-socket"
+						class="text-end col-start-2"
+						init={(element) =>
+							emit({
+								type: 'render',
+								data: {
+									type: 'socket',
+									side: 'output',
+									key,
+									nodeId: node.id,
+									element,
+									payload: output.socket
+								}
+							})}
+						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
+					/>
+				</div>
+			{/each}
+		</form>
+	</div>
+</section>
 
 <!-- <div class="mt-[10rem]" onpointerdown={stopPropagation}>
 	<OldNode data={node} {emit}/>
