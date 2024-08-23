@@ -114,8 +114,8 @@
 		) {
 			if (node.picked)
 				floating.update();
-			if (node.factory && node.factory.transform.zoom < zoomThreshold)
-				update();
+			// if (node.factory && node.factory.transform.zoom < zoomThreshold)
+			// 	update();
 		}
 		return ctx;
 	});
@@ -124,9 +124,12 @@
 	import * as dom from 'svelte-floating-ui/dom';
 	import Portal from 'svelte-portal';
 	import { untrack } from 'svelte';
-	const [floatingRef, floatingContent, update] = createFloatingActions({
+	const [floatingRef, floatingContent] = createFloatingActions({
 		middleware: [dom.offset(7.5)],
-		placement: 'top'
+		placement: 'top',
+		autoUpdate: {
+			animationFrame: true
+		}
 	});
 </script>
 
