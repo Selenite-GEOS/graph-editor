@@ -71,6 +71,14 @@
 		parent.style.zIndex = String(hovered ? 20 : node.picked ? 15 : node.selected ? 10 : 5);
 	});
 	const zoomThreshold = 0.5;
+
+	function updateFloatingLabels(zoom?: number) {
+		if ((zoom ?? 1) > zoomThreshold) {
+			node.area?.container.classList.add('hideFloatingLabel');
+		} else {
+			node.area?.container.classList.remove('hideFloatingLabel');
+		}
+	}
 	// Add hide names pipe
 	$effect(() => {
 		if (!node.factory || !node.area) return;
@@ -78,17 +86,15 @@
 		if (hideLabelPipeSetup.value) return;
 		untrack(() => {
 			hideLabelPipeSetup.value = true;
-		});
-		console.log('Adding hide label pipe');
-		node.area.addPipe((ctx) => {
-			if (ctx.type === 'zoomed') {
-				if (ctx.data.zoom > zoomThreshold) {
-					node.area?.container.classList.add('hideFloatingLabel');
-				} else {
-					node.area?.container.classList.remove('hideFloatingLabel');
+			console.log('Adding hide label pipe');
+			node.area?.addPipe((ctx) => {
+				if (ctx.type === 'zoomed') {
+					updateFloatingLabels(ctx.data.zoom);
 				}
-			}
-			return ctx;
+				return ctx;
+			});
+
+			updateFloatingLabels(node.factory?.transform.zoom);
 		});
 	});
 
@@ -130,7 +136,9 @@
 			animationFrame: true
 		}
 	});
-	const nodeElmnt = $derived(floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined);
+	const nodeElmnt = $derived(
+		floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined
+	);
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
