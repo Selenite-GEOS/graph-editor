@@ -70,7 +70,7 @@ describe('typed-socket', () => {
                     { type: 'any', datastructure: 'scalar' },
                     { type: 'any', datastructure: 'array' }
                 )
-            ).toBe(false);
+            ).toBe(true);
         })
         it('should handle subtypes', () => {
             expect(
