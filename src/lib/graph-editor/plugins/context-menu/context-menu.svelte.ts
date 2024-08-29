@@ -32,6 +32,8 @@ export class ContextMenu {
 		return this.#instance;
 	}
 
+	target = $state<HTMLElement>();
+
 	/** Position of the menu, in client coordinates. */
 	pos = $state<Position>({ x: 0, y: 0 });
 
@@ -54,6 +56,7 @@ export class ContextMenu {
 			this.minHeight = undefined;
 			this.minWidth = undefined;
 			this.query = '';
+			this.target = undefined;
 			this.expanded = false;
 		}
 	}
@@ -162,11 +165,13 @@ export const showContextMenu: ShowContextMenu = ({
 	pos,
 	searchbar,
 	onHide,
-	expand = false
+	expand = false,
+	target
 }) => {
 	const menu = ContextMenu.instance;
 	menu.minHeight = undefined;
 	menu.minWidth = undefined;
+	menu.target = target;
 	menu.expanded = expand;
 	menu.visible = true;
 	menu.pos = pos;

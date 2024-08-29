@@ -37,11 +37,12 @@
 {:else}
 	<!-- svelte-ignore event_directive_deprecated -->
 	<div
+		bind:this={socket.element}
 		class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}
 		
 		"
 		role="button"
-		tabindex="0"
+		tabindex="-1"
 		class:outline={data.selected}
 		{title}
 		use:cssVars={socketVars}

@@ -10,7 +10,8 @@ import {
 	type BaseComponent,
 	PythonNodeComponent,
 	R_SocketSelection_NC,
-	type NodeComponentParams
+	type NodeComponentParams,
+	type ComponentParams
 } from '$graph-editor/components';
 import {
 	Socket,
@@ -34,7 +35,7 @@ import type { Schemes } from '$graph-editor/schemes';
 import { structures } from 'rete-structures';
 import { getLeavesFromOutput } from './utils';
 import type { HTMLInputAttributes } from 'svelte/elements';
-import { uuidv4, type SaveData } from '@selenite/commons';
+import { capitalize, uuidv4, type SaveData } from '@selenite/commons';
 import type { SelectorEntity } from '$graph-editor/editor/NodeSelection.svelte';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -136,6 +137,7 @@ export interface NodeParams {
 	label?: string;
 	description?: string;
 	name?: string;
+	id?: string;
 	width?: number;
 	height?: number;
 	factory?: NodeFactory;
@@ -368,8 +370,14 @@ export class Node<
 
 	constructor(params: NodeParams = {}) {
 		const { label = '', width = 190, height = 120, factory } = params;
-		this.id = uuidv4();
+		this.#id = params.id ?? uuidv4();
 		this.label = label;
+		if (params.name) {
+			this.name = params.name;
+		}
+
+		
+
 		this.initialValues =
 			params.initialValues === undefined
 				? undefined
@@ -378,7 +386,12 @@ export class Node<
 					: { inputs: params.initialValues, controls: {} };
 		this.pythonComponent = this.addComponentByClass(PythonNodeComponent);
 		this.socketSelectionComponent = this.addComponentByClass(R_SocketSelection_NC);
-		this.state = (params.state ?? {}) as State;
+		if (params.state) {
+			this.state = {
+				...this.state,
+				...params.state
+			}
+		}
 
 		Node.nodeCounts++;
 		if (params.params && 'factory' in params.params) {
@@ -395,7 +408,10 @@ export class Node<
 		this.height = height;
 	}
 	label = $state('');
-	id: string;
+	#id: string;
+	get id() {
+		return this.#id;
+	}
 
 	get previewed(): boolean {
 		return this.factory?.previewedNodes.has(this) ?? false;
@@ -462,17 +478,11 @@ export class Node<
 		return null;
 	}
 
-	addComponentByClass<
-		T extends BaseComponent,
-		N extends NodeComponentParams<Inputs, Outputs>,
-		P,
-		Inputs extends Record<string, Socket>,
-		Outputs extends Record<string, Socket>
-	>(componentClass: new (options: N & P) => T, params: P): T {
+	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(componentClass: new (params: P) => C, params: Omit<P, keyof ComponentParams>): C {
 		const component = new componentClass({
 			owner: this as unknown as Node<Inputs, Outputs>,
 			...params
-		} as N & P);
+		} as P & {owner: Node<Inputs, Outputs>});
 		this.components.push(component);
 		return component;
 	}
@@ -703,7 +713,7 @@ export class Node<
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			label: (params.showLabel ?? true) ? (params.label ?? (key !== 'value' ? key : undefined)) : undefined,
+			label: (params.showLabel ?? true) ? (params.label ?? (key !== 'value'  && key !== 'result' ? capitalize(key) : undefined)) : undefined,
 			description: params.description
 		});
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
@@ -732,11 +742,13 @@ export class Node<
 			datastructure?: Inputs[K]['datastructure'] extends 'scalar'
 				? 'scalar' | undefined
 				: Inputs[K]['datastructure'];
+			options?: string[];
 			control?: Partial<InputControlParams<InputControlType>>;
 			label?: string;
 			description?: string;
 			isRequired?: boolean;
-			isLabelDisplayed?: boolean;
+			alwaysShowLabel?: boolean;
+			hideLabel?: boolean;
 			initial?: SocketValueType<Inputs[K]['type']>;
 			index?: number;
 			props?: HTMLInputAttributes;
@@ -749,24 +761,26 @@ export class Node<
 		const input = new Input({
 			socket: new Socket({
 				node: this,
-				displayLabel: params?.isLabelDisplayed,
+				displayLabel: params?.alwaysShowLabel,
 				datastructure: params?.datastructure,
 				type: params?.type ?? 'any'
 			}),
-			alwaysShowLabel: params?.isLabelDisplayed,
+			hideLabel: params?.hideLabel,
+			alwaysShowLabel: params?.alwaysShowLabel,
 			index: params?.index,
 			description: params?.description,
-			multipleConnections: params?.type?.startsWith('xmlElement'),
+			multipleConnections: params?.type?.startsWith('xmlElement') && params.datastructure === 'array',
 			isRequired: params?.isRequired,
-			label: params?.label ?? (key !== 'value' ? (key as string) : undefined)
+			label: params?.label ?? (key !== 'value'  && key !== 'result' ? (key as string) : undefined)
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
-		const controlType = assignControl(params?.type ?? 'any');
+		const controlType = params?.options  ? 'select': assignControl(params?.type ?? 'any');
 		if (controlType) {
 			const inputControl = this.makeInputControl({
 				type: controlType,
 				...params?.control,
 				props: params?.props,
+				options: params?.options,
 				socketType: params?.type ?? 'any',
 				datastructure: params?.datastructure ?? 'scalar',
 				initial: this.initialValues?.inputs?.[key] ?? params?.initial,
@@ -847,7 +861,7 @@ export class Node<
 			}
 			this.factory?.resetDataflow(this);
 		} catch (e) {
-			console.warn('Dataflow processing cancelled');
+			console.warn('Dataflow processing cancelled', e);
 		}
 	};
 

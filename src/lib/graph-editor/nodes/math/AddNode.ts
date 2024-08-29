@@ -20,8 +20,8 @@ export class AddNode extends Node<
 	constructor(params: NodeParams & { a?: number; b?: number } = {}) {
 		super({ label: 'Add', height: 190, ...params });
 		const { a = 0, b = 0 } = params;
-		this.addInData('a', { type: 'number', initial: a });
-		this.addInData('b', { type: 'number', initial: b });
+		this.addInData('a', { type: 'number', initial: a, hideLabel: true });
+		this.addInData('b', { type: 'number', initial: b, hideLabel: true });
 
 		this.addOutData('value', { type: 'number' });
 	}

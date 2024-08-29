@@ -12,6 +12,9 @@ import {
 	type SaveData
 } from '@selenite/commons';
 import type { NodeFactory } from '../NodeFactory.svelte';
+import { FormatGroupNameNode } from '$graph-editor/nodes/io/FormatNode';
+import { BreakArrayNode } from '$graph-editor/nodes/data/array';
+import { lowerFirst } from 'lodash-es';
 
 export function xmlToGraph(params: { xml: string; schema: XmlSchema; factory?: NodeFactory }) {
 	const parsedXml = parseXml(params.xml);
@@ -46,13 +49,14 @@ export function parsedXmlToGraph({
 		source: string;
 		target: { node: Node; key: string };
 	}[] = [];
+	const cellBlockMap = new Map<string, XmlNode>();
 	function rec({ xml, parent }: { xml: ParsedXmlNodes; parent?: XmlNode }): void {
 		for (const xmlNode of xml) {
 			const xmlTag = getElementFromParsedXml(xmlNode);
 			if (xmlTag === null) {
-				console.error('Failed to parse xml tag.');
+				continue;
 			}
-			if (xmlTag?.startsWith('?')) continue;
+			if (xmlTag.startsWith('?')) continue;
 			const complex = schema.complexTypes.get(xmlTag ?? '');
 			if (!complex) {
 				console.warn('Complex type not found', xmlTag);
@@ -105,7 +109,7 @@ export function parsedXmlToGraph({
 
 				if (candidate === undefined) continue;
 				if (attrDef.type.startsWith('real') && attrDef.type.endsWith('array2d')) {
-					console.log('candidate', candidate);
+					// console.log('candidate', candidate);
 					xmlAttributes[k] = candidate.map((t) => {
 						if (typeof t === 'string')
 							throw new ErrorWNotif('Expected array for type real array2d');
@@ -139,11 +143,27 @@ export function parsedXmlToGraph({
 				factory,
 				initialValues: xmlAttributes,
 				schema,
-				xmlConfig: {complex}
+				xmlConfig: { complex }
 			});
 			for (const k of Object.keys(xmlAttributes)) {
-				if (node.optionalXmlAttributes.has(k))
-					node.addOptionalAttribute(k);	
+				if (node.optionalXmlAttributes.has(k)) node.addOptionalAttribute(k);
+			}
+			// Register all cellblocks defined by the internal mesh
+			if (complex.name === 'InternalMesh') {
+				const cellblockNames = xmlAttributes['cellBlockNames'];
+				if (cellblockNames) {
+					if (
+						Array.isArray(cellblockNames) &&
+						cellblockNames.length > 0 &&
+						typeof cellblockNames[0] === 'string'
+					) {
+						for (const cb of cellblockNames) {
+							cellBlockMap.set(cb, node);
+						}
+					} else {
+						console.error('Wrong types for cellblocks names of internal mesh.', cellblockNames);
+					}
+				}
 			}
 			nodes.push(node);
 			// Automatically select output of root types like Solvers, Mesh...
@@ -155,8 +175,24 @@ export function parsedXmlToGraph({
 				const name = xmlAttributes['name'] as string;
 				if (!nameToXmlNode.has(name)) {
 					nameToXmlNode.set(name, node);
+				} else {
+					const previousNode = nameToXmlNode.get(name)!;
+					console.warn('Duplicate name:', name, { previous: previousNode.label, new: node.label });
+					factory?.notifications.warn({
+						message: `Duplicate name in XML : '${name}'.\nThe first one that is not an event will be kept.`,
+						autoClose: 5000
+					});
+					if (previousNode.label.includes('Event')) {
+						console.warn('Previous node is an event node, replacing it with the new one');
+						nameToXmlNode.set(name, node);
+					} else if (node.label.includes('Event')) {
+						console.warn('New node is an event node, skipping it');
+					} else {
+						console.warn('Both nodes are not event nodes, skipping the new one');
+					}
 				}
 			}
+
 			for (const [k, a] of arrayAttrs.entries()) {
 				const attrDef = complex.attributes.get(k);
 				if (!attrDef) throw new ErrorWNotif("Couldn't find simple type for array attribute");
@@ -224,31 +260,130 @@ export function parsedXmlToGraph({
 				if (target) {
 					connections.push(new Connection(node, 'value', parent, target) as Connection);
 				} else {
-					console.warn('Parent has no socket for child', { parent: $state.snapshot(parent.inputs), node, type: complex.name });
+					console.warn('Parent has no socket for child', {
+						parent: $state.snapshot(parent.inputs),
+						node,
+						type: complex.name
+					});
 				}
 			}
 			rec({ xml: (xmlNode as Record<string, ParsedXmlNodes>)[xmlTag], parent: node });
 		}
 	}
 	rec({ xml });
-	console.debug("links", groupNameLinks);
+	const objectPathFormatMap = new Map<string, FormatGroupNameNode>();
+	const cellBlockBreakNodes = new Map<Node, BreakArrayNode>();
+
+	function getCellBlockBreakNode(sourceNode: XmlNode): BreakArrayNode {
+		if (!cellBlockBreakNodes.has(sourceNode)) {
+			const breakNode = new BreakArrayNode({
+				type: 'groupNameRef',
+				name: 'cellBlocks',
+				factory,
+				initialValues: { array: sourceNode.getData('cellBlockNames') }
+			});
+			nodes.push(breakNode);
+			cellBlockBreakNodes.set(sourceNode, breakNode);
+			connections.push(
+				new Connection(sourceNode as Node, 'cellBlockNames', breakNode, 'array') as Connection
+			);
+		}
+		return cellBlockBreakNodes.get(sourceNode)!;
+	}
+	// Process group name links
 	for (const { source, target } of groupNameLinks) {
-		const sourceNode = nameToXmlNode.get(source);
-		if (!sourceNode) {
+		if (cellBlockMap.has(source)) {
+			const sourceNode = cellBlockMap.get(source)!;
+			if (sourceNode === target.node) continue;
+			const breakNode = getCellBlockBreakNode(sourceNode);
+			connections.push(new Connection(breakNode, source, target.node, target.key) as Connection);
+			continue;
+		}
+		// Object Paths links
+		if (target.key === 'objectPath') {
+			if (objectPathFormatMap.has(source)) {
+				const sourceFormat = objectPathFormatMap.get(source)!;
+				connections.push(new Connection(sourceFormat, 'result', target.node, target.key) as Connection);
+				continue;
+			}
+			let formatString: string[] = [];
+			let numVars = 0;
+			let numCellblocks = 0;
+			const vars: { node: Node; outKey: string; inKey: string }[] = [];
+			const nodeVarCount = new Map<string, number>();
+			for (const name of source.split('/')) {
+				const node = nameToXmlNode.get(name);
+				if (cellBlockMap.has(name)) {
+					const key = numCellblocks === 0 ? 'cellBlock' : `cellBlock-${numCellblocks}`;
+					const breakNode = getCellBlockBreakNode(cellBlockMap.get(name)!);
+					formatString.push(`{${key}}`);
+					vars.push({ node: breakNode, outKey: name, inKey: key });
+					numCellblocks++;
+					continue;
+				}
+				if (node) {
+					let key = lowerFirst(node.outLabel);
+					if (nodeVarCount.has(node.outLabel)) {
+						key += `-${nodeVarCount.get(name)}`;
+					}
+					formatString.push(`{${key}}`);
+					vars.push({ node: node as Node, outKey: 'name', inKey: key });
+					numVars++;
+					nodeVarCount.set(node.outLabel, (nodeVarCount.get(node.outLabel) ?? 0) + 1);
+					continue;
+				}
+				formatString.push(name);
+			}
+
+			if (vars.length === 0) continue;
+			const formatNode = new FormatGroupNameNode({
+				name: 'objectPath',
+				factory,
+				initialValues: { format: formatString.join('/') }
+			});
+			// console.log(Object.keys(formatNode.inputs));
+			nodes.push(formatNode);
+			objectPathFormatMap.set(source, formatNode);
+			for (const [i, { node, outKey, inKey }] of vars.entries()) {
+				connections.push(new Connection(node, outKey, formatNode, `data-${inKey}`) as Connection);
+			}
+			connections.push(new Connection(formatNode, 'result', target.node, target.key) as Connection);
+
+			continue;
+		}
+		const candidates = source
+			.split('/')
+			.map((s) => nameToXmlNode.get(s))
+			.filter(Boolean) as XmlNode[];
+
+		if (candidates.length === 0) {
 			console.warn('Source node not found', source);
 			continue;
 		}
-		if (source === "sink") {
-			console.debug('source')
-
-		}
-		connections.push(new Connection(sourceNode, 'name', target.node, target.key) as Connection);
+		const sourceNode = candidates[0];
+		connections.push(
+			new Connection(
+				sourceNode,
+				target.key === 'target' || target.key === 'sources' ? 'value' : 'name',
+				target.node,
+				target.key
+			) as Connection
+		);
 	}
 	return { nodes, connections };
 }
 
-
-export async function addGraphToEditor({factory, nodes, connections, t0}: {factory: NodeFactory, nodes: (Node | SaveData<Node>)[], connections: (Connection | SaveData<Connection>)[], t0: number}) {
+export async function addGraphToEditor({
+	factory,
+	nodes,
+	connections,
+	t0
+}: {
+	factory: NodeFactory;
+	nodes: (Node | SaveData<Node>)[];
+	connections: (Connection | SaveData<Connection>)[];
+	t0: number;
+}) {
 	if (nodes.length === 0 && connections.length === 0) return;
 
 	let addedNodes: Node[] = $state([]);
@@ -262,15 +397,13 @@ export async function addGraphToEditor({factory, nodes, connections, t0}: {facto
 			return `Progress: ${(((addedNodes.length + addedConns.length) / (nodes.length + connections.length)) * 100).toFixed(2)}%`;
 		}
 	});
-
-
 	for (const [i, node] of nodes.entries()) {
 		let n: Node;
 		if (node instanceof Node) {
 			n = node;
 			n.factory = factory;
 		} else {
-			n = await Node.fromJSON(node, {factory});
+			n = await Node.fromJSON(node, { factory });
 		}
 		n.visible = false;
 		if (n) {
@@ -294,6 +427,7 @@ export async function addGraphToEditor({factory, nodes, connections, t0}: {facto
 
 		if (i % 10 === 9) await animationFrame();
 	}
+
 	await animationFrame(2);
 	await factory.arrange?.layout();
 	for (const node of addedNodes) {

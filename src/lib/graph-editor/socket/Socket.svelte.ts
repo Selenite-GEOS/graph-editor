@@ -24,6 +24,7 @@ export class Socket<
 	readonly node: Node;
 	displayLabel: boolean | undefined;
 	port = $state<Port<Socket>>();
+	element = $state<HTMLElement>();
 
 	constructor({
 		name = '',

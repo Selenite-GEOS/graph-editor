@@ -1,8 +1,9 @@
 import { description, Node, registerNode, type NodeParams, type SocketsValues } from '../Node.svelte';
 import type { Scalar, Socket } from '$graph-editor/socket';
 import { InputControlNode } from './common-data-nodes.svelte';
-import type { SocketType } from '$graph-editor/plugins/typed-sockets';
-import { DynamicTypeComponent } from '../components/DynamicTypeComponent';
+import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
+import { DynamicTypeComponent } from '../components/DynamicTypeComponent.svelte';
+import { ConnectionTrackerComponent } from '../components';
 
 @registerNode('array.Array')
 export class ArrayNode extends InputControlNode<SocketType, 'array'> {
@@ -69,7 +70,7 @@ export class GetArrayElementNode extends Node<
 > {
 	constructor(params: NodeParams = {}) {
 		super({
-			label: 'Get Array Element',
+			label: 'Get Element',
 			...params
 		});
 		this.addInData('array', {
@@ -169,4 +170,67 @@ export class JoinNode extends Node<
 			value: array.join(separator).replaceAll("\\n", "\n")
 		};
 	}
+}
+
+
+@registerNode('array.Break')
+@description('Break an array into its elements.')
+export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Record<string, Scalar<DataType>>> {
+	currentOutputs = new Set<string>();
+	constructor(params: NodeParams & {type?: DataType} = {}) {
+		super({label: 'Break', ...params})
+		this.addInData("array", {
+			datastructure: 'array',
+			hideLabel: true,
+			type: params.type ?? 'any'
+		})
+
+		this.addComponentByClass(DynamicTypeComponent, {
+			inputs: ['array'],
+		});
+		this.updateOutputs();
+	}
+	previousData: Record<string, unknown> = {};
+	data(inputs?: SocketsValues<{ array: Socket<DataType, 'array'>; }> | undefined): SocketsValues<{}> | Promise<SocketsValues<{}>> {
+		const array = this.getData('array', inputs);
+		this.updateOutputs(array);
+		const newData = Object.fromEntries(array.map((value) => [typeof value === 'object' ? JSON.stringify(value) : `${value}`, value]));
+		const res = {...this.previousData, ...newData};
+		this.previousData = newData;
+		return res;
+	}
+
+	updateOutputs(inputs?: {array: unknown[]}) {
+		const array = this.getData('array', inputs);
+		const keep = new Set<string>();
+		const type = this.inputs.array?.socket.type;
+		if (!type) return;
+		for (const t of array) {
+			const str = typeof t === 'object' ?  JSON.stringify(t) : `${t}`;
+			if (str === '') continue;
+			keep.add(str);
+			if (this.currentOutputs.has(str)) continue;
+			this.addOutData(`${str}`, {
+				label: str,
+				datastructure: 'scalar',
+				type,
+				description: 'A value extracted from the array.'
+			});
+			this.currentOutputs.add(str);
+		}
+		for (const t of this.currentOutputs.difference(keep)) {
+			this.removeOutput(t);
+			this.currentOutputs.delete(t);
+		}
+
+		setTimeout(() => {
+			const type = this.inputs.array?.socket.type;
+			if (!type) return;
+			for (const output of Object.values(this.outputs)) {
+				if (!output) continue;
+				output.socket.type = type;
+			}
+		})
+	}
+
 }

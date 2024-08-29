@@ -220,7 +220,14 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		 await this.addConnection(new Connection(source_, sourceOutput, target_, targetInput));
 			return conn;
 		} catch (e) {
-			console.error('Error adding connection', e);
+			console.error(
+				'Error adding connection',
+				source_.label + '-' + source_.name ?? '',
+				sourceOutput,
+				target_.label + '-' + source_.name ?? '',
+				targetInput,
+				e
+			);
 			return undefined;
 		}
 	}

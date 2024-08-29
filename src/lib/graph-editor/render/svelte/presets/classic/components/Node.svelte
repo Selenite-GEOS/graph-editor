@@ -4,9 +4,11 @@
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
 	import {
+		affineFromPoints,
 		capitalize,
 		clickIfNoDrag,
 		distance,
+		lerp,
 		posFromClient,
 		shortcut,
 		stopPropagation
@@ -83,6 +85,7 @@
 	$effect(() => {
 		if (!node.factory || !node.area) return;
 		const hideLabelPipeSetup = node.factory.useState('node', 'area-hide-labels-pipe', false);
+
 		if (hideLabelPipeSetup.value) return;
 		untrack(() => {
 			hideLabelPipeSetup.value = true;
@@ -119,6 +122,21 @@
 			(ctx.type === 'nodetranslated' && ctx.data.id === node.id)
 		) {
 			if (node.picked) floating.update();
+			if (ctx.type === 'zoomed') {
+				// Update floating labels offset
+				requestAnimationFrame(() => {
+					const zoom = ctx.data.zoom;
+					const offset = lerp(
+						-15,
+						-35,
+						clamp(linear(affineFromPoints({ x: 0.4, y: 0 }, { x: 0, y: 1 })(zoom)), 0, 2)
+					);
+					// console.debug('offset', offset);
+					update({
+						middleware: [dom.offset(offset)]
+					});
+				});
+			}
 			// if (node.factory && node.factory.transform.zoom < zoomThreshold)
 			// 	update();
 		}
@@ -129,13 +147,16 @@
 	import * as dom from 'svelte-floating-ui/dom';
 	import Portal from 'svelte-portal';
 	import { untrack } from 'svelte';
-	const [floatingRef, floatingContent] = createFloatingActions({
-		middleware: [dom.offset(7.5)],
+	import { clamp } from 'lodash-es';
+	import { cubicIn, elasticIn, expoIn, linear, quadIn } from 'svelte/easing';
+	const [floatingRef, floatingContent, update] = createFloatingActions({
+		middleware: [dom.offset(-35)],
 		placement: 'top',
 		autoUpdate: {
 			animationFrame: true
 		}
 	});
+
 	const nodeElmnt = $derived(
 		floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined
 	);
@@ -165,6 +186,7 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<button
 			use:floatingContent
+			title={[node.label, node.name].filter(Boolean).join('\n')}
 			class="floatingLabel bg-neutral text-neutral-content hover:z-20 select-none p-[0.4rem] rounded-[0.5rem]"
 			on:dblclick={(e) => {
 				stopPropagation(e);
@@ -321,7 +343,7 @@
 					<!-- svelte-ignore event_directive_deprecated -->
 					<button
 						type="button"
-						class="cursor-text pe-2"
+						class="cursor-text mb-2"
 						use:shortcut={{
 							ctrl: true,
 							repeats: false,
@@ -422,7 +444,7 @@
 						unmount={(ref) => emit({ type: 'unmount', data: { element: ref } })}
 					/>
 					<div title={input.description}>
-						{#if !input.control || !input.showControl || input.alwaysShowLabel === true}
+						{#if !input.hideLabel && (!input.control || !input.showControl || input.alwaysShowLabel === true)}
 							<div
 								class="input-title {input.control && input.showControl ? 'ms-0 mb-1' : ''}"
 								data-testid="input-title"
@@ -458,8 +480,12 @@
 					class="text-md justify-items-end items-center grid grid-rows-subgrid col-start-2 gap-2 justify-end"
 					data-testid={key}
 				>
-					<div class="output-title" data-testid="output-title" title={output.description}>
-						{capitalize(output.label || '')}{#if output.socket.isRequired}<span
+					<div
+						class="output-title text-nowrap"
+						data-testid="output-title"
+						title={output.description}
+					>
+						{output.label || ''}{#if output.socket.isRequired}<span
 								class="ps-0.5 text-lg"
 								title="required">*</span
 							>{/if}

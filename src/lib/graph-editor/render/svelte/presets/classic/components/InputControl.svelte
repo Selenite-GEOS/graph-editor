@@ -93,18 +93,19 @@
 	let focusableInput = $state<HTMLInputElement>();
 	$effect(() => {
 		if (focus) {
-			// console.log('Focus', focusableInput);
+			console.log('Focus', focusableInput);
 			focusableInput?.focus();
 		}
 	});
+	// const options = $derived(inputControl.props.options)
 </script>
 
 <!-- TODO maybe move pointerdown stop propagation to framework agnostic logic -->
 {#snippet input(props: HTMLInputAttributes = {})}
 	<input
 		bind:this={focusableInput}
-		value={inputControl.value ?? ""}
-		ondblclick={props.type === "checkbox" ? stopPropagation: undefined}
+		value={inputControl.value ?? ''}
+		ondblclick={props.type === 'checkbox' ? stopPropagation : undefined}
 		onpointerdown={stopPropagation}
 		{...props}
 		class="{props.class} text-base-content"
@@ -160,11 +161,28 @@
 			use:autosize={inputControl.value}
 			{...inputProps as HTMLTextareaAttributes}
 			class="textarea text-start max-h-[20rem] min-w-[11rem] text-base-content"
-			onscroll={stopPropagation}
-			onmousewheel={stopPropagation}
+			onkeydown={(e) => {
+				if (e.key === 'Enter') stopPropagation(e);
+			}}
+			onscroll={(e) => {
+				// Prevent area from scrolling if textarea has a scrollbar
+				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) 
+					stopPropagation(e);
+			}}
+			onmousewheel={(e) => {
+				// Prevent area from scrolling if textarea has a scrollbar
+				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) 
+				stopPropagation(e);
+			}}
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea
 		>
-	{:else}
+		{:else if type === 'select'}
+		<select class="select select-bordered" onpointerdown={stopPropagation}>
+			{#each inputControl.options ?? [] as option}
+				<option value={option} selected={option === inputControl.value}>{option}</option>
+			{/each}
+		</select>
+		{:else}
 		{@render input(inputProps)}
 	{/if}
 {:else if datastructure === 'array'}

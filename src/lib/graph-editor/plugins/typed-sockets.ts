@@ -68,38 +68,14 @@ export function areTypesCompatible(outType: TypeInfo, inType: TypeInfo): boolean
 		return true;
 	}
 	
-	return outType.datastructure === inType.datastructure && (
-		outType.type === 'any' || inType.type === 'any'
+	return outType.type === 'any' || outType.datastructure === inType.datastructure && (
+		 inType.type === 'any'
 		|| outType.type === inType.type
 	);
 }
 
 export function isConnectionInvalid(outputSocket: Socket, inputSocket: Socket) {
 	return !areTypesCompatible(outputSocket, inputSocket);
-	const re = /(\w+):(.+)/;
-	
-	const [, outType, outSubtypes] = re.exec(outputSocket.type) || [];
-	const [, inType, inSubtypes] = re.exec(inputSocket.type) || [];
-	if (inType && outType && inType === outType) {
-		if (outSubtypes === '*' || inSubtypes === '*') {
-			return false;
-		}
-		const outSubtypesArray = outSubtypes.split('|');
-		const inSubtypesArray = inSubtypes.split('|');
-		const intersection = outSubtypesArray.filter((subtype) => inSubtypesArray.includes(subtype));
-		if (intersection.length > 0) {
-			return false;
-		}
-	}
-
-	return (
-		outputSocket instanceof ExecSocket !== inputSocket instanceof ExecSocket ||
-		(outputSocket.type !== inputSocket.type &&
-			outputSocket.type !== 'any' &&
-			inputSocket.type !== 'any' &&
-			!(outputSocket.type === 'pythonObject' && inputSocket.type === 'pythonProperty') &&
-			!(outputSocket.type === 'pythonProperty' && inputSocket.type === 'pythonObject'))
-	);
 }
 
 export class TypedSocketsPlugin<Schemes extends BaseSchemes> extends Scope<never, [Root<Schemes>]> {
@@ -130,7 +106,9 @@ export class TypedSocketsPlugin<Schemes extends BaseSchemes> extends Scope<never
 				const inputSocket = this.getInputSocket(conn.target, conn.targetInput);
 
 				if (isConnectionInvalid(outputSocket, inputSocket)) {
-					const eMessage = `Connection between ${conn.source} and ${conn.target} is not allowed. Output socket type is ${outputSocket.type} and input socket type is ${inputSocket.type}`;
+					const sourceNode = this.parent.getNode(conn.source);
+					const targetNode = this.parent.getNode(conn.target);
+					const eMessage = `Connection between ${sourceNode.name ?? sourceNode.label} and ${targetNode.name ?? targetNode.label} is not allowed. Output socket type is ${outputSocket.datastructure}<${outputSocket.type}> and input socket type is ${inputSocket.datastructure}<${inputSocket.type}>`;
 					console.error(
 						eMessage
 					);

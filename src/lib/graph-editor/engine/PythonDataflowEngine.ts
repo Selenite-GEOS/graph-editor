@@ -90,19 +90,18 @@ export class PythonDataflowEngine<Schemes extends PythonDataflowEngineScheme> ex
 	 * Resets the cache of the node and all its predecessors.
 	 * @param nodeId Node id to reset. If not specified, all nodes will be reset.
 	 */
-	public reset(nodeId?: NodeId) {
+	public reset(nodeId?: NodeId, alreadyResetNodes: Set<NodeId> = new Set()) {
 		if (nodeId) {
+			if (alreadyResetNodes.has(nodeId)) return;
 			const setup = this.getDataflow().setups.get(nodeId);
 
 			if (!setup) throw 'setup';
 
 			const outputKeys = setup.outputs();
-
+			const node = this.editor.getNode(nodeId);
 			this.cache.delete(nodeId);
-			this.editor
-				.getConnections()
-				.filter((c) => c.source === nodeId && outputKeys.includes(c.sourceOutput))
-				.forEach((c) => this.reset(c.target));
+			alreadyResetNodes.add(nodeId);
+			Object.values(node.outConnections).flat().forEach((c) => this.reset(c.target, alreadyResetNodes));
 		} else {
 			this.cache.clear();
 		}

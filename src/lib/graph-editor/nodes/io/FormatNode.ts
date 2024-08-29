@@ -7,25 +7,28 @@ import {
 } from '$graph-editor/nodes/Node.svelte';
 import { capitalize, getVarsFromFormatString } from '$lib/utils/string';
 import type { Scalar, Socket } from '$graph-editor/socket';
+import type { DataType } from '$graph-editor/plugins/typed-sockets';
 
 export type FormatNodeParams = NodeParams & {
-	format?: string;
 	vars?: Record<string, unknown>;
+	outType?: 'string' | 'groupNameRef';
+	varsType?: DataType
 	params?: {
-		format: string;
 		vars: Record<string, unknown>;
 	};
 };
 
 @registerNode('string.Format')
 export class FormatNode extends Node<
-	{ format: Scalar<'string'> } & Record<string, Socket<'any'>>,
-	{ result: Scalar<'string'> }
+	{ format: Scalar<'string'> } & Record<string, Scalar<DataType>>,
+	{ result: Scalar<'string' | 'groupNameRef'> }
 > {
+
+	varsType: DataType
 	constructor(params: FormatNodeParams = {}) {
 		// super('Format', { factory, height: 124.181818 + 43.818182 });
 		super({ label: 'Format', ...params });
-
+		this.varsType = params.varsType ?? 'any';
 		this.pythonComponent.setDataCodeGetter('result', () => {
 			const vars = this.getFormatVariablesKeys();
 			const var_bindings = Object.entries(vars)
@@ -33,12 +36,13 @@ export class FormatNode extends Node<
 				.join(', ');
 			return `$(format).format(${var_bindings})`;
 		});
+		
 		this.addOutData('result', {
-			type: 'string'
+			type: params.outType ?? 'string'
 		});
 		this.addInData('format', {
 			type: 'string',
-			initial: params.params?.format ?? '{name}',
+			initial: '{name}',
 			control: {
 				type: 'textarea',
 				onChange: (value) => {
@@ -101,7 +105,8 @@ export class FormatNode extends Node<
 						anyChange = true;
 						this.addInData(key, {
 							label: capitalize(varName),
-							isLabelDisplayed: true
+							alwaysShowLabel: true,
+							type: this.varsType,
 						});
 						// console.debug('added', key);
 					}
@@ -124,4 +129,12 @@ export class FormatNode extends Node<
 		}
 		if (anyChange) this.updateElement();
 	}
+}
+
+
+@registerNode('xml.FormatGroupName')
+export class FormatGroupNameNode extends FormatNode {
+	constructor(params: FormatNodeParams = {}) {
+		super({label: 'Format Group Name', varsType: 'groupNameRef', outType: 'groupNameRef', ...params})
+	} 
 }

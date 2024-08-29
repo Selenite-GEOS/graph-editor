@@ -40,6 +40,7 @@ export class AddXmlAttributeControl extends Control {
 
 export type XmlConfig = {
 	complex: ComplexType | SaveData<ComplexType>;
+	typePaths?: string[][] | 'infinite';
 	priorities?: Record<string, Record<string, number>>;
 	// xmlTag: string;
 	// outData?: OutDataParams;
@@ -95,11 +96,22 @@ export class XmlNode extends Node<
 		this.addInAttribute(attr);
 		this.processDataflow();
 	}
+
+	addAllOptionalAttributes() {
+		for (const name of this.optionalXmlAttributes) {
+			this.addOptionalAttribute(name);
+		}
+	}
 	removeOptionalAttribute(name: string) {
 		this.usedOptionalAttrs.delete(name);
 		this.state.usedOptionalAttrs = Array.from(this.usedOptionalAttrs);
 		this.removeInput(name);
 		this.processDataflow();
+	}
+	removeAllOptionalAttributes() {
+		for (const name of this.usedOptionalAttrs) {
+			this.removeOptionalAttribute(name);
+		}
 	}
 	static counts: Record<string, number> = {};
 
@@ -111,6 +123,8 @@ export class XmlNode extends Node<
 	xmlVectorProperties: Set<string> = new SvelteSet<string>();
 
 	hasName = $state(false);
+
+	geosSchema = $derived(this.factory?.xmlSchemas.get('geos'));
 
 	set name(n: string) {
 		super.name =
@@ -142,10 +156,24 @@ export class XmlNode extends Node<
 
 	childrenSockets = new Map<string, string>();
 	complex: ComplexType;
+	outLabel: string;
+	typePaths: string[][] | 'infinite' = $state();
+	isMesh = $derived(
+		this.typePaths &&
+			this.typePaths !== 'infinite' &&
+			this.typePaths.length > 0 &&
+			this.typePaths.at(0)?.at(-1) === 'Mesh'
+	);
 	constructor(xmlNodeParams: XmlNodeParams) {
 		let { initialValues = {} } = xmlNodeParams;
 		const xmlConfig = xmlNodeParams.xmlConfig;
 		const schema = xmlNodeParams.schema;
+		if (schema) {
+			const typePath = schema.typePaths.get(xmlConfig.complex.name);
+			if (typePath) {
+				xmlConfig.typePaths = typePath;
+			}
+		}
 		xmlNodeParams.params = {
 			...xmlNodeParams.params,
 			xmlConfig,
@@ -159,6 +187,7 @@ export class XmlNode extends Node<
 			throw new Error('Complex type is missing.');
 		}
 		super({ label: complex.name, ...xmlNodeParams });
+		this.typePaths = xmlConfig.typePaths;
 
 		if (!(complex instanceof ComplexType)) {
 			complex = ComplexType.fromObject(complex);
@@ -265,6 +294,7 @@ export class XmlNode extends Node<
 				}
 			}
 		}
+		this.outLabel = xmlConfig.outLabel ?? complex.name;
 
 		// Add XML output
 		this.addOutData('value', {
@@ -300,6 +330,17 @@ export class XmlNode extends Node<
 				}
 			}
 		}
+		if (this.isMesh) {
+			if (complex.name === 'InternalMesh') {
+				this.addOutData('cellBlockNames', {
+					type: 'groupNameRef',
+					datastructure: 'array',
+					label: 'Cell Block Names',
+					description: 'The cell blocks defined by this internal mesh.'
+				});
+				// console.log(" INTERNAL MESH")
+			}
+		}
 	}
 
 	async getXml(): Promise<string> {
@@ -321,12 +362,18 @@ export class XmlNode extends Node<
 		initialValues = {}
 	}: Attribute & { initialValues?: Record<string, unknown> }) {
 		this.xmlProperties.add(name);
-		const options = undefined;
+		let options: string[] | undefined = undefined;
 		let controlType: InputControlType | undefined;
+		const simpleType = this.geosSchema?.simpleTypeMap.get(type);
 		const xmlTypePattern = /([^\W_]+)(?:_([^\W_]+))?/gm;
 		const [, xmlType, xmlSubType] = xmlTypePattern.exec(type) || [];
 		// console.log('xmlType', xmlType, xmlSubType);
-		if (options) {
+		if (simpleType?.options) {
+			console.log('simpleType', simpleType);
+			options = simpleType.options;
+		} else if (name === 'target' && this.complex.name.includes('Event') || name === 'sources' && this.complex.name.includes('History')) {
+			type = 'xmlElement:*';
+		} else if (options) {
 			controlType = 'select';
 		} else if (xmlType === 'integer' && doc && doc.startsWith('Set to 1 to')) {
 			doc = doc.replace('Set to 1 to', 'Set to true to');
@@ -359,8 +406,9 @@ export class XmlNode extends Node<
 			description: doc?.replaceAll(':ref:', ''),
 			initial: initialValues[name] ?? default_,
 			isRequired: required,
-			isLabelDisplayed: true,
+			alwaysShowLabel: true,
 			type: type as DataType,
+			options,
 			datastructure: isArray ? 'array' : 'scalar'
 		});
 	}
@@ -371,30 +419,36 @@ export class XmlNode extends Node<
 		for (const [key, { tag }] of Object.entries(this.xmlInputs)) {
 			const data = this.getData(key, inputs) as XMLData;
 			if (data) {
-				if (tag) {
-					const childChildren: Array<XMLData> = data instanceof Array ? data : [data];
+				// if (tag) {
+				// 	const childChildren: Array<XMLData> = data instanceof Array ? data : [data];
 
-					children.push(
-						new XMLData({
-							tag: tag,
-							children: childChildren,
-							properties: {}
-						})
-					);
-				} else {
-					children = [...children, ...(data instanceof Array ? data : [data])];
-				}
+				// 	children.push(
+				// 		new XMLData({
+				// 			tag,
+				// 			children: childChildren,
+				// 			properties: {}
+				// 		})
+				// 	);
+				// } else {
+				children = [...children, ...(data instanceof Array ? data : [data])];
+				// }
 			}
 		}
 
 		const xmlData = new XMLData({
+			node: this,
 			tag: this.xmlTag,
 			children: children,
 			name: this.hasName ? this.name : undefined,
 			properties: this.getProperties(inputs)
 		});
-
-		return { value: xmlData, name: this.name };
+		const res = { value: xmlData, name: this.name };
+		if (this.isMesh) {
+			if (this.complex.name === 'InternalMesh') {
+				res.cellBlockNames = xmlData.properties['cellBlockNames'];
+			}
+		}
+		return res;
 	}
 
 	getProperties(inputs?: Record<string, unknown>): Record<string, unknown> {
@@ -408,31 +462,61 @@ export class XmlNode extends Node<
 		}
 		for (const key of this.xmlProperties) {
 			let data = this.getData(key, inputs) as unknown | unknown[];
-			if (data !== undefined) {
-				if (isArray(key) && !(data instanceof Array)) {
-					data = [data];
-				}
+			if (data === undefined) continue;
 
-				// Ensure that integer properties are not booleans
-				const type = this.complex.attributes.get(key)?.type;
-				if (type === 'integer') {
-					if (isArray(key)) {
-						data = (data as number[]).map((v) => prepData(v, type));
-					} else {
-						data = prepData(data as number, type);
+			if (isArray(key) && !(data instanceof Array)) {
+				data = [data];
+			}
+
+			if (key === 'target' && this.complex.name.endsWith('Event')) {
+				const target = data as XMLData | string;
+				if (typeof target === 'object') {
+					const node = target.node;
+					// Only named nodes are valid targets (or so I think)
+					if (!node.hasName) continue;
+					const paths = node.typePaths;
+					if (Array.isArray(paths)) {
+						const path = paths[0];
+						if (path.at(0) === 'Problem') path.splice(0, 1);
+						data = '/' + path.join('/') + '/' + node.name;
 					}
-				} else {
 				}
+			} else if (key === 'sources' && this.complex.name.endsWith('History')) {
+				const sources = data as (XMLData | string)[];
+				data = sources.map((source) => {
+					if (typeof source === 'object') {
+						const node = source.node;
+						if (!node.hasName) return '';
+						const paths = node.typePaths;
+						if (Array.isArray(paths)) {
+							const path = paths[0];
+							if (path.at(0) === 'Problem') path.splice(0, 1);
+							return '/' + path.join('/') + '/' + node.name;
+						}
+					}
+					return '';
+				});
 
-				if (this.xmlVectorProperties.has(key)) {
-					if (isArray(key)) {
-						properties[key] = (data as Array<Record<string, number>>).map((value) =>
-							Object.values(value)
-						);
-					} else properties[key] = Object.values(data as Record<string, number>);
+			}
+
+			// Ensure that integer properties are not booleans
+			const type = this.complex.attributes.get(key)?.type;
+			if (type === 'integer') {
+				if (isArray(key)) {
+					data = (data as number[]).map((v) => prepData(v, type));
 				} else {
-					properties[key] = data;
+					data = prepData(data as number, type);
 				}
+			}
+
+			if (this.xmlVectorProperties.has(key)) {
+				if (isArray(key)) {
+					properties[key] = (data as Array<Record<string, number>>).map((value) =>
+						Object.values(value)
+					);
+				} else properties[key] = Object.values(data as Record<string, number>);
+			} else {
+				properties[key] = data;
 			}
 		}
 		return properties;

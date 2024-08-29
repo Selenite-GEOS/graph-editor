@@ -11,7 +11,7 @@
 		},
 		placement: 'bottom-start',
 		get middleware() {
-			return [offset({ mainAxis: -15, alignmentAxis: -10 }), shift(), flip()];
+			return [offset({ mainAxis: -23, alignmentAxis: -30 }), shift({mainAxis: true, crossAxis: true})];
 		}
 	});
 
@@ -20,6 +20,7 @@
 		if (!menu.visible) return;
 		menu.pos.x;
 		menu.pos.y;
+		menu.query;
 		floating.update();
 	});
 	import Portal from 'svelte-portal';
@@ -57,7 +58,7 @@
 </script>
 
 {#if menu.visible}
-	<Portal>
+	<Portal target={menu.target}>
 		<div
 			class="floating"
 			bind:this={floating.elements.reference}

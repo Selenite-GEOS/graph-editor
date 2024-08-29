@@ -19,6 +19,7 @@ import { notificationsSetup } from '$graph-editor/plugins/notifications';
 import type { GraphNode } from '$graph-editor/nodes';
 import { HistoryPlugin } from '$graph-editor/plugins/history';
 import { setupSvelteRender } from '$graph-editor/render';
+import type { XmlSchema } from '@selenite/commons';
 
 export type XmlContext = {};
 
@@ -30,6 +31,7 @@ export type SetupGraphEditorParams = {
 	xmlContext?: Writable<XmlContext>;
 	modalStore?: ModalStore;
 	setups?: (SetupFunction | Setup)[];
+	xmlSchemas?: Record<string, XmlSchema | undefined>;
 };
 
 export type SetupGraphEditorResult = {
@@ -43,7 +45,8 @@ export async function setupGraphEditor(
 	const editor = new NodeEditor();
 
 	const factory = new NodeFactory({
-		editor
+		editor,
+		xmlSchemas: params.xmlSchemas,
 	});
 	if (params.container) {
 		params = (await setupArea({ editor, factory, ...params })) ?? params;

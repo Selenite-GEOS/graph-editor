@@ -119,6 +119,7 @@ export type InputControlParams<
 > = {
 	type: T;
 	datastructure: D;
+	options?: string[]
 	initial?: SocketValueWithDatastructure<InputControlValueType<T>, D>;
 	readonly?: boolean;
 	props?: HTMLInputAttributes;
@@ -178,6 +179,7 @@ export class InputControl<
 	#socketType: SocketType = $state('any');
 	changeType?: (type: SocketType) => void = $state();
 	props = $state<HTMLInputAttributes>({});
+	options = $state<string[]>();
 
 	constructor(params: InputControlParams<T, D>) {
 		super();
@@ -191,6 +193,7 @@ export class InputControl<
 		this.type = params.type;
 		this.changeType = params.changeType;
 		this.#socketType = params.socketType;
+		this.options = params.options;
 	}
 
 	get value(): SocketValueWithDatastructure<InputControlValueType<T>, D> {

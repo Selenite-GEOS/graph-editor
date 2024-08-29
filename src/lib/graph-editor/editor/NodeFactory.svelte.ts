@@ -18,7 +18,7 @@ import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
-import { downloadJSON, newUuid, type SaveData } from '@selenite/commons';
+import { downloadJSON, newUuid, XmlSchema, type SaveData } from '@selenite/commons';
 import { Modal } from '$graph-editor/plugins/modal';
 import type {
 	BaseComponent,
@@ -154,9 +154,9 @@ export class NodeFactory implements ComponentSupportInterface {
 		};
 	}
 
-	getState<T>(id: string, key: string, value?: T): T {
+	getState<T>(id: string, key: string, initial?: T): T {
 		const stateKey = id + '_' + key;
-		if (!this.state.has(stateKey)) this.state.set(stateKey, value);
+		if (!this.state.has(stateKey)) this.state.set(stateKey, initial);
 		return this.state.get(stateKey) as T;
 	}
 
@@ -203,9 +203,9 @@ export class NodeFactory implements ComponentSupportInterface {
 				...nodeSaveData.params,
 				factory: this,
 				initialValues: nodeSaveData.inputControlValues,
-				state: nodeSaveData.state
+				state: nodeSaveData.state,
+				id: nodeSaveData.id
 			});
-			node.id = nodeSaveData.id;
 			if (node.initializePromise) {
 				await node.initializePromise;
 				if (node.afterInitialize) node.afterInitialize();
@@ -355,6 +355,10 @@ export class NodeFactory implements ComponentSupportInterface {
 	connectionPlugin?: ConnectionPlugin;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
 	#isDataflowEnabled = true;
+	#xmlSchemas = new SvelteMap<string, XmlSchema>()
+	get xmlSchemas() {
+		return this.#xmlSchemas;
+	}
 
 	reactivateDataflowTimeout: NodeJS.Timeout | null = null;
 
@@ -378,11 +382,16 @@ export class NodeFactory implements ComponentSupportInterface {
 	 */
 	async bulkOperation(callback: () => void | Promise<void>) {
 		this.#isDataflowEnabled = false;
+		try {
 		await callback();
+		} catch (e) {
+			console.error('Bulk operation error', e);
+		}
 		if (this.reactivateDataflowTimeout) clearTimeout(this.reactivateDataflowTimeout);
 		this.reactivateDataflowTimeout = setTimeout(() => {
 			this.reactivateDataflowTimeout = null;
 			this.#isDataflowEnabled = true;
+			this.dataflowEngine.reset();
 			this.runDataflowEngines();
 		}, 100);
 	}
@@ -408,8 +417,10 @@ export class NodeFactory implements ComponentSupportInterface {
 		history?: HistoryPlugin<Schemes>;
 		comment?: CommentPlugin<Schemes, AreaExtra>;
 		accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
+		xmlSchemas?: Record<string, XmlSchema | undefined>
+
 	}) {
-		const { editor, area, makutuClasses, arrange } = params;
+		const { editor, area, makutuClasses, arrange, xmlSchemas  = {} } = params;
 
 		this.comment = params.comment;
 		// this.accumulating = params.accumulating;
@@ -423,6 +434,11 @@ export class NodeFactory implements ComponentSupportInterface {
 		this.makutuClasses = makutuClasses;
 		this.editor = editor;
 		this.editor.factory = this;
+		
+		for (const [key, schema] of Object.entries(xmlSchemas)) {
+			if (schema)
+				this.#xmlSchemas.set(key, schema);
+		}
 		editor.use(this.dataflowEngine);
 		editor.use(this.controlflowEngine);
 		editor.use(this.pythonDataflowEngine);
@@ -744,11 +760,12 @@ export class NodeFactory implements ComponentSupportInterface {
 					n.needsProcessing = false;
 				});
 		} catch (e) {
-			console.error('Dataflow engine cancelled');
+			console.error('Dataflow engine cancelled', e);
 		}
 	}
 
 	resetDataflow(node?: Node) {
+		if (!this.#isDataflowEnabled) return;
 		this.dataflowEngine.reset(node?.id);
 		this.runDataflowEngines();
 	}

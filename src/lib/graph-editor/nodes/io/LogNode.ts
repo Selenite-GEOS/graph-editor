@@ -26,7 +26,7 @@ if (rank == 0):
 		});
 		this.addInData('time', {
 			label: 'Time',
-			isLabelDisplayed: true,
+			alwaysShowLabel: true,
 			type: 'number',
 			initial: 3
 		});

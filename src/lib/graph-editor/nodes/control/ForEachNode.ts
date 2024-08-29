@@ -2,7 +2,7 @@ import { Node, registerNode, tags, type NodeParams, type SocketsValues } from '.
 import { getLeavesFromOutput } from '../utils';
 import type { DataType, SocketType } from '../../plugins/typed-sockets';
 import type { ExecSocket, Socket } from '$graph-editor/socket';
-import { DynamicTypeComponent } from '../components/DynamicTypeComponent';
+import { DynamicTypeComponent } from '../components/DynamicTypeComponent.svelte';
 
 // Class defining a For Each Node
 @registerNode('control.ForEach')

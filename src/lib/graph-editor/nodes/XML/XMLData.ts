@@ -1,5 +1,6 @@
 import { ErrorWNotif } from '$lib/global/index.svelte';
 import { formatXMLArray } from '@selenite/commons';
+import type { XmlNode } from './XmlNode.svelte';
 
 function formatToXML(obj: object): string {
 	if (obj instanceof Array) {
@@ -16,22 +17,26 @@ export class XMLData {
 	name?: string;
 	properties: Record<string, unknown>;
 	children: XMLData[];
+	node: XmlNode;
 
 	constructor({
 		tag,
 		name,
 		properties,
-		children
+		children,
+		node,
 	}: {
 		tag: string;
 		name?: string;
 		properties: Record<string, unknown>;
 		children: XMLData[];
+		node: XmlNode;
 	}) {
 		this.tag = tag;
 		this.name = name;
 		this.properties = properties;
 		this.children = children;
+		this.node = node;
 	}
 	
 	toXml(): string {

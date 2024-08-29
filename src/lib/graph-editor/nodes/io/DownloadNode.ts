@@ -13,10 +13,10 @@ export class DownloadNode extends Node<
 > {
 	constructor(params: NodeParams = {}) {
 		super({ label: 'Download', ...params });
-		this.addInData('name', { type: 'string', isLabelDisplayed: true, initial: 'problem.xml' });
+		this.addInData('name', { type: 'string', alwaysShowLabel: true, initial: 'problem.xml' });
 		this.addInExec();
 		this.addOutExec();
-		this.addInData('data', { isLabelDisplayed: true });
+		this.addInData('data', { alwaysShowLabel: true });
 		this.addControl(
 			'downloadBtn',
 			new ButtonControl({ label: 'Download', onClick: () => this.download(), placeInHeader: true })

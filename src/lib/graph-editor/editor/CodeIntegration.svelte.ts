@@ -75,8 +75,10 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 		// instantiateWorker();
 		// if (!worker) throw new ErrorWNotif('Worker not instantiated');
 		if (!worker) {
-			const { nodes, connections } = xmlToGraph({ xml, schema });
-			addGraphToEditor({ factory, nodes, connections, t0 });
+			await this.owner.bulkOperation(async () => {
+				const { nodes, connections } = xmlToGraph({ xml, schema, factory });
+				await addGraphToEditor({ factory, nodes, connections, t0 });
+			})
 			return;
 		}  
 		const msg: WorkerMessage = { type: 'xmlToGraph', xml, schema: schema.toJSON() };

@@ -34,6 +34,9 @@
 				container,
 				setups: [setupSvelteRender],
 				showContextMenu,
+				xmlSchemas: {
+					geos: schema
+				},
 				additionalNodeItems: [
 					...(schema
 						? xmlNodeItems({

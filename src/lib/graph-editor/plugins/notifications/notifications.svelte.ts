@@ -55,15 +55,15 @@ class Notifications implements NotificationsManager {
 	}
 
 	success(notif: Omit<NotificationParams, 'color'>) {
-		this.show({ ...notif, color: 'success' });
+		this.show({ title: 'Success', ...notif, color: 'success' });
 	}
 
 	warn(notif: Omit<NotificationParams, 'color'>) {
-		this.show({ ...notif, color: 'warning' });
+		this.show({ title: 'Warning', ...notif, color: 'warning' });
 	}
 
 	error(notif: Omit<NotificationParams, 'color'>) {
-		this.show({ ...notif, color: 'error' });
+		this.show({ title: 'Error', ...notif, color: 'error' });
 	}
 
 	info(notif: Omit<NotificationParams, 'color'>) {
