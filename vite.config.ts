@@ -15,11 +15,11 @@ export default defineConfig({
 	test: {
 		include: ['src/**/*.{test,spec,test.svelte}.{js,ts}'],
 	},
-	resolve: process.env.VITEST
-		? {
-				conditions: ['browser']
-			}
-		: undefined,
+	// resolve: process.env.VITEST
+	// 	? {
+	// 			conditions: ['browser']
+	// 		}
+	// 	: undefined,
 	server: {
 		port: 1501
 	}
