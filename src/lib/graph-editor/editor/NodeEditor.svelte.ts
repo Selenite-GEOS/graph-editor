@@ -222,9 +222,9 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		} catch (e) {
 			console.error(
 				'Error adding connection',
-				source_.label + (('-' + source_.name) ?? ''),
+				source_.label + (source_.name ? '-' + source_.name  : ''),
 				sourceOutput,
-				target_.label + (('-' + source_.name) ?? ''),
+				target_.label + (target_.name ? '-' + target_.name : ''),
 				targetInput,
 				e
 			);

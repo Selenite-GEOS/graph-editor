@@ -40,7 +40,7 @@ export class AddXmlAttributeControl extends Control {
 
 export type XmlConfig = {
 	complex: ComplexType | SaveData<ComplexType>;
-	typePaths?: string[][] | 'infinite';
+	typePaths: string[][] | 'infinite';
 	priorities?: Record<string, Record<string, number>>;
 	// xmlTag: string;
 	// outData?: OutDataParams;
@@ -330,16 +330,15 @@ export class XmlNode extends Node<
 				}
 			}
 		}
-		if (this.isMesh) {
-			if (complex.name === 'InternalMesh') {
-				this.addOutData('cellBlockNames', {
-					type: 'groupNameRef',
-					datastructure: 'array',
-					label: 'Cell Block Names',
-					description: 'The cell blocks defined by this internal mesh.'
-				});
-				// console.log(" INTERNAL MESH")
-			}
+
+		if (complex.name === 'InternalMesh') {
+			this.addOutData('cellBlockNames', {
+				type: 'groupNameRef',
+				datastructure: 'array',
+				label: 'Cell Block Names',
+				description: 'The cell blocks defined by this internal mesh.'
+			});
+			// console.log(" INTERNAL MESH")
 		}
 	}
 
@@ -371,7 +370,10 @@ export class XmlNode extends Node<
 		if (simpleType?.options) {
 			console.log('simpleType', simpleType);
 			options = simpleType.options;
-		} else if (name === 'target' && this.complex.name.includes('Event') || name === 'sources' && this.complex.name.includes('History')) {
+		} else if (
+			(name === 'target' && this.complex.name.includes('Event')) ||
+			(name === 'sources' && this.complex.name.includes('History'))
+		) {
 			type = 'xmlElement:*';
 		} else if (options) {
 			controlType = 'select';
@@ -496,7 +498,6 @@ export class XmlNode extends Node<
 					}
 					return '';
 				});
-
 			}
 
 			// Ensure that integer properties are not booleans
