@@ -64,7 +64,7 @@ describe('typed-socket', () => {
                 )
             ).toBe(true);
         })
-        it('should return false if some types are any but datastructures are incompatible', () => {
+        it('should return true if some types are any but datastructures are incompatible', () => {
             expect(
                 areTypesCompatible(
                     { type: 'any', datastructure: 'scalar' },
