@@ -47,7 +47,7 @@
 			snippet: OptionalAttributesModal,
 			props: {},
 			title: 'Optional attributes',
-			buttons: ['cancel']
+			buttons: ['close']
 		});
 	}}
 	onpointerdown={stopPropagation}

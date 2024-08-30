@@ -44,14 +44,15 @@
 	use:shortcut={{ key: 'Enter', action: addRow, ignoreElements: [] }}
 >
 	{#each controls as control, i (i)}
-		<span class="text-end">{i}</span>
-		<span>—</span>
+		<span class="text-end select-none">{i}</span>
+		<span class="select-none">—</span>
 		<span class="text-center text-base-content">
 			<InputControlComponent data={control} focus={true} />
 		</span>
 		<!-- Delete row button -->
 		<button
 			type="button"
+			title="Delete row"
 			class="btn-icon"
 			onclick={() => {
 				array.splice(i, 1);

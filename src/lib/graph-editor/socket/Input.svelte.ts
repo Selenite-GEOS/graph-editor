@@ -1,9 +1,10 @@
-import { ClassicPreset } from 'rete';
+import type { ClassicPreset } from 'rete';
 import type { Socket } from './Socket.svelte';
 import type { Control } from '../control';
+import { Port, type PortParams } from './port.svelte';
 
 export class Input<S extends Socket = Socket>
-	extends ClassicPreset.Port<S>
+	extends Port<S>
 	implements ClassicPreset.Input<S>
 {
 	public readonly isRequired: boolean;
@@ -19,37 +20,18 @@ export class Input<S extends Socket = Socket>
 	showControl = $state(true);
 
 	alwaysShowLabel = $state(false);
-	description?: string
 	hideLabel = $state(false)
-	constructor({
-		socket,
-		multipleConnections,
-		alwaysShowLabel = false,
-		hideLabel = false,
-		label,
-		isRequired = false,
-		index,
-		description
-	}: {
-		socket: S;
-		label?: string;
+	constructor(params: PortParams<S> & {
 		alwaysShowLabel?: boolean;
 		hideLabel?: boolean
-		multipleConnections?: boolean;
 		isRequired?: boolean;
 		index?: number;
-		description?: string;
 	}) {
-		super(socket, label, multipleConnections);
-		this.alwaysShowLabel = alwaysShowLabel;
-		this.hideLabel = hideLabel
-		this.description = description
-		// $effect.root(() => {
-		// 	console.log('showcontrol', this.showControl);
-		// });
-		this.index = index;
-		this.socket.port = this;
-		this.isRequired = isRequired;
+		super(params);
+		this.alwaysShowLabel = params.alwaysShowLabel ?? false;
+		this.hideLabel = params.hideLabel ?? false;
+		this.index = params.index;
+		this.isRequired = params.isRequired ?? false;
 	}
 
 	/**

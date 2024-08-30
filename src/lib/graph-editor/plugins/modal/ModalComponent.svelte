@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { isComponentModalSettings, isSnippetModalSettings, Modal } from './modal.svelte';
+	import { isComponentModalSettings, isSnippetModalSettings, Modal, type ModalButton } from './modal.svelte';
 
 	const modal = Modal.instance;
 	let dialog = $state<HTMLDialogElement>();
 	let lastModal = $derived(modal.queue.at(-1));
 	let title = $derived(lastModal?.title);
 	let buttons = $derived(lastModal?.buttons);
-	let resolvedButtons = $derived(
+	let resolvedButtons: ModalButton[] | undefined = $derived(
 		buttons === undefined
 			? undefined
 			: buttons.map((btn) => {
@@ -16,6 +16,13 @@
 								label: 'Cancel',
 								onclick: () => modal.close()
 							};
+						case 'close': 
+							return {
+								label: 'Close',
+								level: 'neutral',
+								onclick: () => modal.close()
+							};
+							
 						default:
 							return btn;
 					}
@@ -39,7 +46,7 @@
 					{@render title()}
 				{/if}
 			{/if}
-			<div class="text-base-content">
+			<div>
 				{#if isComponentModalSettings(lastModal)}
 					<lastModal.component {...lastModal?.props} modal={lastModal} />
 				{:else if isSnippetModalSettings(lastModal)}
@@ -48,9 +55,16 @@
 			</div>
 			{#if resolvedButtons}
 				<div class="divider"></div>
-				<div class="modal-buttons">
+				<div class="modal-buttons modal-action">
 					{#each resolvedButtons as button}
-						<button class="modal-button" onclick={() => button.onclick()}>{button.label}</button>
+						<button
+						title={button.description}
+						class:btn-primary={button.level === 'primary'}
+						class:btn-secondary={button.level === 'secondary'}
+						class:btn-neutral={button.level === 'neutral'}
+						class:btn-warning={button.level === 'warning'}
+						class:btn-error={button.level === 'danger'}
+						 class="btn btn-neutral" onclick={() => button.onclick()}>{button.label}</button>
 					{/each}
 				</div>
 			{/if}
@@ -73,30 +87,19 @@
 		justify-content: flex-end;
 		gap: 1rem;
 	}
-	.modal-button {
-		background-color: #2d3748;
-		color: white;
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
 
-		&:hover {
-			background-color: #4a5568;
-		}
-		&:active {
-			background-color: #2d3748;
-		}
-	}
 	.divider {
 		height: 1px;
-		background-color: #2d3748;
+		// background-color: #2d3748;
+		// background-color: oklch(var(--bc) / 0.3);
 		margin: 1rem 0;
 	}
 	.modal-box {
 		min-width: 30rem;
-		background-color: #1d232a;
+		// background-color: #1d232a;
 		padding: 1.5rem;
 		border-radius: 1rem;
-		color: white;
+		// color: white;
 
 		h1 {
 			font-size: 1.5rem;
@@ -106,6 +109,7 @@
 	.modal {
 		margin: 0;
 		transition: all 0.2s;
+		// color: white;
 		position: fixed;
 		max-height: none;
 		max-width: none;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Modal } from '$graph-editor/plugins/modal';
+	import { Modal, type ModalButtonSettings } from '$graph-editor/plugins/modal';
 	import {
 		defaultInputControlValues,
 		socketToControl,
@@ -16,6 +16,7 @@
 	import EditArray from './EditArray.svelte';
 	import { fade } from 'svelte/transition';
 	import type { DataType } from '$graph-editor/plugins/typed-sockets';
+	import { description } from '$graph-editor/nodes';
 	type Props = {
 		data: InputControl<InputControlType>;
 		// width?: string;
@@ -188,36 +189,41 @@
 {:else if datastructure === 'array'}
 	<button
 		type="button"
-		class="btn-edit-datastructure text-nowrap"
+		class="btn btn-outline btn-sm me-[0.25rem] dbtn-edit-datastructure text-nowrap"
 		ondblclick={stopPropagation}
 		onpointerdown={stopPropagation}
 		onclick={() => {
+			const buttons: ModalButtonSettings[] = [];
+			if (inputControl.canChangeType) {
+				buttons.push({
+					label: 'Change type',
+					level: 'warning',
+					description: 'Change the type of the array. This will lose unconvertible values and break incompatible connections.',
+					onclick() {
+						modal.show({
+							snippet: changeTypeModal,
+							params: [],
+							title: 'Change type',
+							buttons: ['cancel']
+						});
+					}
+				});
+			}
+			buttons.push({
+				label: 'Add row',
+				description: 'Add a new row to the array',
+				level: 'neutral',
+				onclick() {
+					(inputControl.value as []).push(defaultInputControlValues[type]);
+					if (inputControl.onChange) inputControl.onChange(inputControl.value);
+				}
+			});
 			modal.show({
 				component: EditArray,
 				get title() {
 					return `Edit ${inputControl.socketType} array`;
 				},
-				buttons: [
-					{
-						label: 'Change type',
-						level: 'warning',
-						onclick() {
-							modal.show({
-								snippet: changeTypeModal,
-								params: [],
-								title: 'Change type',
-								buttons: ['cancel']
-							});
-						}
-					},
-					{
-						label: 'Add row',
-						onclick() {
-							(inputControl.value as []).push(defaultInputControlValues[type]);
-							if (inputControl.onChange) inputControl.onChange(inputControl.value);
-						}
-					}
-				],
+				buttons,
 				props: {
 					addRow() {
 						(inputControl.value as []).push(defaultInputControlValues[type]);

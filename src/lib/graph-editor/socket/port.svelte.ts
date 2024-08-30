@@ -1,4 +1,4 @@
-import { ClassicPreset} from 'rete'
+import type { ClassicPreset} from 'rete'
 import type { Socket } from './Socket.svelte';
 import { newLocalId } from '@selenite/commons';
 
@@ -18,7 +18,9 @@ export class Port<S extends Socket = Socket> implements ClassicPreset.Port<S> {
         this.id = newLocalId('port');
         this.socket = params.socket;
         this.socket.port = this;
-        Object.assign(this, params);
+        this.multipleConnections = params.multipleConnections;
+        this.label = params.label;
+        this.description = params.description;
     }
 }
 

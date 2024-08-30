@@ -2,16 +2,19 @@ import type { Component, Snippet } from 'svelte';
 
 type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
 
+export type ModalButton = {
+			level?: ButtonLevel;
+			label: string;
+			description?: string;
+			onclick: () => void;
+	  }
+export type ModalButtonSettings =
+	ModalButton 
+	| 'cancel'
+	| 'close';
 export type BaseModalSettings = {
 	title?: string | Snippet;
-	buttons?: (
-		| {
-				level?: ButtonLevel;
-				label: string;
-				onclick: () => void;
-		  }
-		| 'cancel'
-	)[];
+	buttons?: ModalButtonSettings[];
 };
 
 export type ComponentModalSettings<Props extends Record<string, any> = {}> = {

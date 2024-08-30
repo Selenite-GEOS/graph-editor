@@ -280,7 +280,7 @@ export function parsedXmlToGraph({
 				type: 'groupNameRef',
 				name: 'cellBlocks',
 				factory,
-				initialValues: { array: sourceNode.getData('cellBlockNames') }
+				initialValues: { array: [...(sourceNode.getData('cellBlockNames') as unknown[] | undefined) ?? []] }
 			});
 			nodes.push(breakNode);
 			cellBlockBreakNodes.set(sourceNode, breakNode);

@@ -126,7 +126,9 @@ export type InputControlParams<
 	onChange?: (value: InputControlValueType<T>) => void;
 	label?: string;
 	changeType?: (type: SocketType) => void;
+	canChangeType?: boolean;
 	socketType: SocketType;
+
 	// socket?: Socket<(typeof inputControlSocketType)[T]>;
 };
 export function getDatastructure<T extends InputControlType, D extends SocketDatastructure>({
@@ -178,6 +180,7 @@ export class InputControl<
 	datastructure: D;
 	#socketType: SocketType = $state('any');
 	changeType?: (type: SocketType) => void = $state();
+	canChangeType = $state(false);
 	props = $state<HTMLInputAttributes>({});
 	options = $state<string[]>();
 
@@ -192,6 +195,7 @@ export class InputControl<
 		this.#value = params.initial ?? getDatastructure(params);
 		this.type = params.type;
 		this.changeType = params.changeType;
+		this.canChangeType = params.canChangeType ?? false;
 		this.#socketType = params.socketType;
 		this.options = params.options;
 	}

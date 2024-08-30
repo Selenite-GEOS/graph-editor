@@ -20,10 +20,10 @@ export class DynamicTypeComponent<
 		return this.node.state.dynamicTypeCmpnt as { type: SocketType };
 	}
 
-	get dynamicTypeInputs(): (keyof Inputs)[] {
+	get dynamicTypeInputs(): (keyof Inputs)[] | '*' {
 		return this.params.inputs ?? [];
 	 };
-	get dynamicTypeOutputs(): (keyof Outputs)[] {
+	get dynamicTypeOutputs(): (keyof Outputs)[] | '*' {
 		return this.params.outputs ?? [];
 	};
 	params: DynamicTypeParams<Inputs, Outputs>;
@@ -58,8 +58,8 @@ export class DynamicTypeComponent<
 					const conn = context.data;
 
 					if (
-						(conn.target !== node.id || !this.dynamicTypeInputs.includes(conn.targetInput)) &&
-						(conn.source !== node.id || !this.dynamicTypeOutputs.includes(conn.sourceOutput))
+						(conn.target !== node.id || this.dynamicTypeInputs !== '*' && !this.dynamicTypeInputs.includes(conn.targetInput)) &&
+						(conn.source !== node.id || this.dynamicTypeOutputs !== '*' && !this.dynamicTypeOutputs.includes(conn.sourceOutput))
 					)
 						return context;
 

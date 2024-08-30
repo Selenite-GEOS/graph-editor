@@ -50,6 +50,7 @@ export class InputControlNode<
 		this.inputControl = this.addInputControl('value', {
 			type: controlType,
 			socketType,
+			canChangeType: datastructure !== 'scalar',
 			datastructure,
 			initial: params.initial,
 			props: params.props,

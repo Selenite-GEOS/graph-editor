@@ -187,6 +187,7 @@ export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Rec
 
 		this.addComponentByClass(DynamicTypeComponent, {
 			inputs: ['array'],
+			outputs: '*'
 		});
 		this.updateOutputs();
 	}
