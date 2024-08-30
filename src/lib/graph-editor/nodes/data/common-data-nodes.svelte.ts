@@ -96,18 +96,18 @@ type SocketConverter<S extends SocketType, T extends SocketType, D extends Socke
  * @template S Source type.
  * @template T Target type.
  */
-export abstract class ConverterNode<
+export class ConverterNode<
 	S extends DataType = DataType,
 	T extends DataType = DataType,
-	D extends SocketDatastructure = SocketDatastructure
+	D extends SocketDatastructure = 'scalar'
 > extends Node<{ value: Socket<S, D> }, { value: Socket<T, D> }> {
-	convert: SocketConverter<S, T, D>;
+	convert?: SocketConverter<S, T, D>;
 	constructor(
 		params: NodeParams & {
-			source: S;
-			target: T;
-			convert: SocketConverter<S, T, D>;
-		}
+			source?: S;
+			target?: T;
+			convert?: SocketConverter<S, T, D>;
+		} = {}
 	) {
 		const { source = 'any', target ='any' } = params;
 		super({...params, params: { source, target}});
@@ -119,8 +119,9 @@ export abstract class ConverterNode<
 	data(
 		inputs?: SocketsValues<{ value: Socket<S, D> }> | undefined
 	): SocketsValues<{ value: Socket<T, D> }> {
+		const v = this.getData('value', inputs)
 		return {
-			value: this.convert(this.getData('value', inputs))
+			value: this.convert?.(v) ?? v
 		};
 	}
 }

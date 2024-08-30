@@ -18,45 +18,45 @@ export class NumberNode extends InputControlNode<'integer'> {
 @registerNode('integer.ToString')
 @description('Converts an integer to a string.')
 @tags('string', 'text', 'convert')
-export class ToStringNode extends ConverterNode<'integer', 'string'> {
+export class ToStringNode extends ConverterNode<'integer', 'string', 'scalar'> {
 	constructor(params: NodeParams = {}) {
 		super({
 			label: 'To string',
 			...params,
 			source: 'integer',
 			target: 'string',
-			convert: (e) => String(e),
-		})
+			convert: (e) => String(e)
+		});
 	}
 }
 
 @registerNode('integer.ToNumber')
 @description('Converts an integer to a number.')
 @tags('float', 'real', 'convert')
-export class ToNumberNode extends ConverterNode<'integer', 'number'> {
+export class ToNumberNode extends ConverterNode<'integer', 'number', 'scalar'> {
 	constructor(params: NodeParams = {}) {
 		super({
 			label: 'To number',
 			...params,
 			source: 'integer',
 			target: 'number',
-			convert: (e) => Number(e),
-		})
+			convert: (e) => Number(e)
+		});
 	}
 }
 
 @registerNode('integer.Parse')
 @description('Parses a string to an integer.')
 @tags('int', 'convert')
-export class ParseNode extends ConverterNode<'string', 'integer'> {
+export class ParseNode extends ConverterNode<'string', 'integer', 'scalar'> {
 	constructor(params: NodeParams = {}) {
 		super({
 			label: 'Parse Integer',
 			...params,
 			source: 'string',
 			target: 'integer',
-			convert: (e) => parseInt(e),
-		})
+			convert: (e) => parseInt(e)
+		});
 	}
 }
 
@@ -124,7 +124,7 @@ export class ToBoolNode extends ConverterNode<'integer', 'boolean'> {
 			...params,
 			source: 'integer',
 			target: 'boolean',
-			convert: (e) => Boolean(e),
-		})
+			convert: (e) => Boolean(e)
+		});
 	}
 }

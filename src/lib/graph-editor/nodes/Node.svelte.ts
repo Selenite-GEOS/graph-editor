@@ -1,7 +1,7 @@
 import { ClassicPreset } from 'rete';
 import type { DataflowNode } from 'rete-engine';
 import type { AreaExtra } from '$graph-editor/area';
-import type { SocketType } from '$graph-editor/plugins/typed-sockets';
+import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 import type { NodeFactory, NodeEditor } from '$graph-editor/editor';
 import type { GetRenderTypes } from 'rete-area-plugin/_types/types';
 import { Stack } from '$lib/types/Stack';
@@ -76,7 +76,7 @@ export const converters = new Map<SocketType, Map<SocketType, NodeConstructor>>(
 /**
  * Registers a converter node.
  */
-export function registerConverter<S extends SocketType, T extends SocketType>(
+export function registerConverter<S extends DataType, T extends DataType>(
 	source: S,
 	target: T
 ) {
