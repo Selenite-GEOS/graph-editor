@@ -61,5 +61,8 @@ pnpm publish
 - Make UseMass and isThermal from CompositionalMultiphaseFVM be interpreted as a boolean
 - Ensure names of XML nodes are valid GEOS group names (no special characters, maybe no spaces)
 - Make format node format just an input control
+- Example: XML Generation : Remove download node
+- Example: Get Array Element : Add display node for every array
+- Example: Basic Datatypes: Remove bonjour je suis un ....
 ### Not important
 - make node selection framework agnostic
