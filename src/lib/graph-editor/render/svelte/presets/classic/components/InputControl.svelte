@@ -109,7 +109,7 @@
 			}}
 		bind:this={focusableInput}
 		value={inputControl.value ?? ''}
-		ondblclick={props.type === 'checkbox' ? stopPropagation : undefined}
+		ondblclick={props.type === 'checkbox' || props.type === 'number' ? stopPropagation : undefined}
 		onpointerdown={stopPropagation}
 		{...props}
 		class="{props.class} text-base-content"
@@ -179,6 +179,7 @@
 				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) 
 				stopPropagation(e);
 			}}
+			ondblclick={stopPropagation}
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea
 		>
 		{:else if type === 'select'}

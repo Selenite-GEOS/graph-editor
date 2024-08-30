@@ -300,6 +300,7 @@
 	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + 'border-opacity-100 focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
 	${node.previewed ? 'previewed' : ''}
 	${variableNode ? '!rounded-full' : ''}
+	${variableNode?.variable?.highlighted ? '!bg-accent text-accent-content transition-colors' : ''}
 	`}
 	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
 		transitionEnabled

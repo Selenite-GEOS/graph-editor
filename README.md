@@ -58,5 +58,8 @@ pnpm publish
 - Investigate using okclh for socket colors so it adapts better to different themes
 - Implement Javascript node where user can write javascript code to do the processing
 - Implement connection breaking when changing array type
+- Make UseMass and isThermal from CompositionalMultiphaseFVM be interpreted as a boolean
+- Ensure names of XML nodes are valid GEOS group names (no special characters, maybe no spaces)
+- Make format node format just an input control
 ### Not important
 - make node selection framework agnostic
