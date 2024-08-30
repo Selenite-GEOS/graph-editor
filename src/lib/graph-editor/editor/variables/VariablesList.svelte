@@ -129,6 +129,7 @@
 	const pointerDownWatcher = PointerDownWatcher.instance;
 	const mouseDown = $derived(pointerDownWatcher.isPointerDown);
 	$inspect('variables', $state.snapshot(variables));
+	let buttonHeight = $state<number>()
 </script>
 
 {#if mounted}
@@ -140,15 +141,17 @@
 		class:w-40={$collapsed}
 		class:w-[30rem]={!$collapsed}
 		class:h-52={!$collapsed}
-		class:h-12={$collapsed}
 		class:bg-opacity-0={$collapsed}
 		class:transition-main-div={mounted}
 		class:light-bg-transparent={true}
 		class:shadow-lg={!$collapsed}
+		class:overflow-clip={true}
 		class=" h-52 transition-main-div transition m-7 rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none"
+		style={ $collapsed ? `height:${buttonHeight}px`: undefined}
 	>
 		<div
 			class:rounded-container-token={$collapsed}
+			bind:clientHeight={buttonHeight}
 			class="pe-3 w-full bg-base-200 rounded-tl-box rounded-tr-box flex justify-between items-center"
 		>
 			<!-- Collapse button -->
@@ -182,10 +185,12 @@
 				<Fa icon={faPlus} size="xs" />
 			</button>
 		</div>
+		{#if !$collapsed}
 		<!-- Variables list -->
 		<div
-			class="rounded-bl-container-token rounded-br-container-token overflow-hidden"
+			class="rounded-bl-box rounded-br-box overflow-hidden"
 			style="padding:0rem 0.09rem;"
+			transition:fade={{ duration: 200 }}
 		>
 			<div
 				class:bg-surface-100={themeControl.isLight}
@@ -225,6 +230,7 @@
 				</ul>
 			</div>
 		</div>
+		{/if}
 	</div>
 {/if}
 
