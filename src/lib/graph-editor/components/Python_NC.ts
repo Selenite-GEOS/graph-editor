@@ -1,5 +1,4 @@
 import type { Node } from '$graph-editor/node/Node';
-import { getMessageFormatter } from 'svelte-i18n';
 import { NodeComponent } from './NodeComponent';
 
 export type PythonComponentDataType = 'static' | 'dynamic';

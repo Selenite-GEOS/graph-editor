@@ -1,4 +1,3 @@
-import { _ } from 'svelte-i18n';
 import { Node, registerNode } from '$graph-editor/nodes/Node.svelte';
 import type { NodeFactory } from '$graph-editor/editor';
 
