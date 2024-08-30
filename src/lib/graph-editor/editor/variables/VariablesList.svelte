@@ -146,7 +146,7 @@
 		class:light-bg-transparent={true}
 		class:shadow-lg={!$collapsed}
 		class:overflow-clip={true}
-		class=" h-52 transition-main-div transition m-7 rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none pointer-events-auto"
+		class=" h-52 transition-main-div transition rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none pointer-events-auto"
 		style={ $collapsed ? `height:${buttonHeight}px`: undefined}
 	>
 		<div
