@@ -114,8 +114,7 @@ export class NodeFactory implements ComponentSupportInterface {
 			if (notif.title) res += notif.title + ':';
 			console.warn(res, notif.message);
 		},
-		hide() {
-		}
+		hide() {}
 	};
 	public readonly connectionPathType: Writable<ConnectionPathType> = persisted(
 		'connectionPathType',
@@ -281,14 +280,20 @@ export class NodeFactory implements ComponentSupportInterface {
 			await this.editor.clear();
 
 			// Load variables
-			for (const v of Array.isArray(editorSaveData.variables) ? editorSaveData.variables : Object.values(editorSaveData.variables)) {
+			for (const v of Array.isArray(editorSaveData.variables)
+				? editorSaveData.variables
+				: Object.values(editorSaveData.variables)) {
 				this.editor.variables[v.id] = v;
 			}
 			this.editor.setName(editorSaveData.editorName);
 			for (const nodeSaveData of editorSaveData.nodes) {
-				const node = await this.loadNode(nodeSaveData);
-				if (editorSaveData.previewedNodes?.includes(node.id)) {
-					this.editor.previewedNodes.add(node);
+				try {
+					const node = await this.loadNode(nodeSaveData);
+					if (editorSaveData.previewedNodes?.includes(node.id)) {
+						this.editor.previewedNodes.add(node);
+					}
+				} catch (e) {
+					console.error('Failed to load node', e);
 				}
 			}
 
@@ -298,31 +303,39 @@ export class NodeFactory implements ComponentSupportInterface {
 					return;
 				}
 				console.log('load comment ', commentSaveData.text);
-				this.comment.addFrame(commentSaveData.text, commentSaveData.links, {
-					id: commentSaveData.id
-				});
+				try {
+					this.comment.addFrame(commentSaveData.text, commentSaveData.links, {
+						id: commentSaveData.id
+					});
+				} catch (e) {
+					console.error('Failed to load comment', e);
+				}
 			}
 
 			editorSaveData.connections.forEach(async (connectionSaveData) => {
-				const source = this.editor.getNode(connectionSaveData.source);
-				if (!source) {
-					console.error('Source node not found for connection', connectionSaveData);
-					throw new ErrorWNotif('Source node not found for connection');
+				try {
+					const source = this.editor.getNode(connectionSaveData.source);
+					if (!source) {
+						console.error('Source node not found for connection', connectionSaveData);
+						throw new ErrorWNotif('Source node not found for connection');
+					}
+					const target = this.editor.getNode(connectionSaveData.target);
+					if (!target) {
+						console.error('Target node not found for connection', connectionSaveData);
+						throw new ErrorWNotif('Target node not found for connection');
+					}
+					const conn = new Connection(
+						source,
+						connectionSaveData.sourceOutput,
+						target,
+						connectionSaveData.targetInput
+					);
+					conn.id = connectionSaveData.id;
+					conn.factory = this;
+					await this.editor.addConnection(conn);
+				} catch (e) {
+					console.error('Failed to load connection', e);
 				}
-				const target = this.editor.getNode(connectionSaveData.target);
-				if (!target) {
-					console.error('Target node not found for connection', connectionSaveData);
-					throw new ErrorWNotif('Target node not found for connection');
-				}
-				const conn = new Connection(
-					source,
-					connectionSaveData.sourceOutput,
-					target,
-					connectionSaveData.targetInput
-				);
-				conn.id = connectionSaveData.id;
-				conn.factory = this;
-				await this.editor.addConnection(conn);
 			});
 			setTimeout(() => {
 				if (this.area) AreaExtensions.zoomAt(this.area, this.editor.getNodes());
@@ -334,16 +347,16 @@ export class NodeFactory implements ComponentSupportInterface {
 	get area() {
 		return this.#area;
 	}
-	transform = $state({zoom: 1});
+	transform = $state({ zoom: 1 });
 	set area(area: AreaPlugin<Schemes, AreaExtra> | undefined) {
 		if (area === this.#area) return;
 		this.#area = area;
 		this.#area?.addPipe((ctx) => {
-			if (ctx.type === "zoomed") {
+			if (ctx.type === 'zoomed') {
 				this.transform.zoom = ctx.data.zoom;
 			}
 			return ctx;
-		})		
+		});
 	}
 
 	public readonly makutuClasses?: MakutuClassRepository;
@@ -359,7 +372,7 @@ export class NodeFactory implements ComponentSupportInterface {
 	connectionPlugin?: ConnectionPlugin;
 	public comment: CommentPlugin<Schemes, AreaExtra> | undefined;
 	#isDataflowEnabled = true;
-	#xmlSchemas = new SvelteMap<string, XmlSchema>()
+	#xmlSchemas = new SvelteMap<string, XmlSchema>();
 	get xmlSchemas() {
 		return this.#xmlSchemas;
 	}
@@ -387,7 +400,7 @@ export class NodeFactory implements ComponentSupportInterface {
 	async bulkOperation(callback: () => void | Promise<void>) {
 		this.#isDataflowEnabled = false;
 		try {
-		await callback();
+			await callback();
 		} catch (e) {
 			console.error('Bulk operation error', e);
 		}
@@ -421,10 +434,9 @@ export class NodeFactory implements ComponentSupportInterface {
 		history?: HistoryPlugin<Schemes>;
 		comment?: CommentPlugin<Schemes, AreaExtra>;
 		accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
-		xmlSchemas?: Record<string, XmlSchema | undefined>
-
+		xmlSchemas?: Record<string, XmlSchema | undefined>;
 	}) {
-		const { editor, area, makutuClasses, arrange, xmlSchemas  = {} } = params;
+		const { editor, area, makutuClasses, arrange, xmlSchemas = {} } = params;
 
 		this.comment = params.comment;
 		// this.accumulating = params.accumulating;
@@ -438,10 +450,9 @@ export class NodeFactory implements ComponentSupportInterface {
 		this.makutuClasses = makutuClasses;
 		this.editor = editor;
 		this.editor.factory = this;
-		
+
 		for (const [key, schema] of Object.entries(xmlSchemas)) {
-			if (schema)
-				this.#xmlSchemas.set(key, schema);
+			if (schema) this.#xmlSchemas.set(key, schema);
 		}
 		editor.use(this.dataflowEngine);
 		editor.use(this.controlflowEngine);
@@ -717,8 +728,7 @@ export class NodeFactory implements ComponentSupportInterface {
 		if (this.area) AreaExtensions.zoomAt(this.area, [node], { scale: undefined });
 	}
 	focusNodes(nodes?: Node[], options: AreaExtensions.ZoomAt = {}): void {
-		if (this.area)
-			AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes(), options);
+		if (this.area) AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes(), options);
 	}
 
 	select(entity: SelectorEntity, options: SelectOptions = {}) {
