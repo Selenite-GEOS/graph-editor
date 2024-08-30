@@ -28,7 +28,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	get area() {
 		return this.factory?.getArea();
 	}
-	variables: Writable<Record<string, Variable>> = writable({});
+	variables = $state<Record<string, Variable>>({});
 	previewedNodes = new SvelteSet<Node>();
 
 	// constructor() {
@@ -305,16 +305,15 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	}
 
 	toJSON() {
-		const variables = get(this.variables);
+		const variables: Variable[] = [];
 
-		for (const v of Object.values(variables)) {
-			variables[v.id] = { ...v, highlighted: false };
+		for (const v of Object.values(this.variables)) {
+			variables.push({ ...v, highlighted: false });
 		}
-
 		return {
 			editorName: this.graphName,
 			graphName: this.graphName,
-			variables,
+			variables: variables as Record<string, Variable> | Variable[],
 			previewedNodes: Array.from(this.previewedNodes).map((node) => node.id),
 			nodes: this.getNodes().map((node) => node.toJSON()),
 			connections: this.getConnections().map((conn) => conn.toJSON()),

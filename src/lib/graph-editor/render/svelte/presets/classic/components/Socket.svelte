@@ -4,7 +4,6 @@
 	import { capitalize } from 'lodash-es';
 	import cssVars from 'svelte-css-vars';
 	import ExecSocketCmpnt from './ExecSocket.svelte';
-	import { variant } from '$utils';
 	import { ExecSocket } from '$graph-editor/socket/ExecSocket';
 	let { data }: { data: Socket } = $props();
 	const socket = $derived(data);
@@ -38,12 +37,12 @@
 	<!-- svelte-ignore event_directive_deprecated -->
 	<div
 		bind:this={socket.element}
-		class="socket outline-4 outline outline-primary-400 border-white border-1 hover:border-4 {datastructureClass}
+		class:outline={data.selected}
+		class="socket outline-4 outline outline-accent border-white border-1 hover:border-4 {datastructureClass}
 		
 		"
 		role="button"
 		tabindex="-1"
-		class:outline={data.selected}
 		{title}
 		use:cssVars={socketVars}
 		on:contextmenu|stopPropagation|preventDefault

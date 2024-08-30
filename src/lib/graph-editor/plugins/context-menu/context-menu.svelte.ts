@@ -85,6 +85,8 @@ export class ContextMenu {
 		this.expanded = q.trim() !== '';
 	}
 
+	sort = $state(false);
+
 	/** Filtered items. */
 	filteredItems = $derived.by(() => {
 		const query = this.query.toLowerCase().trim();
@@ -163,7 +165,8 @@ export const contextMenu = ContextMenu.instance;
 export const showContextMenu: ShowContextMenu = ({
 	items,
 	pos,
-	searchbar,
+	sort = false,
+	searchbar = false,
 	onHide,
 	expand = false,
 	target
@@ -175,6 +178,7 @@ export const showContextMenu: ShowContextMenu = ({
 	menu.expanded = expand;
 	menu.visible = true;
 	menu.pos = pos;
+	menu.sort = sort;
 	menu.searchbar = searchbar;
 	menu.items = items.map((item, i) => {
 		return {

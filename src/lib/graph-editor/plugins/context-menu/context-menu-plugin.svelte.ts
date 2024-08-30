@@ -12,7 +12,7 @@ import { clientToSurfacePos } from '$utils/html';
 // Ensure all nodes are registered
 import '../../nodes';
 import type { Control, Socket } from '$graph-editor/socket';
-import { XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
+import { VariableNode, XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
 import {
 	getSharedString,
 	newLocalId,
@@ -26,8 +26,7 @@ import type { SocketData } from 'rete-connection-plugin';
 import { ContextMenu } from './context-menu.svelte';
 import { tick } from 'svelte';
 
-export type NodeMenuItem<
-	NC extends new (...params: unknown[]) => Node = new (...params: unknown[]) => Node
+export type NodeMenuItem<NC extends typeof Node = typeof Node
 > = {
 	/** Label of the node. */
 	label: string;
@@ -203,11 +202,26 @@ export function getMenuItemsFromNodeItems({
 	}
 	return res;
 }
+
+export function createNodeMenuItem(params: Partial<Omit<NodeMenuItem, 'nodeClass' | 'params'>> & {nodeClass: NodeMenuItem['nodeClass'], params: NodeMenuItem['params']} ): NodeMenuItem {
+	return {
+		tags: [],
+		path: [],
+		label: 'Node Item',
+		description: '',
+		inputTypes: {},
+		outputTypes: {},
+		...params,
+	}
+}
+
 export type ShowContextMenu = (params: {
 	expand?: boolean;
 	pos: Position;
+	/** Whether to sort the items. Default to false. */
+	sort?: boolean;
 	items: Partial<MenuItem>[];
-	searchbar: boolean;
+	searchbar?: boolean;
 	onHide?: () => void;
 	target?: HTMLElement;
 }) => void;
@@ -424,25 +438,24 @@ export function contextMenuSetup({
 					context.data.event.preventDefault();
 					console.debug('Context menu on editor');
 					const variables: NodeMenuItem[] = [];
-					for (const v of Object.values(get(editor.variables))) {
-						// variables.push(
-						// 	createNodeMenuItem({
-						// 		label: v.name,
-						// 		outTypes: [v.type],
-						// 		menuPath: ['Variables'],
-						// 		editorType: EditorType.XML,
-						// 		addNode: ({}) => {
-						// 			return new VariableNode({ factory, variableId: v.id });
-						// 		}
-						// 	})
-						// );
+					for (const v of Object.values(editor.variables)) {
+						variables.push(
+							createNodeMenuItem({
+								nodeClass: VariableNode as typeof Node,
+								label: v.name,
+								description: `Get the variable: '${v.name}'.`,
+								params: {variableId: v.id},
+								path: ['Variables'],
+								tags: ['get']
+							})
+						);
 					}
 
 					const pos: Position = { x: context.data.event.clientX, y: context.data.event.clientY };
 					const items: MenuItem[] = getMenuItemsFromNodeItems({
 						factory,
 						pos,
-						nodeItems: [...baseNodeMenuItems, ...(additionalNodeItems || [])] as NodeMenuItem[]
+						nodeItems: [...variables, ...[...baseNodeMenuItems, ...(additionalNodeItems || [])].sort((a, b) => (a.path.join('') + a.label).localeCompare(b.path.join('') + b.label) )] as NodeMenuItem[]
 					});
 					console.debug('settin hey', baseNodeMenuItems);
 					// Spawn context menu

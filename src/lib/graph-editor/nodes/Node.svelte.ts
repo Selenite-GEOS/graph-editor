@@ -263,7 +263,7 @@ export class Node<
 		this.#width = w;
 		this.emitResized();
 	}
-
+	
 	async emitResized() {
 		this.area?.emit({
 			type: 'noderesized',

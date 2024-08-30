@@ -18,6 +18,8 @@
 	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';
+	import VariablesList from '$graph-editor/editor/variables/VariablesList.svelte';
+	import { setContext } from 'svelte';
 	let editor = $state<NodeEditor>();
 	const factory = $derived(editor?.factory);
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
@@ -142,7 +144,12 @@
 		action?: (e: Event) => void;
 		props?: HTMLButtonAttributes;
 	};
-
+	const editorContext = { get editor()  {
+		return editor;
+	}, get factory() {
+		return factory;
+	}};
+	setContext('editor', editorContext);
 </script>
 
 {#snippet button({
@@ -252,5 +259,9 @@
 			class:!opacity-100={editorReady}
 			bind:this={container}
 		></div>
+	</div>
+	<div class="absolute bottom-2 left-2">
+
+		<VariablesList />
 	</div>
 </div>

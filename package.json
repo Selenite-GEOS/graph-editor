@@ -39,7 +39,7 @@
 	],
 	"peerDependencies": {
 		"svelte": "^5.0.0-next.241",
-		"@selenite/commons": "^0.21.2"
+		"@selenite/commons": "^0.22.5"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.4",

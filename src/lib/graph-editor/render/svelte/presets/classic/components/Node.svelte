@@ -13,7 +13,7 @@
 		shortcut,
 		stopPropagation
 	} from '@selenite/commons';
-	import { XmlNode } from '$graph-editor/nodes/XML';
+	import { VariableNode, XmlNode } from '$graph-editor/nodes/XML';
 	import type { Position } from '$graph-editor/common';
 	import { Control } from '$graph-editor/socket';
 	import { variant } from '$utils';
@@ -37,8 +37,9 @@
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
 	const constructor = $derived(node.constructor as NodeConstructor);
 	let transitionEnabled = $state(false);
-
+	
 	const xmlNode = $derived(node instanceof XmlNode ? node : undefined);
+	const variableNode = $derived(node instanceof VariableNode ? node : undefined);
 	// Avoid transitions on mount
 	$effect(() => {
 		setTimeout(() => {
@@ -142,7 +143,7 @@
 		}
 		return ctx;
 	});
-	const showNamePopup = $derived(node.name || xmlNode);
+	const showNamePopup = $derived(!variableNode && (node.name || xmlNode));
 	import { createFloatingActions } from 'svelte-floating-ui';
 	import * as dom from 'svelte-floating-ui/dom';
 	import Portal from 'svelte-portal';
@@ -160,6 +161,7 @@
 	const nodeElmnt = $derived(
 		floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined
 	);
+
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
@@ -290,12 +292,13 @@
 	{...interactions.getReferenceProps()}
 	bind:this={floating.elements.reference}
 	use:floatingRef
-	class:text-primary={node.needsProcessing}
+	class:text-primary={false && node.needsProcessing}
 	class:transition-all={transitionEnabled}
 	class:opacity-0={!node.visible}
-	class={`relative border-base-200 group border border-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none
-	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + ' focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
+	class={`relative border-base-content border-opacity-10 group border dborder-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none 
+	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + 'border-opacity-100 focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
 	${node.previewed ? 'previewed' : ''}
+	${variableNode ? '!rounded-full' : ''}
 	`}
 	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
 		transitionEnabled
@@ -327,7 +330,10 @@
 	<div
 		class:disappear={disappearProcessing}
 		class:animated-diagonal={displayProcessing}
-		class="grid select-none p-4 cursor-pointer gap-2 grid-flow-row-dense w-fit"
+		class="grid select-none cursor-pointer gap-2 grid-flow-row-dense w-fit"
+		class:p-4={!variableNode}
+		class:p-2={variableNode}
+		class:px-4={variableNode}
 		class:min-w-[13.65rem]={xmlNode}
 		bind:clientWidth={node.width}
 		bind:clientHeight={node.height}
@@ -421,7 +427,7 @@
 				})}
 			{/if}
 		{/each}
-		<form class="grid grid-flow-dense gap-2">
+		<form class="grid grid-flow-dense" class:gap-2={!variableNode}>
 			{#each node.sortedInputs as [key, input], i (key)}
 				<div
 					class="text-md justify-items-start items-center flex gap-2 grid-rows-subgrid col-start-1"
@@ -482,6 +488,8 @@
 				>
 					<div
 						class="output-title text-nowrap"
+						class:font-semibold={variableNode}
+						class:me-1={variableNode}
 						data-testid="output-title"
 						title={output.description}
 					>

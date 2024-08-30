@@ -115,8 +115,10 @@ export async function setupFullGraphEditor(
 					area.addPipe((ctx) => {
 						if (ctx.type === 'pointerdown') {
 							document.body.style.userSelect = 'none';
+							// document.body.style.pointerEvents = 'none';
 						} else if (ctx.type === 'pointerup') {
 							document.body.style.userSelect = '';
+							// document.body.style.pointerEvents = '';
 						}
 
 						// if (ctx.type === 'render') {

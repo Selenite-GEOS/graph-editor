@@ -158,12 +158,12 @@ export class XmlNode extends Node<
 	complex: ComplexType;
 	outLabel: string;
 	typePaths: string[][] | 'infinite' = $state();
-	isMesh = $derived(
-		this.typePaths &&
-			this.typePaths !== 'infinite' &&
-			this.typePaths.length > 0 &&
-			this.typePaths.at(0)?.at(-1) === 'Mesh'
-	);
+	// isMesh = $derived(
+	// 	this.typePaths &&
+	// 		this.typePaths !== 'infinite' &&
+	// 		this.typePaths.length > 0 &&
+	// 		this.typePaths.at(0)?.at(-1) === 'Mesh'
+	// );
 	constructor(xmlNodeParams: XmlNodeParams) {
 		let { initialValues = {} } = xmlNodeParams;
 		const xmlConfig = xmlNodeParams.xmlConfig;
@@ -445,10 +445,8 @@ export class XmlNode extends Node<
 			properties: this.getProperties(inputs)
 		});
 		const res = { value: xmlData, name: this.name };
-		if (this.isMesh) {
-			if (this.complex.name === 'InternalMesh') {
-				res.cellBlockNames = xmlData.properties['cellBlockNames'];
-			}
+		if (this.complex.name === 'InternalMesh') {
+			res.cellBlockNames = xmlData.properties['cellBlockNames'];
 		}
 		return res;
 	}

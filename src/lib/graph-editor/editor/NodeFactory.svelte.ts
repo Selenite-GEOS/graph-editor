@@ -279,7 +279,11 @@ export class NodeFactory implements ComponentSupportInterface {
 		await this.bulkOperation(async () => {
 			console.log('Load graph :', editorSaveData.editorName);
 			await this.editor.clear();
-			this.editor.variables.set(editorSaveData.variables);
+
+			// Load variables
+			for (const v of Array.isArray(editorSaveData.variables) ? editorSaveData.variables : Object.values(editorSaveData.variables)) {
+				this.editor.variables[v.id] = v;
+			}
 			this.editor.setName(editorSaveData.editorName);
 			for (const nodeSaveData of editorSaveData.nodes) {
 				const node = await this.loadNode(nodeSaveData);

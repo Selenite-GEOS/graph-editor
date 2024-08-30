@@ -8,7 +8,7 @@ import { get } from 'svelte/store';
 import wu from 'wu';
 import { Node, Connection } from '$graph-editor/nodes/Node.svelte';
 
-import { VariableNode } from '$graph-editor/nodes/XML/VariableNode';
+import { VariableNode } from '$graph-editor/nodes/XML/VariableNode.svelte';
 export class InputNode extends Node {
 	private value: unknown;
 

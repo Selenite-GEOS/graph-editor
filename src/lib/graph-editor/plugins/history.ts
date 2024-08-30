@@ -21,6 +21,11 @@ export class HistoryPlugin<Schemes extends BaseSchemes> extends BaseHistoryPlugi
 		this.canRedo.set(this.history.reserved.length > 0);
 	}
 
+	execute(action: HistoryAction): void {
+		this.add(action);
+		action.redo();
+	}
+
 	async undo(): Promise<void> {
 		this.lastMoveTime = Date.now();
 		this.isUndoing = true;

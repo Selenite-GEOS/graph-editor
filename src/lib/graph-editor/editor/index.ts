@@ -12,3 +12,5 @@
 export * from './NodeEditor.svelte';
 export * from './types';
 export * from './NodeFactory.svelte';
+export * as Variables from './variables'
+export * from './variables'

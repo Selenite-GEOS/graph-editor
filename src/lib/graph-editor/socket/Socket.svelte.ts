@@ -20,7 +20,7 @@ export class Socket<
 	readonly isRequired: boolean;
 	type: S = $state('any' as S);
 	value: unknown;
-	selected: boolean;
+	selected: boolean = $state(false);
 	readonly node: Node;
 	displayLabel: boolean | undefined;
 	port = $state<Port<Socket>>();

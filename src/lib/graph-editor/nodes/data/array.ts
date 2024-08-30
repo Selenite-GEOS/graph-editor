@@ -193,7 +193,7 @@ export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Rec
 	previousData: Record<string, unknown> = {};
 	data(inputs?: SocketsValues<{ array: Socket<DataType, 'array'>; }> | undefined): SocketsValues<{}> | Promise<SocketsValues<{}>> {
 		const array = this.getData('array', inputs);
-		this.updateOutputs(array);
+		this.updateOutputs(inputs);
 		const newData = Object.fromEntries(array.map((value) => [typeof value === 'object' ? JSON.stringify(value) : `${value}`, value]));
 		const res = {...this.previousData, ...newData};
 		this.previousData = newData;
