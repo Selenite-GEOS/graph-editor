@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
-	import { NodeStorage, Setup } from '$lib/graph-editor';
+	import { NodeStorage, Setup, VariablesListComponent } from '$lib/graph-editor';
 	import {
 		showContextMenu,
 		ContextMenuComponent,
@@ -18,7 +18,6 @@
 	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';
-	import VariablesList from '$graph-editor/editor/variables/VariablesList.svelte';
 	import { setContext } from 'svelte';
 	let editor = $state<NodeEditor>();
 	const factory = $derived(editor?.factory);
@@ -262,6 +261,6 @@
 	</div>
 	<div class="absolute bottom-2 left-2">
 
-		<VariablesList />
+		<VariablesListComponent />
 	</div>
 </div>
