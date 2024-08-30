@@ -67,6 +67,11 @@
 			| undefined;
 		if (elmnt?.focus) elmnt.focus();
 	}
+
+	export function triggerFirst() {
+		console.log("trigger first")
+		itemsInTree.at(0)?.action();
+	}
 </script>
 
 <div class="p-2 bg-neutral bg-opacity-100 text-neutral-content {classes}">

@@ -1,4 +1,4 @@
-import { Node, registerNode, tags, type NodeParams, type SocketsValues } from '../Node.svelte';
+import { Node, path, registerNode, tags, type NodeParams, type SocketsValues } from '../Node.svelte';
 import { getLeavesFromOutput } from '../utils';
 import type { DataType, SocketType } from '../../plugins/typed-sockets';
 import type { ExecSocket, Socket } from '$graph-editor/socket';
@@ -6,6 +6,7 @@ import { DynamicTypeComponent } from '../components/DynamicTypeComponent.svelte'
 
 // Class defining a For Each Node
 @registerNode('control.ForEach')
+@path('Array')
 @tags('loop', 'iteration')
 export class ForEachNode<T extends DataType = DataType> extends Node<
 	{ exec: ExecSocket; array: Socket<DataType, 'array'> },
@@ -36,7 +37,10 @@ for $(index), $(item) in enumerate($(array)):
 		this.addOutExec('loop', 'Loop');
 		this.addOutExec('exec', 'Done');
 		let dynamicTypeCmpnt: DynamicTypeComponent | undefined;
-		this.addInData('array', {
+		this.addInData('array', {	
+			control: {
+				canChangeType: true
+			},
 			datastructure: 'array',
 			type: initialType,
 			changeType: (type) => {
@@ -89,10 +93,10 @@ for $(index), $(item) in enumerate($(array)):
 	data(
 		inputs?: SocketsValues<{ exec: ExecSocket; array: Socket<'any', 'array'> }> | undefined
 	): SocketsValues<{ item: Socket<'any', 'scalar'>; index: Socket<'number', 'scalar'> }> {
-		if (this.currentItemIndex === undefined) {
-			return { item: undefined, index: -1 };
-		}
 		const array = this.getData('array', inputs);
+		if (this.currentItemIndex === undefined || this.currentItemIndex === -1) {
+			return { item: array?.at(0), index: 0 };
+		}
 		const item = array[this.currentItemIndex];
 		return { item, index: this.currentItemIndex };
 	}

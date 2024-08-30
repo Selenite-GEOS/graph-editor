@@ -173,7 +173,7 @@
 				}}
 			>
 				<Fa icon={faAngleDown} size="sm" flip={$collapsed ? 'vertical' : undefined} />
-				<h3>Variables</h3>
+				<h3 class="font-bold">Variables</h3>
 			</button>
 			<!-- Create variable button -->
 			<button

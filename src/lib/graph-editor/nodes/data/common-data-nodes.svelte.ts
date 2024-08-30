@@ -1,4 +1,4 @@
-import type { SocketType } from '$graph-editor/plugins/typed-sockets';
+import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 import {
 	inputControlSocketType,
 	socketToControl,
@@ -96,9 +96,9 @@ type SocketConverter<S extends SocketType, T extends SocketType, D extends Socke
  * @template S Source type.
  * @template T Target type.
  */
-export class ConverterNode<
-	S extends SocketType = 'any',
-	T extends SocketType = 'any',
+export abstract class ConverterNode<
+	S extends DataType = DataType,
+	T extends DataType = DataType,
 	D extends SocketDatastructure = SocketDatastructure
 > extends Node<{ value: Socket<S, D> }, { value: Socket<T, D> }> {
 	convert: SocketConverter<S, T, D>;
@@ -109,10 +109,11 @@ export class ConverterNode<
 			convert: SocketConverter<S, T, D>;
 		}
 	) {
-		super(params);
+		const { source = 'any', target ='any' } = params;
+		super({...params, params: { source, target}});
 		this.convert = params.convert;
-		this.addInData('value', { type: params.source });
-		this.addOutData('value', { type: params.target });
+		this.addInData('value', { type: source });
+		this.addOutData('value', { type: target });
 	}
 
 	data(

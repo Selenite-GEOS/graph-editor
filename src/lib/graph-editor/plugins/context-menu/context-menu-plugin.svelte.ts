@@ -462,6 +462,7 @@ export function contextMenuSetup({
 					showContextMenu({
 						items,
 						pos,
+						sort: true,
 						searchbar: true
 					});
 				}

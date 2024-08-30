@@ -327,7 +327,7 @@ export class NodeFactory implements ComponentSupportInterface {
 					const target = this.editor.getNode(connectionSaveData.target);
 					if (!target) {
 						console.error('Target node not found for connection', connectionSaveData);
-						throw new ErrorWNotif('Target node not found for connection');
+						throw new ErrorWNotif('Target node not found for connection.');
 					}
 					const conn = new Connection(
 						source,

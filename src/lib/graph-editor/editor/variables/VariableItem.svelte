@@ -175,7 +175,7 @@
 				e.dataTransfer.setData('application/graph-variable', JSON.stringify(v));
 			}}
 			class:outline-dashed={v.exposed}
-			class="outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
+			class="font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
 			on:contextmenu|preventDefault|stopPropagation={(e) =>
 				openContextMenu({ pos: { x: e.clientX, y: e.clientY } })}
 			on:click={() => openRenamePrompt()}

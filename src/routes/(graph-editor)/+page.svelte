@@ -215,7 +215,7 @@
 		{#if editor}
 			<input class="input input-bordered" bind:value={editor.graphName} />
 		{/if}
-		<aside>
+		<aside class="flex gap-2">
 			<h2>DB</h2>
 			<p>Count : {NodeStorage.numGraphs}</p>
 		</aside>

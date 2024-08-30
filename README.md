@@ -58,5 +58,6 @@ pnpm publish
 - Fix format node handling of invalid formats (ie. do nothing)
 - Add progress to big clears
 - Maybe, not sure it's better : Give better z index to node labels and nodes on the left / top
+- Investigate using okclh for socket colors so it adapts better to different themes
 ### Not important
 - make node selection framework agnostic

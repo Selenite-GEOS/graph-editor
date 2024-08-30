@@ -22,7 +22,8 @@ export const colorMap: { [key in SocketType]?: string } = {
 	mesh: '#ad8c71',
 	vector: true
 		? //  'hsl(58 87% 44% / 1)'
-			'hsl(58 79% 44% / 1)'
+		'hsl(51.65deg 59.09% 52.87%)'
+			// 'hsl(58 79% 44% / 1)'
 		: '#efec78',
 	groupNameRef: '#5165b2'
 };

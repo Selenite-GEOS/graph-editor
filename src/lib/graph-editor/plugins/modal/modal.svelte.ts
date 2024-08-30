@@ -13,6 +13,7 @@ export type ModalButtonSettings =
 	| 'cancel'
 	| 'close';
 export type BaseModalSettings = {
+	divider?: boolean;
 	title?: string | Snippet;
 	buttons?: ModalButtonSettings[];
 };

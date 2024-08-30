@@ -104,6 +104,9 @@
 <!-- TODO maybe move pointerdown stop propagation to framework agnostic logic -->
 {#snippet input(props: HTMLInputAttributes = {})}
 	<input
+		onkeydown={(e) => {
+				if (e.key === 'Enter') stopPropagation(e);
+			}}
 		bind:this={focusableInput}
 		value={inputControl.value ?? ''}
 		ondblclick={props.type === 'checkbox' ? stopPropagation : undefined}
@@ -115,16 +118,17 @@
 
 {#snippet changeTypeModal()}
 	<div class="flex flex-col">
-		<div class="p-2 rounded-t grid grid-cols-[0fr,1fr] gap-2 max-w-[30rem]">
+		<div class="items-start grid grid-cols-[0fr,1fr] gap-2 max-w-[30rem] alert alert-warning mb-4">
 			<span>Warning&nbsp;:</span>
 			<span class="text-wrap">
 				Changing type will get rid of unconvertible values and may break connections.</span
 			>
 		</div>
 		<select
-			class="rounded-b p-2 text-black"
+			class="select select-bordered"
 			oninput={(e) => {
 				onTypeChange(e.currentTarget.value as keyof typeof socketToControl);
+				inputControl.socketType = e.currentTarget.value as keyof typeof socketToControl;
 				modal.close();
 			}}
 		>
@@ -201,6 +205,7 @@
 					description: 'Change the type of the array. This will lose unconvertible values and break incompatible connections.',
 					onclick() {
 						modal.show({
+							divider: false,
 							snippet: changeTypeModal,
 							params: [],
 							title: 'Change type',

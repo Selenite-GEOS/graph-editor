@@ -84,10 +84,12 @@
 				action: () => {
 					if (menuCmpnt?.getFocusedItem()) {
 						menuCmpnt?.getFocusedItem()?.action();
-						menu.visible = false;
 						return;
 					}
-					menu.triggerFirstItem();
+					menuCmpnt?.triggerFirst();
+					menu.visible = false;
+					
+					// menu.triggerFirstItem();
 				}
 			}}
 			use:shortcut={{

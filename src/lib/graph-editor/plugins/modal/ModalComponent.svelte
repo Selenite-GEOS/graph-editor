@@ -54,7 +54,9 @@
 				{/if}
 			</div>
 			{#if resolvedButtons}
-				<div class="divider"></div>
+				{#if lastModal.divider ?? true}
+				<div class="divider !mt-9"></div>
+				{/if}
 				<div class="modal-buttons modal-action">
 					{#each resolvedButtons as button}
 						<button
