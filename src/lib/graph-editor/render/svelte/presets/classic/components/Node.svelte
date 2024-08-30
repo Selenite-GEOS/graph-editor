@@ -6,6 +6,7 @@
 	import {
 		affineFromPoints,
 		capitalize,
+		clickIfDrag,
 		clickIfNoDrag,
 		distance,
 		lerp,
@@ -320,6 +321,11 @@
 			if (e.button !== 0) return;
 			node.factory?.select(node);
 		}
+	}}
+	use:clickIfDrag={{
+		onclick(e) {
+			(floating.elements.reference as HTMLElement | undefined)?.blur()
+		},
 	}}
 	on:keydown={(e) => {
 		if (!nameInput && e.key === 'Enter') {
