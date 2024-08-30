@@ -411,7 +411,10 @@ export class XmlNode extends Node<
 			alwaysShowLabel: true,
 			type: type as DataType,
 			options,
-			datastructure: isArray ? 'array' : 'scalar'
+			datastructure: isArray ? 'array' : 'scalar',
+			control: {
+				canChangeType: false
+			}
 		});
 	}
 

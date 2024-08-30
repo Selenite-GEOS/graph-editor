@@ -44,20 +44,19 @@ pnpm publish
 ## TODO
 - Add input values to history
 - Add array description on hover
-- Add tootip popup
 - Support scientific writing of numbers (e.g. 1e-3)
-- Code integration : Update existing node names instead of duplicating
+- Code integration : To code : Update existing named XML elements instead of duplicating ? Maybe
 - Make history undo / redo use factory.bulkOperation
-- Add index to Context Menu items and fix sorting / enter
+- Add index to Context Menu items
 - Add variables
 - Add minimap
-- Add smarter drop from node
 - Add auto connection
 - Add magnetic connection
 - Add panning viewport
-- Fix format node handling of invalid formats (ie. do nothing)
 - Add progress to big clears
 - Maybe, not sure it's better : Give better z index to node labels and nodes on the left / top
 - Investigate using okclh for socket colors so it adapts better to different themes
+- Implement Javascript node where user can write javascript code to do the processing
+- Implement connection breaking when changing array type
 ### Not important
 - make node selection framework agnostic

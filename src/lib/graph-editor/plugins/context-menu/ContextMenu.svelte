@@ -145,7 +145,7 @@
 				bind:this={menuCmpnt}
 				class="row-start-2 h-full"
 				items={menu.filteredItems}
-				sort={menu.sort}
+				sort={menu.sort && menu.query.trim() === ''}
 				onclick={() => {
 					menu.visible = false;
 				}}

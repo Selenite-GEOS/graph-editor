@@ -19,14 +19,6 @@ describe('typed-socket', () => {
                 )
             ).toBe(false);
         })
-        it('should return false if the datastructures are incompatible', () => {
-            expect(
-                areTypesCompatible(
-                    { type: 'boolean', datastructure: 'scalar' },
-                    { type: 'boolean', datastructure: 'array' }
-                )
-            ).toBe(false);
-        })
         it('should return true if in type is any', () => {
             expect(
                 areTypesCompatible(
@@ -64,11 +56,27 @@ describe('typed-socket', () => {
                 )
             ).toBe(true);
         })
-        it('should return true if some types are any but datastructures are incompatible', () => {
+        it('should return true if both types are any but datastructures are incompatible', () => {
             expect(
                 areTypesCompatible(
                     { type: 'any', datastructure: 'scalar' },
                     { type: 'any', datastructure: 'array' }
+                )
+            ).toBe(true);
+        });
+        it('should return true if some types are any and datastructures are different', () => {
+            expect(
+                areTypesCompatible(
+                    { type: 'integer', datastructure: 'scalar' },
+                    { type: 'any', datastructure: 'array' }
+                )
+            ).toBe(true);
+        })
+        it('should return true if same types with scalar output and array input', () => {
+            expect(
+                areTypesCompatible(
+                    { type: 'integer', datastructure: 'scalar' },
+                    { type: 'integer', datastructure: 'array' }
                 )
             ).toBe(true);
         })

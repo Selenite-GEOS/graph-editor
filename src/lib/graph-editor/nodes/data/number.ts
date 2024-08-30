@@ -38,7 +38,7 @@ export class ToStringNode extends ConverterNode<'number', 'string'> {
 @registerNode('number.Floor')
 @description('Gets the largest integer less than or equal to a number.')
 @registerConverter('number', 'integer')
-@tags('int', 'convert')
+@tags('int', 'convert', 'partie entière')
 export class FloorNode extends ConverterNode<'number', 'integer'> {
 	constructor(params: NodeParams = {}) {
 		super({
@@ -70,7 +70,7 @@ export class CeilNode extends ConverterNode<'number', 'integer'> {
 @registerNode('number.Round')
 @description('Gets the closest integer to a number.')
 @registerConverter('number', 'integer')
-@tags('int', 'convert')
+@tags('int', 'convert', 'arrondir')
 export class RoundNode extends ConverterNode<'number', 'integer'> {
 	constructor(params: NodeParams = {}) {
 		super({

@@ -438,9 +438,9 @@ export async function addGraphToEditor({
 	setTimeout(() => {
 		factory.notifications.hide(notifId);
 	}, 1000);
-	if (import.meta.env.MODE === 'development')
+	if (true || import.meta.env.MODE === 'development')
 		factory.notifications.info({
-			title: 'Graph Editor',
-			message: 'It took ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s to parse the xml'
+			title: 'Code Integration',
+			message: 'It took ' + ((performance.now() - t0) / 1000).toFixed(2) + ' s to parse the xml!'
 		});
 }

@@ -68,9 +68,11 @@ export function areTypesCompatible(outType: TypeInfo, inType: TypeInfo): boolean
 		return true;
 	}
 	
-	return outType.type === 'any' || outType.datastructure === inType.datastructure && (
-		 inType.type === 'any'
-		|| outType.type === inType.type
+	return (
+		outType.type === 'any' ||
+		((outType.datastructure === inType.datastructure || inType.datastructure === 'array') &&
+			(inType.type === 'any' || outType.type === inType.type)) ||
+		inType.type === 'any'
 	);
 }
 
@@ -112,7 +114,7 @@ export class TypedSocketsPlugin<Schemes extends BaseSchemes> extends Scope<never
 					console.error(
 						eMessage
 					);
-					notifications.error({message: eMessage});
+					notifications.error({message: eMessage, autoClose: 8000});
 					let nodeEditor: NodeEditor<Schemes>;
 
 					if ((nodeEditor = scope as NodeEditor<Schemes>) && this.lastConnectionRemove) {

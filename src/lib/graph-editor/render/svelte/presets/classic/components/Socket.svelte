@@ -5,6 +5,7 @@
 	import cssVars from 'svelte-css-vars';
 	import ExecSocketCmpnt from './ExecSocket.svelte';
 	import { ExecSocket } from '$graph-editor/socket/ExecSocket';
+	import { stopPropagation } from '@selenite/commons';
 	let { data }: { data: Socket } = $props();
 	const socket = $derived(data);
 	const node = $derived(data.node);
@@ -45,6 +46,7 @@
 		tabindex="-1"
 		{title}
 		use:cssVars={socketVars}
+		on:dblclick={stopPropagation}
 		on:contextmenu|stopPropagation|preventDefault
 	></div>
 {/if}

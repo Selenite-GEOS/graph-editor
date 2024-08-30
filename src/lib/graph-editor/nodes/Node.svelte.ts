@@ -769,7 +769,7 @@ export class Node<
 			alwaysShowLabel: params?.alwaysShowLabel,
 			index: params?.index,
 			description: params?.description,
-			multipleConnections: params?.type?.startsWith('xmlElement') && params.datastructure === 'array',
+			multipleConnections: params?.datastructure === 'array' || params?.type?.startsWith('xmlElement') && params.datastructure === 'array',
 			isRequired: params?.isRequired,
 			label: params?.label ?? (key !== 'value'  && key !== 'result' ? (key as string) : undefined)
 		}) as Input<Exclude<Inputs[K], undefined>>;
@@ -880,33 +880,35 @@ export class Node<
 
 	getData<K extends DataSocketsKeys<Inputs>>(
 		key: K,
-		inputs?: Record<keyof Inputs, unknown>
+		inputs?: Record<keyof Inputs, unknown[]>
 	): SocketValueWithDatastructure<SocketValueType<Inputs[K]['type']>, Inputs[K]['datastructure']> {
-		// const checkedInputs2 = inputs as Record<string, N>;
-		// if (checkedInputs2 && key in checkedInputs2) {
-		// 	console.log("get", checkedInputs2[key]);
+		type Res = SocketValueWithDatastructure<
+			SocketValueType<Inputs[K]['type']>,
+			Inputs[K]['datastructure']
+		>;
 
-		// 	return checkedInputs2[key];
-		// }
-		// if ()
-		const checkedInputs = inputs as Record<string, unknown[]>;
-		// const isArray = this.inputs[key]?.socket.isArray;
-
-		if (checkedInputs && key in checkedInputs) {
+		
+		if (inputs && key in inputs) {
+			const isArray = this.inputs[key]?.socket.datastructure === 'array';
+			const checkedInputs = inputs as {[key in K]: unknown[]};
+			// Data is an array because there can be multiple connections
+			const data = checkedInputs[key];
 			// console.log(checkedInputs);
 			// console.log("get0", checkedInputs[key][0]);
-			if (checkedInputs[key].length > 1) {
-				return checkedInputs[key] as SocketValueType<Inputs[K]['type']>;
+			
+			if (data.length > 1) {
+				return data.flat() as Res;
 			}
-			return checkedInputs[key][0] as SocketValueType<Inputs[K]['type']>;
+			const firstData = data[0];
+			return (isArray && !Array.isArray(firstData) ? [data[0]] : data[0]) as Res;
 		}
 
-		const inputControl = this.inputs[key]?.control as InputControl<T, N>;
+		const inputControl = this.inputs[key]?.control as InputControl;
 
 		if (inputControl) {
-			return inputControl.value;
+			return inputControl.value as Res;
 		}
-		return undefined as SocketValueType<Inputs[K]['type']>;
+		return undefined as Res;
 	}
 
 	// @ts-expect-error

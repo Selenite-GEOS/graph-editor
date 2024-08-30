@@ -182,7 +182,7 @@ export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Rec
 		this.addInData("array", {
 			datastructure: 'array',
 			hideLabel: true,
-			type: params.type ?? 'any'
+			type: params.type ?? 'any',
 		})
 
 		this.addComponentByClass(DynamicTypeComponent, {
