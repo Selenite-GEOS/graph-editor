@@ -1,6 +1,8 @@
 {
     "editorName": "XML Generation",
-    "variables": {},
+    "graphName": "XML Generation",
+    "variables": [],
+    "previewedNodes": [],
     "nodes": [
         {
             "id": "5cc45132bdd9fd89",
@@ -190,46 +192,261 @@
             "selectedOutputs": []
         },
         {
-            "id": "86b91b48-5dab-40b5-a00d-bbb789cea9d6",
+            "id": "7df250a2-ebd2-4bda-94f6-d15dd228ef19",
             "type": "xml.XML",
             "params": {
                 "xmlConfig": {
-                    "xmlTag": "ExampleWithName",
-                    "xmlProperties": [
-                        {
-                            "name": "name",
-                            "type": "string",
-                            "required": true
-                        },
-                        {
-                            "name": "cfl",
-                            "type": "number",
-                            "required": true
-                        },
-                        {
-                            "name": "b",
-                            "type": "number"
-                        }
-                    ]
-                },
-                "initialValues": {
-                    "inputs": {
-                        "cfl": 0
+                    "complex": {
+                        "name": "AcousticSEM",
+                        "attributes": [
+                            {
+                                "name": "attenuationType",
+                                "type": "geos_WaveSolverUtils_AttenuationType",
+                                "required": false,
+                                "default": "none",
+                                "doc": "Flag to indicate which attenuation model to use: \"none\" for no attenuation, \"sls\\ for the standard-linear-solid (SLS) model (Fichtner, 2014)."
+                            },
+                            {
+                                "name": "cflFactor",
+                                "type": "real64",
+                                "required": false,
+                                "default": 0.5,
+                                "doc": "Factor to apply to the `CFL condition <http://en.wikipedia.org/wiki/Courant-Friedrichs-Lewy_condition>`_ when calculating the maximum allowable time step. Values should be in the interval (0,1] "
+                            },
+                            {
+                                "name": "discretization",
+                                "type": "groupNameRef",
+                                "required": true,
+                                "doc": "Name of discretization object (defined in the :ref:`NumericalMethodsManager`) to use for this solver. For instance, if this is a Finite Element Solver, the name of a :ref:`FiniteElement` should be specified. If this is a Finite Volume Method, the name of a :ref:`FiniteVolume` discretization should be specified."
+                            },
+                            {
+                                "name": "dtSeismoTrace",
+                                "type": "real64",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Time step for output pressure at receivers"
+                            },
+                            {
+                                "name": "enableLifo",
+                                "type": "integer",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Set to 1 to enable LIFO storage feature"
+                            },
+                            {
+                                "name": "forward",
+                                "type": "integer",
+                                "required": false,
+                                "default": 1,
+                                "doc": "Set to 1 to compute forward propagation"
+                            },
+                            {
+                                "name": "initialDt",
+                                "type": "real64",
+                                "required": false,
+                                "default": 1e+99,
+                                "doc": "Initial time-step value required by the solver to the event manager."
+                            },
+                            {
+                                "name": "lifoOnDevice",
+                                "type": "integer",
+                                "required": false,
+                                "default": -80,
+                                "doc": "Set the capacity of the lifo device storage (if negative, opposite of percentage of remaining memory)"
+                            },
+                            {
+                                "name": "lifoOnHost",
+                                "type": "integer",
+                                "required": false,
+                                "default": -80,
+                                "doc": "Set the capacity of the lifo host storage (if negative, opposite of percentage of remaining memory)"
+                            },
+                            {
+                                "name": "lifoSize",
+                                "type": "integer",
+                                "required": false,
+                                "default": 2147483647,
+                                "doc": "Set the capacity of the lifo storage (should be the total number of buffers to store in the LIFO)"
+                            },
+                            {
+                                "name": "linearDASGeometry",
+                                "type": "real64_array2d",
+                                "required": false,
+                                "default": [
+                                    [
+                                        0
+                                    ]
+                                ],
+                                "doc": "Geometry parameters for a linear DAS fiber (dip, azimuth, gauge length)"
+                            },
+                            {
+                                "name": "linearDASSamples",
+                                "type": "integer",
+                                "required": false,
+                                "default": 5,
+                                "doc": "Number of sample points to be used for strain integration when integrating the strain for the DAS signal"
+                            },
+                            {
+                                "name": "logLevel",
+                                "type": "integer",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Log level"
+                            },
+                            {
+                                "name": "outputSeismoTrace",
+                                "type": "integer",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Flag that indicates if we write the seismo trace in a file .txt, 0 no output, 1 otherwise"
+                            },
+                            {
+                                "name": "receiverCoordinates",
+                                "type": "real64_array2d",
+                                "required": false,
+                                "default": [
+                                    [
+                                        0
+                                    ]
+                                ],
+                                "doc": "Coordinates (x,y,z) of the receivers"
+                            },
+                            {
+                                "name": "rickerOrder",
+                                "type": "integer",
+                                "required": false,
+                                "default": 2,
+                                "doc": "Flag that indicates the order of the Ricker to be used o, 1 or 2. Order 2 by default"
+                            },
+                            {
+                                "name": "saveFields",
+                                "type": "integer",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Set to 1 to save fields during forward and restore them during backward"
+                            },
+                            {
+                                "name": "shotIndex",
+                                "type": "integer",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Set the current shot for temporary files"
+                            },
+                            {
+                                "name": "slsAnelasticityCoefficients",
+                                "type": "real32_array",
+                                "required": false,
+                                "default": [
+                                    0
+                                ],
+                                "doc": "Anelasticity coefficients for the standard-linear-solid (SLS) anelasticity.The default value is { }, corresponding to no attenuation. An array with the corresponding reference frequencies must be provided."
+                            },
+                            {
+                                "name": "slsReferenceAngularFrequencies",
+                                "type": "real32_array",
+                                "required": false,
+                                "default": [
+                                    0
+                                ],
+                                "doc": "Reference angular frequencies (omega) for the standard-linear-solid (SLS) anelasticity.The default value is { }, corresponding to no attenuation. An array with the corresponding anelasticity coefficients must be provided."
+                            },
+                            {
+                                "name": "sourceCoordinates",
+                                "type": "real64_array2d",
+                                "required": false,
+                                "default": [
+                                    [
+                                        0
+                                    ]
+                                ],
+                                "doc": "Coordinates (x,y,z) of the sources"
+                            },
+                            {
+                                "name": "targetRegions",
+                                "type": "groupNameRef_array",
+                                "required": true,
+                                "doc": "Allowable regions that the solver may be applied to. Note that this does not indicate that the solver will be applied to these regions, only that allocation will occur such that the solver may be applied to these regions. The decision about what regions this solver will beapplied to rests in the EventManager."
+                            },
+                            {
+                                "name": "timeSourceDelay",
+                                "type": "real32",
+                                "required": false,
+                                "default": -1,
+                                "doc": "Source time delay (1 / f0 by default)"
+                            },
+                            {
+                                "name": "timeSourceFrequency",
+                                "type": "real32",
+                                "required": false,
+                                "default": 0,
+                                "doc": "Central frequency for the time source"
+                            },
+                            {
+                                "name": "useDAS",
+                                "type": "geos_WaveSolverUtils_DASType",
+                                "required": false,
+                                "default": "none",
+                                "doc": "Flag to indicate if DAS data will be modeled, and which DAS type to use: \"none\" to deactivate DAS, \"strainIntegration\" for strain integration, \"dipole\" for displacement difference"
+                            },
+                            {
+                                "name": "name",
+                                "type": "groupName",
+                                "required": true,
+                                "doc": "A name is required for any non-unique nodes"
+                            }
+                        ],
+                        "children": [
+                            {
+                                "type": "LinearSolverParameters",
+                                "maxOccurs": 1
+                            },
+                            {
+                                "type": "NonlinearSolverParameters",
+                                "maxOccurs": 1
+                            }
+                        ]
                     },
-                    "controls": {}
-                }
+                    "priorities": {
+                        "Problem": {
+                            "Solvers": 10,
+                            "Mesh": 9,
+                            "Geometry": 8,
+                            "Events": 7,
+                            "ElementRegions": 6,
+                            "NumericalMethods": 5,
+                            "Constitutive": 4,
+                            "FieldSpecifications": 3,
+                            "Functions": 2,
+                            "Outputs": 1
+                        }
+                    },
+                    "typePaths": [
+                        [
+                            "Problem",
+                            "Solvers"
+                        ]
+                    ],
+                    "outLabel": "Solver"
+                },
+                "initialValues": {}
             },
             "state": {
-                "usedOptionalAttrs": [],
-                "name": "Example XML"
+                "usedOptionalAttrs": [
+                    "cflFactor"
+                ],
+                "name": "acousticSEM3"
             },
             "position": {
-                "x": 515.6235039490608,
-                "y": 228.12740490362899
+                "x": 169.70850070183053,
+                "y": 350.7231439361108
             },
             "inputControlValues": {
                 "inputs": {
-                    "cfl": 0
+                    "discretization": "",
+                    "targetRegions": [
+                        ""
+                    ],
+                    "cflFactor": 0.5
                 },
                 "controls": {}
             },
@@ -295,20 +512,6 @@
             "targetInput": "data-name"
         },
         {
-            "id": "37f183b0e83017d1",
-            "source": "fb5d5bc80b7f841f",
-            "target": "86b91b48-5dab-40b5-a00d-bbb789cea9d6",
-            "sourceOutput": "item",
-            "targetInput": "cfl"
-        },
-        {
-            "id": "7429b3ad4b3b62f9",
-            "source": "86b91b48-5dab-40b5-a00d-bbb789cea9d6",
-            "target": "5cc45132bdd9fd89",
-            "sourceOutput": "value",
-            "targetInput": "xml"
-        },
-        {
             "id": "b404651e625bd9d8",
             "source": "5cc45132bdd9fd89",
             "target": "bdc926222f57fa83",
@@ -328,6 +531,20 @@
             "target": "52f1ed1beb0c4a17",
             "sourceOutput": "exec",
             "targetInput": "exec"
+        },
+        {
+            "id": "e3cfd895a7eaaa2c",
+            "source": "fb5d5bc80b7f841f",
+            "target": "7df250a2-ebd2-4bda-94f6-d15dd228ef19",
+            "sourceOutput": "item",
+            "targetInput": "cflFactor"
+        },
+        {
+            "id": "58695e2540c411d0",
+            "source": "7df250a2-ebd2-4bda-94f6-d15dd228ef19",
+            "target": "5cc45132bdd9fd89",
+            "sourceOutput": "value",
+            "targetInput": "xml"
         }
     ],
     "comments": []

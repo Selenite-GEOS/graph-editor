@@ -11,7 +11,10 @@
 		},
 		placement: 'bottom-start',
 		get middleware() {
-			return [offset({ mainAxis: -23, alignmentAxis: -30 }), shift({mainAxis: true, crossAxis: true})];
+			return [
+				offset({ mainAxis: -23, alignmentAxis: -30 }),
+				shift({ mainAxis: true, crossAxis: true })
+			];
 		}
 	});
 
@@ -43,7 +46,7 @@
 	});
 
 	const menuElmnt = $derived(floating.elements.floating);
-	
+
 	// Set min size to initial size
 	$effect(() => {
 		if (!menu.visible || !menuElmnt) return;
@@ -82,14 +85,9 @@
 				key: 'Enter',
 				ignoreElements: [],
 				action: () => {
-					if (menuCmpnt?.getFocusedItem()) {
-						menuCmpnt?.getFocusedItem()?.action();
-						return;
-					}
-					menuCmpnt?.triggerFirst();
+					if (menuCmpnt?.getFocusedItem()) menuCmpnt?.getFocusedItem()?.action();
+					else menuCmpnt?.triggerFirst();
 					menu.visible = false;
-					
-					// menu.triggerFirstItem();
 				}
 			}}
 			use:shortcut={{
