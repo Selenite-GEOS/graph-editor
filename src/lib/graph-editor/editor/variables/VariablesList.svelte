@@ -14,7 +14,7 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import type { NodeEditor } from '../NodeEditor.svelte';
 
-	let collapsed = persisted('advanced-variablesListCollapsed', false, { storage: 'session' });
+	let collapsed = persisted('advanced-variablesListCollapsed', true, { storage: 'session' });
 
 	const editorContext = getContext('editor') as {
 		activeFactory?: NodeFactory;
@@ -146,7 +146,7 @@
 		class:light-bg-transparent={true}
 		class:shadow-lg={!$collapsed}
 		class:overflow-clip={true}
-		class=" h-52 transition-main-div transition m-7 rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none"
+		class=" h-52 transition-main-div transition m-7 rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none pointer-events-auto"
 		style={ $collapsed ? `height:${buttonHeight}px`: undefined}
 	>
 		<div
