@@ -294,6 +294,11 @@ export class NodeFactory implements ComponentSupportInterface {
 					}
 				} catch (e) {
 					console.error('Failed to load node', e);
+					const name = nodeSaveData.state?.name ?? nodeSaveData.type;
+					this.notifications.error({
+						message: `Failed to load node ${name}.`,
+						title: 'Graph Loading'
+					})
 				}
 			}
 
