@@ -9,6 +9,8 @@ export * as Editor from './editor';
 export * from './editor';
 export * as Variable from './variables';
 export * from './variables';
+export * as Utils from './utils';
+export * from './utils';
 export * as Setup from './setup';
 export * from './setup';
 export * from './render';
