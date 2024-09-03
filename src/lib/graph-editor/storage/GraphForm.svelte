@@ -14,8 +14,10 @@
 
 	let { editor, formId, existingGraph }: Props = $props();
 	const savedForm = persisted<Partial<typeof graph>>('graph-form', {}, { storage: 'session' });
+	const localPersistedGraph = persisted<Partial<typeof graph>>('graph-form', {});
 	const graph: Partial<StoredGraph & { addToFavorite: boolean }> = $state({
 		...$savedForm,
+		...$localPersistedGraph,
 		...existingGraph,
 		get name() {
 			return editor.graphName ?? '';
@@ -34,6 +36,8 @@
 		'description',
 		'public',
 		'addToFavorite',
+	] as (keyof typeof graph)[];
+	const localPersistedKeys = [
 		'author'
 	] as (keyof typeof graph)[];
 	function saveForm() {
@@ -43,6 +47,12 @@
 			res[key] = graph[key];
 		}
 		$savedForm = res;
+
+		const localRes: Record<string, unknown> = {};
+		for (const key of localPersistedKeys) {
+			localRes[key] = graph[key];
+		}
+		$localPersistedGraph = localRes;
 		console.debug('Saved form', $savedForm);
 	}
 
