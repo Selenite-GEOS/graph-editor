@@ -3,8 +3,8 @@
 	import cssVars from 'svelte-css-vars';
 	import Color from 'color';
 	import { _ } from '$lib/global';
-	import { createEventDispatcher, untrack } from 'svelte';
-	import type { DataType } from '$graph-editor/plugins/typed-sockets';
+	import { createEventDispatcher, tick, untrack } from 'svelte';
+	import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 	import { assignControl, colorMap } from '$graph-editor/render/utils';
 	import { InputControl, type InputControlType } from '$graph-editor/control';
 	import { InputControlComponent } from '$graph-editor/render';
@@ -14,6 +14,7 @@
 	import { createFloatingActions } from 'svelte-floating-ui';
 	import { upperFirst } from 'lodash-es';
 	import { flip } from 'svelte-floating-ui/core';
+	import type { SocketDatastructure } from '$graph-editor/socket';
 
 	interface Props {
 		variable: Variable;
@@ -52,34 +53,50 @@
 		if (!firstSet) dispatch('change', { variable: v });
 	});
 
-	const controlType = $derived(assignControl(v.type));
-	const inputControl: InputControl | undefined = $derived.by(() => {
-		if (!controlType) {
-			console.error(`Control type not found for ${v.type}`);
-			return;
+	const controlType = assignControl(v.type) ?? 'text';
+	let currentDatastructure: SocketDatastructure | undefined;
+	let currentDataType: SocketType | undefined;
+	// console.debug('Creating input control');
+	// if (!controlType) {
+	// 	console.error(`Control type not found for ${v.type}`);
+	// 	return;
+	// }
+	// untrack(() => {
+	// 	if (currentDatastructure === 'scalar' && v.isArray) {
+	// 		v.value = [v.value];
+	// 	} else if (currentDatastructure === 'array' && !v.isArray) {
+	// 		v.value = v.value[0];
+	// 	}
+	// currentDatastructure = v.isArray ? 'array' : 'scalar';
+	const inputControl = new InputControl({
+		type: controlType,
+		datastructure: v.isArray ? 'array' : 'scalar',
+		socketType: v.type,
+		// @ts-expect-error Ignore type error
+		initial: $state.snapshot(v.value),
+		onChange: (val) => {
+			console.debug('change', v.id, val);
+			v.value = val;
 		}
-		let res: InputControl | undefined = undefined;
-		untrack(() => {
-			res = new InputControl({
-				type: controlType,
-				datastructure: v.isArray ? 'array' : 'scalar',
-				socketType: v.type,
-				// @ts-expect-error Ignore type error
-				initial: firstSet ? v.value : undefined,
-				onChange: (val) => {
-					console.debug('change', v.id, val);
-					v.value = val;
-					// v = { ...v, value: val };
-				}
-			});
-		});
-
-		return res;
-		// if (!firstSet) {
-		// 	dispatch('changetype', { type: v.type });
-		// }
-		console.debug(controlType);
 	});
+
+	$effect(() => {
+		v.isArray
+		untrack(() => {
+			inputControl.datastructure = v.isArray ? 'array' : 'scalar';
+		})
+	})
+
+	$effect(() => {
+		v.type
+		untrack(() => {
+			inputControl.socketType = v.type;
+		})
+	})
+
+	// if (!firstSet) {
+	// 	dispatch('changetype', { type: v.type });
+	// }
 
 	let displayTypeSelection = $state(false);
 
@@ -143,13 +160,31 @@
 						}}
 					>
 						<div
-							class="rectangle-3d"
+							class:rectangle-3d={!v.isArray}
+							class:array={v.isArray}
 							use:cssVars={{ color: Color(colorMap[type]).saturationv(70).string() }}
 						></div>
 						{upperFirst(type)}
 					</button>
 				</li>
 			{/each}
+			<li>
+				<button
+					class="btn btn-sm"
+					onclick={() => {
+						v.isArray = !v.isArray;
+						displayTypeSelection = false;
+					}}
+				>
+					<div
+						class:rectangle-3d={v.isArray}
+						class:array={!v.isArray}
+						use:cssVars={{ color }}
+					></div>
+
+					To {v.isArray ? 'Scalar' : 'Array'}
+				</button>
+			</li>
 		</ul>
 	</div>
 {/if}

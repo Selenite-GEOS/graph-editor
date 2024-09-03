@@ -2,28 +2,35 @@
 	import { Modal, type ModalButtonSettings } from '$graph-editor/plugins/modal';
 	import {
 		defaultInputControlValues,
+		InputControl,
 		socketToControl,
-		type InputControl,
 		type InputControlType,
 		type InputControlValueType
 	} from '$graph-editor/socket';
-	import { autosize, stopPropagation } from '@selenite/commons';
+	import { autosize, checkbox, shortcut, stopPropagation } from '@selenite/commons';
 	import type {
 		HTMLInputAttributes,
 		HTMLInputTypeAttribute,
 		HTMLTextareaAttributes
 	} from 'svelte/elements';
-	import EditArray from './EditArray.svelte';
 	import { fade } from 'svelte/transition';
 	import type { DataType } from '$graph-editor/plugins/typed-sockets';
 	import { description } from '$graph-editor/nodes';
+	import Fa from 'svelte-fa';
+	import { faTimes } from '@fortawesome/free-solid-svg-icons';
+	import { cloneDeep } from 'lodash-es';
+	import { tick } from 'svelte';
 	type Props = {
 		data: InputControl<InputControlType>;
 		// width?: string;
 		focus?: boolean;
 		inputTextSize?: string;
 	};
-	let { data: inputControl, inputTextSize = 'text-md', focus = false }: Props = $props();
+	let {
+		data: inputControl = $bindable(),
+		inputTextSize = 'text-md',
+		focus = false
+	}: Props = $props();
 	let type = $derived(inputControl.type);
 	const isCheckbox = $derived(type === 'checkbox');
 	// $inspect(inputControl.value).with(console.debug);
@@ -109,6 +116,7 @@
 		}}
 		bind:this={focusableInput}
 		value={inputControl.value ?? ''}
+		use:checkbox={props.type === 'checkbox'}
 		ondblclick={props.type === 'checkbox' || props.type === 'number' ? stopPropagation : undefined}
 		onpointerdown={stopPropagation}
 		{...props}
@@ -165,7 +173,7 @@
 		<textarea
 			use:autosize={inputControl.value}
 			{...inputProps as HTMLTextareaAttributes}
-			class="textarea text-start dmax-h-[20rem] min-w-[11rem] text-base-content d!overflow-hidden dhover:!overflow-y-auto"
+			class="textarea text-start dmax-h-[20rem] min-w-[11rem] text-base-content d!overflow-hidden dhover:!overflow-y-auto break-keep"
 			onkeydown={(e) => {
 				if (e.key === 'Enter') stopPropagation(e);
 			}}
@@ -194,6 +202,60 @@
 		{@render input(inputProps)}
 	{/if}
 {:else if datastructure === 'array'}
+	{@const addRow = async () => {
+		(inputControl.value as unknown[]).push(defaultInputControlValues[type]);
+		// @ts-expect-error Ignore type error
+		await tick();
+		inputControl.onChange?.($state.snapshot(inputControl.value));
+	}}
+	{#snippet EditArray()}
+		{@const array = inputControl.value as unknown[]}
+		<div
+			class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center h-[40rem] place-content-start overflow-auto py-2 pe-2"
+			use:shortcut={{ key: 'Enter', action: addRow, ignoreElements: [] }}
+		>
+			{#each array as v, i (i)}
+				<span class="text-end select-none w-6 truncate">{i}</span>
+				<span class="select-none">—</span>
+				<!-- svelte-ignore a11y_label_has_associated_control -->
+				<label class="text-center text-base-content cursor-pointer">
+					<svelte:self
+						data={new InputControl({
+							datastructure: 'scalar',
+							get socketType() {
+								return inputControl.socketType;
+							},
+							onChange: (v) => {
+								console.log('a');
+								inputControl.value[i] = $state.snapshot(v);
+								console.log('b');
+								const res = $state.snapshot(array);
+								res[i] = v;
+								// @ts-expect-error Ignore type error
+								inputControl.onChange?.(res);
+							},
+							type,
+							initial: $state.snapshot(v)
+						})}
+						focus={true}
+					/>
+				</label>
+				<!-- Delete row button -->
+				<button
+					type="button"
+					title="Delete row"
+					class="btn-icon"
+					onclick={() => {
+						array.splice(i, 1);
+						inputControl.onChange?.($state.snapshot(array));
+						// if (onchange) onchange(array);
+					}}
+				>
+					<Fa icon={faTimes} class="m-auto opacity-50" />
+				</button>
+			{/each}
+		</div>
+	{/snippet}
 	<button
 		type="button"
 		class="btn btn-outline btn-sm me-[0.25rem] dbtn-edit-datastructure text-nowrap"
@@ -222,31 +284,31 @@
 				label: 'Add row',
 				description: 'Add a new row to the array',
 				level: 'neutral',
-				onclick() {
-					(inputControl.value as []).push(defaultInputControlValues[type]);
-					if (inputControl.onChange) inputControl.onChange(inputControl.value);
-				}
+				onclick: addRow
 			});
 			modal.show({
-				component: EditArray,
+				snippet: EditArray,
 				get title() {
 					return `Edit ${inputControl.socketType} array`;
 				},
-				buttons,
-				props: {
-					addRow() {
-						(inputControl.value as []).push(defaultInputControlValues[type]);
-					},
-					get array() {
-						return inputControl.value as unknown[];
-					},
-					get type() {
-						return inputControl.type;
-					},
-					onchange: (v) => {
-						if (inputControl.onChange) inputControl.onChange(v);
-					}
-				}
+				props: {},
+				buttons
+				// props: {
+				// 	addRow() {
+				// 		(inputControl.value as []).push(defaultInputControlValues[type]);
+				// 	},
+				// 	get array() {
+				// 		return inputControl.value as unknown[];
+				// 	},
+				// 	get type() {
+				// 		return inputControl.type;
+				// 	},
+
+				// 	onchange: (v) => {
+				// 		console.log('change', v);
+				// 		if (inputControl.onChange) inputControl.onChange(v);
+				// 	}
+				// }
 			});
 		}}>Edit array</button
 	><span class="text-xs ms-1 text-nowrap">Length : {(inputControl.value as []).length}</span>

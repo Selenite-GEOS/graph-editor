@@ -50,12 +50,14 @@ export class VariableNode extends Node<{}, { value: Scalar<DataType> }> {
 			});
 			$effect(() => {
 				this.variable?.type;
+				this.variable?.isArray;
 				untrack(() => {
 					const e = this.editor;
 					if (!e) return;
 					const output = this.outputs['value'];
 					if (!output) return;
 					output.socket.type = this.variable?.type;
+					output.socket.datastructure = this.variable?.isArray ? 'array' : 'scalar';
 					const t = this.variable?.type;
 
 					// Remove invalid connections

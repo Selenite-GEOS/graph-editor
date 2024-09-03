@@ -248,9 +248,9 @@ export const setupConnections: SetupFunction = (params: SetupParams) => {
 			}
 		};
 		return new (
-			socketData.payload.datastructure === 'array' &&
-			socketData.payload.node instanceof XmlNode &&
-			socketData.key === 'children'
+			socketData.payload.datastructure === 'array' 
+			// socketData.payload.node instanceof XmlNode &&
+			// socketData.key === 'children'
 				? BidirectFlow
 				: ClassicFlow
 		)(params);

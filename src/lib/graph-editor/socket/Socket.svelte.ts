@@ -16,7 +16,7 @@ export class Socket<
 	D extends SocketDatastructure = SocketDatastructure
 > extends ClassicPreset.Socket {
 	// readonly isArray: boolean;
-	readonly datastructure: D;
+	datastructure = $state('scalar' as D);
 	readonly isRequired: boolean;
 	type: S = $state('any' as S);
 	value: unknown;

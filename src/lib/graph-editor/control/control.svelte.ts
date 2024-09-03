@@ -178,7 +178,7 @@ export class InputControl<
 	onChange?: InputControlParams<T>['onChange'];
 	label = $state('');
 	type = $state<InputControlType>('text');
-	datastructure: D;
+	#datastructure = $state('scalar' as D);
 	#socketType: SocketType = $state('any');
 	changeType?: (type: SocketType) => void = $state();
 	canChangeType = $state(false);
@@ -189,16 +189,16 @@ export class InputControl<
 		super();
 		this.props = params.props ?? {};
 		this.id = getUID();
-		this.datastructure = params.datastructure;
+		this.#datastructure = params.datastructure;
 		this.readonly = params.readonly ?? false;
 		this.label = params.label ?? '';
 		this.onChange = params.onChange;
 		this.#value = params.initial ?? getDatastructure(params);
-		untrack(() => {
-			if (params.onChange) {
-				params.onChange(this.#value);
-			}
-		});
+		// untrack(() => {
+		// 	if (params.onChange) {
+		// 		params.onChange(this.#value);
+		// 	}
+		// });
 		this.type = params.type;
 		this.changeType = params.changeType;
 		this.canChangeType = params.canChangeType ?? false;
@@ -236,7 +236,29 @@ export class InputControl<
 			values,
 			type: socketToControl[t]
 		});
+		this.type = assignControl(t, this.type);
 		this.#socketType = t;
+	}
+
+	get datastructure() {
+		return this.#datastructure;
+	}
+
+	set datastructure(d) {
+		if (d === this.#datastructure) return;
+		if (d === 'scalar') {
+			if (this.#value?.length > 0)
+				this.#value = this.#value[0];
+			else
+				this.#value = defaultInputControlValues[this.type] as InputControlValueType<T>;
+		} else {
+			if (this.value === undefined)
+				this.#value = []
+			else
+				this.#value = [this.#value];
+		}
+		this.#datastructure = d;
+		this.onChange?.($state.snapshot(this.#value));
 	}
 }
 // const test = new InputControl({ type: 'checkbox', initial: true });

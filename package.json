@@ -1,6 +1,6 @@
 {
 	"name": "@selenite/graph-editor",
-	"version": "0.0.150",
+	"version": "0.0.151",
 	"homepage": "https://selenite-geos.github.io/docs/developper/components/#graph-editor",
 	"repository": "github:Selenite-GEOS/graph-editor",
 	"license": "MIT",
@@ -39,7 +39,7 @@
 	],
 	"peerDependencies": {
 		"svelte": "^5.0.0-next.243",
-		"@selenite/commons": "^0.22.11",
+		"@selenite/commons": "^0.22.14",
 		"@fortawesome/free-regular-svg-icons": "^6.6.0",
 		"@fortawesome/free-solid-svg-icons": "^6.6.0"
 	},
