@@ -8,6 +8,7 @@ import type {
 } from '../socket/Socket.svelte';
 import { valueConverters } from '$graph-editor/common';
 import type { HTMLAttributes, HTMLBaseAttributes, HTMLInputAttributes } from 'svelte/elements';
+import { untrack } from 'svelte';
 
 export type ControlParams = {
 	placeInHeader: boolean;
@@ -192,7 +193,12 @@ export class InputControl<
 		this.readonly = params.readonly ?? false;
 		this.label = params.label ?? '';
 		this.onChange = params.onChange;
-		this.value = params.initial ?? getDatastructure(params);
+		this.#value = params.initial ?? getDatastructure(params);
+		untrack(() => {
+			if (params.onChange) {
+				params.onChange(this.#value);
+			}
+		})
 		this.type = params.type;
 		this.changeType = params.changeType;
 		this.canChangeType = params.canChangeType ?? false;
