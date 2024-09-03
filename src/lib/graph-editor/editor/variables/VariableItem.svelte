@@ -11,7 +11,7 @@
 	import { InputControl } from '$graph-editor/control';
 	import { InputControlComponent } from '$graph-editor/render';
 	import type { NodeFactory } from '../NodeFactory.svelte';
-	import { showContextMenu } from '$graph-editor/plugins';
+	import { modals, showContextMenu } from '$graph-editor/plugins';
 	import type { Point } from '@selenite/commons';
 	import { variableDragStart } from '$graph-editor/utils';
 
@@ -104,7 +104,11 @@
 
 	function openRenamePrompt(): void {
 		console.log("To implement: Rename prompt")
-		v.name = v.name + '1';
+		modals.show({prompt: 'Rename variable', initial: v.name, response(r) {
+			if (typeof r === 'string') {
+				v.name = r;
+			}
+		},})
 		// modalStore.trigger({
 		// 	type: 'prompt',
 		// 	title: $_('variable-item.rename-prompt.title'),
@@ -173,7 +177,7 @@
 			on:pointerleave={() => v.highlighted =false }
 			on:dragstart={variableDragStart(v)}
 			class:outline-dashed={v.exposed}
-			class="font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
+			class="line-clamp-1 font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
 			on:contextmenu|preventDefault|stopPropagation={(e) =>
 				openContextMenu({ pos: { x: e.clientX, y: e.clientY } })}
 			on:click={() => openRenamePrompt()}
@@ -182,15 +186,15 @@
 		</button>
 	</div>
 	{#if inputControl}
-		{#if v.isArray}
+		<!-- {#if v.isArray}
 			<button
 				type="button"
 				class="btn btn-sm variant-filled w-full"
 				on:click={() => openArrayEditor()}>Edit array</button
 			>
-		{:else}
+		{:else} -->
 			<InputControlComponent data={inputControl} width="w-56" />
-		{/if}
+		<!-- {/if} -->
 	{/if}
 </div>
 

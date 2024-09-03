@@ -73,10 +73,13 @@ export const setupArea: SetupFunction = (params) => {
 		await editor.addNode(addedNode);
 		await tick();
 		await animationFrame(2);
-		area.translate(addedNode.id, {
-			x: surfacePos.x - addedNode.width / 2,
-			y: surfacePos.y - addedNode.height / 2
-		});
+		if (addedNode instanceof VariableNode) {
+			surfacePos.x = surfacePos.x - addedNode.width;
+		} else if (addedNode instanceof MacroNode) {
+			surfacePos.x = surfacePos.x - addedNode.width / 2;
+		}
+		surfacePos.y = surfacePos.y - addedNode.height / 2;
+		area.translate(addedNode.id, surfacePos);
 		addedNode.visible = true;
 		e.preventDefault();
 	});

@@ -10,7 +10,7 @@ export type ModalButton = {
 	  }
 export type ModalButtonSettings =
 	ModalButton 
-	| 'cancel'
+	| 'cancel' | 'promptConfirm'
 	| 'close' | 'submit' | { formId: string};
 export type BaseModalSettings = {
 	divider?: boolean;
@@ -29,7 +29,11 @@ export type SnippetModalSettings<Props extends Record<string, any> = {}> = {
 	props: Props;
 } & BaseModalSettings;
 
+
+export type PromptModalSettings = {prompt: string, initial?: string} & BaseModalSettings;
+
 export type ModalSettings<Props extends Record<string, any> = {}> =
+ | PromptModalSettings
 	| ComponentModalSettings<Props>
 	| SnippetModalSettings<Props>;
 
@@ -42,6 +46,12 @@ export function isSnippetModalSettings<Props extends Record<string, any>>(
 	modal: ModalSettings<Props>
 ): modal is SnippetModalSettings<Props> {
 	return 'snippet' in modal;
+}
+
+export function isPromptModalSettings(
+	modal: ModalSettings
+): modal is PromptModalSettings {
+	return 'prompt' in modal;
 }
 
 /**
@@ -64,6 +74,10 @@ export class Modal {
 
 	show<Props extends Record<string, any>>(params: ModalSettings<Props>) {
 		console.debug('Show modal', params);
+		if ('prompt' in params) {
+			params.buttons = params.buttons || ['cancel', 'promptConfirm'];
+			params.title = params.title || params.prompt;
+		}
 		this.queue.push(params as unknown as ModalSettings);
 	}
 

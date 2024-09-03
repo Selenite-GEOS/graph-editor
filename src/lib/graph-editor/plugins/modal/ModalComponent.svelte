@@ -2,6 +2,7 @@
 	import type { SvelteComponent } from 'svelte';
 	import {
 		isComponentModalSettings,
+		isPromptModalSettings,
 		isSnippetModalSettings,
 		Modal,
 		type ComponentModalSettings,
@@ -45,6 +46,15 @@
 									modals.close();
 								}
 							};
+						case 'promptConfirm':
+							return {
+								label: 'Confirm',
+								level: 'primary',
+								onclick: () => {
+									lastModal?.response?.(promptInput?.value);
+									modals.close();
+								}
+							}
 						default:
 							if ('formId' in btn) {
 								return {
@@ -68,6 +78,7 @@
 			dialog.showModal();
 		}
 	});
+	let promptInput = $state<HTMLInputElement>();
 </script>
 
 {#if lastModal}
@@ -85,6 +96,9 @@
 					<lastModal.component bind:this={childComponent} {...lastModal?.props} modal={lastModal} />
 				{:else if isSnippetModalSettings(lastModal)}
 					{@render lastModal.snippet(lastModal.props)}
+				{:else if isPromptModalSettings(lastModal)}
+					<input value={lastModal.initial} bind:this={promptInput} placeholder="New value" class="input input-bordered w-full" onkeydown={(e) => 
+					{if (e.key === 'Enter') {lastModal.response?.(promptInput?.value); modals.close();}}}/>
 				{/if}
 			</div>
 			{#if resolvedButtons}
