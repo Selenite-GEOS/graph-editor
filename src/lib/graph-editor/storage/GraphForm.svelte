@@ -6,6 +6,7 @@
 	import type { HTMLInputAttributes, HTMLTextareaAttributes } from 'svelte/elements';
 	import { FavoritesManager } from './FavoritesManager.svelte';
 	import { VariableNode } from '$graph-editor/nodes/XML/VariableNode.svelte';
+	import { InputControl, type Input } from '$graph-editor/socket';
 	interface Props {
 		editor: NodeEditor;
 		formId?: string;
@@ -56,20 +57,24 @@
 		console.debug('Saved form', $savedForm);
 	}
 
-	export function getResponse(): StoredGraph {
+	export async function getResponse(): Promise<StoredGraph> {
 		const id = editor.graphId;
 		FavoritesManager.setFavorite(id, graph.addToFavorite ?? false);
 		const date = new Date();
 
-		function gatherPorts(side: 'input' | 'output') {
+		async function gatherPorts(side: 'input' | 'output') {
 			const res: GraphPorts = [];
 			for (const [nodeId, ports] of Object.entries(side === 'input' ? inputs : outputs)) {
 				for (const [key, { keep, nickname, descr, priority }] of Object.entries(ports)) {
 					if (!keep) continue;
-
-					const port = editor.getNode(nodeId)?.[side === 'input' ? 'inputs' : 'outputs'][key];
+					const node = editor.getNode(nodeId)
+					const port = node?.[side === 'input' ? 'inputs' : 'outputs'][key];
 					if (!port) continue;
 					const socket = port.socket;
+					let value: unknown
+					if (side === 'input') {
+						value = await node.getDataWithInputs(key);
+					}
 					res.push({
 						nodeId,
 						key,
@@ -77,6 +82,7 @@
 						description: descr,
 						datastructure: socket.datastructure,
                         priority,
+						default: value,
 						type: socket.type
 					});
 				}
@@ -89,8 +95,8 @@
 			graph: editor.toJSON(),
 			createdAt: date,
 			updatedAt: date,
-			inputs: gatherPorts('input'),
-			outputs: gatherPorts('output'),
+			inputs: await gatherPorts('input'),
+			outputs: await gatherPorts('output'),
 			variables: Object.entries(variables).map(([id, { keep, nickname, descr, priority }]) => ({
 				id,
 				keep,
@@ -144,7 +150,7 @@
 	const exposedVariables = $derived(Object.values(editor.variables).filter((v) => v.exposed));
 	const variables = $state<Record<string, { nickname?: string; keep?: boolean; descr?: string; priority?:number }>>(
 		Object.fromEntries(
-			Object.values(editor.variables).map((v) => {
+			Object.values(editor.variables).filter(v => v.exposed).map((v) => {
 				const existing = existingGraph?.variables?.find((v2) => v2.id === v.id);
 				return [
 					v.id,
@@ -255,7 +261,7 @@
 						{#each selected as [key, port]}
 							<label class="grid grid-flow-col gap-3 items-center ms-4 grid-cols-[0fr,0fr,1fr]">
 								<input type="checkbox" bind:checked={target[node.id][key].keep} class="checkbox" />
-								<span class="w-[5rem] truncate col-start-2 font-semibold">{port.label ?? key}</span>
+								<span class="w-[5rem] truncate col-start-2 font-semibold" title={port.label ?? key} >{port.label ?? key}</span>
 								<input type="number" bind:value={target[node.id][key].priority} class="input input-bordered col-span-2" placeholder="Priority" title={`Influences the order of ${name}. Higher priority means higher display.`} />
 								<input
 									bind:value={target[node.id][key].nickname}

@@ -149,6 +149,7 @@ export class MacroNode extends Node {
 				this.macroInputs[macroKey] =  this.addInData(macroKey, {
 					label: i.label,
 					type: i.type,
+					initial: i.default,
 					index:  i.priority,
 					description: i.description,
 					datastructure: i.datastructure,
@@ -246,9 +247,13 @@ export class MacroNode extends Node {
 					console.log('micromacro macro inputs', microMacroNode.macroInputs);
 				} else {
 					inputNode = await this.macroFactory.addNode(InputNode, {
-						isArray: input.socket.isArray
+						isArray: input.socket.datastructure === "array"
 					});
 					if (!inputNode) throw new Error('Failed to add input node ' + macroKey);
+					for (const conn of [...node.ingoingDataConnections[key] ?? [], ...node.ingoingExecConnections[key] ?? []]) {
+						await this.macroEditor.removeConnection(conn.id);
+					}
+					
 					await this.macroEditor.addNewConnection(inputNode, 'value', node, key);
 				}
 

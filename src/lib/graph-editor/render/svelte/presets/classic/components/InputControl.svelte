@@ -105,8 +105,8 @@
 {#snippet input(props: HTMLInputAttributes = {})}
 	<input
 		onkeydown={(e) => {
-				if (e.key === 'Enter') stopPropagation(e);
-			}}
+			if (e.key === 'Enter') stopPropagation(e);
+		}}
 		bind:this={focusableInput}
 		value={inputControl.value ?? ''}
 		ondblclick={props.type === 'checkbox' || props.type === 'number' ? stopPropagation : undefined}
@@ -165,30 +165,28 @@
 		<textarea
 			use:autosize={inputControl.value}
 			{...inputProps as HTMLTextareaAttributes}
-			class="textarea text-start max-h-[20rem] min-w-[11rem] text-base-content"
+			class="textarea text-start dmax-h-[20rem] min-w-[11rem] text-base-content d!overflow-hidden dhover:!overflow-y-auto"
 			onkeydown={(e) => {
 				if (e.key === 'Enter') stopPropagation(e);
 			}}
 			onscroll={(e) => {
 				// Prevent area from scrolling if textarea has a scrollbar
-				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) 
-					stopPropagation(e);
+				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) stopPropagation(e);
 			}}
 			onmousewheel={(e) => {
 				// Prevent area from scrolling if textarea has a scrollbar
-				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) 
-				stopPropagation(e);
+				if (e.currentTarget.scrollHeight > e.currentTarget.clientHeight) stopPropagation(e);
 			}}
 			ondblclick={stopPropagation}
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea
 		>
-		{:else if type === 'select'}
-		<select class="select select-bordered" onpointerdown={stopPropagation}>
+	{:else if type === 'select'}
+		<select class="select select-bordered" onpointerdown={stopPropagation} oninput={inputProps.oninput}>
 			{#each inputControl.options ?? [] as option}
 				<option value={option} selected={option === inputControl.value}>{option}</option>
 			{/each}
 		</select>
-		{:else}
+	{:else}
 		{@render input(inputProps)}
 	{/if}
 {:else if datastructure === 'array'}
@@ -203,7 +201,8 @@
 				buttons.push({
 					label: 'Change type',
 					level: 'warning',
-					description: 'Change the type of the array. This will lose unconvertible values and break incompatible connections.',
+					description:
+						'Change the type of the array. This will lose unconvertible values and break incompatible connections.',
 					onclick() {
 						modal.show({
 							divider: false,

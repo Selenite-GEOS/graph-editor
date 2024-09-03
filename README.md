@@ -64,5 +64,6 @@ pnpm publish
 - Example: XML Generation : Remove download node
 - Example: Get Array Element : Add display node for every array
 - Example: Basic Datatypes: Remove bonjour je suis un ....
+- Dropping node on socket automatically connects it
 ### Not important
 - make node selection framework agnostic

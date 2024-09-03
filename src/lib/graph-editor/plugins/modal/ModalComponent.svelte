@@ -10,7 +10,7 @@
 	} from './modal.svelte';
 
 	let contentContainer = $state<HTMLElement>();
-	let childComponent = $state<SvelteComponent & { getResponse?: () => unknown }>();
+	let childComponent = $state<SvelteComponent & { getResponse?: () => Promise<unknown> | unknown }>();
 	const modals = Modal.instance;
 	let dialog = $state<HTMLDialogElement>();
 	let lastModal = $derived(modals.queue.at(-1));
@@ -36,12 +36,12 @@
 							return {
 								label: 'Submit',
 								level: 'primary',
-								onclick: () => {
+								onclick: async () => {
 									if (contentContainer) {
 										const forms = contentContainer.querySelectorAll('form');
 										for (const form of forms) if (!form.reportValidity()) return;
 									}
-									const r = childComponent?.getResponse?.();
+									const r = await childComponent?.getResponse?.();
 									lastModal?.response?.(r);
 									modals.close();
 								}

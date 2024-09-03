@@ -788,13 +788,23 @@ export class Node<
 			label: params?.label ?? (key !== 'value' && key !== 'result' ? (key as string) : undefined)
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
-		const controlType = params?.options ? 'select' : assignControl(params?.type ?? 'any');
+		const type = params?.type ?? 'any';
+		let controlType = params?.options ? 'select' : assignControl(params?.type ?? 'any');
+		let options = params?.options;
+		if (!options && type.startsWith('geos_')) {
+			const geosSchema = this.factory?.xmlSchemas.get("geos");
+			const simpleType = geosSchema?.simpleTypeMap.get(type);
+			if (simpleType) {
+				controlType = 'select';
+				options = simpleType.options;
+			}
+		}
 		if (controlType) {
 			const inputControl = this.makeInputControl({
 				type: controlType,
 				...params?.control,
 				props: params?.props,
-				options: params?.options,
+				options,
 				socketType: params?.type ?? 'any',
 				datastructure: params?.datastructure ?? 'scalar',
 				initial: this.initialValues?.inputs?.[key] ?? params?.initial,

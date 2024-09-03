@@ -16,7 +16,8 @@ export type GraphPorts = {
 	datastructure: SocketDatastructure;
 	nodeId: string;
 	description?: string;
-	priority?: number
+	priority?: number;
+	default?: unknown;
 }[];
 
 /** Visual programming graph save data structure . */
