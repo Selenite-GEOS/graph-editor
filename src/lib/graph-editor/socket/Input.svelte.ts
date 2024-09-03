@@ -8,7 +8,6 @@ export class Input<S extends Socket = Socket>
 	implements ClassicPreset.Input<S>
 {
 	public readonly isRequired: boolean;
-	public index = $state<number>();
 	// showControl: boolean = $state(true);
 	/**
 	 * Control instance
@@ -25,12 +24,10 @@ export class Input<S extends Socket = Socket>
 		alwaysShowLabel?: boolean;
 		hideLabel?: boolean
 		isRequired?: boolean;
-		index?: number;
 	}) {
 		super(params);
 		this.alwaysShowLabel = params.alwaysShowLabel ?? false;
 		this.hideLabel = params.hideLabel ?? false;
-		this.index = params.index;
 		this.isRequired = params.isRequired ?? false;
 	}
 

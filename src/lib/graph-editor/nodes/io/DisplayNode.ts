@@ -40,7 +40,7 @@ export class DisplayNode extends Node<
 		});
 	}
 
-	data(inputs?: { input: string } | undefined): SocketsValues<{}> {
+	async data(inputs?: { input: string } | undefined): SocketsValues<{}> {
 		const inputValue = this.getData('input', inputs);
 		this.controls.display.value =
 			typeof inputValue === 'string' ? inputValue : inputValue instanceof XMLData ? inputValue.toXml() :  JSON.stringify(inputValue);

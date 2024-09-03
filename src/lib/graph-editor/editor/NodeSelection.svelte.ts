@@ -133,8 +133,8 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	);
 
 	picked = $state<SelectorEntity>();
-	pickedNode = $derived(this.picked instanceof Node ? Node : undefined);
-	pickedConnection = $derived(this.picked instanceof Connection ? Connection : undefined);
+	pickedNode = $derived(this.picked instanceof Node ? this.picked : undefined);
+	pickedConnection = $derived(this.picked instanceof Connection ? this.picked : undefined);
 
 	entityElement(entity: SelectorEntity): HTMLElement | undefined {
 		const area = this.owner.area;

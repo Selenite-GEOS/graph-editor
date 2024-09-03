@@ -11,8 +11,8 @@ export * as IO from './io';
 export * as Control from './control';
 export * as XML from './XML';
 export * from './XML';
-export * as Macro from './MacroNode';
-export * from './MacroNode';
+export * as Macro from './MacroNode.svelte';
+export * from './MacroNode.svelte';
 
 // import * as API from './ObjectAPINode';
 // import * as API from './APINode';

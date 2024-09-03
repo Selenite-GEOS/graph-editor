@@ -19,7 +19,7 @@ import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/co
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
 import { downloadJSON, newUuid, XmlSchema, type SaveData } from '@selenite/commons';
-import { Modal } from '$graph-editor/plugins/modal';
+import { Modal, modals } from '$graph-editor/plugins/modal';
 import type {
 	BaseComponent,
 	ComponentParams,
@@ -35,6 +35,7 @@ import { NodeStorage } from '$graph-editor/storage';
 import { CodeIntegration } from './CodeIntegration.svelte';
 import type { ConnectionPlugin } from '$graph-editor/setup/ConnectionSetup';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
+import type { StoredGraph } from '$graph-editor/storage/types';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -232,11 +233,14 @@ export class NodeFactory implements ComponentSupportInterface {
 			}
 
 			await this.editor.addNode(node);
-			if (nodeSaveData.position && this.area)
+			if (nodeSaveData.position && this.area) {
 				this.area.translate(nodeSaveData.id, {
 					x: nodeSaveData.position.x,
 					y: nodeSaveData.position.y
 				});
+			} else if (this.area) {
+				console.error("Node doesn't have a position", nodeSaveData);
+			}
 			return node;
 		} else {
 			console.debug('Node class not found', nodeSaveData);
@@ -270,15 +274,39 @@ export class NodeFactory implements ComponentSupportInterface {
 		return AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes());
 	}
 
+	async openGraphForm() {
+		const GraphForm = (await import('$graph-editor/storage/GraphForm.svelte')).default;
+		const existingGraph = await NodeStorage.getGraph(this.editor.graphId);
+
+		modals.show({
+			component: GraphForm,
+			props: { editor: this.editor, existingGraph },
+			title: `${existingGraph ? 'Update' : 'Save'} Graph`,
+			buttons: ['cancel', 'submit'],
+			response: async (r) => {
+				if (!r || !(typeof r === 'object') || !('id' in r))
+					throw new ErrorWNotif('Graph form response not found');
+				const g = r as StoredGraph;
+				console.log('Saving graph to storage', g);
+				await NodeStorage.saveGraph(g);
+
+				this.notifications.success({
+					title: 'Graph Storage',
+					message: 'Graph saved!'
+				});
+			}
+		});
+	}
+
 	/**
 	 * Loads a graph from a save.
 	 * @param editorSaveData - Save data to load.
 	 */
 	async loadGraph(editorSaveData: NodeEditorSaveData) {
 		await this.bulkOperation(async () => {
-			console.log('Load graph :', editorSaveData.editorName);
+			console.log(`Load graph : ${editorSaveData.editorName} (id: ${editorSaveData.id})`);
 			await this.editor.clear();
-
+			this.editor.graphId = editorSaveData.id;
 			// Load variables
 			for (const v of Array.isArray(editorSaveData.variables)
 				? editorSaveData.variables
@@ -298,7 +326,7 @@ export class NodeFactory implements ComponentSupportInterface {
 					this.notifications.error({
 						message: `Failed to load node ${name}.`,
 						title: 'Graph Loading'
-					})
+					});
 				}
 			}
 
@@ -672,13 +700,6 @@ export class NodeFactory implements ComponentSupportInterface {
 		downloadJSON(this.editor.graphName, this.editor);
 	}
 
-	async saveToDB(): Promise<void> {
-		console.debug('Saving to DB');
-		await NodeStorage.saveGraph({
-			id: newUuid()
-		});
-	}
-
 	loadFromFile() {
 		const input = document.createElement('input');
 		input.type = 'file';
@@ -783,9 +804,13 @@ export class NodeFactory implements ComponentSupportInterface {
 		}
 	}
 
-	resetDataflow(node?: Node) {
+	async resetDataflow(node?: Node) {
 		if (!this.#isDataflowEnabled) return;
-		this.dataflowEngine.reset(node?.id);
-		this.runDataflowEngines();
+		if (node) {
+			if (this.dataflowCache.has(node)) this.dataflowEngine.reset(node.id);
+		} else {
+			this.dataflowEngine.reset();
+		}
+		await this.runDataflowEngines();
 	}
 }

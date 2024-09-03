@@ -95,7 +95,7 @@ export async function setupFullGraphEditor(
 		setups: [
 			...(params.setups ?? []),
 			setupConnections,
-			setupMinimap,
+			// setupMinimap,
 			({ editor }) => {
 				console.log('Setting up typed sockets plugin');
 				const typedSocketsPlugin = new TypedSocketsPlugin<Schemes>();

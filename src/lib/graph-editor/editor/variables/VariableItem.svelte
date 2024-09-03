@@ -13,6 +13,7 @@
 	import type { NodeFactory } from '../NodeFactory.svelte';
 	import { showContextMenu } from '$graph-editor/plugins';
 	import type { Point } from '@selenite/commons';
+	import { variableDragStart } from '$graph-editor/utils';
 
 	let v: Variable;
 	export { v as variable };
@@ -162,7 +163,7 @@
 				class:array={v.isArray}
 				title={v.type}
 				use:cssVars={{ color }}
-			/>
+			></div>
 		</button>
 		<button
 			type="button"
@@ -170,10 +171,7 @@
 			draggable="true"
 			on:pointerenter={() => v.highlighted = true}
 			on:pointerleave={() => v.highlighted =false }
-			on:dragstart={(e) => {
-				if (!e.dataTransfer) return;
-				e.dataTransfer.setData('application/graph-variable', JSON.stringify(v));
-			}}
+			on:dragstart={variableDragStart(v)}
 			class:outline-dashed={v.exposed}
 			class="font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
 			on:contextmenu|preventDefault|stopPropagation={(e) =>

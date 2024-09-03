@@ -1,9 +1,18 @@
 <script lang="ts">
-	import { isComponentModalSettings, isSnippetModalSettings, Modal, type ModalButton } from './modal.svelte';
+	import type { SvelteComponent } from 'svelte';
+	import {
+		isComponentModalSettings,
+		isSnippetModalSettings,
+		Modal,
+		type ComponentModalSettings,
+		type ModalButton
+	} from './modal.svelte';
 
-	const modal = Modal.instance;
+	let contentContainer = $state<HTMLElement>();
+	let childComponent = $state<SvelteComponent & { getResponse?: () => unknown }>();
+	const modals = Modal.instance;
 	let dialog = $state<HTMLDialogElement>();
-	let lastModal = $derived(modal.queue.at(-1));
+	let lastModal = $derived(modals.queue.at(-1));
 	let title = $derived(lastModal?.title);
 	let buttons = $derived(lastModal?.buttons);
 	let resolvedButtons: ModalButton[] | undefined = $derived(
@@ -14,59 +23,86 @@
 						case 'cancel':
 							return {
 								label: 'Cancel',
-								onclick: () => modal.close()
+								onclick: () => modals.close()
 							};
-						case 'close': 
+						case 'close':
 							return {
 								label: 'Close',
 								level: 'neutral',
-								onclick: () => modal.close()
+								onclick: () => modals.close()
 							};
-							
+						case 'submit':
+							return {
+								label: 'Submit',
+								level: 'primary',
+								onclick: () => {
+									if (contentContainer) {
+										const forms = contentContainer.querySelectorAll('form');
+										for (const form of forms) if (!form.reportValidity()) return;
+									}
+									const r = childComponent?.getResponse?.();
+									lastModal?.response?.(r);
+									modals.close();
+								}
+							};
 						default:
+							if ('formId' in btn) {
+								return {
+									label: 'Submit',
+									level: 'primary',
+									onclick: () => {
+										const form = document.getElementById(btn.formId) as HTMLFormElement;
+										if (form) {
+											form.requestSubmit();
+										}
+									}
+								};
+							}
 							return btn;
 					}
 				})
 	);
 	$effect(() => {
 		if (!dialog) return;
-		if (modal.queue.length > 0) {
+		if (modals.queue.length > 0) {
 			dialog.showModal();
 		}
 	});
 </script>
 
 {#if lastModal}
-	<dialog bind:this={dialog} class="modal" onclose={() => modal.close()}>
+	<dialog bind:this={dialog} class="modal" onclose={() => modals.close()}>
 		<div class="modal-box">
 			{#if title}
 				{#if typeof title === 'string'}
-					<h1>{title}</h1>
+					<h1 class="font-bold">{title}</h1>
 				{:else}
 					{@render title()}
 				{/if}
 			{/if}
-			<div>
+			<div bind:this={contentContainer}>
 				{#if isComponentModalSettings(lastModal)}
-					<lastModal.component {...lastModal?.props} modal={lastModal} />
+					<lastModal.component bind:this={childComponent} {...lastModal?.props} modal={lastModal} />
 				{:else if isSnippetModalSettings(lastModal)}
 					{@render lastModal.snippet(lastModal.props)}
 				{/if}
 			</div>
 			{#if resolvedButtons}
 				{#if lastModal.divider ?? true}
-				<div class="divider !mt-9"></div>
+					<div class="divider !mt-9"></div>
 				{/if}
-				<div class="modal-buttons modal-action">
+				<div class="modal-action">
 					{#each resolvedButtons as button}
 						<button
-						title={button.description}
-						class:btn-primary={button.level === 'primary'}
-						class:btn-secondary={button.level === 'secondary'}
-						class:btn-neutral={button.level === 'neutral'}
-						class:btn-warning={button.level === 'warning'}
-						class:btn-error={button.level === 'danger'}
-						 class="btn btn-neutral" onclick={() => button.onclick()}>{button.label}</button>
+							title={button.description}
+							class:btn-primary={button.level === 'primary'}
+							class:btn-secondary={button.level === 'secondary'}
+							class:btn-neutral={button.level === 'neutral'}
+							class:btn-warning={button.level === 'warning'}
+							class:btn-error={button.level === 'danger'}
+							class="btn btn-neutral"
+							onclick={() => button.onclick()}>{button.label}</button
+						>
 					{/each}
 				</div>
 			{/if}
@@ -83,11 +119,6 @@
 			width: 100%;
 			height: 100%;
 		}
-	}
-	.modal-buttons {
-		display: flex;
-		justify-content: flex-end;
-		gap: 1rem;
 	}
 
 	.divider {

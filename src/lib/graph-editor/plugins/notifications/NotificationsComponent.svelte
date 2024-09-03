@@ -22,7 +22,7 @@
 	{@const notif = displayedNotif.notif}
 	<article
 		role="alert"
-		class="alert shadow-lg w-[25rem]"
+		class="alert shadow-lg w-[25rem] overflow-clip"
 		out:fly={{ duration: notifications.hideAnimTime, x: 100 }}
 	>
 		<div
@@ -32,7 +32,7 @@
 				: 'oklch(var(--in))'};"
 		></div>
 		<div>
-			<h1 class="font-bold">{notif.title ?? 'Notification'}</h1>
+			<h1 class="font-bold truncate">{notif.title ?? 'Notification'}</h1>
 			<p class="text-wrap">
 				{#each (notif.message ?? '').split('\n') as line}
 					{line}
@@ -61,3 +61,13 @@
 		{/each}
 	</aside>
 </Portal>
+
+<style>
+	.alert {
+		grid-auto-flow: column;
+        grid-template-columns: auto minmax(auto, 1fr);
+        justify-items: start;
+        text-align: start;
+		max-width: 70vw;
+	}
+</style>

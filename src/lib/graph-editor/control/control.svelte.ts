@@ -119,7 +119,7 @@ export type InputControlParams<
 > = {
 	type: T;
 	datastructure: D;
-	options?: string[]
+	options?: string[];
 	initial?: SocketValueWithDatastructure<InputControlValueType<T>, D>;
 	readonly?: boolean;
 	props?: HTMLInputAttributes;
@@ -192,7 +192,7 @@ export class InputControl<
 		this.readonly = params.readonly ?? false;
 		this.label = params.label ?? '';
 		this.onChange = params.onChange;
-		this.#value = params.initial ?? getDatastructure(params);
+		this.value = params.initial ?? getDatastructure(params);
 		this.type = params.type;
 		this.changeType = params.changeType;
 		this.canChangeType = params.canChangeType ?? false;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Node, NodeConstructor } from '$graph-editor/nodes';
+	import { MacroNode, type Node, type NodeConstructor } from '$graph-editor/nodes';
 	import Ref from '$graph-editor/render/svelte/Ref.svelte';
 	import type { SvelteArea2D } from 'rete-svelte-plugin';
 	import type { Schemes } from '$graph-editor/schemes';
@@ -31,16 +31,18 @@
 		faAlignLeft,
 		faAlignRight,
 		faArrowsLeftRight,
-		faArrowsUpToLine
+		faArrowsUpToLine,
+		faCogs
 	} from '@fortawesome/free-solid-svg-icons';
 	import Fa from 'svelte-fa';
 
 	let { data: node, emit }: { data: Node; emit: (props: SvelteArea2D<Schemes>) => void } = $props();
 	const constructor = $derived(node.constructor as NodeConstructor);
 	let transitionEnabled = $state(false);
-	
+
 	const xmlNode = $derived(node instanceof XmlNode ? node : undefined);
 	const variableNode = $derived(node instanceof VariableNode ? node : undefined);
+	const macroNode = $derived(node instanceof MacroNode ? node : undefined);
 	// Avoid transitions on mount
 	$effect(() => {
 		setTimeout(() => {
@@ -163,6 +165,10 @@
 		floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined
 	);
 
+	$inspect(
+		'outputs',
+		node.sortedOutputs.map(([key, output]) => `${output.index}-${output.label}`)
+	);
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
@@ -309,6 +315,7 @@
 	}`}
 	on:pointerenter={() => (hovered = true)}
 	on:pointerleave={() => (hovered = false)}
+	on:pointerdown={() => window.getSelection()?.removeAllRanges()}
 	on:dblclick={(e) => {
 		stopPropagation(e);
 		node.factory?.centerView([node]);
@@ -325,8 +332,8 @@
 	}}
 	use:clickIfDrag={{
 		onclick(e) {
-			(floating.elements.reference as HTMLElement | undefined)?.blur()
-		},
+			(floating.elements.reference as HTMLElement | undefined)?.blur();
+		}
 	}}
 	on:keydown={(e) => {
 		if (!nameInput && e.key === 'Enter') {
@@ -356,6 +363,7 @@
 					<!-- svelte-ignore event_directive_deprecated -->
 					<button
 						type="button"
+						class:opacity-0={editingName}
 						class="cursor-text mb-2"
 						use:shortcut={{
 							ctrl: true,
@@ -417,7 +425,12 @@
 						/>
 					{/if}
 				</h1>
-				<aside class="col-start-2 row-span-full ms-4 max-h-0">
+				<aside class="relative col-start-2 row-span-full ms-4 max-h-0">
+					{#if macroNode}
+						<span class="absolute right-0 tooltip tooltip-left" data-tip="This is a macro-block, a block that executes a sub graph." title="">
+							<Fa icon={faCogs} class="ms-auto mt-0" />
+						</span>
+					{/if}
 					{#each node.sortedControls as [k, control]}
 						{#if control.placeInHeader}
 							{@render controlSnippet(control, {})}

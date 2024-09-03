@@ -1,6 +1,6 @@
 import { GitHubDataSource } from './datasources';
 import { IndexedDBSource } from './db.svelte';
-import type { Database, Datasource as DataSource, Graph } from './types';
+import {type StoredGraph, type Database, type Datasource as DataSource, type Graph } from './types';
 
 export class NodeStorage {
     static pullDataSourcesInterval = 5000
@@ -18,15 +18,19 @@ export class NodeStorage {
 	}
 
 	numGraphs = $state(0);
+	graphs = $state<StoredGraph[]>([])
 	private constructor() {
 		const { unsubscribe } = NodeStorage.mainStorage.numGraphs.subscribe((num) => {
 			this.numGraphs = num;
+		});
+		NodeStorage.mainStorage.graphs.subscribe((graphs) => {
+			this.graphs = graphs;
 		});
 		NodeStorage.updateLoop();
 
 		if (import.meta.hot) {
 			import.meta.hot.on('vite:beforeUpdate', () => {
-				unsubscribe();
+				// unsubscribe();
 				clearTimeout(NodeStorage.updateTimeout);
 			});
 		}
@@ -41,6 +45,10 @@ export class NodeStorage {
 
 	static get numGraphs() {
 		return NodeStorage.instance.numGraphs;
+	}
+
+	static get graphs() {
+		return NodeStorage.instance.graphs;
 	}
 
 	static getGraphs(): Promise<Graph[]> {

@@ -7,7 +7,7 @@ import { NodeFactory } from './NodeFactory.svelte';
 import wu from 'wu';
 import { _ } from '$lib/global/index.svelte';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-import { animationFrame, browser, type SaveData } from '@selenite/commons';
+import { animationFrame, browser, newUuid, type SaveData } from '@selenite/commons';
 import type { Schemes } from '$graph-editor/schemes';
 
 export type CommentSaveData = {
@@ -37,6 +37,17 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		this.graphName = name;
 	}
 	readonly name = 'Node Editor';
+
+	#graphId = $state(newUuid());
+	set graphId(id: string | undefined) {
+		if (!id) this.#graphId = newUuid();
+		else this.#graphId = id;
+	}
+
+	get graphId(): string {
+		return this.#graphId;
+	}
+
 	#graphName = $state('New Graph');
 	get graphName() {
 		return this.#graphName;
@@ -66,22 +77,35 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	id = newLocalId('node-editor');
 
 	nodesMap = new SvelteMap<string, Node>();
-	connectionsMap = new SvelteMap<string, Connection>();	
+	connectionsMap = new SvelteMap<string, Connection>();
 
 	get nodes() {
 		return this.getNodes();
 	}
 
+	selectedInputs = $derived(
+		Array.from(this.nodesMap.values())
+			.map((node) => ({ node, selected: node.selectedInputs }))
+			.filter(({ selected: inputs }) => inputs.length > 0)
+	);
+
+	selectedOutputs = $derived(
+		Array.from(this.nodesMap.values())
+			.map((node) => ({ node, selected: node.selectedOutputs }))
+			.filter(({ selected }) => selected.length > 0)
+	);
+
 	get connections() {
 		return this.getConnections();
 	}
 
-	constructor() {
-		super()
+	constructor({ id }: { id?: string } = {}) {
+		super();
 		// @ts-expect-error delete base class properties
 		delete this.nodes;
 		// @ts-expect-error delete base class properties
 		delete this.connections;
+		this.graphId = id ?? newUuid();
 	}
 
 	/**
@@ -98,7 +122,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 	 * Gets all nodes.
 	 * @returns An array of all nodes in the editor
 	 */
-	getNodes():  Node[] {
+	getNodes(): Node[] {
 		return [...this.nodesMap.values()];
 	}
 
@@ -195,7 +219,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 
 	async addExecConnection(source: Node, target: Node): Promise<boolean> {
 		try {
-		return await this.addConnection(new Connection(source, 'exec', target, 'exec'));
+			return await this.addConnection(new Connection(source, 'exec', target, 'exec'));
 		} catch (e) {
 			console.error('Error adding connection', e);
 			return false;
@@ -217,12 +241,12 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		try {
 			const conn = new Connection(source_, sourceOutput, target_, targetInput);
 			conn.factory = this.factory;
-		 await this.addConnection(new Connection(source_, sourceOutput, target_, targetInput));
+			await this.addConnection(new Connection(source_, sourceOutput, target_, targetInput));
 			return conn;
 		} catch (e) {
 			console.error(
 				'Error adding connection',
-				source_.label + (source_.name ? '-' + source_.name  : ''),
+				source_.label + (source_.name ? '-' + source_.name : ''),
 				sourceOutput,
 				target_.label + (target_.name ? '-' + target_.name : ''),
 				targetInput,
@@ -277,7 +301,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return true;
 	}
 
-	clearing = $state(false)
+	clearing = $state(false);
 
 	async clear() {
 		if (this.nodesMap.size === 0) return true;
@@ -288,7 +312,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		this.clearing = true;
 		if (browser) {
 			document.body.style.cursor = 'wait';
-			await animationFrame(2)
+			await animationFrame(2);
 		}
 
 		for (const connection of this.connectionsMap.values()) await this.removeConnection(connection);
@@ -296,7 +320,6 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 
 		if (browser) {
 			document.body.style.cursor = '';
-
 		}
 
 		await this.emit({ type: 'cleared' });
@@ -313,6 +336,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 		return {
 			editorName: this.graphName,
 			graphName: this.graphName,
+			id: this.graphId as string | undefined,
 			variables: variables as Record<string, Variable> | Variable[],
 			previewedNodes: Array.from(this.previewedNodes).map((node) => node.id),
 			nodes: this.getNodes().map((node) => node.toJSON()),

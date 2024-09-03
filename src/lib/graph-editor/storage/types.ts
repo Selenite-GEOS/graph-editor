@@ -3,8 +3,21 @@ import type {
 	ConnectionSaveData,
 	NodeEditorSaveData,
 	NodeSaveData
-} from '@selenite/graph-editor';
+} from '$graph-editor';
+import type { SocketType } from '$graph-editor/plugins/typed-sockets';
+import type { SocketDatastructure } from '$graph-editor/socket';
+import type { Variable } from '$graph-editor/variables';
 import type { Observable } from 'dexie';
+
+export type GraphPorts = {
+	key: string;
+	label: string;
+	type: SocketType;
+	datastructure: SocketDatastructure;
+	nodeId: string;
+	description?: string;
+	priority?: number
+}[];
 
 /** Visual programming graph save data structure . */
 export interface Graph {
@@ -14,29 +27,20 @@ export interface Graph {
 	name?: string;
 	/** Description of the graph. */
 	description?: string;
+
+	/** Data of the graph. */
+	graph: NodeEditorSaveData;
+
 	/** Author of the graph. */
-	author?: {
-		id: string;
-		name?: string;
-	};
+	author?: string;
 	/** Public visibility of the graph. */
 	public?: boolean;
-	/** Nodes of the graph. */
-	nodes?: NodeSaveData[];
-	/** Connections of the graph. */
-	connections?: ConnectionSaveData[];
-	/** Comments of the graph. */
-	comments?: CommentSaveData[];
-	/** Variables of the graph. */
-	variables?: NodeEditorSaveData['variables'];
 	/** Version of the graph. */
 	version?: number;
 	/** Date of the last modification. */
 	updatedAt?: Date;
 	/** Date of creation. */
 	createdAt?: Date;
-	/** User IDs who added this graph to their favorites. */
-	favoriteOf?: string[];
 	/** Version of the GEOS schema. */
 	schemaVersion?: string;
 	/** Search tags of the graph. */
@@ -45,8 +49,13 @@ export interface Graph {
 	/** Menu path. */
 	path?: string[];
 
+	inputs?: GraphPorts;
+	outputs?: GraphPorts;
+	variables?: {keep?: boolean, label?: string, id: string, description?: string, priority?: number}[]
 	// TODO: input props, output props
 }
+
+export interface StoredGraph extends Graph {}
 
 export interface Datasource {
 	getGraphs(): Promise<Graph[]>;
@@ -54,8 +63,9 @@ export interface Datasource {
 
 export interface Database extends Datasource {
 	clearGraphs(): Promise<void>;
-    getGraph(id: string): Promise<Graph | undefined>;
-    saveGraph(graph: Graph): Promise<string>;
+	getGraph(id: string): Promise<Graph | undefined>;
+	saveGraph(graph: Graph): Promise<string>;
 	saveGraphs(graphs: Graph[]): Promise<string>;
 	numGraphs: Observable<number>;
+	graphs: Observable<StoredGraph[]>;
 }

@@ -3,7 +3,16 @@
  * @module
  */
 
-import { description, registerConverter, registerNode, tags, type NodeParams } from '$graph-editor/nodes/Node.svelte';
+import {
+	description,
+	Node,
+	registerConverter,
+	registerNode,
+	tags,
+	type NodeParams,
+	type SocketsValues
+} from '$graph-editor/nodes/Node.svelte';
+import type { Scalar } from '$graph-editor/socket';
 import { ConverterNode, InputControlNode } from './common-data-nodes.svelte';
 
 /**
@@ -18,7 +27,6 @@ export class NumberNode extends InputControlNode<'number'> {
 	}
 }
 
-
 @registerNode('number.ToString')
 @description('Converts a number to a string.')
 @registerConverter('number', 'string')
@@ -30,8 +38,8 @@ export class ToStringNode extends ConverterNode<'number', 'string'> {
 			...params,
 			source: 'number',
 			target: 'string',
-			convert: (e) => String(e),
-		})
+			convert: (e) => String(e)
+		});
 	}
 }
 
@@ -46,8 +54,8 @@ export class FloorNode extends ConverterNode<'number', 'integer'> {
 			...params,
 			source: 'number',
 			target: 'integer',
-			convert: (e) => Math.floor(e),
-		})
+			convert: (e) => Math.floor(e)
+		});
 	}
 }
 
@@ -62,8 +70,8 @@ export class CeilNode extends ConverterNode<'number', 'integer'> {
 			...params,
 			source: 'number',
 			target: 'integer',
-			convert: (e) => Math.ceil(e),
-		})
+			convert: (e) => Math.ceil(e)
+		});
 	}
 }
 
@@ -78,8 +86,8 @@ export class RoundNode extends ConverterNode<'number', 'integer'> {
 			...params,
 			source: 'number',
 			target: 'integer',
-			convert: (e) => Math.round(e),
-		})
+			convert: (e) => Math.round(e)
+		});
 	}
 }
 
@@ -94,11 +102,10 @@ export class ParseNode extends ConverterNode<'string', 'number'> {
 			...params,
 			source: 'string',
 			target: 'number',
-			convert: (e) => parseFloat(e),
-		})
+			convert: (e) => parseFloat(e)
+		});
 	}
 }
-
 
 @registerNode('number.ToBool')
 @description('Converts a number to a boolean.')
@@ -111,7 +118,31 @@ export class ToBoolNode extends ConverterNode<'number', 'boolean'> {
 			...params,
 			source: 'number',
 			target: 'boolean',
-			convert: (e) => Boolean(e),
-		})
+			convert: (e) => Boolean(e)
+		});
+	}
+}
+
+@registerNode('number.Multiply')
+@description('Multiplies two numbers.')
+@tags('multiply', 'x', '*')
+export class MultiplyNode extends Node<
+	{ a: Scalar<'number'>; b: Scalar<'number'> },
+	{ value: Scalar<'number'> }
+> {
+	constructor(params: NodeParams = {}) {
+		super({ label: 'Multiply', ...params });
+		this.addInData('a', {
+			type: 'number'
+		});
+		this.addInData('b', {
+			type: 'number'
+		});
+		this.addOutData('value', {
+			type: 'number'
+		});
+	}
+	data(inputs?: SocketsValues<{ a: Scalar<'number'>; b: Scalar<'number'>; }> | undefined): SocketsValues<{ value: Scalar<'number'>; }> {
+		return {value: this.getData('a', inputs) * this.getData('b', inputs)};
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@selenite/graph-editor",
-	"version": "0.0.140",
+	"version": "0.0.142",
 	"homepage": "https://selenite-geos.github.io/docs/developper/components/#graph-editor",
 	"repository": "github:Selenite-GEOS/graph-editor",
 	"license": "MIT",
@@ -38,8 +38,8 @@
 		"!dist/**/*.spec.*"
 	],
 	"peerDependencies": {
-		"svelte": "^5.0.0-next.242",
-		"@selenite/commons": "^0.22.5",
+		"svelte": "^5.0.0-next.243",
+		"@selenite/commons": "^0.22.10",
 		"@fortawesome/free-regular-svg-icons": "^6.6.0",
 		"@fortawesome/free-solid-svg-icons": "^6.6.0"
 	},
@@ -47,12 +47,12 @@
 		"@sveltejs/adapter-static": "^3.0.4",
 		"@sveltejs/kit": "^2.5.25",
 		"@sveltejs/package": "^2.3.4",
-		"@sveltejs/vite-plugin-svelte": "3.1.1",
+		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"@types/color": "^3.0.6",
 		"@types/d3-shape": "^3.1.6",
 		"@types/eslint": "^9.6.1",
 		"@types/lodash-es": "^4.17.12",
-		"@types/node": "^22.5.1",
+		"@types/node": "^22.5.2",
 		"@types/uuid": "^10.0.0",
 		"@types/wu": "^2.1.44",
 		"daisyui": "^4.12.10",

@@ -32,4 +32,6 @@ export class IndexedDBSource implements Database {
 	}
 
 	numGraphs = liveQuery(() => db.graphs.count());
+
+	graphs = liveQuery(() => db.graphs.toArray());
 }

@@ -76,10 +76,7 @@ export const converters = new Map<SocketType, Map<SocketType, NodeConstructor>>(
 /**
  * Registers a converter node.
  */
-export function registerConverter<S extends DataType, T extends DataType>(
-	source: S,
-	target: T
-) {
+export function registerConverter<S extends DataType, T extends DataType>(source: S, target: T) {
 	return function (nodeClass: typeof ConverterNode<S, T>) {
 		console.debug(`Registering converter from ${source} to ${target}`);
 		if (!converters.has(source)) converters.set(source, new Map());
@@ -263,13 +260,14 @@ export class Node<
 		this.#width = w;
 		this.emitResized();
 	}
-	
+
 	async emitResized() {
 		this.area?.emit({
 			type: 'noderesized',
 			data: { id: this.id, size: { height: this.height, width: this.width } }
 		});
 	}
+
 	// updateConnections() {
 	// 	console.debug("update conns")
 	// 	for (const conn of this.getConnections()) {
@@ -320,11 +318,19 @@ export class Node<
 	);
 	outputs: { [key in keyof Outputs]?: Output<Exclude<Outputs[key], undefined>> | undefined } =
 		$state({});
+
 	controls = $state<Controls>({} as Controls);
 	needsProcessing = $state(false);
 	sortedInputs = $derived(sortedByIndex(Object.entries(this.inputs)) as [string, Input<Socket>][]);
 	sortedOutputs = $derived(
 		sortedByIndex(Object.entries(this.outputs)) as [string, Output<Socket>][]
+	);
+
+	selectedInputs = $derived(
+		Object.entries(this.inputs as Record<string, Input>).filter(([_, i]) => i?.socket.selected)
+	);
+	selectedOutputs = $derived(
+		Object.entries(this.outputs as Record<string, Output>).filter(([_, o]) => o?.socket.selected)
 	);
 	sortedControls = $derived(sortedByIndex(Object.entries(this.controls)) as [string, Control][]);
 	readonly pythonComponent: PythonNodeComponent;
@@ -376,8 +382,6 @@ export class Node<
 			this.name = params.name;
 		}
 
-		
-
 		this.initialValues =
 			params.initialValues === undefined
 				? undefined
@@ -390,7 +394,7 @@ export class Node<
 			this.state = {
 				...this.state,
 				...params.state
-			}
+			};
 		}
 
 		Node.nodeCounts++;
@@ -478,11 +482,14 @@ export class Node<
 		return null;
 	}
 
-	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(componentClass: new (params: P) => C, params: Omit<P, keyof ComponentParams>): C {
+	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(
+		componentClass: new (params: P) => C,
+		params: Omit<P, keyof ComponentParams>
+	): C {
 		const component = new componentClass({
 			owner: this as unknown as Node<Inputs, Outputs>,
 			...params
-		} as P & {owner: Node<Inputs, Outputs>});
+		} as P & { owner: Node<Inputs, Outputs> });
 		this.components.push(component);
 		return component;
 	}
@@ -699,6 +706,7 @@ export class Node<
 			type: Outputs[K]['type'];
 			isArray?: boolean;
 			label?: string;
+			index?: number;
 			description?: string;
 		}
 	) {
@@ -713,7 +721,11 @@ export class Node<
 				node: this,
 				displayLabel: params.showLabel
 			}),
-			label: (params.showLabel ?? true) ? (params.label ?? (key !== 'value'  && key !== 'result' ? capitalize(key) : undefined)) : undefined,
+			index: params.index,
+			label:
+				(params.showLabel ?? true)
+					? (params.label ?? (key !== 'value' && key !== 'result' ? capitalize(key) : undefined))
+					: undefined,
 			description: params.description
 		});
 		this.addOutput(key, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
@@ -769,12 +781,14 @@ export class Node<
 			alwaysShowLabel: params?.alwaysShowLabel,
 			index: params?.index,
 			description: params?.description,
-			multipleConnections: params?.datastructure === 'array' || params?.type?.startsWith('xmlElement') && params.datastructure === 'array',
+			multipleConnections:
+				params?.datastructure === 'array' ||
+				(params?.type?.startsWith('xmlElement') && params.datastructure === 'array'),
 			isRequired: params?.isRequired,
-			label: params?.label ?? (key !== 'value'  && key !== 'result' ? (key as string) : undefined)
+			label: params?.label ?? (key !== 'value' && key !== 'result' ? (key as string) : undefined)
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
-		const controlType = params?.options  ? 'select': assignControl(params?.type ?? 'any');
+		const controlType = params?.options ? 'select' : assignControl(params?.type ?? 'any');
 		if (controlType) {
 			const inputControl = this.makeInputControl({
 				type: controlType,
@@ -818,6 +832,7 @@ export class Node<
 			...params,
 			onChange: (v) => {
 				this.processDataflow();
+
 				if (params.onChange) {
 					params.onChange(v);
 				}
@@ -854,6 +869,8 @@ export class Node<
 
 	processDataflow = () => {
 		if (!this.editor) return;
+
+		// console.log("cache", Array.from(f.dataflowCache.keys()));
 		// this.needsProcessing = true;
 		try {
 			for (const n of structures(this.editor).successors(this.id).nodes()) {
@@ -880,22 +897,21 @@ export class Node<
 
 	getData<K extends DataSocketsKeys<Inputs>>(
 		key: K,
-		inputs?: Record<keyof Inputs, unknown[]>
+		inputs?: Record<keyof Inputs, unknown | unknown[]>
 	): SocketValueWithDatastructure<SocketValueType<Inputs[K]['type']>, Inputs[K]['datastructure']> {
 		type Res = SocketValueWithDatastructure<
 			SocketValueType<Inputs[K]['type']>,
 			Inputs[K]['datastructure']
 		>;
 
-		
 		if (inputs && key in inputs) {
 			const isArray = this.inputs[key]?.socket.datastructure === 'array';
-			const checkedInputs = inputs as {[key in K]: unknown[]};
+			const checkedInputs = inputs as { [key in K]: unknown[] };
 			// Data is an array because there can be multiple connections
 			const data = checkedInputs[key];
 			// console.log(checkedInputs);
 			// console.log("get0", checkedInputs[key][0]);
-			
+
 			if (data.length > 1) {
 				return data.flat() as Res;
 			}
@@ -966,7 +982,7 @@ export class Connection<
 		const target = this.factory?.editor.getNode(this.target);
 		if (!source || !target) return true;
 		return source.visible && target.visible;
-});
+	});
 	get selected(): boolean {
 		return this.factory ? this.factory.selector.isSelected(this as SelectorEntity) : false;
 	}

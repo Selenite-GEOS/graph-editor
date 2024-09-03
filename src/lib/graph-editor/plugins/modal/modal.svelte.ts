@@ -11,15 +11,16 @@ export type ModalButton = {
 export type ModalButtonSettings =
 	ModalButton 
 	| 'cancel'
-	| 'close';
+	| 'close' | 'submit' | { formId: string};
 export type BaseModalSettings = {
 	divider?: boolean;
 	title?: string | Snippet;
 	buttons?: ModalButtonSettings[];
+	response?: (r: unknown) => void;
 };
 
 export type ComponentModalSettings<Props extends Record<string, any> = {}> = {
-	component: Component<Props & { modal: ComponentModalSettings }>;
+	component: Component<Props & { modal: ComponentModalSettings }, {getResponse?: () => unknown}>;
 	props: Props;
 } & BaseModalSettings;
 

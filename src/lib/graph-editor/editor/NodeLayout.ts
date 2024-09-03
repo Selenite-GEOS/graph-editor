@@ -43,9 +43,9 @@ export class NodeLayout extends BaseComponent<NodeFactory> {
 				h: node.height,
 				w: node.width
 			});
-			// if (node === pickedNode) {
-			// 	refPos = i;
-			// }
+			if (node === pickedNode) {
+				refPos = i;
+			}
 		}
 		return { rects, refPos };
 	}
