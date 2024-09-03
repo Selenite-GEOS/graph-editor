@@ -276,7 +276,8 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 
 	selectAll() {
 		const editor = this.owner.editor;
-		wu.chain<SelectorEntity>(editor.nodesArray, editor.connectionsArray).forEach((e) => this.entities.add(e));
+		this.selectMultiple(this.owner.nodes);
+		// wu.chain<SelectorEntity>(editor.nodesArray, editor.connectionsArray).forEach((e) => this.entities.add(e));
 		// this.comment?.comments.forEach((comment) => {
 		// 	this.comment?.select(comment.id);
 		// });
