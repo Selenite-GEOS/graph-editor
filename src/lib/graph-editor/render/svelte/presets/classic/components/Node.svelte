@@ -297,7 +297,7 @@
 	class:text-primary={false && node.needsProcessing}
 	class:transition-all={transitionEnabled}
 	class:opacity-0={!node.visible}
-	class={`relative border-base-content border-opacity-10 group border dborder-opacity-0 overflow-hidden bg-opacity-85 rounded-box focus-visible:outline-none 
+	class={`relative border-base-content border-opacity-10 group border dborder-opacity-0 overflow-hidden hover:overflow-visible bg-opacity-85 rounded-box focus-visible:outline-none 
 	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + 'border-opacity-100 focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
 	${node.previewed ? 'previewed' : ''}
 	${variableNode ? '!rounded-full' : ''}
