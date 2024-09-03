@@ -101,7 +101,7 @@
 	let focusableInput = $state<HTMLInputElement>();
 	$effect(() => {
 		if (focus) {
-			console.log('Focus', focusableInput);
+			// console.log('Focus', focusableInput);
 			focusableInput?.focus();
 		}
 	});
@@ -226,9 +226,7 @@
 								return inputControl.socketType;
 							},
 							onChange: (v) => {
-								console.log('a');
 								inputControl.value[i] = $state.snapshot(v);
-								console.log('b');
 								const res = $state.snapshot(array);
 								res[i] = v;
 								// @ts-expect-error Ignore type error

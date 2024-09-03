@@ -74,16 +74,17 @@
 		console.log('create');
 		$collapsed = false;
 		const id = newUuid('variable');
-
+		const type = $defaultVariableType;
+		const isArray = $defaultVariableArray;
 		const redo = () => {
 			nVarsCreated += 1;
 			if (variables === undefined) return;
 			variables[id] = {
 				name: `variable${nVarsCreated}`,
 				exposed: false,
-				isArray: false,
+				isArray,
 				value: undefined,
-				type: $defaultType,
+				type,
 				highlighted: false,
 				id
 			};
@@ -99,9 +100,8 @@
 		redo();
 	}
 
-	let defaultType: Writable<DataType> = persisted('defaultVariableType', 'string', {
-		storage: 'session'
-	});
+	const defaultVariableType = persisted('defaultVariableType', 'number', {storage: 'session'});
+	const defaultVariableArray = persisted('defaultVariableArray', false, {storage: 'session'});
 
 	const scroll: Action = (node) => {
 		currentFlipDuration = 0;
@@ -218,10 +218,6 @@
 											}
 										});
 										deleteVariable(id);
-									}}
-									on:changetype={(e) => {
-										console.log('set default variable type', e.detail.type);
-										$defaultType = e.detail.type;
 									}}
 								/>
 							</li>

@@ -3,24 +3,26 @@
 	import cssVars from 'svelte-css-vars';
 	import Color from 'color';
 	import { _ } from '$lib/global';
-	import { createEventDispatcher, tick, untrack } from 'svelte';
-	import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
+	import { createEventDispatcher, untrack } from 'svelte';
+	import type { DataType } from '$graph-editor/plugins/typed-sockets';
 	import { assignControl, colorMap } from '$graph-editor/render/utils';
-	import { InputControl, type InputControlType } from '$graph-editor/control';
+	import { InputControl } from '$graph-editor/control';
 	import { InputControlComponent } from '$graph-editor/render';
 	import { modals, showContextMenu } from '$graph-editor/plugins';
-	import { preventDefault, sleep, stopPropagation, type Point } from '@selenite/commons';
+	import { persisted, preventDefault, sleep, stopPropagation, type Point } from '@selenite/commons';
 	import { variableDragStart } from '$graph-editor/utils';
 	import { createFloatingActions } from 'svelte-floating-ui';
 	import { upperFirst } from 'lodash-es';
 	import { flip } from 'svelte-floating-ui/core';
-	import type { SocketDatastructure } from '$graph-editor/socket';
-
+	
 	interface Props {
 		variable: Variable;
 	}
 
 	let { variable: v = $bindable() }: Props = $props();
+
+		const defaultVariableType = persisted('defaultVariableType', 'number', {storage: 'session'});
+	const defaultVariableArray = persisted('defaultVariableArray', false, {storage: 'session'});
 
 	const dispatch = createEventDispatcher<{
 		changetype: { type: DataType };
@@ -54,25 +56,11 @@
 	});
 
 	const controlType = assignControl(v.type) ?? 'text';
-	let currentDatastructure: SocketDatastructure | undefined;
-	let currentDataType: SocketType | undefined;
-	// console.debug('Creating input control');
-	// if (!controlType) {
-	// 	console.error(`Control type not found for ${v.type}`);
-	// 	return;
-	// }
-	// untrack(() => {
-	// 	if (currentDatastructure === 'scalar' && v.isArray) {
-	// 		v.value = [v.value];
-	// 	} else if (currentDatastructure === 'array' && !v.isArray) {
-	// 		v.value = v.value[0];
-	// 	}
-	// currentDatastructure = v.isArray ? 'array' : 'scalar';
+
 	const inputControl = new InputControl({
 		type: controlType,
 		datastructure: v.isArray ? 'array' : 'scalar',
 		socketType: v.type,
-		// @ts-expect-error Ignore type error
 		initial: $state.snapshot(v.value),
 		onChange: (val) => {
 			console.debug('change', v.id, val);
@@ -157,6 +145,7 @@
 						onclick={() => {
 							v.type = type;
 							displayTypeSelection = false;
+							$defaultVariableType = type;
 						}}
 					>
 						<div
@@ -174,6 +163,7 @@
 					onclick={() => {
 						v.isArray = !v.isArray;
 						displayTypeSelection = false;
+						$defaultVariableArray = v.isArray;
 					}}
 				>
 					<div
