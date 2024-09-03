@@ -12,7 +12,7 @@
 	import { InputControlComponent } from '$graph-editor/render';
 	import type { NodeFactory } from '../NodeFactory.svelte';
 	import { modals, showContextMenu } from '$graph-editor/plugins';
-	import type { Point } from '@selenite/commons';
+	import { sleep, type Point } from '@selenite/commons';
 	import { variableDragStart } from '$graph-editor/utils';
 	import { createFloatingActions } from 'svelte-floating-ui';
 	import { upperFirst } from 'lodash-es';
@@ -177,6 +177,7 @@
 				<li>
 					<button
 						class="btn btn-sm"
+						on:focus={() => (displayTypeSelection = true)}
 						on:click={() => {
 							v.type = type;
 							displayTypeSelection = false;
@@ -215,6 +216,14 @@
 			class="btn px-0 pb-0 py-1"
 			use:changeTypeRef
 			on:click={() => (displayTypeSelection = !displayTypeSelection)}
+			on:blur={() => {
+				const listener = async () => {
+					await sleep();
+					displayTypeSelection = false;
+					document.removeEventListener('pointerup', listener);
+				}
+				document.addEventListener('pointerup', listener) ;
+			}}
 		>
 			<div
 				class:rectangle-3d={!v.isArray}
