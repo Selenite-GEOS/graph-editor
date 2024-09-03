@@ -53,9 +53,11 @@ export class XMLData {
 			xml += '>';
 			try {
 				this.children.forEach((child) => {
+					if (!child) return;
 					xml += child.toXml();
 				});
 			} catch (e) {
+				console.error(e)
 				throw new ErrorWNotif('Error generating XML, are you sure you connected everything ?');
 			}
 			xml += `</${this.tag}>`;

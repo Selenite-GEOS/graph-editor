@@ -5,9 +5,10 @@ import {
 	type NodeParams,
 	type SocketsValues
 } from '$graph-editor/nodes/Node.svelte';
-import { capitalize, getVarsFromFormatString } from '$lib/utils/string';
+import { getVarsFromFormatString } from '$lib/utils/string';
 import type { Scalar, Socket } from '$graph-editor/socket';
 import type { DataType } from '$graph-editor/plugins/typed-sockets';
+import { upperFirst } from 'lodash-es';
 
 export type FormatNodeParams = NodeParams & {
 	vars?: Record<string, unknown>;
@@ -104,7 +105,7 @@ export class FormatNode extends Node<
 						// const varData = this.getData(varName, inputs);
 						anyChange = true;
 						this.addInData(key, {
-							label: capitalize(varName),
+							label: upperFirst(varName),
 							alwaysShowLabel: true,
 							type: this.varsType,
 						});

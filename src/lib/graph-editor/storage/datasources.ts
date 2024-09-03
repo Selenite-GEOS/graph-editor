@@ -26,7 +26,7 @@ export class GitHubDataSource implements Datasource {
         const fs = await getFs();
         const {clone, pull} = await import('isomorphic-git');
         const http = await import("isomorphic-git/http/web")
-		console.debug('Getting graphs from GitHub', this.url.toString());
+		// console.debug('Getting graphs from GitHub', this.url.toString());
 		const url = this.url;
 		const pathname = url.pathname;
 		const pathParts = pathname.split('/');
@@ -37,7 +37,7 @@ export class GitHubDataSource implements Datasource {
         const dir = `/${username}-${repo}`;
         try {
             const stat = await fs.promises.stat(dir)
-            console.debug('Pulling repo', repoUrl)
+            // console.debug('Pulling repo', repoUrl)
             await pull({
                 fs,
                 http,
@@ -49,7 +49,7 @@ export class GitHubDataSource implements Datasource {
                 
             })
         } catch (e) {
-            console.debug('Cloning repo', repoUrl)
+            // console.debug('Cloning repo', repoUrl)
             await clone({
                 fs,
                 http,
@@ -71,7 +71,7 @@ export class GitHubDataSource implements Datasource {
                 console.error("Invalid JSON at", menuPath)
                 continue;
             }
-            console.debug("Read", menuPath, parsed)
+            // console.debug("Read", menuPath, parsed)
             if (path.endsWith("index.json")) {
                 console.log("folder description", )
                 continue;

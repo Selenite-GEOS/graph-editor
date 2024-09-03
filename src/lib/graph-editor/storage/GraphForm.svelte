@@ -74,6 +74,9 @@
 					let value: unknown
 					if (side === 'input') {
 						value = await node.getDataWithInputs(key);
+						if (typeof value === "object") {
+							value = JSON.stringify(value);
+						}
 					}
 					res.push({
 						nodeId,

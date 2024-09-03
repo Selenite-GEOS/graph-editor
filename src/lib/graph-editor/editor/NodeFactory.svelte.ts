@@ -791,8 +791,14 @@ export class NodeFactory implements ComponentSupportInterface {
 			this.editor
 				.getNodes()
 				// .filter((n) => n instanceof AddNode || n instanceof DisplayNode)
-				.forEach((n) => {
-					this.dataflowEngine.fetch(n.id);
+				.forEach(async (n) => {
+					try {
+					await this.dataflowEngine.fetch(n.id);
+					} catch(e) {
+						const err = e as Error
+						if (err.message === 'cancelled') return;
+						console.error(e)
+					}
 					this.dataflowEngine.cache.get(n.id)?.then((res) => {
 						// console.log('Dataflow engine finished', n.label, res);
 						this.dataflowCache.set(n, res);

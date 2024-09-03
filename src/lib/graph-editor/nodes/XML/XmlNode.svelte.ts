@@ -7,7 +7,6 @@ import {
 	type SocketsValues
 } from '$graph-editor/nodes/Node.svelte';
 import type { XmlAttributeDefinition } from './types';
-import { camlelcaseize } from '$lib/utils/string';
 import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 import { XMLData } from './XMLData';
 import {
@@ -22,6 +21,7 @@ import 'regenerator-runtime/runtime';
 import wu from 'wu';
 import { formatXml } from '$utils';
 import {
+	camlelcaseize,
 	ComplexType,
 	getSharedString,
 	singular,
@@ -157,7 +157,7 @@ export class XmlNode extends Node<
 	childrenSockets = new Map<string, string>();
 	complex: ComplexType;
 	outLabel: string;
-	typePaths: string[][] | 'infinite' = $state();
+	typePaths: string[][] | 'infinite' | undefined = $state();
 	// isMesh = $derived(
 	// 	this.typePaths &&
 	// 		this.typePaths !== 'infinite' &&

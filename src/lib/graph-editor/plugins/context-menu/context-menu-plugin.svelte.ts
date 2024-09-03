@@ -1,10 +1,7 @@
-import { capitalizeWords } from '$utils/string';
 import { type Setup } from '$graph-editor/setup/Setup';
 import { _ } from '$lib/global/index.svelte';
 import { NodeFactory } from '$graph-editor/editor';
 import { Node, nodeRegistry } from '$graph-editor/nodes';
-import { get } from 'svelte/store';
-import wu from 'wu';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
 import type { Position } from '$graph-editor/common';
 import type { MenuItem } from './types';
@@ -14,17 +11,14 @@ import '../../nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { VariableNode, XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
 import {
-	getSharedString,
-	newLocalId,
-	singular,
+	localId,
 	XmlSchema,
-	type XMLTypeTree
+	type XMLTypeTree,
+	capitalizeWords
 } from '@selenite/commons';
-import type { XmlAttributeDefinition } from '$graph-editor/nodes/XML/types';
 import { areTypesCompatible } from '../typed-sockets';
 import type { SocketData } from 'rete-connection-plugin';
 import { ContextMenu } from './context-menu.svelte';
-import { tick } from 'svelte';
 
 export type NodeMenuItem<NC extends typeof Node = typeof Node
 > = {
@@ -186,7 +180,7 @@ export function getMenuItemsFromNodeItems({
 
 	for (const { description, label, path, tags, nodeClass, params } of nodeItems) {
 		res.push({
-			id: newLocalId(nodeClass.id.replaceAll('.', '-')),
+			id: localId(nodeClass.id.replaceAll('.', '-')),
 			description,
 			label,
 			path,

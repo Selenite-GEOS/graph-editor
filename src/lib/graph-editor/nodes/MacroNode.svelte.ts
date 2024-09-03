@@ -69,7 +69,6 @@ class OutExecNode extends Node {
 	}
 }
 
-
 function makeMacroKey(microKey: string, nodeId: string): string {
 	return microKey + '¤' + nodeId;
 }
@@ -114,7 +113,7 @@ export class MacroNode extends Node {
 		}
 
 		// Add variables inputs
-		for (const {keep, id, description, label, priority} of graph.variables ?? []) {
+		for (const { keep, id, description, label, priority } of graph.variables ?? []) {
 			if (!keep) continue;
 			const v = this.macroEditor.variables[id];
 			const controlType = assignControl(v.type);
@@ -146,11 +145,16 @@ export class MacroNode extends Node {
 		if (graph.inputs) {
 			for (const i of graph.inputs) {
 				const macroKey = makeMacroKey(i.key, i.nodeId);
-				this.macroInputs[macroKey] =  this.addInData(macroKey, {
+				let initial = i.default;
+				if (typeof i.default === 'string')
+				try {
+					initial = JSON.parse(i.default);
+				} catch(e) {}
+				this.macroInputs[macroKey] = this.addInData(macroKey, {
 					label: i.label,
 					type: i.type,
-					initial: i.default,
-					index:  i.priority,
+					initial,
+					index: i.priority,
 					description: i.description,
 					datastructure: i.datastructure,
 					isRequired: true,
@@ -169,7 +173,7 @@ export class MacroNode extends Node {
 			for (const o of graph.outputs) {
 				const macroKey = makeMacroKey(o.key, o.nodeId);
 				this.addOutData(macroKey, {
-					index: typeof o.priority !== "undefined" ? -o.priority : undefined,
+					index: typeof o.priority !== 'undefined' ? -o.priority : undefined,
 					label: upperFirst(o.label),
 					description: o.description,
 					type: o.type,
@@ -242,18 +246,21 @@ export class MacroNode extends Node {
 					}
 					// console.log("loop microMacroNode", microMacroNode)
 					inputNode = microMacroNode.inputNodes[microKey + '¤' + microNodeId];
-					console.log('Deleting micro macro input', microKey + '¤' + microNodeId);
+					// console.log('Deleting micro macro input', microKey + '¤' + microNodeId);
 					delete microMacroNode.macroInputs[key];
-					console.log('micromacro macro inputs', microMacroNode.macroInputs);
+					// console.log('micromacro macro inputs', microMacroNode.macroInputs);
 				} else {
 					inputNode = await this.macroFactory.addNode(InputNode, {
-						isArray: input.socket.datastructure === "array"
+						isArray: input.socket.datastructure === 'array'
 					});
 					if (!inputNode) throw new Error('Failed to add input node ' + macroKey);
-					for (const conn of [...node.ingoingDataConnections[key] ?? [], ...node.ingoingExecConnections[key] ?? []]) {
+					for (const conn of [
+						...(node.ingoingDataConnections[key] ?? []),
+						...(node.ingoingExecConnections[key] ?? [])
+					]) {
 						await this.macroEditor.removeConnection(conn.id);
 					}
-					
+
 					await this.macroEditor.addNewConnection(inputNode, 'value', node, key);
 				}
 
@@ -310,7 +317,7 @@ export class MacroNode extends Node {
 				node.socketSelectionComponent.selectedOutputs()
 			)) {
 				const macroKey = makeMacroKey(microKey, node.id);
-				console.log('macroKey', macroKey);
+				// console.log('macroKey', macroKey);
 				if (output.socket instanceof ExecSocket) {
 					this.addOutExec(macroKey, output.socket.name);
 					const execNode = await this.macroFactory.addNode(OutExecNode, {
@@ -350,7 +357,7 @@ export class MacroNode extends Node {
 		for (const key in variables) {
 			this.macroEditor.variables[key].value = this.getData(key, inputs);
 		}
-		
+
 		// Set macro input nodes values
 		for (const [macroKey, input] of Object.entries(this.macroInputs)) {
 			// console.log('setting input', macroKey, 'to', this.getData(macroKey, inputs));
@@ -359,24 +366,25 @@ export class MacroNode extends Node {
 		// Wait for states to update
 		await tick();
 		await this.macroFactory.resetDataflow();
-		await sleep()
+		await sleep();
 
 		const res: Record<string, unknown> = {};
 		for (const outputKey of Object.keys(this.outputs)) {
 			const [microOutputKey, microNodeId, ...microMacroNodeIds] = outputKey.split('¤');
-			
+
 			// In case of several nested macro nodes, find the appropriate micro factory to get the
 			// right data node
 			let macroFactory = this.macroFactory;
 			while (microMacroNodeIds.length > 0) {
 				const microMacroNodeId = microMacroNodeIds.pop() as string;
-				macroFactory = (macroFactory.getNode(microMacroNodeId) as MacroNode).macroFactory as NodeFactory;
+				macroFactory = (macroFactory.getNode(microMacroNodeId) as MacroNode)
+					.macroFactory as NodeFactory;
 			}
 			const microRes = await macroFactory.dataflowEngine.fetch(microNodeId);
 			// console.log(this.graph?.name, microNodeId,'microRes', microRes);
 			res[outputKey] = microRes[microOutputKey];
 		}
-		
+
 		// console.log(this.graph?.name, "macro out data", res)
 		return res;
 	}

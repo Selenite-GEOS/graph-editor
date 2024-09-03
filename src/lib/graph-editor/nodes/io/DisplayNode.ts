@@ -44,7 +44,7 @@ export class DisplayNode extends Node<
 		const inputValue = this.getData('input', inputs);
 		this.controls.display.value =
 			typeof inputValue === 'string' ? inputValue : inputValue instanceof XMLData ? inputValue.toXml() :  JSON.stringify(inputValue);
-		console.debug('Displaying input', inputValue);
+		// console.debug('Displaying input', inputValue);
 		this.updateElement('control', this.controls.display.id);
 		return {};
 	}

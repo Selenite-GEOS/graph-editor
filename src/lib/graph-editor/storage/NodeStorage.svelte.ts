@@ -67,10 +67,10 @@ export class NodeStorage {
 	}
 
 	static async pullSources() {
-		console.debug('Pulling sources');
+		// console.debug('Pulling sources');
 		const res = (await Promise.all(NodeStorage.sources.map((source) => source.getGraphs()))).flat();
 
 		NodeStorage.mainStorage.saveGraphs(res);
-		console.debug('Pulled sources', res);
+		// console.debug('Pulled sources', res);
 	}
 }
