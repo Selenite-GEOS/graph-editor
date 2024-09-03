@@ -14,6 +14,9 @@
 	import { modals, showContextMenu } from '$graph-editor/plugins';
 	import type { Point } from '@selenite/commons';
 	import { variableDragStart } from '$graph-editor/utils';
+	import { createFloatingActions } from 'svelte-floating-ui';
+	import { upperFirst } from 'lodash-es';
+	import { flip } from 'svelte-floating-ui/core';
 
 	let v: Variable;
 	export { v as variable };
@@ -48,7 +51,8 @@
 				dispatch('changetype', { type: v.type });
 			}
 			console.debug(controlType);
-			inputControl = new InputControl({type: controlType,
+			inputControl = new InputControl({
+				type: controlType,
 				datastructure: v.isArray ? 'array' : 'scalar',
 				socketType: v.type,
 				initial: firstSet ? v.value : undefined,
@@ -73,7 +77,6 @@
 	// 	state: ({ state }) => (displayTypeSelection = state)
 	// };
 
-
 	function openContextMenu({ pos }: { pos: Point }): void {
 		showContextMenu({
 			pos,
@@ -97,18 +100,21 @@
 					},
 					tags: ['delete']
 				}
-
 			]
-		})
+		});
 	}
 
 	function openRenamePrompt(): void {
-		console.log("To implement: Rename prompt")
-		modals.show({prompt: 'Rename variable', initial: v.name, response(r) {
-			if (typeof r === 'string') {
-				v.name = r;
+		console.log('To implement: Rename prompt');
+		modals.show({
+			prompt: 'Rename variable',
+			initial: v.name,
+			response(r) {
+				if (typeof r === 'string') {
+					v.name = r;
+				}
 			}
-		},})
+		});
 		// modalStore.trigger({
 		// 	type: 'prompt',
 		// 	title: $_('variable-item.rename-prompt.title'),
@@ -139,7 +145,12 @@
 	// 	};
 	// 	modalStore.trigger(arrayEditorModal);
 	// }
+	const [changeTypeRef, changeTypePopup] = createFloatingActions({
+		placement: 'bottom-start',
+		middleware: [flip()]
+	});
 </script>
+
 <!-- 
 <div class="bg-surface-50-900-token rounded-container-token p-2" data-popup={id}>
 	{#if displayTypeSelection}
@@ -159,9 +170,52 @@
 	{/if}
 </div> -->
 
-<div class="flex items-center justify-between h-10">
+{#if displayTypeSelection}
+	<div class="bg-base-100 rounded-box p-2" use:changeTypePopup>
+		<ul class="flex flex-col gap-2">
+			{#each possibleTypes as type}
+				<li>
+					<button
+						class="btn btn-sm"
+						on:click={() => {
+							v.type = type;
+							displayTypeSelection = false;
+							if (!inputControl) return;
+							const controlType = assignControl(v.type);
+							if (!controlType) throw new Error(`Control type not found for ${v.type}`);
+							inputControl = new InputControl({
+								type: controlType,
+								datastructure: v.isArray ? 'array' : 'scalar',
+								socketType: v.type,
+								initial: firstSet ? v.value : undefined,
+								onChange: (val) => {
+									console.debug('change', v.id, val);
+									v.value = val;
+									// v = { ...v, value: val };
+								}
+							});
+						}}
+					>
+						<div
+							class="rectangle-3d"
+							use:cssVars={{ color: Color(colorMap[type]).saturationv(70).string() }}
+						></div>
+						{upperFirst(type)}
+					</button>
+				</li>
+			{/each}
+		</ul>
+	</div>
+{/if}
+
+<div class="flex items-center h-10">
 	<div class="flex items-center gap-2 pe-2">
-		<button type="button" class="btn px-0 pb-0 py-1" dusepopup=" popupSettings}">
+		<button
+			type="button"
+			class="btn px-0 pb-0 py-1"
+			use:changeTypeRef
+			on:click={() => (displayTypeSelection = !displayTypeSelection)}
+		>
 			<div
 				class:rectangle-3d={!v.isArray}
 				class:array={v.isArray}
@@ -173,8 +227,8 @@
 			type="button"
 			title={v.name}
 			draggable="true"
-			on:pointerenter={() => v.highlighted = true}
-			on:pointerleave={() => v.highlighted =false }
+			on:pointerenter={() => (v.highlighted = true)}
+			on:pointerleave={() => (v.highlighted = false)}
 			on:dragstart={variableDragStart(v)}
 			class:outline-dashed={v.exposed}
 			class="line-clamp-1 font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
@@ -193,7 +247,9 @@
 				on:click={() => openArrayEditor()}>Edit array</button
 			>
 		{:else} -->
+		<label class="grow flex justify-center min-h-12 items-center">
 			<InputControlComponent data={inputControl} width="w-56" />
+		</label>
 		<!-- {/if} -->
 	{/if}
 </div>

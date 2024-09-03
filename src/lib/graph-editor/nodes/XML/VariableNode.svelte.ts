@@ -1,26 +1,33 @@
 import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
-import type { Output, Scalar } from '$graph-editor/socket';
+import { type SocketDatastructure, type Output, type Scalar } from '$graph-editor/socket';
 import { get } from 'svelte/store';
-import { hidden, Node, registerNode, type NodeParams, type SocketsValues } from '$graph-editor/nodes/Node.svelte';
+import {
+	hidden,
+	Node,
+	registerNode,
+	type NodeParams,
+	type SocketsValues
+} from '$graph-editor/nodes/Node.svelte';
 import { isEqual } from 'lodash-es';
-import type { DataType } from '$graph-editor/plugins/typed-sockets';
+import { areTypesCompatible, type DataType } from '$graph-editor/plugins/typed-sockets';
 import { untrack } from 'svelte';
-
 
 @registerNode('variable.Get')
 @hidden
-export class VariableNode extends Node<{}, { value: Scalar<DataType>}> {
+export class VariableNode extends Node<{}, { value: Scalar<DataType> }> {
 	public readonly variableId: string = '';
 	private lastValue: unknown;
 	variable = $derived(this.editor?.variables[this.variableId]);
 
-	constructor(params: NodeParams & {variableId?: string} = {}) {
-		const {variableId} = params;
+	datastructure = $derived<SocketDatastructure>(this.variable?.isArray ? 'array' : 'scalar');
+
+	constructor(params: NodeParams & { variableId?: string } = {}) {
+		const { variableId } = params;
 		super({ ...params, params: { variableId } });
 		if (!this.editor || !variableId) return;
 		this.variableId = variableId;
 		const variable = this.editor.variables[variableId];
-		this.addOutData('value',  { ...variable,  label: variable.name });
+		this.addOutData('value', { ...variable, label: variable.name });
 
 		$effect.root(() => {
 			$effect(() => {
@@ -30,20 +37,40 @@ export class VariableNode extends Node<{}, { value: Scalar<DataType>}> {
 				this.variable?.value;
 				untrack(() => {
 					this.processDataflow();
-				})
-			})
+				});
+			});
 			$effect(() => {
-				this.variable?.name
+				this.variable?.name;
 				untrack(() => {
 					const output = this.outputs['value'];
 					if (!output) return;
 					output.label = this.variable?.name;
-					if (this.variable)
-						this.description = `Get the variable: ${this.variable.name}`;
-				})
-			})
-		})
-		
+					if (this.variable) this.description = `Get the variable: ${this.variable.name}`;
+				});
+			});
+			$effect(() => {
+				this.variable?.type;
+				untrack(() => {
+					const e = this.editor;
+					if (!e) return;
+					const output = this.outputs['value'];
+					if (!output) return;
+					output.socket.type = this.variable?.type;
+					const t = this.variable?.type;
+					
+					// Remove invalid connections
+					for (const conn of this.outConnections['value'] ?? []) {
+						const target = e.getNode(conn.target);
+						if (!target) continue;
+						const input = target.inputs[conn.targetInput];
+						if (!input) continue;
+						if (areTypesCompatible({type: t, datastructure: this.datastructure }, input.socket)) continue;
+						e.removeConnection(conn.id);
+					}
+				});
+			});
+		});
+
 		// this.editor.variables.subscribe(async (variables) => {
 		// 	if (variableId in variables) {
 		// 		this.label = variables[variableId].name;
@@ -65,9 +92,13 @@ export class VariableNode extends Node<{}, { value: Scalar<DataType>}> {
 		// });
 	}
 
-	data(inputs?: SocketsValues<{}> | undefined): SocketsValues<{ value: Scalar<DataType>; }> | Promise<SocketsValues<{ value: Scalar<DataType>; }>> {
+	data(
+		inputs?: SocketsValues<{}> | undefined
+	):
+		| SocketsValues<{ value: Scalar<DataType> }>
+		| Promise<SocketsValues<{ value: Scalar<DataType> }>> {
 		return {
 			value: this.variable?.value
-		}
+		};
 	}
 }

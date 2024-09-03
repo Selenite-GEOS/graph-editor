@@ -128,7 +128,6 @@
 	let currentFlipDuration = $state(flipDuration);
 	const pointerDownWatcher = PointerDownWatcher.instance;
 	const mouseDown = $derived(pointerDownWatcher.isPointerDown);
-	$inspect('variables', $state.snapshot(variables));
 	let buttonHeight = $state<number>()
 </script>
 

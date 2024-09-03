@@ -164,11 +164,6 @@
 	const nodeElmnt = $derived(
 		floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined
 	);
-
-	$inspect(
-		'outputs',
-		node.sortedOutputs.map(([key, output]) => `${output.index}-${output.label}`)
-	);
 </script>
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
