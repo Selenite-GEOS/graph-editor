@@ -159,6 +159,16 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 		return this.entities.has(entity);
 	}
 
+	invertSelection() {
+		const nodes = new Set(this.owner.nodes);
+		const selectedNodes = new Set(this.nodes);
+		const toSelect = nodes.difference(selectedNodes);
+		this.unselectAll();
+		this.selectMultiple(toSelect);
+	}
+
+	
+
 	/**
 	 * Selects all entities between two entities.
 	 *
@@ -188,6 +198,12 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 			if (proportion >= 0.5) {
 				this.entities.add(e);
 			}
+		}
+	}
+
+	selectMultiple(entities: Iterable<SelectorEntity>) {
+		for (const e of entities) {
+			this.entities.add(e);
 		}
 	}
 
