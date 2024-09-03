@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { flip, offset, shift, useFloating } from '@skeletonlabs/floating-ui-svelte';
 	import { ContextMenu } from './context-menu.svelte';
-	import { preventDefault, shortcut, stopPropagation } from '@selenite/commons';
+	import { animationFrame, preventDefault, shortcut, stopPropagation } from '@selenite/commons';
 	const menu = $derived(ContextMenu.instance);
 	const x = $derived(menu.pos.x);
 	const y = $derived(menu.pos.y);
@@ -58,6 +58,12 @@
 			menu.minWidth = width;
 		});
 	});
+
+	async function handlePointerEvents(e: Event) {
+		stopPropagation(e);
+		await animationFrame();
+		floating.update();
+	}
 </script>
 
 {#if menu.visible}
@@ -70,6 +76,8 @@
 		<!-- svelte-ignore event_directive_deprecated -->
 		<div
 			on:contextmenu={preventDefault}
+			on:pointerdown={handlePointerEvents}
+			on:pointerup={handlePointerEvents}
 			use:shortcut={{
 				shortcuts(e) {
 					const key = e.key.toLowerCase();
