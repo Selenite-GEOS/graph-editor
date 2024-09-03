@@ -1,6 +1,13 @@
-import type { Scalar } from "$graph-editor/socket";
-import { description, Node, registerNode, tags, type NodeParams, type SocketsValues } from "../Node.svelte";
-import { ConverterNode, InputControlNode } from "./common-data-nodes.svelte";
+import type { Scalar } from '$graph-editor/socket';
+import {
+	description,
+	Node,
+	registerNode,
+	tags,
+	type NodeParams,
+	type SocketsValues
+} from '../Node.svelte';
+import { ConverterNode, InputControlNode } from './common-data-nodes.svelte';
 
 /**
  * A node that outputs a number.
@@ -13,7 +20,6 @@ export class NumberNode extends InputControlNode<'integer'> {
 		super({ label: 'Integer', ...params, controlType: 'integer', props: { class: 'w-3' } });
 	}
 }
-
 
 @registerNode('integer.ToString')
 @description('Converts an integer to a string.')
@@ -63,54 +69,75 @@ export class ParseNode extends ConverterNode<'string', 'integer', 'scalar'> {
 @registerNode('integer.Add')
 @description('Adds two integers.')
 @tags('int', 'add', 'sum', 'plus', '+')
-export class AddNode extends Node<{a: Scalar<'integer'>, b: Scalar<'integer'>}, {value: Scalar<'integer'>}> {
+export class AddNode extends Node<
+	{ a: Scalar<'integer'>; b: Scalar<'integer'> },
+	{ value: Scalar<'integer'> }
+> {
 	constructor(params: NodeParams = {}) {
-		super({label: 'Add', ...params});
-		this.addInData('a', {type: 'integer', hideLabel: true});
-		this.addInData('b', {type: 'integer', hideLabel: true});
-		this.addOutData('value', {type: 'integer'});
+		super({ label: 'Add', ...params });
+		this.addInData('a', { type: 'integer', hideLabel: true });
+		this.addInData('b', { type: 'integer', hideLabel: true });
+		this.addOutData('value', { type: 'integer' });
 	}
 
-	data(inputs?: SocketsValues<{ a: Scalar<"integer">; b: Scalar<"integer">; }> | undefined): SocketsValues<{ value: Scalar<"integer">; }> | Promise<SocketsValues<{ value: Scalar<"integer">; }>> {
+	data(
+		inputs?: SocketsValues<{ a: Scalar<'integer'>; b: Scalar<'integer'> }> | undefined
+	):
+		| SocketsValues<{ value: Scalar<'integer'> }>
+		| Promise<SocketsValues<{ value: Scalar<'integer'> }>> {
 		const a = this.getData('a', inputs);
 		const b = this.getData('b', inputs);
-		return {value: a + b};
+		return { value: a + b };
 	}
 }
 
 @registerNode('integer.Subtract')
 @description('Subtracts two integers.')
 @tags('int', 'subtract', 'minus', 'difference', '-')
-export class SubtractNode extends Node<{a: Scalar<'integer'>, b: Scalar<'integer'>}, {value: Scalar<'integer'>}> {
+export class SubtractNode extends Node<
+	{ a: Scalar<'integer'>; b: Scalar<'integer'> },
+	{ value: Scalar<'integer'> }
+> {
 	constructor(params: NodeParams = {}) {
-		super({label: 'Subtract', ...params});
-		this.addInData('a', {type: 'integer', hideLabel: true});
-		this.addInData('b', {type: 'integer', hideLabel: true});
-		this.addOutData('value', {type: 'integer'});
+		super({ label: 'Subtract', ...params });
+		this.addInData('a', { type: 'integer', hideLabel: true });
+		this.addInData('b', { type: 'integer', hideLabel: true });
+		this.addOutData('value', { type: 'integer' });
 	}
 
-	data(inputs?: SocketsValues<{ a: Scalar<"integer">; b: Scalar<"integer">; }> | undefined): SocketsValues<{ value: Scalar<"integer">; }> | Promise<SocketsValues<{ value: Scalar<"integer">; }>> {
+	data(
+		inputs?: SocketsValues<{ a: Scalar<'integer'>; b: Scalar<'integer'> }> | undefined
+	):
+		| SocketsValues<{ value: Scalar<'integer'> }>
+		| Promise<SocketsValues<{ value: Scalar<'integer'> }>> {
 		const a = this.getData('a', inputs);
 		const b = this.getData('b', inputs);
-		return {value: a - b};
+		return { value: a - b };
 	}
 }
 
 @registerNode('integer.Multiply')
 @description('Multiplies two integers.')
 @tags('int', 'multiply', 'times', '*')
-export class MultiplyNode extends Node<{a: Scalar<'integer'>, b: Scalar<'integer'>}, {value: Scalar<'integer'>}> {
+export class MultiplyNode extends Node<
+	{ a: Scalar<'integer'>; b: Scalar<'integer'> },
+	{ value: Scalar<'integer'> }
+> {
 	constructor(params: NodeParams = {}) {
-		super({label: 'Multiply', ...params});
-		this.addInData('a', {type: 'integer', hideLabel: true});
-		this.addInData('b', {type: 'integer', hideLabel: true});
-		this.addOutData('value', {type: 'integer'});
+		super({ label: 'Multiply', ...params });
+		this.addInData('a', { type: 'integer', hideLabel: true });
+		this.addInData('b', { type: 'integer', hideLabel: true });
+		this.addOutData('value', { type: 'integer' });
 	}
 
-	data(inputs?: SocketsValues<{ a: Scalar<"integer">; b: Scalar<"integer">; }> | undefined): SocketsValues<{ value: Scalar<"integer">; }> | Promise<SocketsValues<{ value: Scalar<"integer">; }>> {
+	data(
+		inputs?: SocketsValues<{ a: Scalar<'integer'>; b: Scalar<'integer'> }> | undefined
+	):
+		| SocketsValues<{ value: Scalar<'integer'> }>
+		| Promise<SocketsValues<{ value: Scalar<'integer'> }>> {
 		const a = this.getData('a', inputs);
 		const b = this.getData('b', inputs);
-		return {value: a * b};
+		return { value: a * b };
 	}
 }
 

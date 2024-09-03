@@ -13,13 +13,12 @@ import type { WorkerMessage as WorkerMessage, WorkerResult } from './CodeIntegra
 import { addGraphToEditor, xmlToGraph } from './code-integration/utils.svelte';
 let worker: Worker | undefined;
 
-async function instantiateWorker() {
-}
+async function instantiateWorker() {}
 
 if (typeof requestIdleCallback !== 'undefined')
-requestIdleCallback(() => {
-	instantiateWorker();
-});
+	requestIdleCallback(() => {
+		instantiateWorker();
+	});
 
 export class CodeIntegration extends BaseComponent<NodeFactory> {
 	/**
@@ -78,9 +77,9 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 			await this.owner.bulkOperation(async () => {
 				const { nodes, connections } = xmlToGraph({ xml, schema, factory });
 				await addGraphToEditor({ factory, nodes, connections, t0 });
-			})
+			});
 			return;
-		}  
+		}
 		const msg: WorkerMessage = { type: 'xmlToGraph', xml, schema: schema.toJSON() };
 		worker.postMessage(msg);
 		worker.onmessage = async (e: MessageEvent<WorkerResult>) => {
@@ -92,8 +91,6 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 		};
 
 		return;
-
-		
 
 		// await factory.bulkOperation(async () => {
 		// 	const area = factory.getArea();
@@ -128,6 +125,5 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 		// 		await AreaExtensions.zoomAt(area, editor.getNodes(), {});
 		// 	}
 		// });
-		
 	}
 }

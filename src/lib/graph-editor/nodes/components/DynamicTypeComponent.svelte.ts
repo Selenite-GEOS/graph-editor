@@ -4,12 +4,15 @@ import type { Socket } from '$graph-editor/socket';
 import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { Node } from '../Node.svelte';
 
-type R =  Record<string, Socket>
-export type DynamicTypeParams<Inputs extends R =R, Outputs extends Record<string, Socket> = Record<string, Socket>> = NodeComponentParams<Inputs, Outputs> & {
-			initial?: SocketType;
-			inputs?: (keyof Inputs)[];
-			outputs?: (keyof Outputs)[];
-		};
+type R = Record<string, Socket>;
+export type DynamicTypeParams<
+	Inputs extends R = R,
+	Outputs extends Record<string, Socket> = Record<string, Socket>
+> = NodeComponentParams<Inputs, Outputs> & {
+	initial?: SocketType;
+	inputs?: (keyof Inputs)[];
+	outputs?: (keyof Outputs)[];
+};
 export class DynamicTypeComponent<
 	Inputs extends Record<string, Socket> = Record<string, Socket>,
 	Outputs extends Record<string, Socket> = Record<string, Socket>
@@ -22,14 +25,12 @@ export class DynamicTypeComponent<
 
 	get dynamicTypeInputs(): (keyof Inputs)[] | '*' {
 		return this.params.inputs ?? [];
-	 };
+	}
 	get dynamicTypeOutputs(): (keyof Outputs)[] | '*' {
 		return this.params.outputs ?? [];
-	};
+	}
 	params: DynamicTypeParams<Inputs, Outputs>;
-	constructor(
-		params: DynamicTypeParams<Inputs, Outputs>
-	) {
+	constructor(params: DynamicTypeParams<Inputs, Outputs>) {
 		super(params);
 		this.params = params;
 		const node = this.node as Node<
@@ -58,8 +59,12 @@ export class DynamicTypeComponent<
 					const conn = context.data;
 
 					if (
-						(conn.target !== node.id || this.dynamicTypeInputs !== '*' && !this.dynamicTypeInputs.includes(conn.targetInput)) &&
-						(conn.source !== node.id || this.dynamicTypeOutputs !== '*' && !this.dynamicTypeOutputs.includes(conn.sourceOutput))
+						(conn.target !== node.id ||
+							(this.dynamicTypeInputs !== '*' &&
+								!this.dynamicTypeInputs.includes(conn.targetInput))) &&
+						(conn.source !== node.id ||
+							(this.dynamicTypeOutputs !== '*' &&
+								!this.dynamicTypeOutputs.includes(conn.sourceOutput)))
 					)
 						return context;
 
@@ -88,8 +93,8 @@ export class DynamicTypeComponent<
 
 					return context;
 				});
-			})
-		})
+			});
+		});
 	}
 	changeType(type: SocketType) {
 		// console.log('changeType', type);

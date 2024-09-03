@@ -471,7 +471,7 @@ export class XmlNode extends Node<
 				data = [data];
 			}
 			if (isArray(key))
-				data = (data as unknown[]).filter(v => typeof v === "boolean" ? true : Boolean(v))
+				data = (data as unknown[]).filter((v) => (typeof v === 'boolean' ? true : Boolean(v)));
 
 			if (key === 'target' && this.complex.name.endsWith('Event')) {
 				const target = data as XMLData | string;

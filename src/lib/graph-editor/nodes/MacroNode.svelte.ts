@@ -147,9 +147,9 @@ export class MacroNode extends Node {
 				const macroKey = makeMacroKey(i.key, i.nodeId);
 				let initial = i.default;
 				if (typeof i.default === 'string')
-				try {
-					initial = JSON.parse(i.default);
-				} catch(e) {}
+					try {
+						initial = JSON.parse(i.default);
+					} catch (e) {}
 				this.macroInputs[macroKey] = this.addInData(macroKey, {
 					label: i.label,
 					type: i.type,

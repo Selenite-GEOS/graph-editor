@@ -792,7 +792,7 @@ export class Node<
 		let controlType = params?.options ? 'select' : assignControl(params?.type ?? 'any');
 		let options = params?.options;
 		if (!options && type.startsWith('geos_')) {
-			const geosSchema = this.factory?.xmlSchemas.get("geos");
+			const geosSchema = this.factory?.xmlSchemas.get('geos');
 			const simpleType = geosSchema?.simpleTypeMap.get(type);
 			if (simpleType) {
 				controlType = 'select';

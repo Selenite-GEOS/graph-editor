@@ -46,7 +46,7 @@ export async function setupGraphEditor(
 
 	const factory = new NodeFactory({
 		editor,
-		xmlSchemas: params.xmlSchemas,
+		xmlSchemas: params.xmlSchemas
 	});
 	if (params.container) {
 		params = (await setupArea({ editor, factory, ...params })) ?? params;
@@ -218,9 +218,5 @@ export async function setupSvelteGraphEditor(
 		additionalNodeItems?: NodeMenuItem[];
 	} = {}
 ): Promise<SetupGraphEditorResult> {
-	return setupFullGraphEditor({...params, setups: [
-		...params.setups ?? [],
-		setupSvelteRender
-	]
-	});
+	return setupFullGraphEditor({ ...params, setups: [...(params.setups ?? []), setupSvelteRender] });
 }

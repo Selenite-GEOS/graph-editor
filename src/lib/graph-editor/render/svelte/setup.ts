@@ -181,9 +181,8 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	return params;
 };
 
-
 export const svelteRenderSetup: Setup = {
 	name: 'Svelte Render',
 	type: 'area',
 	setup: setupSvelteRender
-}
+};

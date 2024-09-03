@@ -167,8 +167,6 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 		this.selectMultiple(toSelect);
 	}
 
-	
-
 	/**
 	 * Selects all entities between two entities.
 	 *

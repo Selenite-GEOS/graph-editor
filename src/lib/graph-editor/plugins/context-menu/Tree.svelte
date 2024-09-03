@@ -51,7 +51,11 @@
 	}
 </script>
 
-<div bind:this={element} class="grid items-start grid-cols-[1rem,1fr] gap-1 {classes}" class:hidden={!expanded}>
+<div
+	bind:this={element}
+	class="grid items-start grid-cols-[1rem,1fr] gap-1 {classes}"
+	class:hidden={!expanded}
+>
 	{#each tree as elmnt, i (i)}
 		{#if isForest(elmnt)}
 			<div class="grid items-start grid-cols-subgrid grid-rows-subgrid col-span-2">
@@ -71,14 +75,14 @@
 				</button>
 			</div>
 			{#if childExpanded[i] !== undefined}
-			<svelte:self
-				bind:this={childTrees[i] as TreeComponent<T>}
-				class="col-start-2"
-				tree={elmnt.forest}
-				bind:expanded={childExpanded[i]}
-				{leaf}
-				isRoot={false}
-			/>
+				<svelte:self
+					bind:this={childTrees[i] as TreeComponent<T>}
+					class="col-start-2"
+					tree={elmnt.forest}
+					bind:expanded={childExpanded[i]}
+					{leaf}
+					isRoot={false}
+				/>
 			{/if}
 		{:else}
 			<div class="col-span-2">

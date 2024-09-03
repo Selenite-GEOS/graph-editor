@@ -13,7 +13,7 @@ import { upperFirst } from 'lodash-es';
 export type FormatNodeParams = NodeParams & {
 	vars?: Record<string, unknown>;
 	outType?: 'string' | 'groupNameRef';
-	varsType?: DataType
+	varsType?: DataType;
 	params?: {
 		vars: Record<string, unknown>;
 	};
@@ -24,8 +24,7 @@ export class FormatNode extends Node<
 	{ format: Scalar<'string'> } & Record<string, Scalar<DataType>>,
 	{ result: Scalar<'string' | 'groupNameRef'> }
 > {
-
-	varsType: DataType
+	varsType: DataType;
 	constructor(params: FormatNodeParams = {}) {
 		// super('Format', { factory, height: 124.181818 + 43.818182 });
 		super({ label: 'Format', ...params });
@@ -37,7 +36,7 @@ export class FormatNode extends Node<
 				.join(', ');
 			return `$(format).format(${var_bindings})`;
 		});
-		
+
 		this.addOutData('result', {
 			type: params.outType ?? 'string'
 		});
@@ -107,7 +106,7 @@ export class FormatNode extends Node<
 						this.addInData(key, {
 							label: upperFirst(varName),
 							alwaysShowLabel: true,
-							type: this.varsType,
+							type: this.varsType
 						});
 						// console.debug('added', key);
 					}
@@ -132,10 +131,14 @@ export class FormatNode extends Node<
 	}
 }
 
-
 @registerNode('xml.FormatGroupName')
 export class FormatGroupNameNode extends FormatNode {
 	constructor(params: FormatNodeParams = {}) {
-		super({label: 'Format Group Name', varsType: 'groupNameRef', outType: 'groupNameRef', ...params})
-	} 
+		super({
+			label: 'Format Group Name',
+			varsType: 'groupNameRef',
+			outType: 'groupNameRef',
+			...params
+		});
+	}
 }

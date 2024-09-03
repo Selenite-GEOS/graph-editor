@@ -10,7 +10,9 @@
 	} from './modal.svelte';
 
 	let contentContainer = $state<HTMLElement>();
-	let childComponent = $state<SvelteComponent & { getResponse?: () => Promise<unknown> | unknown }>();
+	let childComponent = $state<
+		SvelteComponent & { getResponse?: () => Promise<unknown> | unknown }
+	>();
 	const modals = Modal.instance;
 	let dialog = $state<HTMLDialogElement>();
 	let lastModal = $derived(modals.queue.at(-1));
@@ -54,7 +56,7 @@
 									lastModal?.response?.(promptInput?.value);
 									modals.close();
 								}
-							}
+							};
 						default:
 							if ('formId' in btn) {
 								return {
@@ -97,8 +99,18 @@
 				{:else if isSnippetModalSettings(lastModal)}
 					{@render lastModal.snippet(lastModal.props)}
 				{:else if isPromptModalSettings(lastModal)}
-					<input value={lastModal.initial} bind:this={promptInput} placeholder="New value" class="input input-bordered w-full" onkeydown={(e) => 
-					{if (e.key === 'Enter') {lastModal.response?.(promptInput?.value); modals.close();}}}/>
+					<input
+						value={lastModal.initial}
+						bind:this={promptInput}
+						placeholder="New value"
+						class="input input-bordered w-full"
+						onkeydown={(e) => {
+							if (e.key === 'Enter') {
+								lastModal.response?.(promptInput?.value);
+								modals.close();
+							}
+						}}
+					/>
 				{/if}
 			</div>
 			{#if resolvedButtons}

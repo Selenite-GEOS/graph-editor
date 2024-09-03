@@ -3,10 +3,7 @@ import type { Socket } from './Socket.svelte';
 import type { Control } from '../control';
 import { Port, type PortParams } from './port.svelte';
 
-export class Input<S extends Socket = Socket>
-	extends Port<S>
-	implements ClassicPreset.Input<S>
-{
+export class Input<S extends Socket = Socket> extends Port<S> implements ClassicPreset.Input<S> {
 	public readonly isRequired: boolean;
 	// showControl: boolean = $state(true);
 	/**
@@ -19,12 +16,14 @@ export class Input<S extends Socket = Socket>
 	showControl = $state(true);
 
 	alwaysShowLabel = $state(false);
-	hideLabel = $state(false)
-	constructor(params: PortParams<S> & {
-		alwaysShowLabel?: boolean;
-		hideLabel?: boolean
-		isRequired?: boolean;
-	}) {
+	hideLabel = $state(false);
+	constructor(
+		params: PortParams<S> & {
+			alwaysShowLabel?: boolean;
+			hideLabel?: boolean;
+			isRequired?: boolean;
+		}
+	) {
 		super(params);
 		this.alwaysShowLabel = params.alwaysShowLabel ?? false;
 		this.hideLabel = params.hideLabel ?? false;

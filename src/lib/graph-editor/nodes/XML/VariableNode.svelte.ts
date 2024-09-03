@@ -57,14 +57,15 @@ export class VariableNode extends Node<{}, { value: Scalar<DataType> }> {
 					if (!output) return;
 					output.socket.type = this.variable?.type;
 					const t = this.variable?.type;
-					
+
 					// Remove invalid connections
 					for (const conn of this.outConnections['value'] ?? []) {
 						const target = e.getNode(conn.target);
 						if (!target) continue;
 						const input = target.inputs[conn.targetInput];
 						if (!input) continue;
-						if (areTypesCompatible({type: t, datastructure: this.datastructure }, input.socket)) continue;
+						if (areTypesCompatible({ type: t, datastructure: this.datastructure }, input.socket))
+							continue;
 						e.removeConnection(conn.id);
 					}
 				});

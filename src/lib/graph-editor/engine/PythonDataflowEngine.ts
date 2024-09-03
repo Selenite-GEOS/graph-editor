@@ -101,7 +101,9 @@ export class PythonDataflowEngine<Schemes extends PythonDataflowEngineScheme> ex
 			const node = this.editor.getNode(nodeId);
 			this.cache.delete(nodeId);
 			alreadyResetNodes.add(nodeId);
-			Object.values(node.outConnections).flat().forEach((c) => this.reset(c.target, alreadyResetNodes));
+			Object.values(node.outConnections)
+				.flat()
+				.forEach((c) => this.reset(c.target, alreadyResetNodes));
 		} else {
 			this.cache.clear();
 		}

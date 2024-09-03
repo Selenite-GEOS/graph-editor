@@ -22,9 +22,9 @@ export const colorMap: { [key in SocketType]?: string } = {
 	mesh: '#ad8c71',
 	vector: true
 		? //  'hsl(58 87% 44% / 1)'
-		'hsl(51.65deg 59.09% 52.87%)'
-			// 'hsl(58 79% 44% / 1)'
-		: '#efec78',
+			'hsl(51.65deg 59.09% 52.87%)'
+		: // 'hsl(58 79% 44% / 1)'
+			'#efec78',
 	groupNameRef: '#5165b2'
 };
 
@@ -33,7 +33,8 @@ export function assignColor(s: Socket): string {
 	// 	return '#b38a8a';
 	const type = s.type;
 	if (type.startsWith('xml')) {
-		if (type.endsWith('*') || s.port?.label?.toLowerCase().endsWith("optional")) return $socketcolor
+		if (type.endsWith('*') || s.port?.label?.toLowerCase().endsWith('optional'))
+			return $socketcolor;
 		// return random color generated from the name and make sure saturation doesn't go over 50%
 		// Convert the string seed into a numerical value
 		const label = s.port?.label;

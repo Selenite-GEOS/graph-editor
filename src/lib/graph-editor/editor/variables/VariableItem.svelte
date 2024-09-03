@@ -58,7 +58,7 @@
 			console.error(`Control type not found for ${v.type}`);
 			return;
 		}
-		let res: InputControl | undefined =undefined;
+		let res: InputControl | undefined = undefined;
 		untrack(() => {
 			res = new InputControl({
 				type: controlType,
@@ -73,7 +73,7 @@
 				}
 			});
 		});
-	
+
 		return res;
 		// if (!firstSet) {
 		// 	dispatch('changetype', { type: v.type });
@@ -187,8 +187,8 @@
 			class:outline-dashed={v.exposed}
 			class="line-clamp-1 font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
 			oncontextmenu={(e) => {
-				preventDefault(stopPropagation(e))
-				openContextMenu({ pos: { x: e.clientX, y: e.clientY } })
+				preventDefault(stopPropagation(e));
+				openContextMenu({ pos: { x: e.clientX, y: e.clientY } });
 			}}
 			onclick={() => openRenamePrompt()}
 		>

@@ -47,13 +47,7 @@
 			unwatch2 && unwatch2();
 		};
 	});
-	const dyn = $derived({component})
+	const dyn = $derived({ component });
 </script>
 
-<dyn.component
-	{...data}
-	{source}
-	start={observedStart}
-	end={observedEnd}
-	path={observedPath}
-/>
+<dyn.component {...data} {source} start={observedStart} end={observedEnd} path={observedPath} />

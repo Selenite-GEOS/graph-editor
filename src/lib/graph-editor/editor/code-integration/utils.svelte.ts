@@ -280,7 +280,9 @@ export function parsedXmlToGraph({
 				type: 'groupNameRef',
 				name: 'cellBlocks',
 				factory,
-				initialValues: { array: [...(sourceNode.getData('cellBlockNames') as unknown[] | undefined) ?? []] }
+				initialValues: {
+					array: [...((sourceNode.getData('cellBlockNames') as unknown[] | undefined) ?? [])]
+				}
 			});
 			nodes.push(breakNode);
 			cellBlockBreakNodes.set(sourceNode, breakNode);
@@ -303,7 +305,9 @@ export function parsedXmlToGraph({
 		if (target.key === 'objectPath') {
 			if (objectPathFormatMap.has(source)) {
 				const sourceFormat = objectPathFormatMap.get(source)!;
-				connections.push(new Connection(sourceFormat, 'result', target.node, target.key) as Connection);
+				connections.push(
+					new Connection(sourceFormat, 'result', target.node, target.key) as Connection
+				);
 				continue;
 			}
 			let formatString: string[] = [];

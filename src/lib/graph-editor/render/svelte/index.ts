@@ -1,2 +1,2 @@
 export * from './setup';
-export {default as InputControlComponent} from './presets/classic/components/InputControl.svelte'
+export { default as InputControlComponent } from './presets/classic/components/InputControl.svelte';

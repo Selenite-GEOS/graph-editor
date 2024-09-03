@@ -109,8 +109,8 @@ export class ConverterNode<
 			convert?: SocketConverter<S, T, D>;
 		} = {}
 	) {
-		const { source = 'any', target ='any' } = params;
-		super({...params, params: { source, target}});
+		const { source = 'any', target = 'any' } = params;
+		super({ ...params, params: { source, target } });
 		this.convert = params.convert;
 		this.addInData('value', { type: source });
 		this.addOutData('value', { type: target });
@@ -119,7 +119,7 @@ export class ConverterNode<
 	data(
 		inputs?: SocketsValues<{ value: Socket<S, D> }> | undefined
 	): SocketsValues<{ value: Socket<T, D> }> {
-		const v = this.getData('value', inputs)
+		const v = this.getData('value', inputs);
 		return {
 			value: this.convert?.(v) ?? v
 		};

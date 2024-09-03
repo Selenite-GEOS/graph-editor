@@ -10,18 +10,12 @@ import { clientToSurfacePos } from '$utils/html';
 import '../../nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { VariableNode, XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
-import {
-	localId,
-	XmlSchema,
-	type XMLTypeTree,
-	capitalizeWords
-} from '@selenite/commons';
+import { localId, XmlSchema, type XMLTypeTree, capitalizeWords } from '@selenite/commons';
 import { areTypesCompatible } from '../typed-sockets';
 import type { SocketData } from 'rete-connection-plugin';
 import { ContextMenu } from './context-menu.svelte';
 
-export type NodeMenuItem<NC extends typeof Node = typeof Node
-> = {
+export type NodeMenuItem<NC extends typeof Node = typeof Node> = {
 	/** Label of the node. */
 	label: string;
 	/** Function that creates the node. */
@@ -197,7 +191,12 @@ export function getMenuItemsFromNodeItems({
 	return res;
 }
 
-export function createNodeMenuItem(params: Partial<Omit<NodeMenuItem, 'nodeClass' | 'params'>> & {nodeClass: NodeMenuItem['nodeClass'], params: NodeMenuItem['params']} ): NodeMenuItem {
+export function createNodeMenuItem(
+	params: Partial<Omit<NodeMenuItem, 'nodeClass' | 'params'>> & {
+		nodeClass: NodeMenuItem['nodeClass'];
+		params: NodeMenuItem['params'];
+	}
+): NodeMenuItem {
 	return {
 		tags: [],
 		path: [],
@@ -205,8 +204,8 @@ export function createNodeMenuItem(params: Partial<Omit<NodeMenuItem, 'nodeClass
 		description: '',
 		inputTypes: {},
 		outputTypes: {},
-		...params,
-	}
+		...params
+	};
 }
 
 export type ShowContextMenu = (params: {
@@ -330,13 +329,12 @@ export function contextMenuSetup({
 									const initialRect = initial.payload.element?.getBoundingClientRect();
 									if (!initialRect) throw new Error('Initial rect not found');
 									setTimeout(() => {
-											if (initialRect.top > event.clientY)
-												y = y - n.height / 1.5;
-											else {
-												y = y - n.height / 3.5;
-											}
-											area.translate(n.id, { x: x - (initialSide === 'input' ? n.width : 0), y });
-										});
+										if (initialRect.top > event.clientY) y = y - n.height / 1.5;
+										else {
+											y = y - n.height / 3.5;
+										}
+										area.translate(n.id, { x: x - (initialSide === 'input' ? n.width : 0), y });
+									});
 								}
 							}),
 							onHide: () => {
@@ -438,7 +436,7 @@ export function contextMenuSetup({
 								nodeClass: VariableNode as typeof Node,
 								label: v.name,
 								description: `Get the variable: '${v.name}'.`,
-								params: {variableId: v.id},
+								params: { variableId: v.id },
 								path: ['Variables'],
 								tags: ['get']
 							})
@@ -449,7 +447,12 @@ export function contextMenuSetup({
 					const items: MenuItem[] = getMenuItemsFromNodeItems({
 						factory,
 						pos,
-						nodeItems: [...variables, ...[...baseNodeMenuItems, ...(additionalNodeItems || [])].sort((a, b) => (a.path.join('') + a.label).localeCompare(b.path.join('') + b.label) )] as NodeMenuItem[]
+						nodeItems: [
+							...variables,
+							...[...baseNodeMenuItems, ...(additionalNodeItems || [])].sort((a, b) =>
+								(a.path.join('') + a.label).localeCompare(b.path.join('') + b.label)
+							)
+						] as NodeMenuItem[]
 					});
 					console.debug('settin hey', baseNodeMenuItems);
 					// Spawn context menu

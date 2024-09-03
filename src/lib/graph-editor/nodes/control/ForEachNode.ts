@@ -1,4 +1,11 @@
-import { Node, path, registerNode, tags, type NodeParams, type SocketsValues } from '../Node.svelte';
+import {
+	Node,
+	path,
+	registerNode,
+	tags,
+	type NodeParams,
+	type SocketsValues
+} from '../Node.svelte';
 import { getLeavesFromOutput } from '../utils';
 import type { DataType, SocketType } from '../../plugins/typed-sockets';
 import type { ExecSocket, Socket } from '$graph-editor/socket';
@@ -37,7 +44,7 @@ for $(index), $(item) in enumerate($(array)):
 		this.addOutExec('loop', 'Loop');
 		this.addOutExec('exec', 'Done');
 		let dynamicTypeCmpnt: DynamicTypeComponent | undefined;
-		this.addInData('array', {	
+		this.addInData('array', {
 			control: {
 				canChangeType: true
 			},

@@ -9,5 +9,5 @@ export * as Array from './array';
 export * as String from './string';
 export * as Boolean from './boolean';
 export * as Vector from './vector';
-export * as Integer from './integer'
+export * as Integer from './integer';
 export * from './common-data-nodes.svelte';

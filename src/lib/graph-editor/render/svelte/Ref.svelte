@@ -18,8 +18,8 @@
 	$effect(() => {
 		return () => {
 			if (ref) unmount(ref);
-		}
-	})
+		};
+	});
 </script>
 
 <span {...props} bind:this={ref} class="grid {props.class}"> </span>

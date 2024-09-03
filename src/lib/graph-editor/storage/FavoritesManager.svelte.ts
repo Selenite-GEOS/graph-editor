@@ -1,58 +1,58 @@
-import { SvelteSet } from "svelte/reactivity";
+import { SvelteSet } from 'svelte/reactivity';
 
 const FAVORITES_KEY = 'favoriteGraphsIds';
 
 export class FavoritesManager {
-    static #instance: FavoritesManager | undefined = undefined;
-    protected static  get instance() {
-        if (!this.#instance) {
-            this.#instance = new FavoritesManager();
-        }
-        return this.#instance;
-    }
+	static #instance: FavoritesManager | undefined = undefined;
+	protected static get instance() {
+		if (!this.#instance) {
+			this.#instance = new FavoritesManager();
+		}
+		return this.#instance;
+	}
 
-    private  constructor() {
-        const favorites = localStorage.getItem(FAVORITES_KEY);
-        if (favorites) {
-            this.#favorites = new SvelteSet(JSON.parse(favorites));
-        }
-    }
+	private constructor() {
+		const favorites = localStorage.getItem(FAVORITES_KEY);
+		if (favorites) {
+			this.#favorites = new SvelteSet(JSON.parse(favorites));
+		}
+	}
 
-    #favorites = new SvelteSet();
-    
-    setFavorite(id: string, value: boolean) {
-        if (value) {
-            this.#favorites.add(id);
-        } else {
-            this.#favorites.delete(id);
-        }
-        this.saveFavorites();
-    }
+	#favorites = new SvelteSet();
 
-    static setFavorite(id: string, value: boolean) {
-        this.instance.setFavorite(id, value);
-    }
+	setFavorite(id: string, value: boolean) {
+		if (value) {
+			this.#favorites.add(id);
+		} else {
+			this.#favorites.delete(id);
+		}
+		this.saveFavorites();
+	}
 
-    isFavorite(id: string) {
-        return this.#favorites.has(id);
-    }
+	static setFavorite(id: string, value: boolean) {
+		this.instance.setFavorite(id, value);
+	}
 
-    static isFavorite(id: string) {
-        return this.instance.isFavorite(id);
-    }
+	isFavorite(id: string) {
+		return this.#favorites.has(id);
+	}
 
-    clearFavorites() {
-        this.#favorites.clear();
-        this.saveFavorites();
-    }
+	static isFavorite(id: string) {
+		return this.instance.isFavorite(id);
+	}
 
-    static clearFavorites() {
-        this.instance.clearFavorites();
-    }
+	clearFavorites() {
+		this.#favorites.clear();
+		this.saveFavorites();
+	}
 
-    protected saveFavorites() {
-        const favs = Array.from(this.#favorites);
-        console.debug("Saving favorites", favs);
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
-    }
+	static clearFavorites() {
+		this.instance.clearFavorites();
+	}
+
+	protected saveFavorites() {
+		const favs = Array.from(this.#favorites);
+		console.debug('Saving favorites', favs);
+		localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+	}
 }

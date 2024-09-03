@@ -13,17 +13,16 @@ export function isNodeEditorSaveData(a: unknown): a is NodeEditorSaveData {
 export const dragGraphType = 'selenite/graph';
 export const dragVariableType = 'selenite/graph-variable';
 
-
 export function onGraphDragStart(g: StoredGraph): (e: DragEvent) => void {
 	document.body.style.userSelect = 'none';
 	const removeSelectNode = () => {
 		document.body.style.userSelect = '';
 		document.removeEventListener('dragend', removeSelectNode);
-	}
+	};
 	document.addEventListener('dragend', removeSelectNode);
 	return (e) => {
 		e.dataTransfer?.setData(dragGraphType, JSON.stringify(g));
-	}
+	};
 }
 
 export function isDraggedGraph(e: DragEvent): boolean {
@@ -40,7 +39,7 @@ export function getDraggedGraph(e: DragEvent): StoredGraph | undefined {
 export function variableDragStart(v: Variable) {
 	return (e: DragEvent) => {
 		e.dataTransfer?.setData(dragVariableType, v.id);
-	}
+	};
 }
 
 export function isDraggedVariable(e: DragEvent): boolean {

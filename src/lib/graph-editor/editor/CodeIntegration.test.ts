@@ -79,7 +79,7 @@ async function getGraph({
 		}
 	});
 
-	await editor.addNewConnection(nodes['TestA'], 'value', nodes['Test'], 'child:Tests')
+	await editor.addNewConnection(nodes['TestA'], 'value', nodes['Test'], 'child:Tests');
 
 	nodes['TestA2'] = await factory.addNode(XmlNode, {
 		xmlConfig: {

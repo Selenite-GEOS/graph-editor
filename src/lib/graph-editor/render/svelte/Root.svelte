@@ -12,7 +12,7 @@
 		onRendered();
 	});
 
-	const dyn = $derived({component})
+	const dyn = $derived({ component });
 </script>
 
 <dyn.component {...props} />

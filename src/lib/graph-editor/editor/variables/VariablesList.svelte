@@ -23,9 +23,7 @@
 		editor?: NodeEditor;
 	};
 	const factory = $derived(editorContext.activeFactory ?? editorContext.factory);
-	const editor = $derived(
-		factory?.editor ?? editorContext.activeEditor ?? editorContext.editor
-	);
+	const editor = $derived(factory?.editor ?? editorContext.activeEditor ?? editorContext.editor);
 	const variables = $derived(editor?.variables ?? {});
 	// let variables: Writable<Record<string, Variable>> | undefined = undefined;
 
@@ -80,7 +78,7 @@
 		const redo = () => {
 			nVarsCreated += 1;
 			if (variables === undefined) return;
-			variables[id] =  {
+			variables[id] = {
 				name: `variable${nVarsCreated}`,
 				exposed: false,
 				isArray: false,
@@ -97,7 +95,7 @@
 				delete variables[id];
 				nVarsCreated -= 1;
 			}
-		})
+		});
 		redo();
 	}
 
@@ -122,13 +120,13 @@
 			undo() {
 				variables[variableId] = v;
 			}
-		})
+		});
 	}
 	const flipDuration = 150;
 	let currentFlipDuration = $state(flipDuration);
 	const pointerDownWatcher = PointerDownWatcher.instance;
 	const mouseDown = $derived(pointerDownWatcher.isPointerDown);
-	let buttonHeight = $state<number>()
+	let buttonHeight = $state<number>();
 </script>
 
 {#if mounted}
@@ -148,7 +146,7 @@
 		class="h-52 transition-main-div transition rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none pointer-events-auto
 		 border border-base-content border-opacity-10
 		"
-		style={ $collapsed ? `height:${buttonHeight}px`: undefined}
+		style={$collapsed ? `height:${buttonHeight}px` : undefined}
 	>
 		<div
 			class:rounded-container-token={$collapsed}
@@ -187,50 +185,50 @@
 			</button>
 		</div>
 		{#if !$collapsed}
-		<!-- Variables list -->
-		<div
-			class="rounded-bl-box rounded-br-box overflow-hidden"
-			style="padding:0rem 0.09rem;"
-			transition:fade={{ duration: 200 }}
-		>
+			<!-- Variables list -->
 			<div
-				class:bg-surface-100={themeControl.isLight}
-				class:bg-opacity-80={themeControl.isLight}
-				class=" overflow-y-auto overflow-x-clip transition-main-div"
-				class:!h-0={$collapsed}
-				style="height: 9.6rem;"
+				class="rounded-bl-box rounded-br-box overflow-hidden"
+				style="padding:0rem 0.09rem;"
+				transition:fade={{ duration: 200 }}
 			>
-				<ul class="space-y-3 py-2">
-					{#each Object.keys(variables) as id (id)}
-						<li
-							animate:flip={{ duration: currentFlipDuration }}
-							in:fade
-							class="ps-4 pe-2 text-surface-900-50-token text-sm"
-							use:scroll
-						>
-							<VariableItem
-								bind:variable={variables[id]}
-								on:delete={() => {
-									if (!variables) return;
-									const v = variables[id];
-									factory?.history?.add({
-										redo: () => deleteVariable(id),
-										undo: () => {
-											variables[id] =  v;
-										}
-									});
-									deleteVariable(id);
-								}}
-								on:changetype={(e) => {
-									console.log('set default variable type', e.detail.type);
-									$defaultType = e.detail.type;
-								}}
-							/>
-						</li>
-					{/each}
-				</ul>
+				<div
+					class:bg-surface-100={themeControl.isLight}
+					class:bg-opacity-80={themeControl.isLight}
+					class=" overflow-y-auto overflow-x-clip transition-main-div"
+					class:!h-0={$collapsed}
+					style="height: 9.6rem;"
+				>
+					<ul class="space-y-3 py-2">
+						{#each Object.keys(variables) as id (id)}
+							<li
+								animate:flip={{ duration: currentFlipDuration }}
+								in:fade
+								class="ps-4 pe-2 text-surface-900-50-token text-sm"
+								use:scroll
+							>
+								<VariableItem
+									bind:variable={variables[id]}
+									on:delete={() => {
+										if (!variables) return;
+										const v = variables[id];
+										factory?.history?.add({
+											redo: () => deleteVariable(id),
+											undo: () => {
+												variables[id] = v;
+											}
+										});
+										deleteVariable(id);
+									}}
+									on:changetype={(e) => {
+										console.log('set default variable type', e.detail.type);
+										$defaultType = e.detail.type;
+									}}
+								/>
+							</li>
+						{/each}
+					</ul>
+				</div>
 			</div>
-		</div>
 		{/if}
 	</div>
 {/if}

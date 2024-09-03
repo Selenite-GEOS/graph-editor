@@ -1,4 +1,10 @@
-import { description, Node, registerNode, type NodeParams, type SocketsValues } from '../Node.svelte';
+import {
+	description,
+	Node,
+	registerNode,
+	type NodeParams,
+	type SocketsValues
+} from '../Node.svelte';
 import type { Scalar, Socket } from '$graph-editor/socket';
 import { InputControlNode } from './common-data-nodes.svelte';
 import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
@@ -61,7 +67,6 @@ export class MergeArraysNode extends Node<
 	}
 }
 
-
 @registerNode('array.GetArrayElement')
 @description('Get an element from an array')
 export class GetArrayElementNode extends Node<
@@ -103,9 +108,11 @@ export class GetArrayElementNode extends Node<
 }
 
 @registerNode('array.makeArray')
-
-export class MakeArrayNode extends Node<Record<`data-${number}`, Scalar<'any'>>, { array: Socket<'any', 'array'> }> {
-	constructor(params: NodeParams & {numPins?: number} = {}) {
+export class MakeArrayNode extends Node<
+	Record<`data-${number}`, Scalar<'any'>>,
+	{ array: Socket<'any', 'array'> }
+> {
+	constructor(params: NodeParams & { numPins?: number } = {}) {
 		super({
 			label: 'Make Array',
 			...params
@@ -128,16 +135,15 @@ export class MakeArrayNode extends Node<Record<`data-${number}`, Scalar<'any'>>,
 			inputs: Array.from({ length: numPins }, (_, i) => `data-${i}`),
 			outputs: ['array']
 		});
-		
 	}
 }
-
 
 @registerNode('array.join')
 @description('Join an array of items into a single string')
 export class JoinNode extends Node<
 	{ array: Socket<'any', 'array'>; separator: Scalar<'string'> },
-	{ value: Scalar<'string'> }> {
+	{ value: Scalar<'string'> }
+> {
 	constructor(params: NodeParams = {}) {
 		super({
 			label: 'Join',
@@ -145,12 +151,12 @@ export class JoinNode extends Node<
 		});
 		this.addInData('array', {
 			datastructure: 'array',
-			type: 'any',
+			type: 'any'
 		});
 		this.addInData('separator', {
 			datastructure: 'scalar',
 			type: 'string',
-			initial: ', ',
+			initial: ', '
 		});
 		this.addOutData('value', {
 			datastructure: 'scalar',
@@ -163,27 +169,35 @@ export class JoinNode extends Node<
 		});
 	}
 
-	data(inputs?: SocketsValues<{ array: Socket<'any', 'array'>; separator: Scalar<'string'>; }> | undefined): SocketsValues<{ value: Scalar<'string'>; }> | Promise<SocketsValues<{ value: Scalar<'string'>; }>> {
+	data(
+		inputs?:
+			| SocketsValues<{ array: Socket<'any', 'array'>; separator: Scalar<'string'> }>
+			| undefined
+	):
+		| SocketsValues<{ value: Scalar<'string'> }>
+		| Promise<SocketsValues<{ value: Scalar<'string'> }>> {
 		const array = this.getData('array', inputs);
 		const separator = this.getData('separator', inputs);
 		return {
-			value: array.join(separator).replaceAll("\\n", "\n")
+			value: array.join(separator).replaceAll('\\n', '\n')
 		};
 	}
 }
 
-
 @registerNode('array.Break')
 @description('Break an array into its elements.')
-export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Record<string, Scalar<DataType>>> {
+export class BreakArrayNode extends Node<
+	{ array: Socket<DataType, 'array'> },
+	Record<string, Scalar<DataType>>
+> {
 	currentOutputs = new Set<string>();
-	constructor(params: NodeParams & {type?: DataType} = {}) {
-		super({label: 'Break', ...params})
-		this.addInData("array", {
+	constructor(params: NodeParams & { type?: DataType } = {}) {
+		super({ label: 'Break', ...params });
+		this.addInData('array', {
 			datastructure: 'array',
 			hideLabel: true,
-			type: params.type ?? 'any',
-		})
+			type: params.type ?? 'any'
+		});
 
 		this.addComponentByClass(DynamicTypeComponent, {
 			inputs: ['array'],
@@ -192,22 +206,26 @@ export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Rec
 		this.updateOutputs();
 	}
 	previousData: Record<string, unknown> = {};
-	data(inputs?: SocketsValues<{ array: Socket<DataType, 'array'>; }> | undefined): SocketsValues<{}> | Promise<SocketsValues<{}>> {
+	data(
+		inputs?: SocketsValues<{ array: Socket<DataType, 'array'> }> | undefined
+	): SocketsValues<{}> | Promise<SocketsValues<{}>> {
 		const array = this.getData('array', inputs);
 		this.updateOutputs(inputs);
-		const newData = Object.fromEntries(array.map((value) => [typeof value === 'object' ? JSON.stringify(value) : `${value}`, value]));
-		const res = {...this.previousData, ...newData};
+		const newData = Object.fromEntries(
+			array.map((value) => [typeof value === 'object' ? JSON.stringify(value) : `${value}`, value])
+		);
+		const res = { ...this.previousData, ...newData };
 		this.previousData = newData;
 		return res;
 	}
 
-	updateOutputs(inputs?: {array: unknown[]}) {
+	updateOutputs(inputs?: { array: unknown[] }) {
 		const array = this.getData('array', inputs);
 		const keep = new Set<string>();
 		const type = this.inputs.array?.socket.type;
 		if (!type) return;
 		for (const t of array) {
-			const str = typeof t === 'object' ?  JSON.stringify(t) : `${t}`;
+			const str = typeof t === 'object' ? JSON.stringify(t) : `${t}`;
 			if (str === '') continue;
 			keep.add(str);
 			if (this.currentOutputs.has(str)) continue;
@@ -231,7 +249,6 @@ export class BreakArrayNode extends Node<{array: Socket<DataType, "array">}, Rec
 				if (!output) continue;
 				output.socket.type = type;
 			}
-		})
+		});
 	}
-
 }

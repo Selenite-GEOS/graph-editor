@@ -142,7 +142,9 @@ export class MultiplyNode extends Node<
 			type: 'number'
 		});
 	}
-	data(inputs?: SocketsValues<{ a: Scalar<'number'>; b: Scalar<'number'>; }> | undefined): SocketsValues<{ value: Scalar<'number'>; }> {
-		return {value: this.getData('a', inputs) * this.getData('b', inputs)};
+	data(
+		inputs?: SocketsValues<{ a: Scalar<'number'>; b: Scalar<'number'> }> | undefined
+	): SocketsValues<{ value: Scalar<'number'> }> {
+		return { value: this.getData('a', inputs) * this.getData('b', inputs) };
 	}
 }

@@ -65,9 +65,9 @@
 <style>
 	.alert {
 		grid-auto-flow: column;
-        grid-template-columns: auto minmax(auto, 1fr);
-        justify-items: start;
-        text-align: start;
+		grid-template-columns: auto minmax(auto, 1fr);
+		justify-items: start;
+		text-align: start;
 		max-width: 70vw;
 	}
 </style>

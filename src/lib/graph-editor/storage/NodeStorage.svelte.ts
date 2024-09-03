@@ -1,9 +1,14 @@
 import { GitHubDataSource } from './datasources';
 import { IndexedDBSource } from './db.svelte';
-import {type StoredGraph, type Database, type Datasource as DataSource, type Graph } from './types';
+import {
+	type StoredGraph,
+	type Database,
+	type Datasource as DataSource,
+	type Graph
+} from './types';
 
 export class NodeStorage {
-    static pullDataSourcesInterval = 5000
+	static pullDataSourcesInterval = 5000;
 	static mainStorage: Database = new IndexedDBSource();
 	static sources: DataSource[] = [
 		new GitHubDataSource('https://github.com/Selenite-GEOS/macro-blocks/tree/main/macro-blocks')
@@ -18,7 +23,7 @@ export class NodeStorage {
 	}
 
 	numGraphs = $state(0);
-	graphs = $state<StoredGraph[]>([])
+	graphs = $state<StoredGraph[]>([]);
 	private constructor() {
 		const { unsubscribe } = NodeStorage.mainStorage.numGraphs.subscribe((num) => {
 			this.numGraphs = num;
@@ -40,7 +45,10 @@ export class NodeStorage {
 	static updateTimeout: NodeJS.Timeout | undefined;
 	static async updateLoop() {
 		await NodeStorage.pullSources();
-		NodeStorage.updateTimeout = setTimeout(NodeStorage.updateLoop, NodeStorage.pullDataSourcesInterval);
+		NodeStorage.updateTimeout = setTimeout(
+			NodeStorage.updateLoop,
+			NodeStorage.pullDataSourcesInterval
+		);
 	}
 
 	static get numGraphs() {

@@ -181,7 +181,11 @@
 			onpointerdown={stopPropagation}>{inputControl.value}</textarea
 		>
 	{:else if type === 'select'}
-		<select class="select select-bordered" onpointerdown={stopPropagation} oninput={inputProps.oninput}>
+		<select
+			class="select select-bordered"
+			onpointerdown={stopPropagation}
+			oninput={inputProps.oninput}
+		>
 			{#each inputControl.options ?? [] as option}
 				<option value={option} selected={option === inputControl.value}>{option}</option>
 			{/each}

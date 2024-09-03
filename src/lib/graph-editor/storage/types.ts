@@ -52,7 +52,13 @@ export interface Graph {
 
 	inputs?: GraphPorts;
 	outputs?: GraphPorts;
-	variables?: {keep?: boolean, label?: string, id: string, description?: string, priority?: number}[]
+	variables?: {
+		keep?: boolean;
+		label?: string;
+		id: string;
+		description?: string;
+		priority?: number;
+	}[];
 	// TODO: input props, output props
 }
 

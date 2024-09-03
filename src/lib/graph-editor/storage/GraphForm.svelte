@@ -36,11 +36,9 @@
 		'name',
 		'description',
 		'public',
-		'addToFavorite',
+		'addToFavorite'
 	] as (keyof typeof graph)[];
-	const localPersistedKeys = [
-		'author'
-	] as (keyof typeof graph)[];
+	const localPersistedKeys = ['author'] as (keyof typeof graph)[];
 	function saveForm() {
 		console.debug(graph.public);
 		const res: Record<string, unknown> = {};
@@ -67,14 +65,14 @@
 			for (const [nodeId, ports] of Object.entries(side === 'input' ? inputs : outputs)) {
 				for (const [key, { keep, nickname, descr, priority }] of Object.entries(ports)) {
 					if (!keep) continue;
-					const node = editor.getNode(nodeId)
+					const node = editor.getNode(nodeId);
 					const port = node?.[side === 'input' ? 'inputs' : 'outputs'][key];
 					if (!port) continue;
 					const socket = port.socket;
-					let value: unknown
+					let value: unknown;
 					if (side === 'input') {
 						value = await node.getDataWithInputs(key);
-						if (typeof value === "object") {
+						if (typeof value === 'object') {
 							value = JSON.stringify(value);
 						}
 					}
@@ -84,7 +82,7 @@
 						label: nickname && nickname.trim().length > 0 ? nickname.trim() : (port.label ?? key),
 						description: descr,
 						datastructure: socket.datastructure,
-                        priority,
+						priority,
 						default: value,
 						type: socket.type
 					});
@@ -105,7 +103,7 @@
 				keep,
 				label: nickname,
 				description: descr,
-                priority
+				priority
 			}))
 		};
 
@@ -118,7 +116,10 @@
 
 	function getPortsConfig(
 		side: 'input' | 'output'
-	): Record<string, Record<string, { keep: boolean; nickname?: string; descr?: string, priority?: number }>> {
+	): Record<
+		string,
+		Record<string, { keep: boolean; nickname?: string; descr?: string; priority?: number }>
+	> {
 		return Object.fromEntries(
 			(side === 'input' ? selectedInputs : selectedOutputs).map(({ node, selected }) => [
 				node.id,
@@ -138,7 +139,7 @@
 								keep: existingGraph ? Boolean(existing) : true,
 								nickname,
 								descr: existing?.description,
-                                priority: existing?.priority
+								priority: existing?.priority
 							}
 						];
 					})
@@ -151,15 +152,24 @@
 	const outputs = $state(getPortsConfig('output'));
 
 	const exposedVariables = $derived(Object.values(editor.variables).filter((v) => v.exposed));
-	const variables = $state<Record<string, { nickname?: string; keep?: boolean; descr?: string; priority?:number }>>(
+	const variables = $state<
+		Record<string, { nickname?: string; keep?: boolean; descr?: string; priority?: number }>
+	>(
 		Object.fromEntries(
-			Object.values(editor.variables).filter(v => v.exposed).map((v) => {
-				const existing = existingGraph?.variables?.find((v2) => v2.id === v.id);
-				return [
-					v.id,
-					{ keep: existing?.keep ?? true, nickname: existing?.label, descr: existing?.description, priority: existing?.priority }
-				];
-			})
+			Object.values(editor.variables)
+				.filter((v) => v.exposed)
+				.map((v) => {
+					const existing = existingGraph?.variables?.find((v2) => v2.id === v.id);
+					return [
+						v.id,
+						{
+							keep: existing?.keep ?? true,
+							nickname: existing?.label,
+							descr: existing?.description,
+							priority: existing?.priority
+						}
+					];
+				})
 		)
 	);
 </script>
@@ -227,7 +237,13 @@
 			<label class="grid grid-flow-col gap-4 items-center ms-4 grid-cols-[0fr,0fr,1fr]">
 				<input type="checkbox" bind:checked={variables[variable.id].keep} class="checkbox" />
 				<span class="w-[5rem] truncate col-start-2 font-semibold">{variable.name}</span>
-                <input type="number" bind:value={variables[variable.id].priority} class="input input-bordered col-span-2" placeholder="Priority" title="Influences the order of inputs. Higher priority means higher display." />
+				<input
+					type="number"
+					bind:value={variables[variable.id].priority}
+					class="input input-bordered col-span-2"
+					placeholder="Priority"
+					title="Influences the order of inputs. Higher priority means higher display."
+				/>
 				<input
 					bind:value={variables[variable.id].nickname}
 					class="input input-bordered col-start-3 justify-self-stretch"
@@ -264,8 +280,16 @@
 						{#each selected as [key, port]}
 							<label class="grid grid-flow-col gap-3 items-center ms-4 grid-cols-[0fr,0fr,1fr]">
 								<input type="checkbox" bind:checked={target[node.id][key].keep} class="checkbox" />
-								<span class="w-[5rem] truncate col-start-2 font-semibold" title={port.label ?? key} >{port.label ?? key}</span>
-								<input type="number" bind:value={target[node.id][key].priority} class="input input-bordered col-span-2" placeholder="Priority" title={`Influences the order of ${name}. Higher priority means higher display.`} />
+								<span class="w-[5rem] truncate col-start-2 font-semibold" title={port.label ?? key}
+									>{port.label ?? key}</span
+								>
+								<input
+									type="number"
+									bind:value={target[node.id][key].priority}
+									class="input input-bordered col-span-2"
+									placeholder="Priority"
+									title={`Influences the order of ${name}. Higher priority means higher display.`}
+								/>
 								<input
 									bind:value={target[node.id][key].nickname}
 									class="input input-bordered grow col-start-3"

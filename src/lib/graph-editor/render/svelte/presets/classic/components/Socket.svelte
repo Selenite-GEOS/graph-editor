@@ -88,17 +88,19 @@
 		--opacity: 15%;
 		border: 4px dashed var(--background);
 		background-color: transparent;
-		background-color: color-mix(in srgb, oklch(var(--arrayBackgroundColor)), oklch(var(--b1)) var(--opacity));
+		background-color: color-mix(
+			in srgb,
+			oklch(var(--arrayBackgroundColor)),
+			oklch(var(--b1)) var(--opacity)
+		);
 		border-radius: 0%;
-
 
 		&:hover {
 			// --opacity: light-dark(25%, 15%);
 
 			@media (prefers-color-scheme: dark) {
-				filter: brightness(1.15)
+				filter: brightness(1.15);
 			}
 		}
-
 	}
 </style>

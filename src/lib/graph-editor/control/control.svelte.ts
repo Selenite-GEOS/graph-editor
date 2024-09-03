@@ -198,7 +198,7 @@ export class InputControl<
 			if (params.onChange) {
 				params.onChange(this.#value);
 			}
-		})
+		});
 		this.type = params.type;
 		this.changeType = params.changeType;
 		this.canChangeType = params.canChangeType ?? false;

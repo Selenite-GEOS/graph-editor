@@ -31,7 +31,7 @@ export class ConnectionTrackerComponent extends NodeComponent {
 			factory.editor.addPipe((ctx) => {
 				if (ctx.type !== 'connectioncreated' && ctx.type !== 'connectionremoved') return ctx;
 				const { source, target } = ctx.data;
-                const type = ctx.type === 'connectioncreated' ? 'creation' : 'removal';
+				const type = ctx.type === 'connectioncreated' ? 'creation' : 'removal';
 				trackedNodes.get(source)?.onOutConnectionChange?.(ctx.data, type);
 				trackedNodes.get(target)?.onInConnectionChange?.(ctx.data, type);
 

@@ -4,9 +4,7 @@
 		setupFullGraphEditor,
 		setupGraphEditor,
 		setupSvelteGraphEditor,
-
 		xmlNodeItems
-
 	} from '$graph-editor';
 	import { parseXsdFromUrl, XmlSchema } from '@selenite/commons';
 	import { untrack } from 'svelte';
@@ -24,7 +22,11 @@
 
 				console.log(schema);
 				if (!schema) return;
-				const res = await setupSvelteGraphEditor({ container, additionalNodeItems: [...xmlNodeItems({schema, basePath: ['GEOS']})], xmlSchemas: {geos: schema} });
+				const res = await setupSvelteGraphEditor({
+					container,
+					additionalNodeItems: [...xmlNodeItems({ schema, basePath: ['GEOS'] })],
+					xmlSchemas: { geos: schema }
+				});
 				factory = res.factory;
 			})();
 		});

@@ -3,15 +3,18 @@ import type { Component, Snippet } from 'svelte';
 type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
 
 export type ModalButton = {
-			level?: ButtonLevel;
-			label: string;
-			description?: string;
-			onclick: () => void;
-	  }
+	level?: ButtonLevel;
+	label: string;
+	description?: string;
+	onclick: () => void;
+};
 export type ModalButtonSettings =
-	ModalButton 
-	| 'cancel' | 'promptConfirm'
-	| 'close' | 'submit' | { formId: string};
+	| ModalButton
+	| 'cancel'
+	| 'promptConfirm'
+	| 'close'
+	| 'submit'
+	| { formId: string };
 export type BaseModalSettings = {
 	divider?: boolean;
 	title?: string | Snippet;
@@ -20,7 +23,7 @@ export type BaseModalSettings = {
 };
 
 export type ComponentModalSettings<Props extends Record<string, any> = {}> = {
-	component: Component<Props & { modal: ComponentModalSettings }, {getResponse?: () => unknown}>;
+	component: Component<Props & { modal: ComponentModalSettings }, { getResponse?: () => unknown }>;
 	props: Props;
 } & BaseModalSettings;
 
@@ -29,11 +32,10 @@ export type SnippetModalSettings<Props extends Record<string, any> = {}> = {
 	props: Props;
 } & BaseModalSettings;
 
-
-export type PromptModalSettings = {prompt: string, initial?: string} & BaseModalSettings;
+export type PromptModalSettings = { prompt: string; initial?: string } & BaseModalSettings;
 
 export type ModalSettings<Props extends Record<string, any> = {}> =
- | PromptModalSettings
+	| PromptModalSettings
 	| ComponentModalSettings<Props>
 	| SnippetModalSettings<Props>;
 
@@ -48,9 +50,7 @@ export function isSnippetModalSettings<Props extends Record<string, any>>(
 	return 'snippet' in modal;
 }
 
-export function isPromptModalSettings(
-	modal: ModalSettings
-): modal is PromptModalSettings {
+export function isPromptModalSettings(modal: ModalSettings): modal is PromptModalSettings {
 	return 'prompt' in modal;
 }
 

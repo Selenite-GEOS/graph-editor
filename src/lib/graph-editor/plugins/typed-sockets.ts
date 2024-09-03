@@ -46,10 +46,10 @@ export function socketTypeExport(t: SocketType): ExportedSocketType {
 export type TypeInfo = {
 	type: SocketType;
 	datastructure: SocketDatastructure;
-}
+};
 export function areTypesCompatible(outType: TypeInfo, inType: TypeInfo): boolean {
 	const re = /(\w+):(.+)/;
-	
+
 	const [, outMainType, outSubtypes] = re.exec(outType.type) || [];
 	const [, inMainType, inSubtypes] = re.exec(inType.type) || [];
 	if (inMainType && outMainType && inMainType === outMainType) {
@@ -67,7 +67,7 @@ export function areTypesCompatible(outType: TypeInfo, inType: TypeInfo): boolean
 	if (outType.type === 'groupNameRef' && inType.type === 'groupNameRef') {
 		return true;
 	}
-	
+
 	return (
 		outType.type === 'any' ||
 		((outType.datastructure === inType.datastructure || inType.datastructure === 'array') &&
@@ -111,10 +111,8 @@ export class TypedSocketsPlugin<Schemes extends BaseSchemes> extends Scope<never
 					const sourceNode = this.parent.getNode(conn.source);
 					const targetNode = this.parent.getNode(conn.target);
 					const eMessage = `Connection between ${sourceNode.name ?? sourceNode.label} and ${targetNode.name ?? targetNode.label} is not allowed. Output socket type is ${outputSocket.datastructure}<${outputSocket.type}> and input socket type is ${inputSocket.datastructure}<${inputSocket.type}>`;
-					console.error(
-						eMessage
-					);
-					notifications.error({message: eMessage, autoClose: 8000});
+					console.error(eMessage);
+					notifications.error({ message: eMessage, autoClose: 8000 });
 					let nodeEditor: NodeEditor<Schemes>;
 
 					if ((nodeEditor = scope as NodeEditor<Schemes>) && this.lastConnectionRemove) {

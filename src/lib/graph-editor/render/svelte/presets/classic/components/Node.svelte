@@ -422,7 +422,11 @@
 				</h1>
 				<aside class="relative col-start-2 row-span-full ms-4 max-h-0">
 					{#if macroNode}
-						<span class="absolute right-0 tooltip tooltip-left" data-tip="This is a macro-block, a block that executes a sub graph." title="">
+						<span
+							class="absolute right-0 tooltip tooltip-left"
+							data-tip="This is a macro-block, a block that executes a sub graph."
+							title=""
+						>
 							<Fa icon={faCogs} class="ms-auto mt-0" />
 						</span>
 					{/if}

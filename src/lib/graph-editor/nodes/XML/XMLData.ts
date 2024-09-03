@@ -24,7 +24,7 @@ export class XMLData {
 		name,
 		properties,
 		children,
-		node,
+		node
 	}: {
 		tag: string;
 		name?: string;
@@ -38,7 +38,7 @@ export class XMLData {
 		this.children = children;
 		this.node = node;
 	}
-	
+
 	toXml(): string {
 		let xml = `<${this.tag}`;
 		if (this.name) xml += ` name="${this.name}"`;
@@ -57,7 +57,7 @@ export class XMLData {
 					xml += child.toXml();
 				});
 			} catch (e) {
-				console.error(e)
+				console.error(e);
 				throw new ErrorWNotif('Error generating XML, are you sure you connected everything ?');
 			}
 			xml += `</${this.tag}>`;

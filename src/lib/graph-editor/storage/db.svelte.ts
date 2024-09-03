@@ -1,8 +1,5 @@
-
 import Dexie, { liveQuery, type EntityTable } from 'dexie';
 import type { Database, Graph } from './types';
-
-
 
 /** Database instance to work with IndexedDB. */
 export const db = new Dexie('selenite') as Dexie & {

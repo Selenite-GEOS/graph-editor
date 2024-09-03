@@ -16,12 +16,18 @@
 		path: string;
 		type?: SocketType;
 		picked: boolean;
-		
 	};
-	let { id, selected, factory, path, picked, source, visible }: Partial<Omit<Connection, "source">> & Props = $props();
+	let {
+		id,
+		selected,
+		factory,
+		path,
+		picked,
+		source,
+		visible
+	}: Partial<Omit<Connection, 'source'>> & Props = $props();
 
 	const color = $derived(source ? assignColor(source.socket) : '');
-
 
 	function onClick() {
 		if (!factory) throw new ErrorWNotif('No factory');
@@ -58,7 +64,6 @@
 	data-testid="connection"
 	class:opacity-0={visible !== undefined && !visible}
 	class="group hover:cursor-pointer -z-10"
-	
 	on:dblclick={stopPropagation}
 	on:click|stopPropagation={() => onClick()}
 	on:keypress={(e) => {
@@ -70,7 +75,7 @@
 	on:contextmenu|preventDefault|stopPropagation={openContextMenu}
 >
 	<title>
-		{source ? source.socket.type : ""}
+		{source ? source.socket.type : ''}
 	</title>
 	<path class="stroke-transparent pointer-events-auto" d={path} fill="none" stroke-width={'20px'} />
 	<path

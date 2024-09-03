@@ -97,15 +97,15 @@ class ThemeControl {
 				) ??
 				0;
 			document.body.dataset.theme = this.themes[this.#themeIndex];
-			if (typeof window.matchMedia === "function")
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-				console.log('pizza', this.isDefault());
-				if (this.isDefault()) {
-					this.#themeIndex =
-						this.getThemeIndex(event.matches ? this.defaultDarkMode : this.defaultLightMode) ?? 0;
-					document.body.dataset.theme = this.themes[this.#themeIndex];
-				}
-			});
+			if (typeof window.matchMedia === 'function')
+				window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+					console.log('pizza', this.isDefault());
+					if (this.isDefault()) {
+						this.#themeIndex =
+							this.getThemeIndex(event.matches ? this.defaultDarkMode : this.defaultLightMode) ?? 0;
+						document.body.dataset.theme = this.themes[this.#themeIndex];
+					}
+				});
 		} else this.#themeIndex = this.getThemeIndex(this.defaultDarkMode) ?? 0;
 	}
 
