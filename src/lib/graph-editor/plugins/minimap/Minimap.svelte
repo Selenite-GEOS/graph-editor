@@ -8,9 +8,11 @@
 	interface Props {
 		/** Minimap size in rem. */
 		size?: number;
+		/** View proprortion under which the view should be displayed. Defaults to 1. */
+		displayViewThreshold?: number;
 	}
 
-	let { size: mapH = 20 }: Props = $props();
+	let { size: mapH = 12, displayViewThreshold = 1 }: Props = $props();
 
 	const editorContext = getEditorFromContext();
 	const editor = $derived(editorContext.editor);
@@ -65,11 +67,11 @@
 	);
 	const viewRect = $derived(!a || !b ? undefined : new Rect(a.x, a.y, b.x - a.x, b.y - a.y));
 	const ratioViewRect = $derived.by(() => {
-		if (!viewRect || !totalRect) return;
+		if (!viewRect || !totalRect || !nodesTotalRect) return;
 		
 		const {x, y, width: w, height: h} = viewRect
 		const {x: baseX, y: baseY, width, height} = totalRect;
-		return new Rect((x - baseX) / width, (y - baseY) / height,  w / width,  h / height);
+		return new Rect((x - baseX - (nodesTotalRect.width - width) / 2) / width, (y - baseY - (nodesTotalRect.height - height) / 2) / height,  w / width,  h / height);
 	});
 	const finalViewRect = $derived.by(() => {
 		if (!ratioViewRect) return;
@@ -80,7 +82,7 @@
 
 	const viewArea = $derived(Rect.area(finalViewRect ?? new Rect()))
 	const containerArea = $derived(Rect.area(containerRect ?? new Rect()))
-	const displayView = $derived(viewArea / containerArea < 1)
+	const displayView = $derived(viewArea / containerArea < displayViewThreshold)
 	// const ratioedSurfaceRect = $derived.by(() => {
 	// 	const { x, y, width, height } = surfaceRect;
 	// 	const { width: w, height: h } = containerRect;
@@ -95,7 +97,7 @@
 
 {#if editor?.factory?.minimapEnabled}
 	<aside
-		class="bg-neutral pointer-events-auto bg-opacity-25 relative overflow-clip cursor-pointer"
+		class="bg-neutral pointer-events-auto bg-opacity-50 relative overflow-clip cursor-pointer rounded-box border-base-content border border-opacity-25"
 		oncontextmenu={preventDefault}
 		style="width: {mapW}rem; height: {mapH}rem;"
 		transition:fade={{ duration: 200 }}
@@ -122,8 +124,8 @@
 			{#each finalRects as { x, y, width, height }, i (i)}
 				<div
 					transition:fade={{ duration: 200 }}
-					class="absolute bg-base-300 bg-opacity-75"
-					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px;"
+					class="absolute bg-neutral-content bg-opacity-75"
+					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px; border-radius: calc(var(--rounded-box) * {0.006 * height});"
 				></div>
 			{/each}
 			{#if finalViewRect && displayView}
