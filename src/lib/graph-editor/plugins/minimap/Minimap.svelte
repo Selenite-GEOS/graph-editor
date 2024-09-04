@@ -83,21 +83,12 @@
 	const viewArea = $derived(Rect.area(finalViewRect ?? new Rect()))
 	const containerArea = $derived(Rect.area(containerRect ?? new Rect()))
 	const displayView = $derived(viewArea / containerArea < displayViewThreshold)
-	// const ratioedSurfaceRect = $derived.by(() => {
-	// 	const { x, y, width, height } = surfaceRect;
-	// 	const { width: w, height: h } = containerRect;
-	// 	return new Rect(x / w, y / h, width / w, height / h);
-	// });
-	// const finalSurfaceRect = $derived.by(() => {
-	// 	const { width, height } = containerRect;
-	// 	const { x, y, width: w, height: h } = ratioedSurfaceRect;
-	// 	return new Rect(x * width, y * height, w * width, h * height);
-	// });
 </script>
 
 {#if editor?.factory?.minimapEnabled}
 	<aside
-		class="bg-neutral pointer-events-auto bg-opacity-50 relative overflow-clip cursor-pointer rounded-box border-base-content border border-opacity-25"
+		class:opacity-0={!displayView}
+		class="transition-all duration-[800] bg-neutral pointer-events-auto bg-opacity-50 relative overflow-clip cursor-pointer rounded-box border-base-content border border-opacity-25"
 		oncontextmenu={preventDefault}
 		style="width: {mapW}rem; height: {mapH}rem;"
 		transition:fade={{ duration: 200 }}
