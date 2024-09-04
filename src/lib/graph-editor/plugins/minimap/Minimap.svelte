@@ -82,7 +82,7 @@
 
 	const viewArea = $derived(Rect.area(finalViewRect ?? new Rect()))
 	const containerArea = $derived(Rect.area(containerRect ?? new Rect()))
-	const displayView = $derived(viewArea / containerArea < displayViewThreshold)
+	const displayView = $derived(nodes.length > 0 && viewArea / containerArea < displayViewThreshold)
 </script>
 
 {#if editor?.factory?.minimapEnabled}
