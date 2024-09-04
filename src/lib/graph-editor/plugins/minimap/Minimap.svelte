@@ -124,7 +124,7 @@
 			{#each finalRects as { x, y, width, height }, i (i)}
 				<div
 					transition:fade={{ duration: 200 }}
-					class="absolute bg-neutral-content bg-opacity-75"
+					class="absolute bg-neutral-content bg-opacity-50"
 					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px; border-radius: calc(var(--rounded-box) * {0.006 * height});"
 				></div>
 			{/each}
