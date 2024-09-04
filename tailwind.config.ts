@@ -3,7 +3,10 @@ import scrollbar from 'tailwind-scrollbar';
 /** @type {import('tailwindcss').Config} */
 export default {
 	darkMode: 'class',
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: [
+		'./src/**/*.{html,js,svelte,ts}',
+		'./node_modules/@selenite/commons/dist/**/*.{html,js,svelte,ts}'
+	],
 	theme: {
 		extend: {
 			// brightness: {

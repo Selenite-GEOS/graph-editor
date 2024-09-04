@@ -18,7 +18,7 @@ import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
-import { downloadJSON, newUuid, XmlSchema, type SaveData } from '@selenite/commons';
+import { downloadJSON, newUuid, Rect, XmlSchema, type SaveData } from '@selenite/commons';
 import { Modal, modals } from '$graph-editor/plugins/modal';
 import type {
 	BaseComponent,
@@ -36,6 +36,8 @@ import { CodeIntegration } from './CodeIntegration.svelte';
 import type { ConnectionPlugin } from '$graph-editor/setup/ConnectionSetup';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import type { StoredGraph } from '$graph-editor/storage/types';
+import { NodeSearch } from './NodeSearch.svelte';
+import { ElementRect } from 'runed';
 
 function createDataflowEngine() {
 	return new DataflowEngine<Schemes>(({ inputs, outputs }) => {
@@ -89,6 +91,16 @@ type WithoutFactory<T> = Omit<T, 'factory'>;
 // export function registerNode() {}
 
 export class NodeFactory implements ComponentSupportInterface {
+	components: BaseComponent[] = [];
+	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(
+		componentClass: new (params: P) => C,
+		params: Omit<P, keyof ComponentParams>
+	): C {
+		const component = new componentClass({ ...(params as P), owner: this });
+		this.components.push(component);
+		return component;
+	}
+	minimapEnabled = $state(true)
 	public notifications: NotificationsManager = {
 		show: (notif) => {
 			let res = '';
@@ -121,6 +133,8 @@ export class NodeFactory implements ComponentSupportInterface {
 		'connectionPathType',
 		defaultConnectionPath
 	);
+
+	surfaceRect = $state(new Rect());
 
 	lastSelectedNode = $state<Node>();
 	editor: NodeEditor;
@@ -388,6 +402,9 @@ export class NodeFactory implements ComponentSupportInterface {
 			if (ctx.type === 'zoomed') {
 				this.transform.zoom = ctx.data.zoom;
 			}
+			if (ctx.type === 'translated' || ctx.type === 'zoomed') {
+				this.surfaceRect = this.#area?.area.content.holder.getBoundingClientRect() ?? new Rect();
+			}
 			return ctx;
 		});
 	}
@@ -398,6 +415,11 @@ export class NodeFactory implements ComponentSupportInterface {
 	private readonly controlflowEngine = createControlflowEngine();
 	// public selector?: AreaExtensions.Selector<SelectorEntity>;
 	selector: NodeSelector;
+	get selection() {
+		return this.selector;
+	}
+
+	search = this.addComponentByClass(NodeSearch, {});
 	// public accumulating?: ReturnType<typeof AreaExtensions.accumulateOnCtrl>;
 	// public selectableNodes?: ReturnType<typeof AreaExtensions.selectableNodes>;
 	public arrange?: AutoArrangePlugin<Schemes>;
@@ -552,16 +574,6 @@ export class NodeFactory implements ComponentSupportInterface {
 
 			return context;
 		});
-	}
-
-	components: BaseComponent[] = [];
-	addComponentByClass<P extends Record<string, unknown>, C extends BaseComponent>(
-		componentClass: new (params: P) => C,
-		params: Omit<P, keyof ComponentParams>
-	): C {
-		const component = new componentClass({ ...(params as P), owner: this });
-		this.components.push(component);
-		return component;
 	}
 
 	commentSelectedNodes(params: { text?: string } = {}): void {

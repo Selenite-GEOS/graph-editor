@@ -184,6 +184,7 @@ export class InputControl<
 	canChangeType = $state(false);
 	props = $state<HTMLInputAttributes>({});
 	options = $state<string[]>();
+	autoType = false;
 
 	constructor(params: InputControlParams<T, D>) {
 		super();

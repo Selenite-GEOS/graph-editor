@@ -7,3 +7,4 @@ export * from './modal';
 export * as ViewportAddons from './viewport-addons';
 export * as Notifications from './notifications';
 export { themeControl } from '$lib/global/index.svelte';
+export * from './minimap'

@@ -30,12 +30,12 @@ import {
 
 import { ErrorWNotif } from '$lib/global/index.svelte';
 import type { ConverterNode } from './data/common-data-nodes.svelte';
-import type { AreaPlugin } from 'rete-area-plugin';
+import type { AreaPlugin, NodeView } from 'rete-area-plugin';
 import type { Schemes } from '$graph-editor/schemes';
 import { structures } from 'rete-structures';
 import { getLeavesFromOutput } from './utils';
 import type { HTMLInputAttributes } from 'svelte/elements';
-import { capitalize, uuidv4, type SaveData } from '@selenite/commons';
+import { capitalize, Rect, uuidv4, type SaveData } from '@selenite/commons';
 import type { SelectorEntity } from '$graph-editor/editor/NodeSelection.svelte';
 import { SvelteMap } from 'svelte/reactivity';
 
@@ -243,8 +243,33 @@ export class Node<
 	>
 	implements ClassicPreset.Node<Inputs, Outputs, Controls>, DataflowNode, ComponentSupportInterface
 {
+	pos = $state({ x: 0, y: 0 });
 	#width = $state(100);
 	#height = $state(50);
+	get rect(): Rect {
+		const n = this;
+		return {
+			get x() {
+				return n.pos.x;
+			},
+			get y() {
+				return n.pos.y;
+			},
+			get width() {
+				return n.width;
+			},
+			get height() {
+				return n.height;
+			},
+			get right() {
+				return n.pos.x + n.width;
+			},
+			get bottom() {
+				return n.pos.y + n.height;
+			}
+		}
+	}
+
 	visible = $state(true);
 	get width() {
 		return this.#width;
@@ -283,13 +308,15 @@ export class Node<
 		return this.factory?.getArea();
 	}
 
+	get view(): NodeView | undefined {
+		return this.area?.nodeViews.get(this.id);
+	}
+
 	static description: string = '';
 	static visible: boolean = true;
 	// static inputTypes?: string[];
 	// static outputTypes?: string[];
 
-	// width = 190;
-	// height = 120;
 	private components: BaseComponent[] = [];
 	static activeFactory: NodeFactory | undefined;
 
@@ -375,7 +402,7 @@ export class Node<
 	inConnections = $derived({ ...this.ingoingDataConnections, ...this.ingoingExecConnections });
 
 	constructor(params: NodeParams = {}) {
-		const { label = '', width = 190, height = 120, factory } = params;
+		const { label = '', factory, height = 0, width = 0 } = params;
 		this.#id = params.id ?? uuidv4();
 		this.label = label;
 		if (params.name) {

@@ -10,6 +10,7 @@
 		clickIfNoDrag,
 		distance,
 		lerp,
+		MatchHighlighter,
 		posFromClient,
 		shortcut,
 		stopPropagation
@@ -164,7 +165,13 @@
 	const nodeElmnt = $derived(
 		floating.elements.reference instanceof HTMLElement ? floating.elements.reference : undefined
 	);
+
+	const searchQuery = $derived(node.factory?.search.query);
 </script>
+
+{#snippet withHighlights(content: string)}
+	<MatchHighlighter {content} ref={searchQuery} />
+{/snippet}
 
 {#snippet controlSnippet(control: Control, { class: classes }: { class?: string })}
 	<Ref
@@ -202,7 +209,7 @@
 				}
 			}}
 		>
-			{node.name ?? node.label}
+			{@render withHighlights(node.name ?? node.label)}
 		</button>
 	</Portal>
 {/if}
@@ -302,6 +309,7 @@
 	${node.previewed ? 'previewed' : ''}
 	${variableNode ? '!rounded-full' : ''}
 	${variableNode?.variable?.highlighted ? '!bg-accent text-accent-content transition-colors' : ''}
+	${node.factory?.search.focused === node ? 'outline-accent outline' : ''}
 	`}
 	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
 		transitionEnabled
@@ -351,7 +359,7 @@
 			<header class="grid">
 				{#if node.name || editingName}
 					<h2 class="text-sm mb-1 col-start-1">
-						{node.label}
+						<MatchHighlighter content={node.label} ref={searchQuery} />
 					</h2>
 				{/if}
 				<h1 class="relative card-title mb-3 col-span-fuaall text-nowrap col-start-1">
@@ -385,7 +393,7 @@
 							lastPointerDownPos = posFromClient(e);
 						}}
 					>
-						{node.name ?? node.label}
+						{@render withHighlights(node.name ?? node.label)}
 					</button>
 					{#if editingName}
 						<!-- svelte-ignore event_directive_deprecated -->
@@ -474,10 +482,10 @@
 								class="input-title {input.control && input.showControl ? 'ms-0 mb-1' : ''}"
 								data-testid="input-title"
 							>
-								{capitalize(input.label || '')}{#if input.socket.isRequired}<span
-										class="ps-0.5 text-lg"
-										title="required">*</span
-									>{/if}
+								{@render withHighlights(capitalize(input.label || ''))}
+								{#if input.socket.isRequired}
+									<span class="ps-0.5 text-lg" title="required">*</span>
+								{/if}
 							</div>
 						{/if}
 
@@ -512,10 +520,11 @@
 						data-testid="output-title"
 						title={output.description}
 					>
-						{output.label || ''}{#if output.socket.isRequired}<span
-								class="ps-0.5 text-lg"
-								title="required">*</span
-							>{/if}
+						{@render withHighlights(capitalize(output.label || ''))}
+						
+						{#if output.socket.isRequired}
+							<span class="ps-0.5 text-lg" title="required">*</span>
+						{/if}
 					</div>
 					<!-- <Ref
 						class="h-full !flex items-center output-control"

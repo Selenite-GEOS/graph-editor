@@ -54,14 +54,13 @@ export function oldClientToSurfacePos({
 }): [number, number] {
 	const area = factory.getArea();
 	if (!area) throw new Error('No area');
-	const surface = area.area.content.holder as HTMLElement;
-	const surfaceRect = surface.getBoundingClientRect();
-	const surfacePos = { x: surfaceRect.left, y: surfaceRect.top };
-
+	const surfaceRect = factory.surfaceRect;
+	const surfacePos = { x: surfaceRect.x, y: surfaceRect.y };
+	const k = area.area.transform.k;
 	// Calculate scaled position
-	const zoomScale = getScale(surface); // Implement this function to retrieve the zoom scale
-	const scaledX = (x - surfacePos.x) / zoomScale.scaleX;
-	const scaledY = (y - surfacePos.y) / zoomScale.scaleY;
+	// const zoomScale = getScale(surface); // Implement this function to retrieve the zoom scale
+	const scaledX = (x - surfacePos.x) / k;
+	const scaledY = (y - surfacePos.y) / k;
 
 	return [scaledX, scaledY];
 }

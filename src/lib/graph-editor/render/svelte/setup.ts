@@ -144,10 +144,8 @@ export const setupSvelteRender: SetupFunction = async (params) => {
 	});
 	// @ts-expect-error: Ignore type error
 	sveltePlugin.use(pathPlugin);
-	const { setup: minimapPreset } = await import('rete-svelte-plugin/svelte/presets/minimap');
 	const { AddXmlAttributeControl } = await import('$graph-editor/nodes/XML');
 	const Presets = await import('./presets');
-	// sveltePlugin.addPreset(minimapPreset({ size: 200 }));
 	// sveltePlugin.addPreset(Presets.contextMenu.setup())
 	sveltePlugin.addPreset(
 		Presets.classic.setup({

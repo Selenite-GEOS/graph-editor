@@ -4,7 +4,8 @@ import { Connection, Node } from '$graph-editor/nodes';
 import { SvelteSet } from 'svelte/reactivity';
 import wu from 'wu';
 import { Comment } from 'rete-comment-plugin';
-import { Rect, type Position } from '@selenite/commons';
+import { boxSelection, Rect, type BoxSelectionParams, type Position } from '@selenite/commons';
+import type { Setup } from '$graph-editor/setup/Setup';
 
 const entityTypesMap = {
 	node: Node,
@@ -200,6 +201,9 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	}
 
 	selectMultiple(entities: Iterable<SelectorEntity>) {
+		if (!this.accumulating && !this.ranging) {
+			this.unselectAll();
+		}
 		for (const e of entities) {
 			this.entities.add(e);
 		}
@@ -279,6 +283,52 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 		// this.comment?.comments.forEach((comment) => {
 		// 	this.comment?.select(comment.id);
 		// });
+	}
+
+	// 
+	// Box selection
+	//
+
+	#boxSelectionEnabled = $state(false);
+
+	get boxSelectionEnabled() {
+		return this.#boxSelectionEnabled;
+	}
+
+
+	boxSelectionAction: ReturnType<typeof boxSelection> | undefined;
+
+	set boxSelectionEnabled(value: boolean) {
+		this.#boxSelectionEnabled = value;
+		const holder = this.owner.area?.area.content.holder;
+		const params: BoxSelectionParams = {
+			holder,
+			threshold: 0.5,
+			enabled: value,
+			onselection: (elements) => {
+				const set = new Set(elements)
+				const nodeViews = this.owner.area?.nodeViews;
+				if (!nodeViews) return;
+				const toSelect: SelectorEntity[] = [];
+				for (const [nodeId, view] of nodeViews) {
+					if (set.has(view.element)) {
+						const node = this.owner.getNode(nodeId);
+						if (node)
+							toSelect.push(node);
+					}
+				}
+				this.selectMultiple(toSelect);
+			}
+		}
+		if (!this.boxSelectionAction) {
+			
+			const container = this.owner.area?.container;
+			if (!container || !holder) return;
+			container.classList.toggle('heybro')
+			this.boxSelectionAction = boxSelection(container, params);
+			return;
+		}
+		this.boxSelectionAction.update?.(params);
 	}
 }
 

@@ -1,42 +1,41 @@
-import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import type { AreaExtra } from '$graph-editor/area';
 import type { Schemes } from '$graph-editor/schemes';
-import { AreaPlugin, type Area2D } from 'rete-area-plugin';
-import { SetupClass, type Setup, type SetupFunction } from './Setup';
-import type { Root } from 'rete';
+import { AreaPlugin } from 'rete-area-plugin';
+import { type Setup, type SetupFunction } from './Setup';
 import {
 	getDraggedGraph,
 	getDraggedVariableId,
 	isDraggedGraph,
 	isDraggedVariable
 } from '$graph-editor/utils';
-import { animationFrame, posFromClient } from '@selenite/commons';
+import { animationFrame, PointerDownWatcher, posFromClient } from '@selenite/commons';
 import { GraphNode, MacroNode, VariableNode } from '$graph-editor';
 import { clientToSurfacePos } from '$utils/html';
 import { tick } from 'svelte';
+import { throttle } from 'lodash-es';
 
-export class AreaSetup extends SetupClass {
-	private lastClicked: HTMLElement | null = null;
-	setup(editor: NodeEditor, area: AreaPlugin<Schemes, AreaExtra>, factory: NodeFactory): void {
-		area.addPipe((ctx) => {
-			const ignored: (AreaExtra | Area2D<Schemes> | Root<Schemes>)['type'][] = [
-				'unmount',
-				'pointermove',
-				'render',
-				'rendered',
-				'zoom',
-				'zoomed',
-				'translate',
-				'translated'
-			];
-			if (ignored.includes(ctx.type)) {
-				return ctx;
-			}
+// export class AreaSetup extends SetupClass {
+// 	private lastClicked: HTMLElement | null = null;
+// 	setup(editor: NodeEditor, area: AreaPlugin<Schemes, AreaExtra>, factory: NodeFactory): void {
+// 		area.addPipe((ctx) => {
+// 			const ignored: (AreaExtra | Area2D<Schemes> | Root<Schemes>)['type'][] = [
+// 				'unmount',
+// 				'pointermove',
+// 				'render',
+// 				'rendered',
+// 				'zoom',
+// 				'zoomed',
+// 				'translate',
+// 				'translated'
+// 			];
+// 			if (ignored.includes(ctx.type)) {
+// 				return ctx;
+// 			}
 
-			return ctx;
-		});
-	}
-}
+// 			return ctx;
+// 		});
+// 	}
+// }
 
 export const setupArea: SetupFunction = (params) => {
 	console.log('Setting up area plugin');
@@ -48,9 +47,46 @@ export const setupArea: SetupFunction = (params) => {
 	}
 	const area = new AreaPlugin<Schemes, AreaExtra>(container);
 
+
+	// Update nodes position
+	area.addPipe(ctx => {
+		// if (ctx.type === 'node')
+		if (ctx.type !== 'nodetranslated') return ctx;
+		const {id, position} = ctx.data;
+		const node = editor.getNode(id);
+		if (!node) return ctx;
+		node.pos = position;
+		return ctx;
+	})
+
+	
+
 	function dragHandler(e: DragEvent) {
 		if (isDraggedGraph(e) || isDraggedVariable(e)) e.preventDefault();
 	}
+
+	let deltaX = 0;
+	let deltaY = 0;
+
+	const throttledTranslate = throttle(() => {
+		const newX = area.area.transform.x + deltaX;
+		const newY = area.area.transform.y + deltaY;
+		area.area.translate(newX, newY);
+		deltaX = 0;
+		deltaY = 0;
+	}, 5)
+
+	// Area movement
+	container.addEventListener('pointermove', async (e) => {
+		if (!PointerDownWatcher.instance.isPointerDown) return;
+		const pDownE = PointerDownWatcher.instance.lastEvent;
+		if (!pDownE) return;
+		if (pDownE.button !== 1 && pDownE.button !== 2) return;
+		deltaX += e.movementX;
+		deltaY += e.movementY;
+		throttledTranslate();
+	}, {passive: true});
+
 	container.addEventListener('dragover', dragHandler);
 	container.addEventListener('dragenter', dragHandler);
 	container.addEventListener('drop', async (e) => {

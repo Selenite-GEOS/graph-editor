@@ -1,30 +1,22 @@
 <script lang="ts">
 	import { setupSvelteRender } from '$graph-editor/render';
-	import { modals, NodeStorage, Setup, VariablesListComponent } from '$lib/graph-editor';
+	import { MiniMap, NodeStorage, Setup, VariablesListComponent } from '$lib/graph-editor';
 	import {
 		showContextMenu,
-		ContextMenuComponent,
 		nodeItem,
-		xmlItem,
-		xmlNodeItems,
-		contextMenu
-	} from '$graph-editor/plugins/context-menu';
-	import { AreaExtensions } from 'rete-area-plugin';
+		xmlNodeItems	} from '$graph-editor/plugins/context-menu';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
 	import { capitalize, parseXsdFromUrl, shortcut, type KeyboardShortcut } from '@selenite/commons';
-	import { ErrorWNotif, notifications, themeControl } from '$lib/global/index.svelte';
+	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';
-	import { setContext } from 'svelte';
-	import GraphForm from '$graph-editor/storage/GraphForm.svelte';
+	import { setContext, untrack } from 'svelte';
 	import { onGraphDragStart } from '$graph-editor/utils';
 	let editor = $state<NodeEditor>();
 	const factory = $derived(editor?.factory);
 	const saveData = persisted<NodeEditorSaveData | null>('graph-editor-save-data', null);
 	let editorReady = $state(false);
-
-	// On mount
 
 	$effect(() => {
 		if (!container) return;
@@ -73,27 +65,7 @@
 						path: ['XML'],
 						tags: ['xml']
 					}),
-					xmlItem({
-						xmlConfig: {
-							xmlTag: 'ExampleWithName',
-							xmlProperties: [
-								{
-									name: 'name',
-									type: 'string',
-									required: true
-								},
-								{
-									name: 'cfl',
-									type: 'number',
-									required: true
-								},
-								{
-									name: 'b',
-									type: 'number'
-								}
-							]
-						}
-					})
+					
 				]
 			});
 
@@ -140,7 +112,7 @@
 		label?: string;
 		class?: string;
 		shortcut?: KeyboardShortcut;
-		action?: (e: Event) => void;
+		action?: (n: HTMLElement, e: Event) => void;
 		props?: HTMLButtonAttributes;
 	};
 	const editorContext = {
@@ -152,6 +124,15 @@
 		}
 	};
 	setContext('editor', editorContext);
+	let minimapOn = persisted('minimap', true)
+	$effect(() => {
+		const on = $minimapOn;
+		factory
+		untrack(() => {
+			if (factory)
+			factory.minimapEnabled = on;
+		})
+	})
 </script>
 
 {#snippet button({
@@ -163,11 +144,11 @@
 }: ButtonProps)}
 	<button
 		type="button"
-		class="btn {classes}"
+		class="btn pointer-events-auto {classes}"
 		{...props}
 		use:shortcut={{ ...kbShortcut, action }}
 		onclick={(e: Event) => {
-			if (action) action(e);
+			if (action) action(e.currentTarget as HTMLElement, e);
 		}}
 	>
 		{label}
@@ -175,11 +156,11 @@
 {/snippet}
 
 <div class="h-[100vh] grid relative bg-base-200">
-	<div class="z-10 absolute top-4 left-4 flex gap-2 items-end flex-wrap">
+	<div class="z-10 absolute top-4 left-4 flex gap-2 items-end flex-wrap pointer-events-none">
 		<button
 			type="button"
 			disabled={!editorReady}
-			class=" hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all"
+			class=" hover:brightness-150 bg-slate-950 text-white rounded-md p-4 active:brightness-50 transition-all pointer-events-auto"
 			onclick={() => save()}
 			use:shortcut={{ key: 's', ctrl: true, action: save }}
 		>
@@ -188,7 +169,7 @@
 		<button
 			class:btn-secondary={isGridlinesVisible}
 			type="button"
-			class="btn"
+			class="btn pointer-events-auto"
 			onclick={toggleGridlinesVisibility}
 		>
 			Grid
@@ -208,34 +189,44 @@
 				factory?.downloadGraph();
 			}
 		})}
-		<select class="select select-bordered" title="Theme" bind:value={themeControl.theme}>
+		<select class="select select-bordered pointer-events-auto" title="Theme" bind:value={themeControl.theme}>
 			<option value="">Default</option>
 			{#each themeControl.themes as theme}
 				<option value={theme}>{capitalize(theme)}</option>
 			{/each}
 		</select>
 		{#if editor}
-			<input class="input input-bordered" bind:value={editor.graphName} />
-			<input class="input input-bordered w-[23em]" bind:value={editor.graphId} />
+			<input class="input input-bordered pointer-events-auto" bind:value={editor.graphName} />
+			<input class="input input-bordered w-[23em] pointer-events-auto" bind:value={editor.graphId} />
 		{/if}
 		<aside class="flex gap-2">
 			<h2>DB</h2>
 			<p>Count : {NodeStorage.numGraphs}</p>
 		</aside>
-		<button class="btn" onclick={() => factory?.openGraphForm()}>Save to DB</button>
-		<button class="btn" onclick={() => NodeStorage.clearGraphs()}>Clear DB</button>
-		<button class="btn" onclick={() => NodeStorage.pullSources()}>Pull datasources</button>
+		<button class="btn pointer-events-auto" onclick={() => factory?.openGraphForm()}>Save to DB</button>
+		<button class="btn pointer-events-auto" onclick={() => NodeStorage.clearGraphs()}>Clear DB</button>
+		<button class="btn pointer-events-auto" onclick={() => NodeStorage.pullSources()}>Pull datasources</button>
+		{@render button({
+			class: factory?.selection.boxSelectionEnabled ? 'btn-success' : '',
+			label: 'Box',
+			shortcut: { key: 'b'},
+			action: () => {
+				if (!factory) return;
+				const selection = factory.selection;
+				selection.boxSelectionEnabled = !selection.boxSelectionEnabled;
+			}
+		})}
+		{#if factory}
+		{@render button({label: 'Previous', shortcut:{key: 'p'}, action: () => factory.search.previous()})}
+		<input class="input input-bordered pointer-events-auto" bind:value={factory.search.query} placeholder="Search"/>
+		{@render button({label: 'Next', shortcut: {key: 'n'}, action: () => factory.search.next()})}
+		{@render button({label: 'Minimap', class: $minimapOn ? 'btn-secondary' : '', action: () => $minimapOn = !$minimapOn})}
+		{/if}
 	</div>
 	<div
 		use:shortcut={{
 			key: 'a',
-			async action(e) {
-				if (contextMenu.visible) return;
-				await editor?.factory?.arrange?.layout();
-				const area = editor?.factory?.area;
-				if (!area) return;
-				await AreaExtensions.zoomAt(area, editor?.getNodes() ?? []);
-			}
+			async action(e) {}
 		}}
 		use:shortcut={{
 			key: 'g',
@@ -266,9 +257,9 @@
 		<VariablesListComponent />
 	</div>
 	<div
-		class="absolute bottom-2 right-2 p-4 bg-base-200 rounded-box border border-base-content border-opacity-10 transition-all"
+		class="absolute bottom-2 right-2 flex gap-4 items-end pointer-events-none"
 	>
-		<details>
+		<details class="p-4 bg-base-200 rounded-box border border-base-content border-opacity-10 transition-all pointer-events-auto">
 			<summary class="ms-4 w-[12rem] font-semibold cursor-pointer select-none">
 				Saved Graphs
 			</summary>
@@ -288,5 +279,6 @@
 				{/each}
 			</ul>
 		</details>
+		<MiniMap />
 	</div>
 </div>

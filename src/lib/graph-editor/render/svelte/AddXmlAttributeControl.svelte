@@ -29,6 +29,8 @@
 				<li>
 					<label class="flex items-center gap-4 py-2 cursor-pointer" title={doc}>
 						<input
+						class="checkbox"
+						type="checkbox"
 							use:checkbox
 							use:keyboardNavigation
 							checked={xmlNode.usedOptionalAttrs.has(attrName)}

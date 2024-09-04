@@ -48,8 +48,6 @@ pnpm publish
 - Code integration : To code : Update existing named XML elements instead of duplicating ? Maybe
 - Make history undo / redo use factory.bulkOperation
 - Add index to Context Menu items
-- Add variables
-- Add minimap
 - Add auto connection
 - Add magnetic connection
 - Add panning viewport

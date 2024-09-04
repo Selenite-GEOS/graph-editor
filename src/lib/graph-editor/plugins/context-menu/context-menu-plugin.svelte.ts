@@ -10,7 +10,7 @@ import { clientToSurfacePos } from '$utils/html';
 import '../../nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { VariableNode, XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
-import { localId, XmlSchema, type XMLTypeTree, capitalizeWords } from '@selenite/commons';
+import { localId, XmlSchema, type XMLTypeTree, capitalizeWords, posFromClient, PointerDownWatcher, distance } from '@selenite/commons';
 import { areTypesCompatible } from '../typed-sockets';
 import type { SocketData } from 'rete-connection-plugin';
 import { ContextMenu } from './context-menu.svelte';
@@ -385,13 +385,23 @@ export function contextMenuSetup({
 
 				// Handle context menu events
 				if (context.type === 'contextmenu') {
+					const e = context.data.event;
+					e.preventDefault();
+					const pos = posFromClient(e);
+					const pDownE = PointerDownWatcher.instance.lastEvent;
+					if (pDownE) {
+						const pDownPos = posFromClient(pDownE);
+						if (distance(pDownPos, pos) > 10) {
+							return context;
+						}
+					}
 					// Context menu on node
 					if (context.data.context !== 'root') {
 						if (!(context.data.context instanceof Node)) return context;
 						console.debug('Context menu on node');
 						const node = context.data.context as Node;
 						// (factory as NodeFactory).select(context.data.context, {
-						// 	accumulate: (factory as NodeFactory).selector.entities.size > 1
+							// 	accumulate: (factory as NodeFactory).selector.entities.size > 1
 						// });
 						showContextMenu({
 							items: [
@@ -419,7 +429,7 @@ export function contextMenuSetup({
 									tags: ['delete', 'deletion']
 								}
 							],
-							pos: { x: context.data.event.clientX, y: context.data.event.clientY },
+							pos,
 							searchbar: false
 						});
 						context.data.event.preventDefault();
@@ -443,7 +453,6 @@ export function contextMenuSetup({
 						);
 					}
 
-					const pos: Position = { x: context.data.event.clientX, y: context.data.event.clientY };
 					const items: MenuItem[] = getMenuItemsFromNodeItems({
 						factory,
 						pos,

@@ -7,7 +7,7 @@
 </script>
 
 <button
-	class="btn btn-primary" class:m-2={isPlay}
+	class="btn btn-primary" class:mb-5={isPlay}
 	on:dblclick|stopPropagation
 	on:pointerdown|stopPropagation={() => null}
 	on:click={data.onClick}

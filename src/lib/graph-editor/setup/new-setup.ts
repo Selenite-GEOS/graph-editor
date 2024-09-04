@@ -3,7 +3,6 @@ import type { Writable } from 'svelte/store';
 import { isSetup, type Setup, type SetupAreaFunction, type SetupFunction } from './Setup';
 import { setupConnections } from './ConnectionSetup';
 import { setupArea } from './AreaSetup';
-import { setupMinimap } from './MinimapSetup';
 import { TypedSocketsPlugin } from '$graph-editor/plugins/typed-sockets';
 import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
@@ -51,7 +50,7 @@ export async function setupGraphEditor(
 	if (params.container) {
 		params = (await setupArea({ editor, factory, ...params })) ?? params;
 	}
-
+	
 	const areaSetups: SetupAreaFunction[] = [];
 	for (const setup of params.setups ?? []) {
 		// Handle the case where setup is a function
@@ -95,7 +94,6 @@ export async function setupFullGraphEditor(
 		setups: [
 			...(params.setups ?? []),
 			setupConnections,
-			// setupMinimap,
 			({ editor }) => {
 				console.log('Setting up typed sockets plugin');
 				const typedSocketsPlugin = new TypedSocketsPlugin<Schemes>();
