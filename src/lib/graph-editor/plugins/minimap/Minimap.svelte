@@ -6,11 +6,11 @@
 	import { clientToSurfacePos } from '$utils/html';
 
 	interface Props {
-		/** Minimap height in rem. */
-		height?: number;
+		/** Minimap size in rem. */
+		size?: number;
 	}
 
-	let { height: mapH = 20 }: Props = $props();
+	let { size: mapH = 20 }: Props = $props();
 
 	const editorContext = getEditorFromContext();
 	const editor = $derived(editorContext.editor);
@@ -18,30 +18,29 @@
 	const areaRect = new ElementRect(() => factory?.area?.container);
 	const nodes = $derived(editor?.nodes ?? []);
 	const rects = $derived(nodes.map((n) => n.rect));
-	const totalRect = $derived(
+	const nodesTotalRect = $derived(
 		nodes.length === 0 ? undefined : Rect.union(nodes[0].rect, ...nodes.map((n) => n.rect).slice(1))
 	);
-	$effect(() => {
-		if (totalRect === undefined) return;
-
-		let { x: baseX, y: baseY, width, height } = totalRect;
-		const res: Rect[] = [];
-		for (const { x, y, width: w, height: h } of rects) {
-			res.push(new Rect((x - baseX) / width, (y - baseY) / height, w / width, h / height));
-		}
-		console.log("update")
-	})
+	const totalSize = $derived(
+		!nodesTotalRect ? undefined : Math.max(nodesTotalRect.width, nodesTotalRect.height)
+	);
+	const totalRect = $derived(!nodesTotalRect ? undefined : new Rect(nodesTotalRect.x, nodesTotalRect.y, totalSize, totalSize));
+	
 
 	const ratioRects = $derived.by(() => {
-		if (totalRect === undefined) return [];
+		if (totalRect === undefined || !nodesTotalRect) return [];
 
 		let { x: baseX, y: baseY, width, height } = totalRect;
 		const res: Rect[] = [];
 		for (const { x, y, width: w, height: h } of rects) {
-			res.push(new Rect((x - baseX) / width, (y - baseY) / height, w / width, h / height));
+			res.push(new Rect((x - baseX - (nodesTotalRect.width - width) / 2) / width, (y - baseY - (nodesTotalRect.height - height) / 2) / height, w / width, h / height));
 		}
 		return res;
 	});
+	// Workaround with effect
+	$effect(() => {
+		ratioRects
+	})
 	let container = $state<HTMLElement>();
 	const containerRect = new ElementRect(() => container);
 	const finalRects = $derived.by(() => {
@@ -53,7 +52,8 @@
 		}
 		return res;
 	});
-	const mapW = $derived((mapH * areaRect.width) / areaRect.height);
+	// const mapW = $derived((mapH * areaRect.width) / areaRect.height);
+	const mapW = $derived(mapH)
 
 	const a = $derived(
 		!factory ? undefined : clientToSurfacePos({ pos: { x: areaRect.x, y: areaRect.y }, factory })
@@ -99,24 +99,26 @@
 		oncontextmenu={preventDefault}
 		style="width: {mapW}rem; height: {mapH}rem;"
 		transition:fade={{ duration: 200 }}
-		use:clickIfNoDrag={{onclick: (e) => {
-			if (!factory || !totalRect) return;
-			console.log("move map")
-			
-			let pos = posFromClient(e)
-			pos = Vector2D.subtract(pos, Rect.pos(containerRect))
-			pos = {
-				x: pos.x * factory.surfaceRect.width / containerRect.width,
-				y: pos.y * factory.surfaceRect.height / containerRect.height
+		use:clickIfNoDrag={{
+			onclick: (e) => {
+				if (!factory || !totalRect) return;
+				console.log('move map');
+
+				let pos = posFromClient(e);
+				pos = Vector2D.subtract(pos, Rect.pos(containerRect));
+				pos = {
+					x: (pos.x * factory.surfaceRect.width) / containerRect.width,
+					y: (pos.y * factory.surfaceRect.height) / containerRect.height
+				};
+				console.log(factory.surfaceRect.height);
+				console.log('current', factory.area?.area.transform);
+				// const newSurfacePos = clientToSurfacePos({pos: newPos, factory})
+				// console.log(newPos, newSurfacePos)
+				// factory.area?.area.translate(pos.x, pos.y)
 			}
-			console.log(factory.surfaceRect.height)
-			console.log("current", factory.area?.area.transform)
-			// const newSurfacePos = clientToSurfacePos({pos: newPos, factory})
-			// console.log(newPos, newSurfacePos)
-			// factory.area?.area.translate(pos.x, pos.y)
-		}}}
+		}}
 	>
-		<div bind:this={container} class="absolute inset-4 ">
+		<div bind:this={container} class="absolute inset-4">
 			{#each finalRects as { x, y, width, height }, i (i)}
 				<div
 					transition:fade={{ duration: 200 }}
