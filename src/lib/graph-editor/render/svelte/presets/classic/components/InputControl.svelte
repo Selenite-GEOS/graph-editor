@@ -190,7 +190,7 @@
 		>
 	{:else if type === 'select'}
 		<select
-			class="select select-bordered"
+			class="select select-bordered text-base-content"
 			onpointerdown={stopPropagation}
 			oninput={inputProps.oninput}
 		>
