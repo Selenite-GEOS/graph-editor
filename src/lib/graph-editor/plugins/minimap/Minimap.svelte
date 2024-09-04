@@ -18,7 +18,7 @@
 	const editor = $derived(editorContext.editor);
 	const factory = $derived(editorContext.factory);
 	const areaRect = new ElementRect(() => factory?.area?.container);
-	const nodes = $derived(editor?.nodes ?? []);
+	const nodes = $derived(editor?.nodes.filter(n => n.visible) ?? []);
 	const rects = $derived(nodes.map((n) => n.rect));
 	const nodesTotalRect = $derived(
 		nodes.length === 0 ? undefined : Rect.union(nodes[0].rect, ...nodes.map((n) => n.rect).slice(1))
