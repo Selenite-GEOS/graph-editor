@@ -11,7 +11,7 @@ export function getEditorFromContext(): { editor?: NodeEditor; factory?: NodeFac
 
     return {
         get editor() {
-            return editorContext.activeEditor || editorContext.editor;
+            return editorContext.activeEditor || editorContext.editor || editorContext.activeFactory?.editor || editorContext.factory?.editor;
         },
         get factory() {
             return editorContext.activeFactory || editorContext.factory || editorContext.activeEditor?.factory || editorContext.editor?.factory;
