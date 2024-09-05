@@ -5,6 +5,8 @@
 	import { fade } from 'svelte/transition';
 	import { clientToSurfacePos } from '$utils/html';
 
+	// TODO: Use bg-base for light themes
+
 	interface Props {
 		/** Minimap size in rem. */
 		size?: number;
