@@ -4,8 +4,7 @@
 	import { ElementRect } from 'runed';
 	import { fade } from 'svelte/transition';
 	import { clientToSurfacePos } from '$utils/html';
-
-	// TODO: Use bg-base for light themes
+	import { themeControl } from '$lib/global';
 
 	interface Props {
 		/** Minimap size in rem. */
@@ -90,7 +89,7 @@
 {#if editor?.factory?.minimapEnabled}
 	<aside
 		class:opacity-0={!displayView}
-		class="transition-all duration-[800] bg-neutral pointer-events-auto bg-opacity-50 relative overflow-clip cursor-pointer rounded-box border-base-content border border-opacity-25"
+		class="transition-all duration-[800] { themeControl.isLight ?  'bg-base-200 bg-opacity-75' : 'bg-neutral bg-opacity-50'} pointer-events-auto  relative overflow-clip cursor-pointer rounded-box border-base-content border border-opacity-25"
 		oncontextmenu={preventDefault}
 		style="width: {mapW}rem; height: {mapH}rem;"
 		transition:fade={{ duration: 200 }}
@@ -117,7 +116,7 @@
 			{#each finalRects as { x, y, width, height }, i (i)}
 				<div
 					transition:fade={{ duration: 200 }}
-					class="absolute bg-neutral-content bg-opacity-50"
+					class="absolute {themeControl.isLight ? 'bg-base-content bg-opacity-30' : 'bg-neutral-content bg-opacity-50'} "
 					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px; border-radius: calc(var(--rounded-box) * {0.006 * height});"
 				></div>
 			{/each}
@@ -125,7 +124,7 @@
 				{@const { width, height, x, y } = finalViewRect}
 				<div
 					transition:fade
-					class="absolute border-accent border bg-accent bg-opacity-15"
+					class="absolute border-accent border bg-accent {themeControl.isLight ? 'bg-opacity-25 border-opacity-50': 'bg-opacity-15 border-opacity-50'}"
 					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px;"
 				></div>
 			{/if}
