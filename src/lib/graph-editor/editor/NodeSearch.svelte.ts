@@ -14,7 +14,15 @@ export class NodeSearch extends BaseComponent<NodeFactory> {
 	matchingNodes = $derived.by(() => {
 		if (this.trimmedQuery === '') return [];
 		return this.owner.nodes.filter((n) =>
-			[n.label, n.name].join(' ').toLowerCase().includes(this.query.toLowerCase())
+			[
+				n.label,
+				n.name,
+				...Object.values(n.inputs).map((i) => i?.label ?? ''),
+				...Object.values(n.outputs).map((o) => o?.label ?? '')
+			]
+				.join(' ')
+				.toLowerCase()
+				.includes(this.query.toLowerCase())
 		);
 	});
 	#focused = $state<GraphNode>();
