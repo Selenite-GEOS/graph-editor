@@ -25,7 +25,7 @@
 		position: relative;
 		height: 0;
 		width: 0;
-		top: -13px;
+		top: -14px;
 		left: -24px;
 		border-top: 14px solid transparent;
 		border-bottom: 14px solid transparent;
