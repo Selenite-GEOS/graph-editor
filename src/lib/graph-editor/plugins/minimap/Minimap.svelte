@@ -1,21 +1,16 @@
 <script lang="ts">
 	import {
-		clickIfNoDrag,
 		distance,
 		PointerDownWatcher,
 		posFromClient,
 		preventDefault,
 		Rect,
-		Vector2D,
-		WindowState
-	} from '@selenite/commons';
+		Vector2D	} from '@selenite/commons';
 	import { getEditorFromContext } from '../utils';
 	import { ElementRect } from 'runed';
 	import { fade } from 'svelte/transition';
 	import { clientToSurfacePos } from '$utils/html';
 	import { themeControl } from '$lib/global';
-	import { subtract } from 'lodash-es';
-	import { area } from 'd3-shape';
 	import { Zoom } from 'rete-area-plugin';
 	import { tweened } from 'svelte/motion';
 
