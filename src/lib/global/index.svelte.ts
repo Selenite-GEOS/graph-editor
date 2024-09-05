@@ -56,7 +56,6 @@ export const darkThemes = [
 	'coffee',
 	'dim',
 	'aqua',
-	'cyberpunk',
 	'sunset'
 ] as (typeof themes)[number][];
 
