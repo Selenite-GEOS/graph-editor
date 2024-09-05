@@ -20,17 +20,47 @@
 			return this.y + this.height;
 		}
 	}
+	function makeRect(x = 0, y = 0, width = 0, height = 0) {
+		return {x, y, width, height, get right() {
+			return this.x + this.width
+		}, get bottom() {
+			return this.y + this.height;
+		}}
+	}
 	type Position = {
 		x: number;
 		y: number;
 	};
 
 	class Node {
-			pos = $state({ x: 0, y: 0 });
-	#width = $state(100);
-	#height = $state(50);
-	rect = $derived(new Rect(this.pos.x, this.pos.y, this.#width, this.#height))
-
+		pos = $state({ x: 0, y: 0 });
+		#width = $state(100);
+		#height = $state(50);
+		// rect = $derived(makeRect(this.pos.x, this.pos.y, this.#width, this.#height))
+			get rect(): Rect {
+		const n = this;
+		return {
+			get x() {
+				return n.pos.x;
+			},
+			get y() {
+				return n.pos.y;
+			},
+			get width() {
+				return n.width;
+			},
+			get height() {
+				return n.height;
+			},
+			get right() {
+				return n.pos.x + n.width;
+			},
+			get bottom() {
+				return n.pos.y + n.height;
+			}
+		}
+	}
+	
 		set width(w) {
 			this.#width = w;
 		}
@@ -82,11 +112,8 @@
 	let { height: mapH = 20 }: Props = $props();
 
 	const nodes = $state([new Node({x: -100, y: -100}), new Node({x: 200, h : 25, y: 20})])
-	// $inspect(nodes[0]?.rect.x);
 	const rects = $derived(nodes.map((n) => n.rect));
-	$inspect("rects", rects);
 	const totalRect = $derived(rects.length === 0 ? undefined : union(rects[0], ...rects.slice(1)));
-	// $inspect('totalRect', totalRect);
 
 	const ratioRects = $derived.by(() => {
 		if (totalRect === undefined) return [];
@@ -99,7 +126,7 @@
 		return res;
 	});
 
-	$inspect("ratio", ratioRects);
+	// $inspect("ratio", ratioRects);
 	let container = $state<HTMLElement>();
 	const containerRect = $derived(container?.getBoundingClientRect() ?? new Rect());
 	const finalRects = $derived.by(() => {
@@ -111,9 +138,8 @@
 		}
 		return res;
 	});
-	const mapW = $derived(mapH);
-
-	$inspect("final", finalRects);
+	
+	$inspect("ratio", ratioRects);
 </script>
 
 <button onclick={() => nodes.push(new Node())}> Add node </button>
@@ -131,24 +157,21 @@
 	<input type="number" bind:value={nodes[i].height} step="10"/>
 {/each}
 
-<h3>Result</h3>
+<h3>Minimap</h3>
 <aside
-	style="width: {mapW}rem; height: {mapH}rem;"
+	style="width: 20rem; height: 20rem;"
 >
 	<div bind:this={container}>
 		{#each finalRects as { x, y, width, height }, i (i)}
 			<div
 				class="node"
 				style="width: {width}px; height:{height}px; left:{x}px; top: {y}px;"
-			></div>
+			>{i}</div>
 		{/each}
 	</div>
 </aside>
 
 <style>
-	/* input {
-			display: block;
-		} */
 	button {
 		background-color: black;
 		border-color: black;
@@ -162,9 +185,10 @@
 	aside div {
 		inset: 1rem;
 		position: absolute;
-		background-color: hsl(0 0% 25%);
 	}
 	.node {
+		display: grid;
+		place-content: center;
 		background-color: hsl(0 20% 30%);
 		position: absolute;
 	}

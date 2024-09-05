@@ -47,7 +47,7 @@ export const setupArea: SetupFunction = (params) => {
 	}
 	const area = new AreaPlugin<Schemes, AreaExtra>(container);
 
-
+	// area.area.setZoomHandler(new SmoothZoom())
 	// Update nodes position
 	area.addPipe(ctx => {
 		// if (ctx.type === 'node')
