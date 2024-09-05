@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		distance,
+		documentListener,
 		PointerDownWatcher,
 		posFromClient,
 		preventDefault,
@@ -105,14 +106,13 @@
 	const viewArea = $derived(Rect.area(finalViewRect ?? new Rect()));
 	const containerArea = $derived(Rect.area(containerRect ?? new Rect()));
 	const displayView = $derived(nodes.length > 0 && viewArea / containerArea < displayViewThreshold);
-
+	$inspect(containerRect.x)
 	function moveArea(e: { clientX: number; clientY: number }) {
 		const area = factory?.area;
 		if (!factory || !totalRect || !ratioViewRect || !area) return;
 
 		let pos = posFromClient(e);
-		pos = Vector2D.subtract(pos, Rect.pos(containerRect));
-
+		pos = Vector2D.subtract(pos, Rect.pos(container!.getBoundingClientRect()));
 		pos = {
 			x: pos.x / containerRect.width,
 			y: pos.y / containerRect.height
@@ -156,20 +156,23 @@
 			// @ts-expect-error Access protected field
 			zoomHandler.wheel(e);
 		}}
-		onpointermove={(e) => {
-			if (!PointerDownWatcher.instance.isPointerDown) return;
-			const pDownE = PointerDownWatcher.instance.lastEvent!;
-			if (!(pDownE.target instanceof HTMLElement) || !pDownE.target?.closest('.minimap')) {
-				return;
-			}
-			const pDownPos = PointerDownWatcher.instance.pos!;
-			const pos = posFromClient(e);
-			if (!useViewTarget && distance(pos, pDownPos) > 5) {
-				const current = factory?.area?.area.transform;
-				viewTarget = tweened({x: current?.x ?? 0, y: current?.y ?? 0}, {duration: viewSmoothingDuration});
-				useViewTarget = true;
-			}
-			moveArea(e);
+		use:documentListener={{
+			passive: true,
+			pointermove: (e) => {
+				if (!PointerDownWatcher.instance.isPointerDown) return;
+				const pDownE = PointerDownWatcher.instance.lastEvent!;
+				if (!(pDownE.target instanceof HTMLElement) || !pDownE.target?.closest('.minimap')) {
+					return;
+				}
+				const pDownPos = PointerDownWatcher.instance.pos!;
+				const pos = posFromClient(e);
+				if (!useViewTarget && distance(pos, pDownPos) > 5) {
+					const current = factory?.area?.area.transform;
+					viewTarget = tweened({ x: current?.x ?? 0, y: current?.y ?? 0 }, { duration: viewSmoothingDuration });
+					useViewTarget = true;
+				}
+				moveArea(e);
+			},
 		}}
 		class="minimap transition-all duration-[800] {themeControl.isLight
 			? 'bg-base-200 bg-opacity-75'
@@ -179,6 +182,7 @@
 		transition:fade={{ duration: 200 }}
 		onpointerdown={(e) => {
 			useViewTarget = false;
+			document.body.style.userSelect = 'none';
 			moveArea(e);
 		}}
 	>
