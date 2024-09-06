@@ -1,12 +1,21 @@
 <script lang="ts">
 	import type { NodeEditor } from '$graph-editor/editor';
-	import { autosize, persisted, unCamelCase } from '@selenite/commons';
+	import {
+		autosize,
+		checkbox,
+		PathGenerator,
+		persisted,
+		Tags,
+		unCamelCase
+	} from '@selenite/commons';
 	import type { GraphPorts, StoredGraph } from './types';
 	import { upperFirst } from 'lodash-es';
 	import type { HTMLInputAttributes, HTMLTextareaAttributes } from 'svelte/elements';
 	import { FavoritesManager } from './FavoritesManager.svelte';
 	import { VariableNode } from '$graph-editor/nodes/XML/VariableNode.svelte';
 	import { InputControl, type Input } from '$graph-editor/socket';
+	import { NodeStorage } from './NodeStorage.svelte';
+	import Node from '$graph-editor/render/svelte/presets/classic/components/Node.svelte';
 	interface Props {
 		editor: NodeEditor;
 		formId?: string;
@@ -17,6 +26,8 @@
 	const savedForm = persisted<Partial<typeof graph>>('graph-form', {}, { storage: 'session' });
 	const localPersistedGraph = persisted<Partial<typeof graph>>('graph-form', {});
 	const graph: Partial<StoredGraph & { addToFavorite: boolean }> = $state({
+		tags: [],
+		path: [],
 		...$savedForm,
 		...$localPersistedGraph,
 		...existingGraph,
@@ -36,7 +47,9 @@
 		'name',
 		'description',
 		'public',
-		'addToFavorite'
+		'addToFavorite',
+		'tags',
+		'path'
 	] as (keyof typeof graph)[];
 	const localPersistedKeys = ['author'] as (keyof typeof graph)[];
 	function saveForm() {
@@ -45,13 +58,13 @@
 		for (const key of persistedKeys) {
 			res[key] = graph[key];
 		}
-		$savedForm = res;
+		$savedForm = $state.snapshot(res);
 
 		const localRes: Record<string, unknown> = {};
 		for (const key of localPersistedKeys) {
 			localRes[key] = graph[key];
 		}
-		$localPersistedGraph = localRes;
+		$localPersistedGraph = $state.snapshot(localRes);
 		console.debug('Saved form', $savedForm);
 	}
 
@@ -71,6 +84,7 @@
 					const socket = port.socket;
 					let value: unknown;
 					if (side === 'input') {
+						// @ts-ignore Type error
 						value = await node.getDataWithInputs(key);
 						if (typeof value === 'object') {
 							value = JSON.stringify(value);
@@ -90,7 +104,7 @@
 			}
 			return res;
 		}
-		const res: StoredGraph = {
+		const res: StoredGraph = $state.snapshot({
 			...graph,
 			id,
 			graph: editor.toJSON(),
@@ -105,7 +119,7 @@
 				description: descr,
 				priority
 			}))
-		};
+		});
 
 		delete (res as { addToFavorite?: boolean }).addToFavorite;
 		return res;
@@ -176,7 +190,7 @@
 
 {#snippet Input(key: keyof typeof graph, props: HTMLInputAttributes = {})}
 	<label class="input input-bordered flex items-center gap-2 has-[:invalid]:input-error">
-		{upperFirst(unCamelCase(key))}
+		<span class="font-semibold">{upperFirst(unCamelCase(key))}</span>
 		<input
 			bind:value={graph[key]}
 			{...props}
@@ -189,9 +203,10 @@
 {#snippet Checkbox(key: keyof typeof graph, props: HTMLInputAttributes = {})}
 	<div class="form-control" title={props.title}>
 		<label class="label cursor-pointer">
-			<span class="label-text">{upperFirst(unCamelCase(key))}</span>
+			<span class="label-text font-semibold">{upperFirst(unCamelCase(key))}</span>
 			<input
 				type="checkbox"
+				use:checkbox
 				bind:checked={graph[key] as boolean}
 				{...props}
 				class="checkbox {props.class}"
@@ -205,7 +220,7 @@
 	{@const label = upperFirst(key)}
 	<label class="form-control">
 		<div class="label">
-			<span class="label-text">{label}</span>
+			<span class="label-text font-bold dtext-base">{label}</span>
 		</div>
 		<textarea
 			bind:value={graph[key]}
@@ -219,18 +234,30 @@
 	</label>
 {/snippet}
 {#snippet Title(title: string)}
-	<h3 class="font-semibold mt-4 mb-1 text-lg">{upperFirst(title)}</h3>
+	<h3 class="font-semibold mt-4 mb-2 text-xl">{upperFirst(title)}</h3>
 {/snippet}
 
 <form id={formId} class="flex flex-col gap-2">
 	{@render Input('name', { required: true })}
 	{@render TextArea('description', {
-		placeholder: 'Description (you can describe here what this graph is about...)'
+		placeholder: 'Description (you can describe here what this macro-block is about...)'
 	})}
-	{@render Checkbox('public', { title: 'Should this graph be visible by other users' })}
-	{@render Checkbox('addToFavorite', { title: 'Add this graph to your favorites' })}
-	Path Tags
+	<!-- {@render Checkbox('public', { title: 'Should this graph be visible by other users' })} -->
+	<h4 class="font-semibold mt-2">Tags</h4>
+	<Tags
+		bind:tags={graph.tags}
+		class="ms-4"
+		knownTags={NodeStorage.data.tags}
+		addTagProps={{ class: 'bg-base-20 border-0' }}
+	/>
+	<div>
+		<h4 class="font-semibold mt-2">Path</h4>
+		<PathGenerator bind:path={graph.path} paths={NodeStorage.data.paths} class="mb-2 ms-4" />
+	</div>
 	{@render Input('author', { required: true, placeholder: "Name of this graph's author" })}
+	<div class="mt-1">
+		{@render Checkbox('addToFavorite', { title: 'Add this graph to your favorites' })}
+	</div>
 	{@render Title('variables')}
 	{#if exposedVariables.length > 0}
 		{#each exposedVariables as variable}
@@ -258,56 +285,66 @@
 			</label>
 		{/each}
 	{:else}
+	<span class="ms-4 italic">
 		No variables exposed.
+		</span>
 	{/if}
 
 	{#snippet Ports(name: 'inputs' | 'outputs')}
 		{@const ports = name === 'inputs' ? selectedInputs : selectedOutputs}
 		{@render Title(upperFirst(name))}
 		{#if ports.length > 0}
-			<ul class="space-y-6">
+			<ul class="ms-4 space-y-8">
 				{#each ports as { node, selected }}
 					{@const target = name === 'inputs' ? inputs : outputs}
 					<li>
-						<h4 class="flex flex-row gap-2 items-center mb-2">
-							<span class="text-sm opacity-50">Node</span>
-							<span class="italic"
+						<h4 class="flex flex-col items-start mb-2">
+							<span class="text-sm opacity-50 italic">{node.name ? node.label : 'Node'}</span>
+							<span class="text-lg font-bold" title={node.description}
 								>{node instanceof VariableNode
 									? `Get variable: ${node.variable?.name}`
 									: (node.name ?? node.label)}</span
 							>
 						</h4>
-						{#each selected as [key, port]}
-							<label class="grid grid-flow-col gap-3 items-center ms-4 grid-cols-[0fr,0fr,1fr]">
-								<input type="checkbox" bind:checked={target[node.id][key].keep} class="checkbox" />
-								<span class="w-[5rem] truncate col-start-2 font-semibold" title={port.label ?? key}
-									>{port.label ?? key}</span
-								>
-								<input
-									type="number"
-									bind:value={target[node.id][key].priority}
-									class="input input-bordered col-span-2"
-									placeholder="Priority"
-									title={`Influences the order of ${name}. Higher priority means higher display.`}
-								/>
-								<input
-									bind:value={target[node.id][key].nickname}
-									class="input input-bordered grow col-start-3"
-									placeholder="Rename"
-								/>
-								<textarea
-									bind:value={target[node.id][key].descr}
-									class="textarea textarea-bordered col-start-3"
-									placeholder="Description"
-									use:autosize
-								></textarea>
-							</label>
-						{/each}
+						<ul class="space-y-6">
+							{#each selected as [key, port]}
+								<label class="grid grid-flow-col gap-2 items-center ms-8 grid-cols-[0fr,0fr,1fr]">
+									<input
+										type="checkbox"
+										bind:checked={target[node.id][key].keep}
+										class="checkbox"
+										use:checkbox
+									/>
+									<span
+										class="col-start-2 w-[10rem] truncate font-medium"
+										title={port.description ?? port.label ?? key}>{port.label ?? key}</span
+									>
+									<input
+										type="number"
+										bind:value={target[node.id][key].priority}
+										class="input input-bordered col-span-2"
+										placeholder="Priority"
+										title={`Influences the order of ${name}. Higher priority means higher display.`}
+									/>
+									<input
+										bind:value={target[node.id][key].nickname}
+										class="input input-bordered grow col-start-3"
+										placeholder="Rename"
+									/>
+									<textarea
+										bind:value={target[node.id][key].descr}
+										class="textarea textarea-bordered col-start-3"
+										placeholder="Description"
+										use:autosize
+									></textarea>
+								</label>
+							{/each}
+						</ul>
 					</li>
 				{/each}
 			</ul>
 		{:else}
-			No {name} selected.
+			<span class="italic ms-4">No {name} selected.</span>
 		{/if}
 	{/snippet}
 

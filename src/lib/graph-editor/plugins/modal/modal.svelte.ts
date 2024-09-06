@@ -1,4 +1,4 @@
-import type { Component, Snippet } from 'svelte';
+import type { Component, Snippet, SvelteComponent } from 'svelte';
 
 type ButtonLevel = 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
 
@@ -8,12 +8,12 @@ export type ModalButton = {
 	description?: string;
 	onclick: () => void;
 };
+export const modalButtonTypes = ['cancel', 'promptConfirm', 'close', 'submit'] as const;
+export type ModalButtonType = (typeof modalButtonTypes)[number];
 export type ModalButtonSettings =
 	| ModalButton
-	| 'cancel'
-	| 'promptConfirm'
-	| 'close'
-	| 'submit'
+	| ModalButtonType
+	| ({ type: ModalButtonType } & Partial<ModalButton>)
 	| { formId: string };
 export type BaseModalSettings = {
 	divider?: boolean;
@@ -54,6 +54,46 @@ export function isPromptModalSettings(modal: ModalSettings): modal is PromptModa
 	return 'prompt' in modal;
 }
 
+export function modalButtonTypeToButton(type: ModalButtonType): ModalButton {
+	switch (type) {
+		case 'cancel':
+			return {
+				label: 'Cancel',
+				onclick: () => modals.close()
+			};
+		case 'close':
+			return {
+				label: 'Close',
+				level: 'neutral',
+				onclick: () => modals.close()
+			};
+		case 'submit':
+			return {
+				label: 'Submit',
+				level: 'primary',
+				onclick: async () => {
+					const contentContainer = Modal.instance.contentContainer;
+					if (contentContainer) {
+						const forms = contentContainer.querySelectorAll('form');
+						for (const form of forms) if (!form.reportValidity()) return;
+					}
+					const r = await Modal.instance.childComponent?.getResponse?.();
+					Modal.instance.lastModal?.response?.(r);
+					modals.close();
+				}
+			};
+		case 'promptConfirm':
+			return {
+				label: 'Confirm',
+				level: 'primary',
+				onclick: () => {
+					Modal.instance.lastModal?.response?.(Modal.instance.promptInput?.value);
+					modals.close();
+				}
+			};
+	}
+}
+
 /**
  * Singleton that manages modals.
  *
@@ -69,6 +109,44 @@ export class Modal {
 	}
 
 	queue: ModalSettings[] = $state([]);
+
+	lastModal = $derived(this.queue.at(-1));
+
+	promptInput = $state<HTMLInputElement>();
+
+	contentContainer = $state<HTMLElement>();
+
+	childComponent = $state<SvelteComponent & { getResponse?: () => Promise<unknown> | unknown }>();
+
+	resolvedButtons: ModalButton[] | undefined = $derived(
+		this.lastModal?.buttons === undefined
+			? undefined
+			: this.lastModal.buttons.map((btn) => {
+					if (typeof btn === 'string') {
+						return modalButtonTypeToButton(btn);
+					}
+					if ('type' in btn) {
+						return {
+							...modalButtonTypeToButton(btn.type),
+							...btn
+						};
+					}
+
+					if ('formId' in btn) {
+						return {
+							label: 'Submit',
+							level: 'primary',
+							onclick: () => {
+								const form = document.getElementById(btn.formId) as HTMLFormElement;
+								if (form) {
+									form.requestSubmit();
+								}
+							}
+						};
+					}
+					return btn;
+				})
+	);
 
 	private constructor() {}
 

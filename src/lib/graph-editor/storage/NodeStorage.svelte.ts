@@ -24,6 +24,24 @@ export class NodeStorage {
 
 	numGraphs = $state(0);
 	graphs = $state<StoredGraph[]>([]);
+
+	data: {tags: string[], paths: string[][]}   = $derived.by(() => {
+		const paths: string[][] = []
+		const tags = new Set<string>();
+		for (const graph of this.graphs) {
+			for (const tag of graph.tags ?? []) {
+				tags.add(tag);
+			}
+			if (graph.path)
+				paths.push(graph.path);
+		}
+		return {paths, tags: Array.from(tags)};
+	})
+
+	static get data() {
+		return NodeStorage.instance.data;
+	}
+
 	private constructor() {
 		const { unsubscribe } = NodeStorage.mainStorage.numGraphs.subscribe((num) => {
 			this.numGraphs = num;

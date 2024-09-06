@@ -100,7 +100,7 @@ export class NodeFactory implements ComponentSupportInterface {
 		this.components.push(component);
 		return component;
 	}
-	minimapEnabled = $state(true)
+	minimapEnabled = $state(true);
 	public notifications: NotificationsManager = {
 		show: (notif) => {
 			let res = '';
@@ -289,25 +289,40 @@ export class NodeFactory implements ComponentSupportInterface {
 	}
 
 	async openGraphForm() {
-		const GraphForm = (await import('$graph-editor/storage/GraphForm.svelte')).default;
+		const GraphForm = (await import('$graph-editor/storage/MacroBlockForm.svelte')).default;
 		const existingGraph = await NodeStorage.getGraph(this.editor.graphId);
 
+		const action = existingGraph ? 'Update' : 'Create';
 		modals.show({
 			component: GraphForm,
 			props: { editor: this.editor, existingGraph },
-			title: `${existingGraph ? 'Update' : 'Save'} Graph`,
-			buttons: ['cancel', 'submit'],
+			title: `${action} Macro-Block`,
+			buttons: [
+				'cancel',
+				{
+					label: action,
+					type: 'submit'
+				}
+			],
 			response: async (r) => {
 				if (!r || !(typeof r === 'object') || !('id' in r))
 					throw new ErrorWNotif('Graph form response not found');
 				const g = r as StoredGraph;
 				console.log('Saving graph to storage', g);
-				await NodeStorage.saveGraph(g);
+				try {
+					await NodeStorage.saveGraph(g);
 
-				this.notifications.success({
-					title: 'Graph Storage',
-					message: 'Graph saved!'
-				});
+					this.notifications.success({
+						title: 'Graph Storage',
+						message: 'Graph saved!'
+					});
+				} catch (e) {
+					console.error(e);
+					this.notifications.error({
+						title: 'Graph Storage',
+						message: 'Failed to save graph.'
+					});
+				}
 			}
 		});
 	}
