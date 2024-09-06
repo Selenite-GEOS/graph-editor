@@ -93,7 +93,7 @@
 					res.push({
 						nodeId,
 						key,
-						label: nickname && nickname.trim().length > 0 ? nickname.trim() : (port.label ?? key),
+						label: nickname && nickname.trim().length > 0 ? nickname.trim() : (port.label ?? (key.startsWith('value') || key.startsWith('data') || key.startsWith('exec') || key.startsWith('result') ? '' : key)),
 						description: descr,
 						datastructure: socket.datastructure,
 						priority,
@@ -152,7 +152,7 @@
 							{
 								keep: existingGraph ? Boolean(existing) : true,
 								nickname,
-								descr: existing?.description,
+								descr: existing?.description ?? port.description,
 								priority: existing?.priority
 							}
 						];
@@ -186,10 +186,11 @@
 				})
 		)
 	);
+
 </script>
 
 {#snippet Input(key: keyof typeof graph, props: HTMLInputAttributes = {})}
-	<label class="input input-bordered flex items-center gap-2 has-[:invalid]:input-error">
+	<label class="input input-bordered flex items-center gap-2 has-[:invalid]:input-warning">
 		<span class="font-semibold">{upperFirst(unCamelCase(key))}</span>
 		<input
 			bind:value={graph[key]}
@@ -200,8 +201,11 @@
 		/>
 	</label>
 {/snippet}
-{#snippet Checkbox(key: keyof typeof graph, props: HTMLInputAttributes = {})}
-	<div class="form-control" title={props.title}>
+{#snippet Checkbox(
+	key: keyof typeof graph,
+	props: HTMLInputAttributes & { containerClass?: string } = {}
+)}
+	<div class={`form-control ${props.containerClass}`} title={props.title}>
 		<label class="label cursor-pointer">
 			<span class="label-text font-semibold">{upperFirst(unCamelCase(key))}</span>
 			<input
@@ -238,7 +242,7 @@
 {/snippet}
 
 <form id={formId} class="flex flex-col gap-2">
-	{@render Input('name', { required: true })}
+	{@render Input('name', { required: true, placeholder: 'Name of the macro-block' })}
 	{@render TextArea('description', {
 		placeholder: 'Description (you can describe here what this macro-block is about...)'
 	})}
@@ -246,7 +250,7 @@
 	<h4 class="font-semibold mt-2">Tags</h4>
 	<Tags
 		bind:tags={graph.tags}
-		class="ms-4"
+		class="ms-4"		
 		knownTags={NodeStorage.data.tags}
 		addTagProps={{ class: 'bg-base-20 border-0' }}
 	/>
@@ -255,9 +259,11 @@
 		<PathGenerator bind:path={graph.path} paths={NodeStorage.data.paths} class="mb-2 ms-4" />
 	</div>
 	{@render Input('author', { required: true, placeholder: "Name of this graph's author" })}
-	<div class="mt-1">
-		{@render Checkbox('addToFavorite', { title: 'Add this graph to your favorites' })}
-	</div>
+	{@render Checkbox('addToFavorite', {
+		title: 'Add this graph to your favorites',
+		class: 'ml-8',
+		containerClass: 'w-fit mt-4 mb-4'
+	})}
 	{@render Title('variables')}
 	{#if exposedVariables.length > 0}
 		{#each exposedVariables as variable}
@@ -285,9 +291,7 @@
 			</label>
 		{/each}
 	{:else}
-	<span class="ms-4 italic">
-		No variables exposed.
-		</span>
+		<span class="ms-4 italic"> No variables exposed. </span>
 	{/if}
 
 	{#snippet Ports(name: 'inputs' | 'outputs')}
@@ -308,6 +312,7 @@
 						</h4>
 						<ul class="space-y-6">
 							{#each selected as [key, port]}
+								{@const k = key.split("¤")[0]}
 								<label class="grid grid-flow-col gap-2 items-center ms-8 grid-cols-[0fr,0fr,1fr]">
 									<input
 										type="checkbox"
@@ -317,7 +322,7 @@
 									/>
 									<span
 										class="col-start-2 w-[10rem] truncate font-medium"
-										title={port.description ?? port.label ?? key}>{port.label ?? key}</span
+										title={port.description ?? port.label ?? key}>{port.label && port.label.trim().length > 0 ? port.label : (k === 'value' ? name.slice(0,-1) : k)}</span
 									>
 									<input
 										type="number"

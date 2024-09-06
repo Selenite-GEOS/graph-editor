@@ -267,7 +267,7 @@ export class Node<
 			get bottom() {
 				return n.pos.y + n.height;
 			}
-		}
+		};
 	}
 
 	visible = $state(true);
@@ -767,10 +767,16 @@ export class Node<
 		isArray = false,
 		type = 'any'
 	}: OutDataParams) {
-		const output = new Output(
-			new Socket({ name: socketLabel, isArray: isArray, type: type, node: this, displayLabel }),
-			displayName
-		);
+		const output = new Output({
+			socket: new Socket({
+				name: socketLabel,
+				datastructure: isArray ? 'array' : 'scalar',
+				type: type,
+				node: this,
+				displayLabel
+			}),
+			label: displayName
+		});
 		this.addOutput(name, output as unknown as Output<Exclude<Outputs[keyof Outputs], undefined>>);
 	}
 
@@ -812,7 +818,11 @@ export class Node<
 				params?.datastructure === 'array' ||
 				(params?.type?.startsWith('xmlElement') && params.datastructure === 'array'),
 			isRequired: params?.isRequired,
-			label: params?.label ?? (key !== 'value' && key !== 'result' ? (key as string) : undefined)
+			label:
+				params?.label ??
+				(key !== 'value' && key !== 'result' && !(key as string).includes('¤')
+					? (key as string)
+					: undefined)
 		}) as Input<Exclude<Inputs[K], undefined>>;
 		this.addInput(key, input);
 		const type = params?.type ?? 'any';

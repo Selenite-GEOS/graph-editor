@@ -5,6 +5,7 @@
 	import '../app.css';
 </script>
 
+<svelte:head><title>Graph Editor</title></svelte:head>
 <ModalComponent />
 <NotificationsComponent />
 <ContextMenuComponent />

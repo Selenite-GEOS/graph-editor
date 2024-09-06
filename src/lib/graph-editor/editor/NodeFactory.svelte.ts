@@ -288,15 +288,18 @@ export class NodeFactory implements ComponentSupportInterface {
 		return AreaExtensions.zoomAt(this.area, nodes ?? this.editor.getNodes());
 	}
 
-	async openGraphForm() {
-		const GraphForm = (await import('$graph-editor/storage/MacroBlockForm.svelte')).default;
+	async openGraphForm(defaultName = 'New Graph') {
+		const MacroBlockForm = (await import('$graph-editor/storage/MacroBlockForm.svelte')).default;
 		const existingGraph = await NodeStorage.getGraph(this.editor.graphId);
 
 		const action = existingGraph ? 'Update' : 'Create';
+		const editor = this.editor;
 		modals.show({
-			component: GraphForm,
+			component: MacroBlockForm,
 			props: { editor: this.editor, existingGraph },
-			title: `${action} Macro-Block`,
+			get title() {
+				return `${action} ${editor.graphName.trim().length === 0 ||  (!existingGraph && editor.graphName === defaultName) ? 'macro-block' : editor.graphName}`;
+			},
 			buttons: [
 				'cancel',
 				{

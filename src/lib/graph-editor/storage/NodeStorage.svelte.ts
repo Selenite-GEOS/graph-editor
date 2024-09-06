@@ -38,6 +38,13 @@ export class NodeStorage {
 		return {paths, tags: Array.from(tags)};
 	})
 
+	static get tags() {
+		return NodeStorage.instance.data.tags;
+	}
+	static get paths() {
+		return NodeStorage.instance.data.paths;
+	}
+
 	static get data() {
 		return NodeStorage.instance.data;
 	}

@@ -42,6 +42,7 @@ pnpm publish
 ```
 
 ## TODO
+- FIX ARRAY EDIT
 - Add input values to history
 - Add array description on hover
 - Support scientific writing of numbers (e.g. 1e-3)

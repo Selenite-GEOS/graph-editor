@@ -203,7 +203,8 @@
 			<h2>DB</h2>
 			<p>Count : {NodeStorage.numGraphs}</p>
 		</aside>
-		<button class="btn pointer-events-auto" onclick={() => factory?.openGraphForm()}>Save to DB</button>
+		{#if factory}
+		<button class="btn pointer-events-auto" onclick={() => factory?.openGraphForm()}>Create Macro-Block</button>
 		<button class="btn pointer-events-auto" onclick={() => NodeStorage.clearGraphs()}>Clear DB</button>
 		<button class="btn pointer-events-auto" onclick={() => NodeStorage.pullSources()}>Pull datasources</button>
 		{@render button({
@@ -216,7 +217,6 @@
 				selection.boxSelectionEnabled = !selection.boxSelectionEnabled;
 			}
 		})}
-		{#if factory}
 		{@render button({label: 'Previous', shortcut:{key: 'p'}, action: () => factory.search.previous()})}
 		<input class="input input-bordered pointer-events-auto" bind:value={factory.search.query} placeholder="Search"/>
 		{@render button({label: 'Next', shortcut: {key: 'n'}, action: () => factory.search.next()})}

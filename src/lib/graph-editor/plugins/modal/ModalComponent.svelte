@@ -1,5 +1,6 @@
 <script lang="ts">
-	import {
+	import { Formatter } from '@selenite/commons';
+import {
 		isComponentModalSettings,
 		isPromptModalSettings,
 		isSnippetModalSettings,
@@ -23,7 +24,7 @@
 		<div class="modal-box">
 			{#if title}
 				{#if typeof title === 'string'}
-					<h1 class="font-bold">{title}</h1>
+					<h1 class="font-bold truncate"><Formatter content={title}/></h1>
 				{:else}
 					{@render title()}
 				{/if}
