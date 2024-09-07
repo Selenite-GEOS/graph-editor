@@ -21,7 +21,7 @@ export type GraphPorts = {
 }[];
 
 /** Visual programming graph save data structure . */
-export interface Graph {
+export interface MacroBlock {
 	/** ID of the graph. */
 	id: string;
 	/** Name of the graph. */
@@ -61,7 +61,7 @@ export interface Graph {
 	}[];
 	// TODO: input props, output props
 }
-
+export interface Graph extends MacroBlock {}
 export interface StoredGraph extends Graph {}
 
 export interface Datasource {
@@ -70,9 +70,15 @@ export interface Datasource {
 
 export interface Database extends Datasource {
 	clearGraphs(): Promise<void>;
-	getGraph(id: string): Promise<Graph | undefined>;
+	clearMacroBlocks(): Promise<void>;
+	getGraph(id: string): Promise<MacroBlock | undefined>;
+	getMacroBlock(id: string): Promise<MacroBlock | undefined>;
 	saveGraph(graph: Graph): Promise<string>;
+	saveMacroBlock(graph: MacroBlock): Promise<string>;
 	saveGraphs(graphs: Graph[]): Promise<string>;
+	saveMacroBlocks(graphs: MacroBlock[]): Promise<string>;
 	numGraphs: Observable<number>;
-	graphs: Observable<StoredGraph[]>;
+	numMacroBlocks: Observable<number>;
+	graphs: Observable<MacroBlock[]>;
+	macroblocks: Observable<MacroBlock[]>;
 }
