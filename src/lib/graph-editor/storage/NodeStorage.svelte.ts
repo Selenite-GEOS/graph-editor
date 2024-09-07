@@ -31,7 +31,7 @@ export class NodeStorage {
 		return NodeStorage.instance.graphs;
 	}
 
-	static queriedMacroBlocks = $derived.by(() => {
+	queriedMacroBlocks = $derived.by(() => {
 		const query = NodeStorage.query;
 		const lowQuery = query.toLowerCase();
 		const user = NodeStorage.user;
@@ -46,6 +46,10 @@ export class NodeStorage {
 		}
 		return res;
 	});
+
+	static get queriedMacroBlocks() {
+		return NodeStorage.instance.queriedMacroBlocks;
+	}
 
 	static user = $state('');
 	static query = $state('');
