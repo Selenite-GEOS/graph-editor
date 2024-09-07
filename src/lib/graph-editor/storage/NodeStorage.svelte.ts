@@ -31,6 +31,25 @@ export class NodeStorage {
 		return NodeStorage.instance.graphs;
 	}
 
+	static queriedMacroBlocks = $derived.by(() => {
+		const query = NodeStorage.query;
+		const lowQuery = query.toLowerCase();
+		const user = NodeStorage.user;
+		const res: MacroBlock[] = [];
+		for (const macro of NodeStorage.macroblocks) {
+			let keep = true;
+			
+			if (query) keep = macro.name?.toLowerCase().includes(lowQuery) ?? false;
+			if (user) keep = keep && macro.author === user;
+
+			if (keep) res.push(macro);
+		}
+		return res;
+	});
+
+	static user = $state('');
+	static query = $state('');
+
 	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][] } = $derived.by(() => {
 		const paths: string[][] = [];
 		const tags = new Set<string>();
