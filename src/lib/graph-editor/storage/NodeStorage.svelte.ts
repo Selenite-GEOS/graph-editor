@@ -5,6 +5,7 @@ import { FavoritesManager } from './FavoritesManager.svelte';
 import type { Database, MacroBlock, Datasource as DataSource, Graph } from './types';
 import { get, type Writable } from 'svelte/store';
 import { debounce } from 'lodash-es';
+import { untrack } from 'svelte';
 
 export const userStore: Writable<string> = persisted('user', '');
 
@@ -74,6 +75,18 @@ export class NodeStorage {
 		const { unsubscribe } = NodeStorage.mainStorage.numGraphs.subscribe((num) => {
 			this.numGraphs = num;
 		});
+		const favoritesManager = FavoritesManager.instance;
+		userStore.subscribe(() => {
+			this.updateData();
+		});
+		$effect.root(() => {
+			$effect(() => {
+				favoritesManager.favorites
+				untrack(() => {
+					this.updateData();
+				})
+			})
+		})
 		NodeStorage.mainStorage.graphs.subscribe((graphs) => {
 			console.debug('Update macro blocks');
 			this.graphs = graphs;

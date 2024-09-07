@@ -4,7 +4,7 @@ const FAVORITES_KEY = 'favoriteGraphsIds';
 
 export class FavoritesManager {
 	static #instance: FavoritesManager | undefined = undefined;
-	protected static get instance() {
+	static get instance() {
 		if (!this.#instance) {
 			this.#instance = new FavoritesManager();
 		}
@@ -18,7 +18,7 @@ export class FavoritesManager {
 		}
 	}
 
-	#favorites = new SvelteSet();
+	#favorites = new SvelteSet<string>();
 
 	setFavorite(id: string, value: boolean) {
 		if (value) {
@@ -28,6 +28,8 @@ export class FavoritesManager {
 		}
 		this.saveFavorites();
 	}
+
+	favorites = $derived(Array.from(this.#favorites))
 
 	static setFavorite(id: string, value: boolean) {
 		this.instance.setFavorite(id, value);

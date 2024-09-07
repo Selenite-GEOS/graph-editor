@@ -1,16 +1,16 @@
-import type { SocketType } from '$rete/plugin/typed-sockets';
+import type { DataType } from "$graph-editor/plugins/typed-sockets";
 
 export type Variable = {
 	name: string;
 	value: unknown;
-	type: SocketType;
+	type: DataType;
 	isArray: boolean;
 	exposed: boolean;
 	id: string;
 	highlighted: boolean;
 };
 
-export const possibleTypes: SocketType[] = [
+export const possibleVarTypes: DataType[] = [
 	'string',
 	'number',
 	'boolean',

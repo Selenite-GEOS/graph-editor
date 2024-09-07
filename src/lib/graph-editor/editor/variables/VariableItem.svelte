@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { possibleTypes, type Variable } from '.';
+	import { possibleVarTypes, type Variable } from '.';
 	import cssVars from 'svelte-css-vars';
 	import Color from 'color';
 	import { _ } from '$lib/global';
@@ -137,7 +137,7 @@
 {#if displayTypeSelection}
 	<div class="bg-base-100 rounded-box p-2" use:changeTypePopup>
 		<ul class="flex flex-col gap-2">
-			{#each possibleTypes as type}
+			{#each possibleVarTypes as type}
 				<li>
 					<button
 						class="btn btn-sm"
