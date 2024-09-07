@@ -1,13 +1,11 @@
+import { persisted } from '@selenite/commons';
 import { GitHubDataSource } from './datasources';
 import { IndexedDBSource } from './db.svelte';
 import { FavoritesManager } from './FavoritesManager.svelte';
-import {
-	type StoredGraph,
-	type Database,
-	type MacroBlock,
-	type Datasource as DataSource,
-	type Graph
-} from './types';
+import type { Database, MacroBlock, Datasource as DataSource, Graph } from './types';
+import { get, type Writable } from 'svelte/store';
+
+export const userStore: Writable<string> = persisted('user', '');
 
 export class NodeStorage {
 	static pullDataSourcesInterval = 5000;
@@ -31,59 +29,30 @@ export class NodeStorage {
 		return NodeStorage.instance.graphs;
 	}
 
-	queriedMacroBlocks = $derived.by(() => {
-		const query = NodeStorage.query;
-		const lowQuery = query.toLowerCase();
-		const user = NodeStorage.user;
-		const res: MacroBlock[] = [];
-		for (const macro of NodeStorage.macroblocks) {
-			let keep = true;
-			
-			if (query) keep = macro.name?.toLowerCase().includes(lowQuery) ?? false;
-			if (user) keep = keep && macro.author === user;
-
-			if (keep) res.push(macro);
-		}
-		return res;
-	});
-
-	static get queriedMacroBlocks() {
-		return NodeStorage.instance.queriedMacroBlocks;
-	}
-
-	user = $state('');
-	static get user() {
-		return NodeStorage.instance.user;
-	}
-	static set user(val: string) {
-		NodeStorage.instance.user = val;
-	}
-	query = $state('');
-	static get query() {
-		return NodeStorage.instance.query;
-	}
-	static set query(val: string) {
-		NodeStorage.instance.query = val;
-	}
-
-	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][] } = $derived.by(() => {
-		const paths: string[][] = [];
-		const tags = new Set<string>();
-		const favorites: MacroBlock[] = [];
-		for (const graph of this.graphs) {
-			for (const tag of graph.tags ?? []) tags.add(tag);
-			if (FavoritesManager.isFavorite(graph.id)) favorites.push(graph);
-			if (graph.path) paths.push(graph.path);
-		}
-		return { paths, favorites, tags: Array.from(tags) };
-	});
+	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][]; userBlocks: MacroBlock[] } =
+		$derived.by(() => {
+			const paths: string[][] = [];
+			const tags = new Set<string>();
+			const favorites: MacroBlock[] = [];
+			const user = get(userStore);
+			const userBlocks: MacroBlock[] = [];
+			for (const graph of this.graphs) {
+				for (const tag of graph.tags ?? []) tags.add(tag);
+				if (FavoritesManager.isFavorite(graph.id)) favorites.push(graph);
+				if (graph.path) paths.push(graph.path);
+				if (user && graph.author === user) userBlocks.push(graph);
+			}
+			return { paths, favorites, tags: Array.from(tags), userBlocks };
+		});
 
 	static get favorites() {
 		return NodeStorage.instance.data.favorites;
 	}
-
 	static get tags() {
 		return NodeStorage.instance.data.tags;
+	}
+	static get userBlocks() {
+		return NodeStorage.instance.data.userBlocks;
 	}
 	static get paths() {
 		return NodeStorage.instance.data.paths;

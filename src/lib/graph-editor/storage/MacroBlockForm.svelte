@@ -13,10 +13,8 @@
 	import type { HTMLInputAttributes, HTMLTextareaAttributes } from 'svelte/elements';
 	import { FavoritesManager } from './FavoritesManager.svelte';
 	import { VariableNode } from '$graph-editor/nodes/XML/VariableNode.svelte';
-	import { InputControl, type Input } from '$graph-editor/socket';
-	import { NodeStorage } from './NodeStorage.svelte';
-	import Node from '$graph-editor/render/svelte/presets/classic/components/Node.svelte';
-	interface Props {
+	import { NodeStorage, userStore } from './NodeStorage.svelte';
+		interface Props {
 		editor: NodeEditor;
 		formId?: string;
 		existingGraph?: StoredGraph;
@@ -93,7 +91,16 @@
 					res.push({
 						nodeId,
 						key,
-						label: nickname && nickname.trim().length > 0 ? nickname.trim() : (port.label ?? (key.startsWith('value') || key.startsWith('data') || key.startsWith('exec') || key.startsWith('result') ? '' : key)),
+						label:
+							nickname && nickname.trim().length > 0
+								? nickname.trim()
+								: (port.label ??
+									(key.startsWith('value') ||
+									key.startsWith('data') ||
+									key.startsWith('exec') ||
+									key.startsWith('result')
+										? ''
+										: key)),
 						description: descr,
 						datastructure: socket.datastructure,
 						priority,
@@ -107,6 +114,7 @@
 		const res: StoredGraph = $state.snapshot({
 			...graph,
 			id,
+			author: $userStore,
 			graph: editor.toJSON(),
 			createdAt: date,
 			updatedAt: date,
@@ -186,19 +194,27 @@
 				})
 		)
 	);
-
 </script>
 
 {#snippet Input(key: keyof typeof graph, props: HTMLInputAttributes = {})}
 	<label class="input input-bordered flex items-center gap-2 has-[:invalid]:input-warning">
 		<span class="font-semibold">{upperFirst(unCamelCase(key))}</span>
-		<input
-			bind:value={graph[key]}
-			{...props}
-			name={'graph-' + key}
-			oninput={saveForm}
-			class="grow"
-		/>
+		{#if key === 'author'}
+			<input
+				bind:value={$userStore}
+				{...props}
+				name={'graph-' + key}
+				class="grow"
+			/>
+		{:else}
+			<input
+				bind:value={graph[key]}
+				{...props}
+				name={'graph-' + key}
+				oninput={saveForm}
+				class="grow"
+			/>
+		{/if}
 	</label>
 {/snippet}
 {#snippet Checkbox(
@@ -250,7 +266,7 @@
 	<h4 class="font-semibold mt-2">Tags</h4>
 	<Tags
 		bind:tags={graph.tags}
-		class="ms-4"		
+		class="ms-4"
 		knownTags={NodeStorage.data.tags}
 		addTagProps={{ class: 'bg-base-20 border-0' }}
 	/>
@@ -312,7 +328,7 @@
 						</h4>
 						<ul class="space-y-6">
 							{#each selected as [key, port]}
-								{@const k = key.split("¤")[0]}
+								{@const k = key.split('¤')[0]}
 								<label class="grid grid-flow-col gap-2 items-center ms-8 grid-cols-[0fr,0fr,1fr]">
 									<input
 										type="checkbox"
@@ -322,7 +338,12 @@
 									/>
 									<span
 										class="col-start-2 w-[10rem] truncate font-medium"
-										title={port.description ?? port.label ?? key}>{port.label && port.label.trim().length > 0 ? port.label : (k === 'value' ? name.slice(0,-1) : k)}</span
+										title={port.description ?? port.label ?? key}
+										>{port.label && port.label.trim().length > 0
+											? port.label
+											: k === 'value'
+												? name.slice(0, -1)
+												: k}</span
 									>
 									<input
 										type="number"
