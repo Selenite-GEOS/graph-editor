@@ -51,8 +51,20 @@ export class NodeStorage {
 		return NodeStorage.instance.queriedMacroBlocks;
 	}
 
-	static user = $state('');
-	static query = $state('');
+	user = $state('');
+	static get user() {
+		return NodeStorage.instance.user;
+	}
+	static set user(val: string) {
+		NodeStorage.instance.user = val;
+	}
+	query = $state('');
+	static get query() {
+		return NodeStorage.instance.query;
+	}
+	static set query(val: string) {
+		NodeStorage.instance.query = val;
+	}
 
 	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][] } = $derived.by(() => {
 		const paths: string[][] = [];
