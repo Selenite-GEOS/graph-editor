@@ -1,8 +1,10 @@
 import { GitHubDataSource } from './datasources';
 import { IndexedDBSource } from './db.svelte';
+import { FavoritesManager } from './FavoritesManager.svelte';
 import {
 	type StoredGraph,
 	type Database,
+	type MacroBlock,
 	type Datasource as DataSource,
 	type Graph
 } from './types';
@@ -25,18 +27,21 @@ export class NodeStorage {
 	numGraphs = $state(0);
 	graphs = $state<StoredGraph[]>([]);
 
-	data: {tags: string[], paths: string[][]}   = $derived.by(() => {
-		const paths: string[][] = []
+	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][] } = $derived.by(() => {
+		const paths: string[][] = [];
 		const tags = new Set<string>();
+		const favorites: MacroBlock[] = [];
 		for (const graph of this.graphs) {
-			for (const tag of graph.tags ?? []) {
-				tags.add(tag);
-			}
-			if (graph.path)
-				paths.push(graph.path);
+			for (const tag of graph.tags ?? []) tags.add(tag);
+			if (FavoritesManager.isFavorite(graph.id)) favorites.push(graph);
+			if (graph.path) paths.push(graph.path);
 		}
-		return {paths, tags: Array.from(tags)};
-	})
+		return { paths, favorites, tags: Array.from(tags) };
+	});
+
+	static get favorites() {
+		return NodeStorage.instance.data.favorites;
+	}
 
 	static get tags() {
 		return NodeStorage.instance.data.tags;
