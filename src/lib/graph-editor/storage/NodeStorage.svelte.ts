@@ -4,6 +4,7 @@ import { IndexedDBSource } from './db.svelte';
 import { FavoritesManager } from './FavoritesManager.svelte';
 import type { Database, MacroBlock, Datasource as DataSource, Graph } from './types';
 import { get, type Writable } from 'svelte/store';
+import { debounce } from 'lodash-es';
 
 export const userStore: Writable<string> = persisted('user', '');
 
@@ -29,21 +30,28 @@ export class NodeStorage {
 		return NodeStorage.instance.graphs;
 	}
 
-	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][]; userBlocks: MacroBlock[] } =
-		$derived.by(() => {
-			const paths: string[][] = [];
-			const tags = new Set<string>();
-			const favorites: MacroBlock[] = [];
-			const user = get(userStore);
-			const userBlocks: MacroBlock[] = [];
-			for (const graph of this.graphs) {
-				for (const tag of graph.tags ?? []) tags.add(tag);
-				if (FavoritesManager.isFavorite(graph.id)) favorites.push(graph);
-				if (graph.path) paths.push(graph.path);
-				if (user && graph.author === user) userBlocks.push(graph);
-			}
-			return { paths, favorites, tags: Array.from(tags), userBlocks };
-		});
+	data = $state<{
+		tags: string[];
+		favorites: MacroBlock[];
+		paths: string[][];
+		userBlocks: MacroBlock[];
+	}>({ tags: [], favorites: [], paths: [], userBlocks: [] });
+
+	updateData = debounce(() => {
+		console.debug('Deriving data');
+		const paths: string[][] = [];
+		const tags = new Set<string>();
+		const favorites: MacroBlock[] = [];
+		const user = get(userStore);
+		const userBlocks: MacroBlock[] = [];
+		for (const graph of this.graphs) {
+			for (const tag of graph.tags ?? []) tags.add(tag);
+			if (FavoritesManager.isFavorite(graph.id)) favorites.push(graph);
+			if (graph.path) paths.push(graph.path);
+			if (user && graph.author === user) userBlocks.push(graph);
+		}
+		NodeStorage.instance.data = { paths, favorites, tags: Array.from(tags), userBlocks };
+	}, 10);
 
 	static get favorites() {
 		return NodeStorage.instance.data.favorites;
@@ -67,7 +75,9 @@ export class NodeStorage {
 			this.numGraphs = num;
 		});
 		NodeStorage.mainStorage.graphs.subscribe((graphs) => {
+			console.debug('Update macro blocks');
 			this.graphs = graphs;
+			this.updateData();
 		});
 		NodeStorage.updateLoop();
 
