@@ -25,5 +25,5 @@ export * as Area from './area';
 export * from './area';
 export * as Common from './common';
 export * as Storage from './storage';
-export { NodeStorage } from './storage';
+export * from './storage';
 export type { Schemes } from './schemes';
