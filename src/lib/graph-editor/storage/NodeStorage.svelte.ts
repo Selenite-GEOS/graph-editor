@@ -25,7 +25,11 @@ export class NodeStorage {
 	}
 
 	numGraphs = $state(0);
-	graphs = $state<StoredGraph[]>([]);
+	graphs = $state<MacroBlock[]>([]);
+
+	static get macroblocks() {
+		return NodeStorage.instance.graphs;
+	}
 
 	data: { tags: string[]; favorites: MacroBlock[]; paths: string[][] } = $derived.by(() => {
 		const paths: string[][] = [];
