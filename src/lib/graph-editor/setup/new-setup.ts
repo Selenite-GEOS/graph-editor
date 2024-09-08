@@ -9,16 +9,14 @@ import type { AreaExtra } from '$graph-editor/area';
 import { tick } from 'svelte';
 import {
 	contextMenuSetup,
-	showContextMenu,
-	type NodeMenuItem,
-	type ShowContextMenu
-} from '$graph-editor/plugins/context-menu';
+	type NodeMenuItem, 
+} from '$graph-editor/plugins/context-menu-plugin.svelte';
 import { gridLinesSetup } from '$graph-editor/plugins/viewport-addons/gridlines';
 import { notificationsSetup } from '$graph-editor/plugins/notifications';
 import type { GraphNode } from '$graph-editor/nodes';
 import { HistoryPlugin } from '$graph-editor/plugins/history';
 import { setupSvelteRender } from '$graph-editor/render';
-import type { XmlSchema } from '@selenite/commons';
+import { showContextMenu, type ShowContextMenu, type XmlSchema } from '@selenite/commons';
 
 export type XmlContext = {};
 

@@ -2,12 +2,11 @@
 	import { setupSvelteRender } from '$graph-editor/render';
 	import { MiniMap, NodeStorage, Setup, VariablesListComponent } from '$lib/graph-editor';
 	import {
-		showContextMenu,
 		nodeItem,
-		xmlNodeItems	} from '$graph-editor/plugins/context-menu';
+		xmlNodeItems	} from '$graph-editor/plugins/context-menu-plugin.svelte';
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
-	import { capitalize, parseXsdFromUrl, shortcut, type KeyboardShortcut } from '@selenite/commons';
+	import { capitalize, parseXsdFromUrl, shortcut, showContextMenu, type KeyboardShortcut } from '@selenite/commons';
 	import { notifications, themeControl } from '$lib/global/index.svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';

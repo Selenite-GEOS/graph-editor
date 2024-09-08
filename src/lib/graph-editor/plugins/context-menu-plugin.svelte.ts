@@ -4,16 +4,14 @@ import { NodeFactory } from '$graph-editor/editor';
 import { Node, nodeRegistry } from '$graph-editor/nodes';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';
 import type { Position } from '$graph-editor/common';
-import type { MenuItem } from './types';
 import { clientToSurfacePos } from '$utils/html';
 // Ensure all nodes are registered
-import '../../nodes';
+import '../nodes';
 import type { Control, Socket } from '$graph-editor/socket';
 import { VariableNode, XmlNode, type XmlConfig } from '$graph-editor/nodes/XML';
-import { localId, XmlSchema, type XMLTypeTree, capitalizeWords, posFromClient, PointerDownWatcher, distance } from '@selenite/commons';
-import { areTypesCompatible } from '../typed-sockets';
+import { localId, XmlSchema, type XMLTypeTree, capitalizeWords, posFromClient, PointerDownWatcher, distance, type ShowContextMenu, ContextMenuState, type MenuItem } from '@selenite/commons';
+import { areTypesCompatible } from './typed-sockets';
 import type { SocketData } from 'rete-connection-plugin';
-import { ContextMenu } from './context-menu.svelte';
 
 export type NodeMenuItem<NC extends typeof Node = typeof Node> = {
 	/** Label of the node. */
@@ -54,7 +52,7 @@ export function xmlItem({
 	xmlConfig: XmlConfig;
 }): NodeMenuItem<typeof Node> {
 	return nodeItem({
-		label: label ?? xmlConfig.xmlTag,
+		label,
 		nodeClass: XmlNode,
 		params: { xmlConfig },
 		path: ['XML'],
@@ -208,16 +206,7 @@ export function createNodeMenuItem(
 	};
 }
 
-export type ShowContextMenu = (params: {
-	expand?: boolean;
-	pos: Position;
-	/** Whether to sort the items. Default to false. */
-	sort?: boolean;
-	items: Partial<MenuItem>[];
-	searchbar?: boolean;
-	onHide?: () => void;
-	target?: HTMLElement;
-}) => void;
+
 export function contextMenuSetup({
 	showContextMenu,
 	additionalNodeItems
@@ -237,7 +226,7 @@ export function contextMenuSetup({
 			// Connection drop context menu
 			else {
 				connPlugin.addPipe((context) => {
-					if (context.type === 'pointermove' && ContextMenu.instance.visible) {
+					if (context.type === 'pointermove' && ContextMenuState.instance.visible) {
 						return;
 					}
 					if (context.type !== 'connectiondrop') return context;
