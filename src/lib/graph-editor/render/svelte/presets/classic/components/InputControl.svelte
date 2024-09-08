@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Modal, type ModalButtonSettings } from '$graph-editor/plugins/modal';
+	import { Modal, type ModalButtonSettings } from '@selenite/commons';
 	import {
 		defaultInputControlValues,
 		InputControl,

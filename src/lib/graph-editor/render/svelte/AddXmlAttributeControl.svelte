@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { AddXmlAttributeControl } from '$graph-editor/nodes/XML';
-	import { checkbox, keyboardNavigation, stopPropagation } from '@selenite/commons';
-	import { modals } from '$graph-editor/plugins';
+	import { checkbox, keyboardNavigation, stopPropagation, modals } from '@selenite/commons';
 	import wu from 'wu';
 
 	let { data }: { data: AddXmlAttributeControl } = $props();

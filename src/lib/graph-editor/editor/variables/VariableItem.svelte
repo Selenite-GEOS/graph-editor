@@ -8,8 +8,7 @@
 	import { assignControl, colorMap } from '$graph-editor/render/utils';
 	import { InputControl } from '$graph-editor/control';
 	import { InputControlComponent } from '$graph-editor/render';
-	import { modals, showContextMenu } from '$graph-editor/plugins';
-	import { persisted, preventDefault, sleep, stopPropagation, type Point } from '@selenite/commons';
+	import { persisted, preventDefault, showContextMenu, sleep, stopPropagation, type Point, modals } from '@selenite/commons';
 	import { variableDragStart } from '$graph-editor/utils';
 	import { createFloatingActions } from 'svelte-floating-ui';
 	import { upperFirst } from 'lodash-es';

@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { ErrorWNotif, _ } from '$lib/global/index.svelte';
 	import type { Connection, NodeFactory } from '$graph-editor';
-	import { showContextMenu } from '$graph-editor/plugins/context-menu';
-	import { stopPropagation } from '@selenite/commons';
+	import { showContextMenu, stopPropagation } from '@selenite/commons';
 	import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 	import { assignColor } from '$graph-editor/render/utils';
 	import type { Output, Socket } from '$graph-editor/socket';

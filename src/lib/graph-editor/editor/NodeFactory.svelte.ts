@@ -18,8 +18,8 @@ import type { HistoryPlugin } from '$graph-editor/plugins/history';
 import { defaultConnectionPath, type ConnectionPathType } from '$graph-editor/connection-path';
 import { tick } from 'svelte';
 import type { NotificationsManager } from '$graph-editor/plugins/notifications';
-import { downloadJSON, newUuid, Rect, XmlSchema, type SaveData } from '@selenite/commons';
-import { Modal, modals } from '$graph-editor/plugins/modal';
+import { downloadJSON, Rect, XmlSchema, type SaveData } from '@selenite/commons';
+import { Modal, modals } from '@selenite/commons';
 import type {
 	BaseComponent,
 	ComponentParams,
