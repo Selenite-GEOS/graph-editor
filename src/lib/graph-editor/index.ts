@@ -25,3 +25,5 @@ export * as Common from './common';
 export * as Storage from './storage';
 export * from './storage';
 export type { Schemes } from './schemes';
+export * as ConnectionPath_ from './connection-path'
+export * from './connection-path'
