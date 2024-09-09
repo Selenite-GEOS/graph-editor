@@ -425,6 +425,9 @@ export class NodeFactory implements ComponentSupportInterface {
 			}
 			return ctx;
 		});
+		if (area?.area.transform.k !== undefined)
+			this.transform.zoom = area.area.transform.k;
+		this.surfaceRect = this.#area?.area.content.holder.getBoundingClientRect() ?? new Rect();
 	}
 
 	public readonly makutuClasses?: MakutuClassRepository;
