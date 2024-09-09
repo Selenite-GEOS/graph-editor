@@ -12,7 +12,7 @@ import { animationFrame, PointerDownWatcher, posFromClient } from '@selenite/com
 import { GraphNode, MacroNode, VariableNode } from '$graph-editor';
 import { clientToSurfacePos } from '$utils/html';
 import { tick } from 'svelte';
-import { throttle } from 'lodash-es';
+import { cloneDeep, throttle } from 'lodash-es';
 
 // export class AreaSetup extends SetupClass {
 // 	private lastClicked: HTMLElement | null = null;
@@ -37,6 +37,20 @@ import { throttle } from 'lodash-es';
 // 	}
 // }
 
+function isXml(e: DragEvent): boolean {
+	if (!e.dataTransfer) return false;
+	const dt = e.dataTransfer;
+	if (dt.types.includes('text/xml')) return true;
+	if (dt.types.includes('Files')) {
+		const files = dt.files;
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			if (file.type === 'text/xml') return true;
+		}
+	}
+
+	return false;
+}
 export const setupArea: SetupFunction = (params) => {
 	console.log('Setting up area plugin');
 	const { factory, editor } = params;
@@ -49,20 +63,24 @@ export const setupArea: SetupFunction = (params) => {
 
 	// area.area.setZoomHandler(new SmoothZoom())
 	// Update nodes position
-	area.addPipe(ctx => {
+	area.addPipe((ctx) => {
 		// if (ctx.type === 'node')
 		if (ctx.type !== 'nodetranslated') return ctx;
-		const {id, position} = ctx.data;
+		const { id, position } = ctx.data;
 		const node = editor.getNode(id);
 		if (!node) return ctx;
 		node.pos = position;
 		return ctx;
-	})
-
-	
+	});
 
 	function dragHandler(e: DragEvent) {
-		if (isDraggedGraph(e) || isDraggedVariable(e)) e.preventDefault();
+		if (
+			isDraggedGraph(e) ||
+			isDraggedVariable(e) ||
+			isXml(e) ||
+			e.dataTransfer?.types.includes('Files')
+		)
+			e.preventDefault();
 	}
 
 	let deltaX = 0;
@@ -74,18 +92,22 @@ export const setupArea: SetupFunction = (params) => {
 		area.area.translate(newX, newY);
 		deltaX = 0;
 		deltaY = 0;
-	}, 5)
+	}, 5);
 
 	// Area movement
-	container.addEventListener('pointermove', async (e) => {
-		if (!PointerDownWatcher.instance.isPointerDown) return;
-		const pDownE = PointerDownWatcher.instance.lastEvent;
-		if (!pDownE) return;
-		if (pDownE.button !== 1 && pDownE.button !== 2) return;
-		deltaX += e.movementX;
-		deltaY += e.movementY;
-		throttledTranslate();
-	}, {passive: true});
+	container.addEventListener(
+		'pointermove',
+		async (e) => {
+			if (!PointerDownWatcher.instance.isPointerDown) return;
+			const pDownE = PointerDownWatcher.instance.lastEvent;
+			if (!pDownE) return;
+			if (pDownE.button !== 1 && pDownE.button !== 2) return;
+			deltaX += e.movementX;
+			deltaY += e.movementY;
+			throttledTranslate();
+		},
+		{ passive: true }
+	);
 
 	container.addEventListener('dragover', dragHandler);
 	container.addEventListener('dragenter', dragHandler);
@@ -93,6 +115,17 @@ export const setupArea: SetupFunction = (params) => {
 		const pos = posFromClient(e);
 		const surfacePos = clientToSurfacePos({ pos, factory });
 		let addedNode: GraphNode | undefined;
+		if (isXml(e)) {
+			e.preventDefault();
+			const xml = await getDraggedXml(e);
+			if (!xml) return;
+			const schema = factory.xmlSchemas.get('geos')
+			if (!schema) return;
+			factory.codeIntegration.toGraph({
+				text: xml,
+				schema
+			})
+		}
 		if (isDraggedVariable(e)) {
 			const vId = getDraggedVariableId(e);
 			if (vId) {
@@ -139,3 +172,27 @@ export const arrangeSetup: Setup = {
 		factory.arrange = arrange;
 	}
 };
+async function getDraggedXml(e: DragEvent): Promise<string | undefined> {
+	const dt = e.dataTransfer;
+	if (!dt) return;
+	if (dt.types.includes('text/xml')) {
+		return dt.getData('text/xml');
+	}
+	if (dt.types.includes('Files')) {
+		const files = dt.files;
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			if (file.type === 'text/xml') {
+				return await new Promise((resolve, reject) => {
+					const reader = new FileReader();
+					reader.onload = () => {
+						resolve(reader.result as string);
+					};
+					reader.onerror = reject
+					reader.readAsText(file);
+				})
+			}
+		}
+	}
+	return;
+}

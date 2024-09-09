@@ -106,7 +106,7 @@
 	const viewArea = $derived(Rect.area(finalViewRect ?? new Rect()));
 	const containerArea = $derived(Rect.area(containerRect ?? new Rect()));
 	const displayView = $derived(nodes.length > 0 && viewArea / containerArea < displayViewThreshold);
-	$inspect(containerRect.x)
+	// $inspect(containerRect.x)
 	function moveArea(e: { clientX: number; clientY: number }) {
 		const area = factory?.area;
 		if (!factory || !totalRect || !ratioViewRect || !area) return;
