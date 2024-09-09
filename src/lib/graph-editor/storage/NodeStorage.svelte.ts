@@ -135,6 +135,10 @@ export class NodeStorage {
 		return NodeStorage.mainStorage.clearGraphs();
 	}
 
+	static deleteMacro(id: string): Promise<void> {
+		return NodeStorage.mainStorage.deleteMacro(id);
+	}
+
 	static async pullSources() {
 		// console.debug('Pulling sources');
 		const res = (await Promise.all(NodeStorage.sources.map((source) => source.getGraphs()))).flat();

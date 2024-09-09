@@ -1,12 +1,6 @@
-import type {
-	CommentSaveData,
-	ConnectionSaveData,
-	NodeEditorSaveData,
-	NodeSaveData
-} from '$graph-editor';
+import type { NodeEditorSaveData } from '$graph-editor';
 import type { SocketType } from '$graph-editor/plugins/typed-sockets';
 import type { SocketDatastructure } from '$graph-editor/socket';
-import type { Variable } from '$graph-editor/variables';
 import type { Observable } from 'dexie';
 
 export type GraphPorts = {
@@ -69,6 +63,7 @@ export interface Datasource {
 }
 
 export interface Database extends Datasource {
+	deleteMacro(id: string): Promise<void>;
 	clearGraphs(): Promise<void>;
 	clearMacroBlocks(): Promise<void>;
 	getGraph(id: string): Promise<MacroBlock | undefined>;

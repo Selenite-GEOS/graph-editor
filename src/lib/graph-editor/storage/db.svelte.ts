@@ -12,6 +12,9 @@ db.version(1).stores({
 });
 
 export class IndexedDBSource implements Database {
+	deleteMacro(id: string): Promise<void> {
+		return db.graphs.delete(id)
+	}
 	clearGraphs(): Promise<void> {
 		return db.graphs.clear();
 	}
