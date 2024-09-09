@@ -291,14 +291,17 @@ export class NodeFactory implements ComponentSupportInterface {
 	async openGraphForm(defaultName = 'New Graph') {
 		const MacroBlockForm = (await import('$graph-editor/storage/MacroBlockForm.svelte')).default;
 		const existingGraph = await NodeStorage.getGraph(this.editor.graphId);
-
-		const action = existingGraph ? 'Update' : 'Create';
+		const nodesSelected = this.selection.nodes.length > 0;
+		const action = existingGraph && !nodesSelected ? 'Update' : 'Create';
 		const editor = this.editor;
 		modals.show({
 			component: MacroBlockForm,
 			props: { editor: this.editor, existingGraph },
 			get title() {
-				return `${action} ${editor.graphName.trim().length === 0 ||  (!existingGraph && editor.graphName === defaultName) ? 'macro-block' : editor.graphName}`;
+				if (nodesSelected)
+					return 'Create macro from selection';
+				else
+					return `${action} ${editor.graphName.trim().length === 0 ||  (!existingGraph && editor.graphName === defaultName) ? 'macro-block' : editor.graphName}`;
 			},
 			buttons: [
 				'cancel',

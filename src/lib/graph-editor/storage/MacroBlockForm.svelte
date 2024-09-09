@@ -6,7 +6,8 @@
 		PathGenerator,
 		persisted,
 		Tags,
-		unCamelCase
+		unCamelCase,
+		uuid
 	} from '@selenite/commons';
 	import type { GraphPorts, StoredGraph } from './types';
 	import { upperFirst } from 'lodash-es';
@@ -14,7 +15,7 @@
 	import { FavoritesManager } from './FavoritesManager.svelte';
 	import { VariableNode } from '$graph-editor/nodes/XML/VariableNode.svelte';
 	import { NodeStorage, userStore } from './NodeStorage.svelte';
-		interface Props {
+	interface Props {
 		editor: NodeEditor;
 		formId?: string;
 		existingGraph?: StoredGraph;
@@ -30,12 +31,16 @@
 		...$localPersistedGraph,
 		...existingGraph,
 		get name() {
-			return editor.graphName ?? '';
+			return areNodesSelected ? subGraphName :  (editor.graphName ?? '');
 		},
 		set name(value: string) {
-			editor.graphName = value;
+			if (areNodesSelected)
+				subGraphName = value;
+			else
+				editor.graphName = value;
 		}
 	});
+	let subGraphName = $state('')
 
 	if (existingGraph) {
 		graph.addToFavorite = FavoritesManager.isFavorite(existingGraph.id);
@@ -66,8 +71,13 @@
 		console.debug('Saved form', $savedForm);
 	}
 
+	const selectedNodes = $derived(editor.factory?.selection.nodes ?? editor.getNodes());
+	const areNodesSelected = $derived(selectedNodes.length > 0);
+	const selectedNodesIds = $derived(new Set(selectedNodes.map((n) => n.id)));
+	const selectedConns = $derived(editor.factory?.selection.connections ?? editor.getConnections());
+	const selectedConnsIds = $derived(selectedConns.map((c) => c.id));
 	export async function getResponse(): Promise<StoredGraph> {
-		const id = editor.graphId;
+		const id = !areNodesSelected ? editor.graphId : uuid();
 		FavoritesManager.setFavorite(id, graph.addToFavorite ?? false);
 		const date = new Date();
 
@@ -111,11 +121,19 @@
 			}
 			return res;
 		}
+		const editorData = editor.toJSON();
+		if (areNodesSelected) {
+			editorData.nodes = editorData.nodes.filter((n) => selectedNodesIds.has(n.id));
+			editorData.connections = editorData.connections.filter((c) => selectedNodesIds.has(c.source) || selectedNodesIds.has(c.target));
+			editorData.graphName = subGraphName;
+			editorData.editorName = subGraphName;
+		}
+
 		const res: StoredGraph = $state.snapshot({
 			...graph,
 			id,
 			author: $userStore,
-			graph: editor.toJSON(),
+			graph: editorData,
 			createdAt: date,
 			updatedAt: date,
 			inputs: await gatherPorts('input'),
@@ -133,8 +151,8 @@
 		return res;
 	}
 
-	const selectedInputs = editor.selectedInputs;
-	const selectedOutputs = editor.selectedOutputs;
+	const selectedInputs = editor.selectedInputs.filter(({ node}) => !areNodesSelected || selectedNodesIds.has(node.id));
+	const selectedOutputs = editor.selectedOutputs.filter(({ node }) => !areNodesSelected || selectedNodesIds.has(node.id));
 
 	function getPortsConfig(
 		side: 'input' | 'output'
@@ -200,12 +218,7 @@
 	<label class="input input-bordered flex items-center gap-2 has-[:invalid]:input-warning">
 		<span class="font-semibold">{upperFirst(unCamelCase(key))}</span>
 		{#if key === 'author'}
-			<input
-				bind:value={$userStore}
-				{...props}
-				name={'graph-' + key}
-				class="grow"
-			/>
+			<input bind:value={$userStore} {...props} name={'graph-' + key} class="grow" />
 		{:else}
 			<input
 				bind:value={graph[key]}
