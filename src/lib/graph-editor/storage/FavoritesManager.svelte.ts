@@ -1,3 +1,4 @@
+import { isBrowser } from '@selenite/commons';
 import { SvelteSet } from 'svelte/reactivity';
 
 const FAVORITES_KEY = 'favoriteGraphsIds';
@@ -12,7 +13,7 @@ export class FavoritesManager {
 	}
 
 	private constructor() {
-		const favorites = localStorage.getItem(FAVORITES_KEY);
+		const favorites = isBrowser() ? localStorage.getItem(FAVORITES_KEY) : '[]';
 		if (favorites) {
 			this.#favorites = new SvelteSet(JSON.parse(favorites));
 		}
