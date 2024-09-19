@@ -3,7 +3,7 @@ import type { Schemes } from '$graph-editor/schemes';
 import type { AreaExtra } from '$graph-editor/area';
 import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import type { GeosDataContext } from '$lib/geos';
-import type { NewGeosContext } from '$lib/global/index.svelte';
+import type { NewGeosContext } from '$lib/global/todo.svelte';
 
 export abstract class SetupClass {
 	abstract setup(

@@ -10,7 +10,7 @@ import { readable, type Readable, type Writable } from 'svelte/store';
 import { PythonDataflowEngine } from '$graph-editor/engine/PythonDataflowEngine';
 import type { MakutuClassRepository } from '$lib/backend-interaction/types';
 import { newLocalId } from '$utils';
-import { ErrorWNotif, _ } from '$lib/global/index.svelte';
+import { ErrorWNotif, _ } from '$lib/global/todo.svelte';
 import type { AutoArrangePlugin } from 'rete-auto-arrange-plugin';
 import type { CommentPlugin } from '$graph-editor/plugins/CommentPlugin';
 import { persisted } from 'svelte-persisted-store';

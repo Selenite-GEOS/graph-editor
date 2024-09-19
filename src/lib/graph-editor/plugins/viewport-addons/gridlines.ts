@@ -1,5 +1,5 @@
 import type { Setup } from '$graph-editor/setup/Setup';
-import { themeControl } from '$lib/global/index.svelte';
+import { themeControl } from '$lib/global/todo.svelte';
 import { gridLines } from '@selenite/commons';
 
 export type GridlineExtra = { type: 'gridline-toggle-visibility' } | { type: 'gridline-update' };

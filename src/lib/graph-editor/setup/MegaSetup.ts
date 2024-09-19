@@ -9,7 +9,7 @@ import type { NodeEditor, NodeFactory } from '$graph-editor/editor';
 import { AreaSetup } from './AreaSetup';
 import { ConnectionSetup } from './ConnectionSetup';
 import type { GeosDataContext } from '$lib/geos';
-import type { NewGeosContext } from '$lib/global/index.svelte';
+import type { NewGeosContext } from '$lib/global/todo.svelte';
 
 export class MegaSetup extends SetupClass {
 	toSetup: SetupClass[] = [

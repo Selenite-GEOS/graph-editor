@@ -1,4 +1,4 @@
-import { ErrorWNotif } from '$lib/global/index.svelte';
+import { ErrorWNotif } from '$lib/global/todo.svelte';
 import { formatXMLArray } from '@selenite/commons';
 import type { XmlNode } from './XmlNode.svelte';
 

@@ -28,7 +28,7 @@ import {
 	type SocketDatastructure
 } from '$graph-editor/socket';
 
-import { ErrorWNotif } from '$lib/global/index.svelte';
+import { ErrorWNotif } from '$lib/global/todo.svelte';
 import type { ConverterNode } from './data/common-data-nodes.svelte';
 import type { AreaPlugin, NodeView } from 'rete-area-plugin';
 import type { Schemes } from '$graph-editor/schemes';

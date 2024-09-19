@@ -1,5 +1,5 @@
 import { type Setup } from '$graph-editor/setup/Setup';
-import { _ } from '$lib/global/index.svelte';
+import { _ } from '$lib/global/todo.svelte';
 import { NodeFactory } from '$graph-editor/editor';
 import { Node, nodeRegistry } from '$graph-editor/nodes';
 import type { SelectorEntity } from 'rete-area-plugin/_types/extensions/selectable';

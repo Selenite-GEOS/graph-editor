@@ -1,4 +1,4 @@
-import { ErrorWNotif, type resolveContext } from '$lib/global/index.svelte';
+import { ErrorWNotif, type resolveContext } from '$lib/global/todo.svelte';
 import {
 	type X2jOptionsOptional,
 	XMLParser,

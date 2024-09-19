@@ -1,7 +1,7 @@
 import { NodeComponent, type NodeComponentParams } from '$graph-editor/components';
 import type { DataType, SocketType } from '$graph-editor/plugins/typed-sockets';
 import type { Socket } from '$graph-editor/socket';
-import { ErrorWNotif } from '$lib/global/index.svelte';
+import { ErrorWNotif } from '$lib/global/todo.svelte';
 import type { Node } from '../Node.svelte';
 
 type R = Record<string, Socket>;

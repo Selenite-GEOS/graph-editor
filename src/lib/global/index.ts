@@ -1,1 +1,1 @@
-export * from './index.svelte';
+export * from './todo.svelte';
