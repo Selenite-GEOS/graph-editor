@@ -6,7 +6,7 @@
  * Both are used to create and manage nodes in the graph editor. However,
  * the NodeFactory is designed as a higher level abstraction that allows
  * more advanced features.
- * @module Editor
+ * @module
  */
 
 export * from './NodeEditor.svelte';
