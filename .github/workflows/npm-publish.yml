@@ -30,7 +30,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Run unit tests
         run: pnpm test run
-      - run: bun package
+      - run: pnpm package
       - uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
