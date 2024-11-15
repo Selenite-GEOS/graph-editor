@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ErrorWNotif, _ } from '$lib/global/index.svelte';
+	import { ErrorWNotif, _ } from '$lib/global';
 	import type { Connection, NodeFactory } from '$graph-editor';
 	import { showContextMenu, stopPropagation } from '@selenite/commons';
 	import type { SocketType } from '$graph-editor/plugins/typed-sockets';

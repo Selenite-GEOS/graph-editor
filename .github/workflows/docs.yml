@@ -2,7 +2,7 @@ name: Deploy docs
 
 on:
   push:
-    paths: ['src/**', 'test/**', 'tsconfig.json', '.github/workflows/docs.yml', 'bun.lockb']
+    paths: ['src/**', 'test/**', 'tsconfig.json', '.github/workflows/docs.yml', 'pnpm-lock.yaml']
     branches:
       - main
   release:
@@ -16,9 +16,9 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
-      - run: bun docgen
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm docgen
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:

@@ -7,7 +7,7 @@
 	import type { NodeEditor, NodeEditorSaveData } from '$graph-editor/editor';
 	import { persisted } from 'svelte-persisted-store';
 	import { capitalize, parseXsdFromUrl, shortcut, showContextMenu, type KeyboardShortcut } from '@selenite/commons';
-	import { notifications, themeControl } from '$lib/global/index.svelte';
+	import { notifications, themeControl } from '$lib/global';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { XmlNode } from '$graph-editor/nodes/XML';
 	import { setContext, untrack } from 'svelte';
