@@ -188,15 +188,15 @@
 				factory?.downloadGraph();
 			}
 		})}
-		<select class="select select-bordered pointer-events-auto" title="Theme" bind:value={themeControl.theme}>
+		<select class="select pointer-events-auto" title="Theme" bind:value={themeControl.theme}>
 			<option value="">Default</option>
 			{#each themeControl.themes as theme}
 				<option value={theme}>{capitalize(theme)}</option>
 			{/each}
 		</select>
 		{#if editor}
-			<input class="input input-bordered pointer-events-auto" bind:value={editor.graphName} />
-			<input class="input input-bordered w-[23em] pointer-events-auto" bind:value={editor.graphId} />
+			<input class="input  pointer-events-auto" bind:value={editor.graphName} />
+			<input class="input  w-[23em] pointer-events-auto" bind:value={editor.graphId} />
 		{/if}
 		<aside class="flex gap-2">
 			<h2>DB</h2>
@@ -217,7 +217,7 @@
 			}
 		})}
 		{@render button({label: 'Previous', shortcut:{key: 'p'}, action: () => factory.search.previous()})}
-		<input class="input input-bordered pointer-events-auto" bind:value={factory.search.query} placeholder="Search"/>
+		<input class="input  pointer-events-auto" bind:value={factory.search.query} placeholder="Search"/>
 		{@render button({label: 'Next', shortcut: {key: 'n'}, action: () => factory.search.next()})}
 		{@render button({label: 'Minimap', class: $minimapOn ? 'btn-secondary' : '', action: () => $minimapOn = !$minimapOn})}
 		{/if}
@@ -258,7 +258,7 @@
 	<div
 		class="absolute bottom-2 right-2 flex gap-4 items-end pointer-events-none"
 	>
-		<details class="p-4 bg-base-200 rounded-box border border-base-content border-opacity-10 transition-all pointer-events-auto">
+		<details class="p-4 bg-base-200 rounded-box border border-base-content/10 transition-all pointer-events-auto">
 			<summary class="ms-4 w-[12rem] font-semibold cursor-pointer select-none">
 				Saved Graphs
 			</summary>
@@ -269,7 +269,7 @@
 						ondblclick={() => factory?.loadGraph(graph.graph)}
 						ondragstart={onGraphDragStart(graph)}
 						class="
-							p-2 bg-base-300 select-none border border-base-content border-opacity-15 rounded-btn
+							p-2 bg-base-300 select-none border border-base-content/15 rounded-field
 							cursor-pointer
 							"
 					>

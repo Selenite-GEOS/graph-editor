@@ -40,9 +40,9 @@
 </script>
 
 <div class="relative">
-	<div class="h-screen grid grid-flow-col grid-cols-[2fr,1fr] gap-2">
+	<div class="h-screen grid grid-flow-col grid-cols-[2fr_1fr] gap-2">
 		<div bind:this={container}></div>
-		<textarea class="textarea-bordered textarea" bind:value={$textareaContent}></textarea>
+		<textarea class=" textarea" bind:value={$textareaContent}></textarea>
 	</div>
 	<div
 		class="absolute inset-0 z-10 row-span-2 row-start-1 col-start-1 grid items-start p-4 justify-center grid-flow-col gap-2 pointer-events-none"

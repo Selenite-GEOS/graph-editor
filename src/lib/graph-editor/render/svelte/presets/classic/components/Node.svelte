@@ -218,7 +218,7 @@
 {#if node.picked}
 	<!-- svelte-ignore event_directive_deprecated -->
 	<div
-		class="grid w-max absolute top-0 left-0 z-10 bg-base-200 bg-opacity-100 p-2 rounded-sm select-none pointer-events-none"
+		class="grid w-max absolute top-0 left-0 z-10 bg-base-200/100 p-2 rounded-xs select-none pointer-events-none"
 		on:pointerdown={stopPropagation}
 		style={floating.floatingStyles}
 		{...interactions.getFloatingProps()}
@@ -304,11 +304,11 @@
 	class:text-primary={false && node.needsProcessing}
 	class:transition-all={transitionEnabled}
 	class:opacity-0={!node.visible}
-	class={`relative border-base-content border-opacity-10 group border dborder-opacity-0 overflow-hidden hover:overflow-visible bg-opacity-85 rounded-box focus-visible:outline-none 
-	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + 'border-opacity-100 focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200 dhover:bg-opacity-85'}
+	class={`relative border-base-content/10 group border overflow-hidden hover:overflow-visible bg-opacity-85 rounded-box focus-visible:outline-hidden 
+	${node.picked ? variant('primary') : node.selected ? variant('secondary') : variant('base-300') + 'border-opacity-100 focus-within:bg-base-200 focus-within:border-base-300 hover:border-base-300 hover:bg-base-200'}
 	${node.previewed ? 'previewed' : ''}
-	${variableNode ? '!rounded-full' : ''}
-	${variableNode?.variable?.highlighted ? '!bg-accent text-accent-content transition-colors' : ''}
+	${variableNode ? 'rounded-full!' : ''}
+	${variableNode?.variable?.highlighted ? 'bg-accent! text-accent-content transition-colors' : ''}
 	${node.factory?.search.focused === node ? 'outline-accent outline' : ''}
 	`}
 	style={`max-width: ${node.width}px; max-height: ${node.height}px;  ${
@@ -450,7 +450,7 @@
 		{#each node.sortedControls as [key, control] (key)}
 			{#if !control.placeInHeader}
 				{@render controlSnippet(control, {
-					class: 'h-full !flex items-center justify-center control col-span-full'
+					class: 'h-full flex! items-center justify-center control col-span-full'
 				})}
 			{/if}
 		{/each}
@@ -491,7 +491,7 @@
 
 						{#if input.control && input.showControl}
 							<Ref
-								class="h-full !flex items-center input-control mr-2"
+								class="h-full flex! items-center input-control mr-2"
 								data-testid="input-control"
 								init={(element) =>
 									emit({
@@ -527,7 +527,7 @@
 						{/if}
 					</div>
 					<!-- <Ref
-						class="h-full !flex items-center output-control"
+						class="h-full flex! items-center output-control"
 						data-testid="output-control"
 						init={(element) =>
 							emit({

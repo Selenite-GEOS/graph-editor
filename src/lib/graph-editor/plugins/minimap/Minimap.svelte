@@ -170,9 +170,9 @@
 				moveArea(e);
 			},
 		}}
-		class="minimap transition-all duration-[800] {themeControl.isLight
-			? 'bg-base-200 bg-opacity-75'
-			: 'bg-neutral bg-opacity-50'} relative overflow-clip cursor-pointer rounded-box border-base-content border border-opacity-25"
+		class="minimap transition-all duration-800 {themeControl.isLight
+			? 'bg-base-200/75'
+			: 'bg-neutral/50'} relative overflow-clip cursor-pointer rounded-box border-base-content/25 border"
 		oncontextmenu={preventDefault}
 		style="width: {mapW}rem; height: {mapH}rem;"
 		transition:fade={{ duration: 200 }}
@@ -187,8 +187,8 @@
 				<div
 					transition:fade={{ duration: 200 }}
 					class="absolute {themeControl.isLight
-						? 'bg-base-content bg-opacity-30'
-						: 'bg-neutral-content bg-opacity-50'} "
+						? 'bg-base-content/30'
+						: 'bg-neutral-content/50'} "
 					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px; border-radius: calc(var(--rounded-box) * {0.006 *
 						height});"
 				></div>
@@ -198,8 +198,8 @@
 				<div
 					transition:fade
 					class="absolute border bg-accent {themeControl.isLight
-						? 'bg-opacity-25 border-opacity-10 border-base-content'
-						: ' border-accent bg-opacity-15 border-opacity-50'}"
+						? 'bg-accent/25 border-base-content/10'
+						: ' border-accent/50 bg-accent/15'}"
 					style="width: {width}px; height:{height}px; left:{x}px; top: {y}px;"
 				></div>
 			{/if}

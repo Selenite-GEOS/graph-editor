@@ -215,7 +215,7 @@
 </script>
 
 {#snippet Input(key: keyof typeof graph, props: HTMLInputAttributes = {})}
-	<label class="input input-bordered flex items-center gap-2 has-[:invalid]:input-warning">
+	<label class="input  flex items-center gap-2 has-[:invalid]:input-warning">
 		<span class="font-semibold">{upperFirst(unCamelCase(key))}</span>
 		{#if key === 'author'}
 			<input bind:value={$userStore} {...props} name={'graph-' + key} class="grow" />
@@ -260,7 +260,7 @@
 			placeholder={label}
 			use:autosize
 			name={'graph-' + key}
-			class="textarea textarea-bordered grow"
+			class="textarea  grow"
 			oninput={saveForm}
 			{...props}
 		></textarea>
@@ -296,24 +296,24 @@
 	{@render Title('variables')}
 	{#if exposedVariables.length > 0}
 		{#each exposedVariables as variable}
-			<label class="grid grid-flow-col gap-4 items-center ms-4 grid-cols-[0fr,0fr,1fr]">
+			<label class="grid grid-flow-col gap-4 items-center ms-4 grid-cols-[0fr_0fr_1fr]">
 				<input type="checkbox" bind:checked={variables[variable.id].keep} class="checkbox" />
 				<span class="w-[5rem] truncate col-start-2 font-semibold">{variable.name}</span>
 				<input
 					type="number"
 					bind:value={variables[variable.id].priority}
-					class="input input-bordered col-span-2"
+					class="input  col-span-2"
 					placeholder="Priority"
 					title="Influences the order of inputs. Higher priority means higher display."
 				/>
 				<input
 					bind:value={variables[variable.id].nickname}
-					class="input input-bordered col-start-3 justify-self-stretch"
+					class="input  col-start-3 justify-self-stretch"
 					placeholder="Rename"
 				/>
 				<textarea
 					bind:value={variables[variable.id].descr}
-					class="textarea textarea-bordered col-start-3"
+					class="textarea  col-start-3"
 					placeholder="Description"
 					use:autosize
 				></textarea>
@@ -342,7 +342,7 @@
 						<ul class="space-y-6">
 							{#each selected as [key, port]}
 								{@const k = key.split('¤')[0]}
-								<label class="grid grid-flow-col gap-2 items-center ms-8 grid-cols-[0fr,0fr,1fr]">
+								<label class="grid grid-flow-col gap-2 items-center ms-8 grid-cols-[0fr_0fr_1fr]">
 									<input
 										type="checkbox"
 										bind:checked={target[node.id][key].keep}
@@ -361,18 +361,18 @@
 									<input
 										type="number"
 										bind:value={target[node.id][key].priority}
-										class="input input-bordered col-span-2"
+										class="input  col-span-2"
 										placeholder="Priority"
 										title={`Influences the order of ${name}. Higher priority means higher display.`}
 									/>
 									<input
 										bind:value={target[node.id][key].nickname}
-										class="input input-bordered grow col-start-3"
+										class="input  grow col-start-3"
 										placeholder="Rename"
 									/>
 									<textarea
 										bind:value={target[node.id][key].descr}
-										class="textarea textarea-bordered col-start-3"
+										class="textarea  col-start-3"
 										placeholder="Description"
 										use:autosize
 									></textarea>

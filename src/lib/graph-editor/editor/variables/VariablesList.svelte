@@ -138,13 +138,12 @@
 		class:w-40={$collapsed}
 		class:w-[30rem]={!$collapsed}
 		class:h-52={!$collapsed}
-		class:bg-opacity-0={$collapsed}
 		class:transition-main-div={mounted}
 		class:light-bg-transparent={true}
 		class:shadow-lg={!$collapsed}
 		class:overflow-clip={true}
 		class="h-52 transition-main-div transition rounded-box text-sm bg-base-200 text-base-content scrollbar-thin select-none pointer-events-auto
-		 border border-base-content border-opacity-10
+		 border border-base-content/10 {$collapsed ? 'bg-base-200/0' : 'bg-base-200'}
 		"
 		style={$collapsed ? `height:${buttonHeight}px` : undefined}
 	>
@@ -192,9 +191,7 @@
 				transition:fade={{ duration: 200 }}
 			>
 				<div
-					class:bg-surface-100={themeControl.isLight}
-					class:bg-opacity-80={themeControl.isLight}
-					class=" overflow-y-auto overflow-x-clip transition-main-div"
+					class="overflow-y-auto overflow-x-clip transition-main-div"
 					class:!h-0={$collapsed}
 					style="height: 9.6rem;"
 				>

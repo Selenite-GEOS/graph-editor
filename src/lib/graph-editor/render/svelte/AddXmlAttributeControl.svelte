@@ -19,7 +19,7 @@
 </script>
 
 {#snippet OptionalAttributesModal()}
-	<input class="input input-bordered w-full mb-2" placeholder="Search..." bind:value={query} />
+	<input class="input  w-full mb-2" placeholder="Search..." bind:value={query} />
 	<p class="text-xs italic ms-2 mb-1 opacity-60">Hold and drag to trigger multiple checkboxes.</p>
 	<div class="h-[50vh] overflow-y-auto scrollbar-thin p-2">
 		<ul class="flex flex-col">

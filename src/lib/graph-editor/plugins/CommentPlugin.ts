@@ -82,7 +82,7 @@ export class CommentPlugin<
 			pick: async (data) => {
 				this.area.area.content.reorder(comment.element, this.area.area.content.holder.firstChild);
 				await this.emit({ type: 'commentselected', data });
-				// comment.nested.classList.add('!rounded-container-token truncate')
+				// comment.nested.classList.add('rounded-container-token! truncate')
 			},
 			translate: async ({ id }, dx, dy, sources) => {
 				await this.emit({ type: 'commenttranslated', data: { id, dx, dy, sources } });
@@ -91,7 +91,7 @@ export class CommentPlugin<
 					comment.nested.textContent = get(_)('graph-editor.comment.default-text');
 				}
 				comment.nested.title = comment.text;
-				// comment.nested.classList.add('!rounded-container-token truncate')
+				// comment.nested.classList.add('rounded-container-token! truncate')
 			}
 		});
 		comment.id = params.id ?? comment.id;
@@ -180,7 +180,7 @@ export class CommentPlugin<
 			comment.text = '';
 		}
 		// comment.element.classList.add('pointer-events-none');
-		comment.nested.classList.add('!rounded-container-token', 'truncate', 'select-none');
+		comment.nested.classList.add('rounded-container-token!', 'truncate', 'select-none');
 		comment.nested.title = comment.text;
 		comment.element.addEventListener('dblclick', () => {
 			console.log('hey');

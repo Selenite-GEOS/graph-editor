@@ -9,8 +9,9 @@
 	let { data }: { data: Socket } = $props();
 	const socket = $derived(data);
 	const node = $derived(data.node);
+	const isArray = $derived(data.datastructure === 'array');
 	const arrayBackgroundColor = $derived(
-		node.picked ? 'var(--p)' : node.selected ? 'var(--s)' : 'var(--b3)'
+		node.picked ? 'var(--color-primary)' : node.selected ? 'var(--color-secondary)' : 'var(--color-base-300)'
 	);
 	let socketVars = $derived({ background: assignColor(data), arrayBackgroundColor });
 	const type = $derived(data.type);
@@ -38,10 +39,8 @@
 	<!-- svelte-ignore event_directive_deprecated -->
 	<div
 		bind:this={socket.element}
-		class:outline={data.selected}
-		class="socket outline-4 outline outline-accent border-white border-1 hover:border-4 {datastructureClass}
-		
-		"
+		class:outline-4={data.selected}
+		class="transition-colors socket outline-accent border-white border-1 hover:border-4 {datastructureClass} {isArray ? 'hover:scale-106' : ''}"
 		role="button"
 		tabindex="-1"
 		{title}
@@ -53,7 +52,7 @@
 
 <style lang="scss" scoped>
 	@use 'sass:math';
-	@import '../vars';
+	@use '../vars' as *;
 
 	.socket {
 		display: inline-block;
@@ -88,19 +87,21 @@
 		--opacity: 15%;
 		border: 4px dashed var(--background);
 		background-color: transparent;
-		background-color: color-mix(
-			in srgb,
-			oklch(var(--arrayBackgroundColor)),
-			oklch(var(--b1)) var(--opacity)
-		);
+		outline-offset: 2px;
+		// background-color: color-mix(
+		// 	in srgb,
+		// 	var(--arrayBackgroundColor),
+		// 	var(--color-base-100) var(--opacity)
+		// );
 		border-radius: 0%;
 
-		&:hover {
-			// --opacity: light-dark(25%, 15%);
+		// &:hover {
+		// 	background-color: var(--color-base-content);
+		// 	// --opacity: light-dark(25%, 15%);
 
-			@media (prefers-color-scheme: dark) {
-				filter: brightness(1.15);
-			}
-		}
+		// 	// @media (prefers-color-scheme: dark) {
+		// 	// 	filter: brightness(1.15);
+		// 	// }
+		// }
 	}
 </style>

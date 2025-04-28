@@ -16,7 +16,7 @@
 </div>
 
 <style lang="scss">
-	@import '../vars.sass';
+	@use '../vars.sass' as *;
 	/* .required {
 		border-color: red;
 	} */

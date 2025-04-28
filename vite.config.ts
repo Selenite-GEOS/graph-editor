@@ -1,8 +1,9 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
 import wasmPack from 'vite-plugin-wasm-pack';
+import tailwind from '@tailwindcss/vite';
 export default defineConfig({
-	plugins: [sveltekit(), wasmPack([], ['@selenite/commons-rs'])],
+	plugins: [sveltekit(), tailwind(), wasmPack([], ['@selenite/commons-rs'])],
 	build: {
 		target: 'es2022'
 	},

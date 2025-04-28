@@ -41,7 +41,7 @@
 							<ListBox
 								multiple
 								rounded="rounded-container-token"
-								hover="hover:bg-gradient-to-tr hover:variant-gradient-secondary-tertiary"
+								hover="hover:bg-linear-to-tr hover:variant-gradient-secondary-tertiary"
 							>
 								<div class="bg-surface-50-900-token rounded-container-token">
 									<ListBoxItem bind:group={selectedJobs} name="job" value="1">Job 1</ListBoxItem>

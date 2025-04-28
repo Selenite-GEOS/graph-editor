@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Modal, type ModalButtonSettings } from '@selenite/commons';
+	import Self from './InputControl.svelte'
 	import {
 		defaultInputControlValues,
 		InputControl,
@@ -79,7 +80,7 @@
 			inputControl.value = value as InputControlValueType<InputControlType>;
 		},
 		...inputControl.props,
-		class: `${isCheckbox ? 'checkbox' : 'input input-bordered grow'} ${inputControl.props.class}`
+		class: `${isCheckbox ? 'checkbox' : 'input  grow'} ${inputControl.props.class}`
 	});
 
 	let vector = $derived(
@@ -126,14 +127,14 @@
 
 {#snippet changeTypeModal()}
 	<div class="flex flex-col">
-		<div class="items-start grid grid-cols-[0fr,1fr] gap-2 max-w-[30rem] alert alert-warning mb-4">
+		<div class="items-start grid grid-cols-[0fr_1fr] gap-2 max-w-[30rem] alert alert-warning mb-4">
 			<span>Warning&nbsp;:</span>
 			<span class="text-wrap">
 				Changing type will get rid of unconvertible values and may break connections.</span
 			>
 		</div>
 		<select
-			class="select select-bordered"
+			class="select"
 			oninput={(e) => {
 				onTypeChange(e.currentTarget.value as keyof typeof socketToControl);
 				inputControl.socketType = e.currentTarget.value as keyof typeof socketToControl;
@@ -153,7 +154,7 @@
 			{#each ['x', 'y', 'z'] as k, i (k)}
 				{@render input({
 					type: 'number',
-					class: `input input-bordered w-[6rem] rounded-none focus:z-10 no-spinner  ${i === 0 ? 'rounded-l-btn' : i === 2 ? 'rounded-r-btn' : ''}`,
+					class: `input  w-[6rem] rounded-none focus:z-10 no-spinner  ${i === 0 ? 'rounded-l-btn' : i === 2 ? 'rounded-r-btn' : ''}`,
 					step: 0.01,
 					value: vector[k as 'x' | 'y' | 'z'],
 					oninput: (e) => {
@@ -190,7 +191,7 @@
 		>
 	{:else if type === 'select'}
 		<select
-			class="select select-bordered text-base-content"
+			class="select text-base-content"
 			onpointerdown={stopPropagation}
 			oninput={inputProps.oninput}
 		>
@@ -211,7 +212,7 @@
 	{#snippet EditArray()}
 		{@const array = inputControl.value as unknown[]}
 		<div
-			class="grid grid-cols-[0fr,0fr,1fr,0fr] gap-2 items-center h-[40rem] place-content-start overflow-auto py-2 pe-2"
+			class="grid grid-cols-[0fr_0fr_1fr_0fr] gap-2 items-center h-[40rem] place-content-start overflow-auto py-2 pe-2"
 			use:shortcut={{ key: 'Enter', action: addRow, ignoreElements: [] }}
 		>
 			{#each array as v, i (i)}
@@ -219,7 +220,7 @@
 				<span class="select-none">—</span>
 				<!-- svelte-ignore a11y_label_has_associated_control -->
 				<label class="text-center text-base-content cursor-pointer">
-					<svelte:self
+					<Self
 						data={new InputControl({
 							datastructure: 'scalar',
 							get socketType() {
@@ -315,6 +316,7 @@
 {/if}
 
 <style lang="scss">
+	@use 'sass:color';
 	.vector {
 		display: flex;
 	}
@@ -344,12 +346,12 @@
 		transition: all 0.2s;
 
 		&:hover {
-			background: lighten($btn-base-color, 7%);
+			background: color.scale($btn-base-color, $lightness:  7%);
 			// color: darken($btn-text-color, 10%);
 		}
 
 		&:active {
-			background: darken($btn-base-color, 10%);
+			background: color.scale($btn-base-color, $lightness: -10%);
 			// color: white;
 		}
 	}

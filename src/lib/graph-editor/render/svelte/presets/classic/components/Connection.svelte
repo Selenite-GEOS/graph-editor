@@ -88,7 +88,7 @@
 </svg>
 
 <style lang="scss">
-	@import '../vars';
+	@use '../vars' as *;
 	/*! https://github.com/retejs/connection-plugin/commit/206ca0fd7fb82801ac45a0f7180ae05dff9ed901 */
 	svg {
 		overflow: visible !important;

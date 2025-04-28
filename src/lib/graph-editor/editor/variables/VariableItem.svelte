@@ -12,7 +12,7 @@
 	import { variableDragStart } from '$graph-editor/utils';
 	import { createFloatingActions } from 'svelte-floating-ui';
 	import { upperFirst } from 'lodash-es';
-	import { flip } from 'svelte-floating-ui/core';
+	import { flip } from 'svelte-floating-ui/dom';
 	
 	interface Props {
 		variable: Variable;
@@ -180,6 +180,7 @@
 
 <div class="flex items-center h-10">
 	<div class="flex items-center gap-2 pe-2">
+		<!-- svelte-ignore a11y_consider_explicit_label -->
 		<button
 			type="button"
 			class="btn px-0 pb-0 py-1"
@@ -209,7 +210,7 @@
 			onpointerleave={() => (v.highlighted = false)}
 			ondragstart={variableDragStart(v)}
 			class:outline-dashed={v.exposed}
-			class="line-clamp-1 font-semibold outline-2 outline-accent text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-btn py-1 px-2"
+			class="line-clamp-1 font-semibold  {v.exposed && 'outline-2 outline-dashed outline-accent'} text-start text-ellipsis w-[7.8rem] overflow-hidden pointer-events-auto hover:bg-base-100 rounded-field py-1 px-2"
 			oncontextmenu={(e) => {
 				preventDefault(stopPropagation(e));
 				openContextMenu({ pos: { x: e.clientX, y: e.clientY } });
