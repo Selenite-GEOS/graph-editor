@@ -4,9 +4,7 @@ import {
 	XMLParser,
 	type XmlBuilderOptionsOptional
 } from 'fast-xml-parser';
-import 'regenerator-runtime/runtime';
 import { get } from 'svelte/store';
-import wu from 'wu';
 import * as __ from 'lodash-es';
 
 const fxpSettings: X2jOptionsOptional & XmlBuilderOptionsOptional = {
@@ -90,7 +88,7 @@ export function buildXml({
 					newLine: true
 				});
 	}
-	return wu(res)
+	return res.values()
 		.map(({ xml, newLine }) => (newLine ? xml + '\n' : xml))
 		.reduce((a, b) => a + (a ? '\n' : '') + b, '');
 }
@@ -142,7 +140,7 @@ export function findPossibleMergePositions({
 			];
 		}
 
-		return wu(xml.entries())
+		return xml.entries()
 			.filter(([i, xmlNode]) => getElementFromParsedXml(xmlNode) === elementPath[0])
 			.map(([i, xmlNode]) =>
 				rec(
@@ -168,9 +166,9 @@ export function getXmlAttributes(xml: {
 }
 
 function mergeRec(base: Record<string, ParsedXmlNodes>[], toAdd: Record<string, ParsedXmlNodes>[]) {
-	wu(toAdd).forEach((xmlNode) => {
+	toAdd.forEach((xmlNode) => {
 		const key = getElementFromParsedXml(xmlNode);
-		const elementMergeCandidate = wu(base)
+		const elementMergeCandidate = base.values()
 			.filter((base_xmlNode) => getElementFromParsedXml(base_xmlNode) == key)
 			.take(1)
 			.toArray()
@@ -203,7 +201,7 @@ export function mergeParsedXml({
 	if (!typesPaths) throw new ErrorWNotif('No typesPaths in geosContext');
 
 	const res = JSON.parse(JSON.stringify(baseXml)) as ParsedXmlNodes;
-	wu(newXml).forEach((newXmlNode) => {
+	newXml.forEach((newXmlNode) => {
 		const element = getElementFromParsedXml(newXmlNode);
 
 		const mergePositions = findPossibleMergePositions({
@@ -217,7 +215,7 @@ export function mergeParsedXml({
 		let selectedMergePosition = mergePositions[0];
 
 		if (mergePositions.length > 1) {
-			selectedMergePosition = wu(mergePositions)
+			selectedMergePosition = mergePositions.values()
 				.filter(({ withCursor }) => withCursor)
 				.reduce((a, b) => {
 					if (a !== undefined) throw new ErrorWNotif('Too many selected merge positions');
@@ -227,7 +225,7 @@ export function mergeParsedXml({
 
 		const elementPath = typesPaths[element];
 		const mergePath = selectedMergePosition.path;
-		const target = wu(mergePath).reduce(
+		const target = mergePath.reduce(
 			({ ePath, base }, mergePathStep) => {
 				return {
 					base: (base[mergePathStep.pos] as Record<string, ParsedXmlNodes>)[mergePathStep.key],

@@ -2,7 +2,6 @@ import { BaseComponent, type ComponentParams } from '$graph-editor/components';
 import type { NodeFactory } from './NodeFactory.svelte';
 import { Connection, Node } from '$graph-editor/nodes';
 import { SvelteSet } from 'svelte/reactivity';
-import wu from 'wu';
 import { Comment } from 'rete-comment-plugin';
 import { boxSelection, Rect, type BoxSelectionParams, type Position } from '@selenite/commons';
 import type { Setup } from '$graph-editor/setup/Setup';
@@ -26,7 +25,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 
 	modifierActive = $derived(this.accumulating || this.ranging);
 	typedEntities: EntityWithType[] = $derived(
-		wu(this.entities)
+		this.entities.values()
 			.map((e) => {
 				let type: EntityType;
 				if (e instanceof Node) {
@@ -122,13 +121,13 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 	}
 
 	nodes = $derived(
-		wu(this.entities)
+		this.entities.values()
 			.filter((e) => e instanceof Node)
 			.toArray()
 	);
 
 	connections = $derived(
-		wu(this.entities)
+		this.entities.values()
 			.filter((e) => e instanceof Connection)
 			.toArray()
 	);
@@ -187,7 +186,7 @@ export class NodeSelection extends BaseComponent<NodeFactory> {
 
 		const boudingRect = new Rect(minX, minY, maxX - minX, maxY - minY);
 
-		for (const e of wu.chain<SelectorEntity>(this.owner.nodes, this.owner.connections)) {
+		for (const e of (this.owner.nodes as SelectorEntity[]).concat( this.owner.connections as SelectorEntity[])) {
 			const rect = this.entityElement(e)?.getBoundingClientRect();
 			if (!rect) continue;
 			const rectArea = Rect.area(rect);

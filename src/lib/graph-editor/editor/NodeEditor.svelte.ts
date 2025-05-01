@@ -4,7 +4,6 @@ import { newLocalId } from '$utils';
 import type { Variable } from '../variables';
 import { get, writable, type Readable, type Writable } from 'svelte/store';
 import { NodeFactory } from './NodeFactory.svelte';
-import wu from 'wu';
 import { _ } from '$lib/global/todo.svelte';
 import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import { animationFrame, browser, newUuid, type SaveData } from '@selenite/commons';
@@ -342,7 +341,7 @@ export class NodeEditor extends BaseNodeEditor<Schemes> {
 			nodes: this.getNodes().map((node) => node.toJSON()),
 			connections: this.getConnections().map((conn) => conn.toJSON()),
 			comments: this.factory?.comment
-				? wu(this.factory?.comment?.comments.values())
+				? this.factory?.comment?.comments.values()
 						.map((t) => {
 							return {
 								id: t.id,

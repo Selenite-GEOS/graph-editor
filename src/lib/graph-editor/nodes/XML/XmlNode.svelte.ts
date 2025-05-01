@@ -17,8 +17,6 @@ import {
 	assignControl,
 	Control
 } from '$graph-editor/socket';
-import 'regenerator-runtime/runtime';
-import wu from 'wu';
 import { formatXml } from '$utils';
 import {
 	camlelcaseize,
@@ -279,7 +277,7 @@ export class XmlNode extends Node<
 						xmlConfig.outLabel = singular(parent);
 					}
 				} else {
-					const parentsChildren = wu(parents)
+					const parentsChildren = parents.values()
 						.map((p) => schema.complexTypes.get(p)?.childTypes)
 						.filter((s) => s !== undefined)
 						.map(getSharedString)

@@ -1,5 +1,4 @@
 import { BaseComponent } from '$graph-editor/components';
-import wu from 'wu';
 import type { NodeFactory } from './NodeFactory.svelte';
 import { XmlNode } from '$graph-editor/nodes';
 import {
@@ -27,7 +26,7 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 	async toCode({ text = '', schema }: { text?: string; schema: XmlSchema }): Promise<string> {
 		const factory = this.owner;
 		const editor = factory.editor;
-		const selectedXmlNodes = wu(factory.selector.entities.values())
+		const selectedXmlNodes = factory.selector.entities.values()
 			.map((selected) => editor.getNode(selected.id))
 			.filter((node) => node instanceof XmlNode)
 			.reduce<Set<XmlNode>>((acc, node) => acc.add(node as XmlNode), new Set());
@@ -41,13 +40,13 @@ export class CodeIntegration extends BaseComponent<NodeFactory> {
 		const cursorTag = 'cursorPositioooon';
 
 		const { structures } = await import('rete-structures');
-		const xmlMergingPromises = wu(factory.selector.entities.values())
+		const xmlMergingPromises = factory.selector.entities.values()
 			.map((selected) => editor.getNode(selected.id))
 			.filter((node) => node instanceof XmlNode)
 			// Take only the selected nodes that are not predecessors
 			// of other selected nodes because they are redundant
 			.filter((node) =>
-				wu(structures(editor).successors(node!.id).nodes().values())
+				structures(editor).successors(node!.id).nodes().values()
 					.filter((node) => node instanceof XmlNode)
 					.every((node) => !selectedXmlNodes.has(node as XmlNode))
 			)

@@ -13,6 +13,7 @@ export * as XML from './XML';
 export * from './XML';
 export * as Macro from './MacroNode.svelte';
 export * from './MacroNode.svelte';
+export * from './ConfigNode.svelte';
 
 // import * as API from './ObjectAPINode';
 // import * as API from './APINode';

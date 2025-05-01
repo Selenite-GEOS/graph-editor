@@ -11,7 +11,6 @@ import {
 } from 'rete-comment-plugin';
 import { get } from 'svelte/store';
 import { _ } from '$lib/global/todo.svelte';
-import wu from 'wu';
 
 export class CommentPlugin<
 	Schemes extends ExpectedSchemes,
@@ -24,7 +23,7 @@ export class CommentPlugin<
 		super(props);
 		this.factory = props.factory;
 		_.subscribe((f) => {
-			wu(this.comments.values()).asyncEach((comment) => {
+			this.comments.forEach((comment) => {
 				if (comment.text.trim() === '') {
 					comment.text = '';
 					comment.nested.textContent = f('graph-editor.comment.default-text');

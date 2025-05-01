@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { AddXmlAttributeControl } from '$graph-editor/nodes/XML';
 	import { checkbox, keyboardNavigation, stopPropagation, modals } from '@selenite/commons';
-	import wu from 'wu';
 
 	let { data }: { data: AddXmlAttributeControl } = $props();
 
@@ -11,9 +10,9 @@
 	let filteredOptAttr = $derived(
 		loweredQuery.trim() === ''
 			? xmlNode.optionalXmlAttributes
-			: wu(xmlNode.optionalXmlAttributes)
+			: xmlNode.optionalXmlAttributes.values()
 					.filter((attr) => attr.toLowerCase().includes(loweredQuery))
-					.toArray()
+					
 	);
 	let attrs = $derived(xmlNode.complex.attributes);
 </script>
