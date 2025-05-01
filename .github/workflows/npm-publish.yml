@@ -28,6 +28,7 @@ jobs:
           node-version: '23'
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
+      - run: pnpm svelte-kit sync
       - name: Run unit tests
         run: pnpm test run
       - run: pnpm package
