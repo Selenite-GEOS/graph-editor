@@ -1,4 +1,4 @@
-import { persisted } from '@selenite/commons';
+import { browser, persisted } from '@selenite/commons';
 import { GitHubDataSource } from './datasources';
 import { IndexedDBSource } from './db.svelte';
 import { FavoritesManager } from './FavoritesManager.svelte';
@@ -6,7 +6,6 @@ import type { Database, MacroBlock, Datasource as DataSource, Graph } from './ty
 import { get, type Writable } from 'svelte/store';
 import { debounce } from 'lodash-es';
 import { untrack } from 'svelte';
-import { browser } from '$app/environment';
 
 export const userStore: Writable<string> = persisted('user', '');
 
