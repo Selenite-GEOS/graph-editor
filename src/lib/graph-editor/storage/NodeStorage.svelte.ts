@@ -6,15 +6,16 @@ import type { Database, MacroBlock, Datasource as DataSource, Graph } from './ty
 import { get, type Writable } from 'svelte/store';
 import { debounce } from 'lodash-es';
 import { untrack } from 'svelte';
+import { browser } from '$app/environment';
 
 export const userStore: Writable<string> = persisted('user', '');
 
 export class NodeStorage {
 	static pullDataSourcesInterval = 5000;
 	static mainStorage: Database = new IndexedDBSource();
-	static sources: DataSource[] = [
+	static sources: DataSource[] = browser ? [
 		new GitHubDataSource('https://github.com/Selenite-GEOS/macro-blocks/tree/main/macro-blocks')
-	];
+	] : [];
 
 	static #instance: NodeStorage;
 	static get instance(): NodeStorage {
